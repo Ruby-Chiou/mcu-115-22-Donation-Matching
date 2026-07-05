@@ -1,45 +1,68 @@
 import { Routes } from '@angular/router';
 
-// 1. 捐助者組件
-import { DonorDailyLobbyComponent } from './features/donor/donor-daily-lobby/donor-daily-lobby.component';
-import { DonorDisasterBoardComponent } from './features/donor/donor-disaster-board/donor-disaster-board.component';
-import { DonorHistoryComponent } from './features/donor/donor-history/donor-history.component';
-
-// 2. 社福機構組件
-import { AgencyDailyPostComponent } from './features/agency/agency-daily-post/agency-daily-post.component';
-import { AgencyDisasterPostComponent } from './features/agency/agency-disaster-post/agency-disaster-post.component';
-import { AgencyRequestManagementComponent } from './features/agency/agency-request-management/agency-request-management.component';
-
-// 3. 管理者組件
-import { AdminAgencyVerifyComponent } from './features/admin/admin-agency-verify/admin-agency-verify.component';
-import { AdminItemReviewComponent } from './features/admin/admin-item-review/admin-item-review.component';
-import { AdminDisasterControlComponent } from './features/admin/admin-disaster-control/admin-disaster-control.component';
-
 export const routes: Routes = [
-  // 預設首警直接進入日常捐贈大廳
+  // 1. 預設首頁修改：一進網站，直接自動導向日常物資大廳！
   { path: '', redirectTo: 'donor/daily', pathMatch: 'full' },
 
-  // ==========================================
-  // 一、 捐助者管道 (Donor Routes)
-  // ==========================================
-  { path: 'donor/daily', component: DonorDailyLobbyComponent }, // 日常捐助大廳
-  { path: 'donor/disaster', component: DonorDisasterBoardComponent }, // 災害救助大廳
-  { path: 'donor/history', component: DonorHistoryComponent }, // 歷史紀錄與進度追蹤
+  // 2. 認證模組 (需要下標、發布需求時才跳轉來這)
+  {
+    path: 'login',
+    loadComponent: () => import('./features/auth/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
+  },
 
-  // ==========================================
-  // 二、 受助者/社福機構管道 (Agency Routes)
-  // ==========================================
-  { path: 'agency/daily-post', component: AgencyDailyPostComponent }, // 發布日常需求
-  { path: 'agency/disaster-post', component: AgencyDisasterPostComponent }, // 發布災害需求
-  { path: 'agency/management', component: AgencyRequestManagementComponent }, // 機構自身需求管理概覽
+  // 3. 捐助者模組 (民眾/訪客端)
+  {
+    path: 'donor/daily',
+    loadComponent: () => import('./features/donor/donor-daily-lobby/donor-daily-lobby.component').then((m) => m.DonorDailyLobbyComponent),
+  },
+  {
+    path: 'donor/disaster',
+    loadComponent: () =>
+      import('./features/donor/donor-disaster-board/donor-disaster-board.component').then((m) => m.DonorDisasterBoardComponent),
+  },
+  {
+    path: 'donor/history',
+    loadComponent: () => import('./features/donor/donor-history/donor-history.component').then((m) => m.DonorHistoryComponent),
+  },
 
-  // ==========================================
-  // 三、 系統營運審核方 (Admin Routes)
-  // ==========================================
-  { path: 'admin/agency-verify', component: AdminAgencyVerifyComponent }, // 社福機構註冊字號審核
-  { path: 'admin/item-review', component: AdminItemReviewComponent }, // 日常物資 AI+人工審核工作流
-  { path: 'admin/disaster-control', component: AdminDisasterControlComponent }, // 日常切換災害模式以及公告(有點抽象)
+  // 4. 社福機構模組 (機構端)
+  {
+    path: 'agency/daily-post',
+    loadComponent: () => import('./features/agency/agency-daily-post/agency-daily-post.component').then((m) => m.AgencyDailyPostComponent),
+  },
+  {
+    path: 'agency/disaster-post',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-post/agency-disaster-post.component').then((m) => m.AgencyDisasterPostComponent),
+  },
+  {
+    path: 'agency/management',
+    loadComponent: () =>
+      import('./features/agency/agency-request-management/agency-request-management.component').then(
+        (m) => m.AgencyRequestManagementComponent
+      ),
+  },
 
-  // 防呆
+  // 5. 系統後台模組 (管理員端)
+  {
+    path: 'admin/agency-verify',
+    loadComponent: () =>
+      import('./features/admin/admin-agency-verify/admin-agency-verify.component').then((m) => m.AdminAgencyVerifyComponent),
+  },
+  {
+    path: 'admin/item-review',
+    loadComponent: () => import('./features/admin/admin-item-review/admin-item-review.component').then((m) => m.AdminItemReviewComponent),
+  },
+  {
+    path: 'admin/disaster-control',
+    loadComponent: () =>
+      import('./features/admin/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent),
+  },
+
+  // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回日常物資大廳
   { path: '**', redirectTo: 'donor/daily' },
 ];
