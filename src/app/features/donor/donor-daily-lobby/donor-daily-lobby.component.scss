@@ -225,8 +225,37 @@ header {
           margin-top: 15px;
         }
       }
+    } // 🎯 關鍵：news-card 的大括號在這裡就結束閉合了！
+
+    // 🌟 點點移到外面來了！跟 news-card 是平級的鄰居
+    .carousel-indicators {
+      display: flex;
+      justify-content: center; // 讓點點在卡片下方水平置中
+      gap: 8px; // 點與點之間的精緻間距
+      margin-top: 20px; // 跟上方卡片空出一些距離
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        background-color: #bdc3c7; // 預設是暗淡的淺灰色
+        border-radius: 50%; // 強制變成正圓形
+        display: inline-block; // 🎯 防呆補上：確保圓形有實體能渲染
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: $text-muted;
+          transform: scale(1.2);
+        }
+
+        &.active {
+          background-color: $primary-color;
+          width: 24px; // 亮起時自動變成「膠囊狀」長條
+          border-radius: 5px;
+        }
+      }
     }
-  }
+  } // 這是 main-content 的總結尾
 
   // 【右邊 20% 獨立底色大框（顏色比左邊深一點）】
   .right-sidebar {

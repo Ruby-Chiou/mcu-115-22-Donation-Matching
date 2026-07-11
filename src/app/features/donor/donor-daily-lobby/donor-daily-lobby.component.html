@@ -30,7 +30,7 @@
                 <div class="nav-item-with-dropdown">
                   <a routerLink="/about">日常捐助 <i class="fa-solid fa-chevron-down arrow"></i></a>
                   <ul class="dropdown-menu">
-                    <li><a routerLink="/requirements">捐助需求</a></li>
+                    <li><a routerLink="/requirements">更多需求</a></li>
                     <li><a routerLink="/orders">訂單詳情</a></li>
                     <li><a routerLink="/thanks-wall">捐助感謝</a></li>
                   </ul>
@@ -72,12 +72,18 @@
 
             <div class="news-card">
               <div class="card-image">
-                <img src="assets/images/lobby.jpg" alt="災後募集" />
+                <img [src]="currentNews().image" [alt]="currentNews().text" />
               </div>
               <div class="card-text">
-                <p>目前花蓮災後物資募集開放中。</p>
-                <p class="highlight">歡迎民眾協助捐助。</p>
+                <p>{{ currentNews().text }}</p>
+                <p class="highlight">{{ currentNews().highlight }}</p>
               </div>
+            </div>
+
+            <div class="carousel-indicators">
+              <span class="dot" [class.active]="currentIndex() === 0" (click)="setSlide(0)"></span>
+              <span class="dot" [class.active]="currentIndex() === 1" (click)="setSlide(1)"></span>
+              <span class="dot" [class.active]="currentIndex() === 2" (click)="setSlide(2)"></span>
             </div>
           </div>
 
