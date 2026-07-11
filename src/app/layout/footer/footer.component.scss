@@ -1,0 +1,46 @@
+// ==========================================
+// 全域感謝公告欄（永遠置底）
+// ==========================================
+.global-thanks-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #1c2833;
+  color: var(--color-white);
+  padding: 6px 0; //高度調這
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+
+  .thanks-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+
+    .fa-heart {
+      color: #e74c3c;
+      animation: pulse 1.5s infinite; //讓愛心會微微跳動
+    }
+
+    strong {
+      color: #f1c40f;
+      font-size: 16px;
+    }
+  }
+}
+
+// 愛心跳動動畫
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

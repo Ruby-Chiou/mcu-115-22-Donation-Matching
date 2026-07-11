@@ -1,0 +1,22 @@
+//這裡是顏色命名處，可全域使用
+:root {
+  /* 核心招牌色*/
+  --color-brand-primary: var(--mat-sys-primary);
+
+  /* 2. 文字色 */
+  --color-text-main: var(--mat-sys-on-surface);
+  --color-text-muted: var(--mat-sys-on-surface-variant);
+  --color-white: #ffffff;
+
+  /* 3. 背景層次 (這是最容易變色的地方)*/
+  --bg-layer-0: #f0f4f8;
+  --bg-layer-1: #e4eaf0;
+  --bg-layer-2: #c5d0db;
+
+  /* 4. 輔助 */
+  --border-default: var(--mat-sys-outline-variant);
+  --border-radius-main: 12px;
+
+  //導覽列背景色
+  --nav-bg: var(--mat-sys-surface);
+}

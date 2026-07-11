@@ -1,108 +1,37 @@
-<!doctype html>
-<html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>智慧捐助媒合平台</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-  </head>
-
-  <body>
-    <section>
-      <header>
-        <div class="container">
-          <div class="nav-wrapper">
-            <div class="left">
-              <p class="nav-name">智慧捐助媒合平台</p>
-            </div>
-
-            <div class="center">
-              <nav>
-                <div class="nav-item-with-dropdown">
-                  <a routerLink="/home" class="active">關於我們 <i class="fa-solid fa-chevron-down arrow"></i></a>
-                  <ul class="dropdown-menu">
-                    <li><a routerLink="/intro">平台介紹</a></li>
-                    <li><a routerLink="/news-section">最新消息</a></li>
-                    <li><a routerLink="/contact-us">聯絡我們</a></li>
-                  </ul>
-                </div>
-
-                <div class="nav-item-with-dropdown">
-                  <a routerLink="/about">日常捐助 <i class="fa-solid fa-chevron-down arrow"></i></a>
-                  <ul class="dropdown-menu">
-                    <li><a routerLink="/requirements">更多需求</a></li>
-                    <li><a routerLink="/orders">訂單詳情</a></li>
-                    <li><a routerLink="/thanks-wall">捐助感謝</a></li>
-                  </ul>
-                </div>
-
-                <div class="nav-item-with-dropdown">
-                  <a routerLink="/skills">物流資訊 <i class="fa-solid fa-chevron-down arrow"></i></a>
-                  <ul class="dropdown-menu">
-                    <li><a routerLink="/tracking">配送查詢</a></li>
-                    <li><a routerLink="/locations">配送據點</a></li>
-                  </ul>
-                </div>
-
-                <div class="nav-item-with-dropdown">
-                  <a routerLink="/contact">客服中心 <i class="fa-solid fa-chevron-down arrow"></i></a>
-                  <ul class="dropdown-menu">
-                    <li><a routerLink="/faq">常見問題</a></li>
-                    <li><a routerLink="/ai-chat">AI 客服</a></li>
-                    <li><a routerLink="/human-chat">真人客服</a></li>
-                  </ul>
-                </div>
-              </nav>
-            </div>
-
-            <div class="right">
-              <a routerLink="/login">登入</a>
-              <span>|</span>
-              <a routerLink="/register">註冊</a>
-              <i class="fa-solid fa-bell"></i>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main class="wrapper">
-        <div id="home" class="home-container">
-          <div class="main-content">
-            <h3 class="section-title">最新消息</h3>
-
-            <div class="news-card">
-              <div class="card-image">
-                <img [src]="currentNews().image" [alt]="currentNews().text" />
-              </div>
-              <div class="card-text">
-                <p>{{ currentNews().text }}</p>
-                <p class="highlight">{{ currentNews().highlight }}</p>
-              </div>
-            </div>
-
-            <div class="carousel-indicators">
-              <span class="dot" [class.active]="currentIndex() === 0" (click)="setSlide(0)"></span>
-              <span class="dot" [class.active]="currentIndex() === 1" (click)="setSlide(1)"></span>
-              <span class="dot" [class.active]="currentIndex() === 2" (click)="setSlide(2)"></span>
-            </div>
-          </div>
-
-          <aside class="right-sidebar">
-            <a routerLink="/news" class="sidebar-item"><i class="fa-solid fa-bullhorn"></i> 最新公告</a>
-            <a routerLink="/trends" class="sidebar-item"><i class="fa-solid fa-fire"></i> 熱門需求</a>
-            <a routerLink="/donor/disaster" class="sidebar-item"><i class="fa-solid fa-triangle-exclamation"></i> 災害救助</a>
-          </aside>
-        </div>
-      </main>
-
-      <footer></footer>
-
-      <div class="global-thanks-bar">
-        <div class="thanks-content">
-          <i class="fa-solid fa-heart text-danger"></i>
-          <span> 感謝： <strong>王*捐</strong> 小姐捐助 <strong>衣物 五箱</strong> 至 某某社福機構</span>
-        </div>
+<div class="lobby-grid">
+  <section class="main-content">
+    <h3 class="section-title">最新消息</h3>
+    <div class="news-card">
+      <div class="card-image">
+        <img [src]="currentNews().image" [alt]="currentNews().text" />
       </div>
-    </section>
-  </body>
-</html>
+      <div class="card-text">
+        <p>{{ currentNews().text }}</p>
+        <p class="highlight">{{ currentNews().highlight }}</p>
+      </div>
+    </div>
+    <div class="carousel-indicators">
+      @for (i of [0, 1, 2]; track i) {
+      <span class="dot" [class.active]="currentIndex() === i" (click)="setSlide(i)"> </span>
+      }
+    </div>
+  </section>
+
+  <aside class="right-sidebar">
+    <a routerLink="/news" class="sidebar-item"><i class="fa-solid fa-bullhorn"></i> 最新公告</a>
+    <a routerLink="/trends" class="sidebar-item"><i class="fa-solid fa-fire"></i> 熱門需求</a>
+    <a routerLink="/donor/disaster" class="sidebar-item"><i class="fa-solid fa-triangle-exclamation"></i> 災害救助</a>
+  </aside>
+</div>
+
+<div class="search">
+  <h3>搜尋區塊</h3>
+</div>
+
+<div class="need-order-card">
+  <h3>顯示需求訂單區塊</h3>
+</div>
+
+<div class="ThanksAndBlacklist">
+  <h3>黑名單與感謝榜區塊</h3>
+</div>

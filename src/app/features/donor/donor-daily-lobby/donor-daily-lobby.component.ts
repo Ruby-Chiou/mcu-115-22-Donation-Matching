@@ -22,7 +22,7 @@ export class DonorDailyLobbyComponent implements OnInit, OnDestroy {
       highlight: '目前花蓮災後物資募集開放中。',
     },
     {
-      image: 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img',
+      image: 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img', //網址是示意圖片
       text: '智慧捐助媒合平台操作教學',
       highlight: '簡單易懂的指引就在這裡',
     },

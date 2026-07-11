@@ -1,0 +1,31 @@
+<header>
+  <div class="container">
+    <div class="nav-wrapper">
+      <div class="left">
+        <p class="nav-name">智慧捐助媒合平台</p>
+      </div>
+
+      <div class="center">
+        <nav>
+          @for (item of navItems; track item.name) {
+          <div class="nav-item-with-dropdown">
+            <a [routerLink]="item.link">{{ item.name }} <i class="fa-solid fa-chevron-down arrow"></i></a>
+            <ul class="dropdown-menu">
+              @for (sub of item.sub; track sub.name) {
+              <li><a [routerLink]="sub.link">{{ sub.name }}</a></li>
+              }
+            </ul>
+          </div>
+          }
+        </nav>
+      </div>
+
+      <div class="right">
+        <a routerLink="/login">登入</a>
+        <span>|</span>
+        <a routerLink="/register">註冊</a>
+        <i class="fa-solid fa-bell"></i>
+      </div>
+    </div>
+  </div>
+</header>
