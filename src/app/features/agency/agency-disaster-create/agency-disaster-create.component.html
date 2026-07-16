@@ -1,0 +1,71 @@
+<div class="container">
+  <h1>新增急難需求</h1>
+
+  <div class="form-box">
+    <!-- 需求物 -->
+    <label> 需求物 </label>
+
+    <input class="short-input" type="text" placeholder="請輸入需求物" [(ngModel)]="demand.item" />
+
+    <!-- 需求數量 -->
+    <label> 需求數量 </label>
+
+    <div class="amount-box">
+      <input class="short-input" type="number" min="0" placeholder="請輸入數量" [(ngModel)]="demand.amount" />
+    </div>
+
+    <!-- 剩餘需求 -->
+    <label> 剩餘需求 </label>
+
+    <div class="amount-box">
+      <input class="short-input" type="number" min="0" placeholder="請輸入剩餘需求" [(ngModel)]="demand.remaining" />
+    </div>
+
+    <!-- 需求原因 -->
+    <label> 需求原因 </label>
+
+    <textarea placeholder="請輸入需求原因" [(ngModel)]="demand.reason"> </textarea>
+
+    <!-- 需求優先度 -->
+    <label> 需求優先度 </label>
+
+    <div class="priority-box">
+      <label>
+        <input type="radio" name="priority" value="普通" [(ngModel)]="demand.priority" />
+        普通
+      </label>
+
+      <label>
+        <input type="radio" name="priority" value="緊急" [(ngModel)]="demand.priority" />
+        緊急
+      </label>
+
+      <label>
+        <input type="radio" name="priority" value="非常緊急" [(ngModel)]="demand.priority" />
+        非常緊急
+      </label>
+    </div>
+
+    <!-- 面交地址 -->
+    <label> 面交地址 </label>
+
+    <input class="medium-input" type="text" placeholder="請輸入面交地址" [(ngModel)]="demand.address" />
+
+    <!-- 聯絡電話 -->
+    <label> 聯絡電話 </label>
+
+    <input class="short-input" type="tel" placeholder="請輸入聯絡電話" [(ngModel)]="demand.phone" />
+
+    <!-- 其他說明 -->
+    <label> 其他說明（備註） </label>
+
+    <textarea placeholder="請輸入其他說明" [(ngModel)]="demand.note"> </textarea>
+
+    <!-- 按鈕 -->
+    <div class="button-area">
+      <button class="back-btn" routerLink="/agency/disaster-post">取消</button>
+
+      <button class="save-btn" (click)="save()">儲存</button>
+    </div>
+  </div>
+</div>

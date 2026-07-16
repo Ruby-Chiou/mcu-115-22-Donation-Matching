@@ -1,0 +1,54 @@
+<div class="container">
+  <h1>急難需求詳細資料</h1>
+
+  <div class="detail-table" *ngIf="demand">
+    <div class="detail-row">
+      <div class="detail-title">需求物</div>
+      <div class="detail-content">{{demand.item}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">需求數量</div>
+      <div class="detail-content">{{demand.amount}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">需求原因</div>
+      <div class="detail-content">{{demand.reason}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">需求優先度</div>
+      <div class="detail-content">{{demand.priority}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">剩餘需求</div>
+      <div class="detail-content">{{demand.remaining}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">狀態</div>
+      <div class="detail-content">{{demand.status}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">面交地址</div>
+      <div class="detail-content">{{demand.address}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">聯絡電話</div>
+      <div class="detail-content">{{demand.phone}}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-title">其他說明（備註）</div>
+      <div class="detail-content">{{demand.note}}</div>
+    </div>
+  </div>
+
+  <div class="button-area">
+    <button class="back-btn" routerLink="/agency/disaster-post">返回</button>
+  </div>
+</div>

@@ -1,0 +1,177 @@
+.container {
+  padding: 30px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
+/* 新增表單外框 */
+.form-box {
+  background-color: var(--bg-layer-1);
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 30px;
+}
+
+/* 標籤 */
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-main);
+  font-weight: 500;
+  font-size: 17px;
+}
+
+/* 輸入框 */
+input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px;
+
+  margin-bottom: 20px;
+
+  border-radius: 10px;
+
+  border: 1px solid #ddd;
+
+  font-size: 16px;
+}
+
+/* 按鈕區 */
+.button-area {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+/* 按鈕樣式跟列表一致 */
+.button-area button {
+  padding: 8px 18px;
+
+  border-radius: 15px;
+
+  border: none;
+
+  cursor: pointer;
+
+  color: var(--color-white);
+
+  font-size: 16px;
+
+  font-weight: 500;
+}
+
+.back-btn,
+.save-btn {
+  background-color: var(--color-brand-primary);
+}
+
+.button-area button:hover {
+  opacity: 0.85;
+}
+
+/* ========================= */
+/* 數量欄位 */
+/* ========================= */
+
+.amount-box {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.amount-box input {
+  flex: none;
+}
+
+.amount-box span {
+  font-size: 14px;
+
+  color: var(--color-text-main);
+}
+
+/* ========================= */
+/* 多行文字欄位 */
+/* ========================= */
+
+textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  min-height: 100px;
+
+  padding: 12px;
+
+  margin-bottom: 20px;
+
+  border-radius: 10px;
+
+  border: 1px solid #ddd;
+
+  font-size: 16px;
+
+  resize: vertical;
+}
+
+/* ========================= */
+/* 需求優先度 */
+/* ========================= */
+
+.priority-box {
+  display: flex;
+
+  flex-direction: row;
+
+  align-items: center;
+
+  gap: 30px;
+
+  margin-bottom: 20px;
+}
+
+.short-input {
+  width: 250px;
+}
+
+/* 中等欄位 */
+.medium-input {
+  width: 450px;
+}
+
+/* 覆蓋上方 label 的 block 設定 */
+.priority-box label {
+  display: flex;
+
+  flex-direction: row;
+
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 0;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+/* radio 圓圈 */
+.priority-box input[type='radio'] {
+  width: auto;
+
+  margin: 0;
+}
+
+.priority-box label {
+  font-size: 16px;
+}

@@ -40,6 +40,21 @@ export const routes: Routes = [
       import('./features/agency/agency-disaster-post/agency-disaster-post.component').then((m) => m.AgencyDisasterPostComponent), // 發布災害需求
   },
   {
+    path: 'agency/disaster-create',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-create/agency-disaster-create.component').then((m) => m.AgencyDisasterCreateComponent), // 新增災害需求
+  },
+  {
+    path: 'agency/disaster-edit/:id',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-edit/agency-disaster-edit.component').then((m) => m.AgencyDisasterEditComponent),
+  },
+  {
+    path: 'agency/disaster-detail/:id',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-detail/agency-disaster-detail.component').then((m) => m.AgencyDisasterDetailComponent),
+  },
+  {
     path: 'agency/management',
     loadComponent: () =>
       import('./features/agency/agency-request-management/agency-request-management.component').then(

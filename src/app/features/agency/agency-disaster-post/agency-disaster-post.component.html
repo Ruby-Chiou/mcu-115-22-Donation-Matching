@@ -1,1 +1,46 @@
-<p>agency-disaster-post works!</p>
+<div class="container">
+  <h1>急難需求列表</h1>
+
+  <div class="action-bar">
+    <button class="add-btn" routerLink="/agency/disaster-create">新增需求</button>
+  </div>
+
+  <table>
+    <tr *ngIf="demands.length === 0">
+      <td colspan="6" class="empty-message">尚未輸入需求</td>
+    </tr>
+
+    <thead>
+      <tr>
+        <th>需求物</th>
+        <th>需求數量</th>
+        <th>優先度</th>
+        <th>剩餘需求</th>
+        <th>狀態</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of demands">
+        <td>{{item.item}}</td>
+
+        <td>{{item.amount}}</td>
+
+        <td>{{item.priority}}</td>
+
+        <td>{{item.remaining}}</td>
+
+        <td>{{item.status}}</td>
+
+        <td class="action-buttons">
+          <button [routerLink]="['/agency/disaster-detail', item.id]">查看</button>
+
+          <button [routerLink]="['/agency/disaster-edit', item.id]">修改</button>
+
+          <button (click)="deleteDemand(item.id)">刪除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
