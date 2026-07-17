@@ -12,7 +12,9 @@ h1 {
   color: var(--color-brand-primary);
 }
 
-/* 表單外框 */
+/* =========================
+   表單外框
+========================= */
 
 .form-box {
   background-color: #e3f2fd;
@@ -22,9 +24,21 @@ h1 {
   border-radius: 15px;
 
   padding: 30px;
+
+  margin-bottom: 30px;
 }
 
-/* 標籤 */
+/* 標題 */
+
+h2 {
+  margin-bottom: 20px;
+
+  font-size: 20px;
+}
+
+/* =========================
+   標籤
+========================= */
 
 label {
   display: block;
@@ -38,7 +52,9 @@ label {
   font-size: 17px;
 }
 
-/* 輸入框 */
+/* =========================
+   輸入框
+========================= */
 
 input,
 select {
@@ -57,61 +73,8 @@ select {
   font-size: 16px;
 }
 
-/* 按鈕 */
-
-.button-area {
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 10px;
-
-  margin-top: 25px;
-}
-
-.button-area button {
-  padding: 8px 18px;
-
-  border-radius: 15px;
-
-  border: none;
-
-  cursor: pointer;
-
-  color: var(--color-white);
-
-  font-size: 16px;
-
-  font-weight: 500;
-}
-
-.back-btn,
-.save-btn {
-  background-color: var(--color-brand-primary);
-}
-
-.button-area button:hover {
-  opacity: 0.85;
-}
-
 /* =========================
-   數量欄位
-========================= */
-
-.amount-box {
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-}
-
-.amount-box input {
-  margin-bottom: 20px;
-}
-
-/* =========================
-   文字欄位
+   文字區域
 ========================= */
 
 textarea {
@@ -135,29 +98,41 @@ textarea {
 }
 
 /* =========================
-   欄位寬度
+   數量 + 單位
+========================= */
+
+.amount-box {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.amount-box input:first-child {
+  width: 250px;
+
+  margin-bottom: 20px;
+}
+
+.amount-box input:nth-child(2) {
+  width: 250px;
+
+  margin-bottom: 20px;
+}
+
+/* =========================
+   一般輸入寬度
 ========================= */
 
 .short-input {
   width: 250px;
 }
 
-/* 單位 */
-
-.unit-input {
-  width: 250px;
-}
-
-/* 中型欄位 */
-
 .medium-input {
   width: 450px;
-}
-
-/* 電話 */
-
-.phone-input {
-  width: 420px;
 }
 
 /* =========================
@@ -181,9 +156,13 @@ textarea {
 
   gap: 6px;
 
+  margin-bottom: 0;
+
   cursor: pointer;
 
   font-size: 16px;
+
+  white-space: nowrap;
 }
 
 .condition-box input[type='checkbox'] {
@@ -192,6 +171,16 @@ textarea {
   height: 18px;
 
   margin: 0;
+
+  cursor: pointer;
+}
+
+/* =========================
+   自訂物品狀態
+========================= */
+
+.condition-box + .medium-input {
+  margin-top: 5px;
 }
 
 /* =========================
@@ -247,7 +236,54 @@ textarea {
 }
 
 /* =========================
-   錯誤紅框
+   電話欄位
+========================= */
+
+.phone-input {
+  width: 450px;
+}
+
+/* =========================
+   按鈕區
+========================= */
+
+.button-area {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 25px;
+}
+
+.button-area button {
+  padding: 8px 18px;
+
+  border-radius: 15px;
+
+  border: none;
+
+  cursor: pointer;
+
+  color: var(--color-white);
+
+  font-size: 16px;
+
+  font-weight: 500;
+}
+
+.back-btn,
+.save-btn {
+  background-color: var(--color-brand-primary);
+}
+
+.button-area button:hover {
+  opacity: 0.85;
+}
+
+/* =========================
+   錯誤提示
 ========================= */
 
 .invalid {
@@ -262,4 +298,16 @@ textarea {
   color: #d32f2f;
 
   font-weight: bold;
+}
+
+/* 分隔線 */
+
+hr {
+  margin-top: 30px;
+
+  margin-bottom: 10px;
+
+  border: none;
+
+  border-top: 1px solid #ccc;
 }

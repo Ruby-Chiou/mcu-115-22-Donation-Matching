@@ -5,40 +5,99 @@
     <button class="add-btn" routerLink="/agency/disaster-create">新增需求</button>
   </div>
 
+  <!-- 全選 + 批次操作 -->
+  <div class="select-area">
+    <div class="select-all">
+      <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
+
+      <span>全選</span>
+    </div>
+
+    <div class="batch-buttons" *ngIf="hasSelected()">
+      <button (click)="editSelected()">修改</button>
+
+      <button (click)="deleteSelected()">刪除</button>
+    </div>
+  </div>
+
   <table>
+    <!-- 無資料 -->
     <tr *ngIf="demands.length === 0">
-      <td colspan="6" class="empty-message">尚未輸入需求</td>
+      <td colspan="5" class="empty-message">
+        <div class="empty-title">尚未輸入需求</div>
+
+        <div class="empty-description">
+          請點選上方「新增需求」建立急難需求。
+
+          <br />
+
+          新增後的需求將同步顯示於捐助者專區， 供民眾瀏覽並進行捐物。
+        </div>
+      </td>
     </tr>
 
     <thead>
       <tr>
+        <th class="checkbox-column">勾選項目</th>
+
         <th>需求物</th>
+
         <th>需求數量</th>
-        <th>優先度</th>
-        <th>剩餘需求</th>
-        <th>狀態</th>
-        <th>操作</th>
+
+        <th>緊急優先度</th>
+
+        <th class="operation-column">操作</th>
       </tr>
     </thead>
 
     <tbody>
       <tr *ngFor="let item of demands">
+        <td class="checkbox-column">
+          <input type="checkbox" [(ngModel)]="item.selected" />
+        </td>
+
         <td>{{item.item}}</td>
 
         <td>{{item.amount}}</td>
 
-        <td>{{item.priority}}</td>
+        <!-- 優先度顏色 -->
 
-        <td>{{item.remaining}}</td>
+        <td
+          [ngClass]="{
 
-        <td>{{item.status}}</td>
+            'normal': item.priority === '普通',
 
-        <td class="action-buttons">
-          <button [routerLink]="['/agency/disaster-detail', item.id]">查看</button>
+            'urgent': item.priority === '緊急',
 
-          <button [routerLink]="['/agency/disaster-edit', item.id]">修改</button>
+            'very-urgent': item.priority === '非常緊急'
 
-          <button (click)="deleteDemand(item.id)">刪除</button>
+          }"
+        >
+          {{item.priority}}
+        </td>
+
+        <!-- 操作 -->
+
+        <td class="operation-column">
+          <div class="button-group">
+            <button [routerLink]="['/agency/disaster-detail', item.id]">查看</button>
+
+            <button [routerLink]="['/agency/disaster-edit', item.id]">修改</button>
+
+            <button (click)="deleteDemand(item.id)">刪除</button>
+          </div>
+
+          <div class="status-group">
+            <label> 狀態： </label>
+
+            <select [(ngModel)]="item.status" (change)="changeStatus(item)">
+              <option value="已上架">已上架</option>
+
+              <option value="隱藏中">隱藏中</option>
+
+              <option value="已下架">已下架</option>
+            </select>
+          </div>
         </td>
       </tr>
     </tbody>

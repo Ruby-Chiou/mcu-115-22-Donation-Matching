@@ -50,6 +50,13 @@ export const routes: Routes = [
       import('./features/agency/agency-disaster-edit/agency-disaster-edit.component').then((m) => m.AgencyDisasterEditComponent),
   },
   {
+    path: 'agency/disaster-batch-edit',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-batch-edit/agency-disaster-batch-edit.component').then(
+        (m) => m.AgencyDisasterBatchEditComponent
+      ),
+  },
+  {
     path: 'agency/disaster-detail/:id',
     loadComponent: () =>
       import('./features/agency/agency-disaster-detail/agency-disaster-detail.component').then((m) => m.AgencyDisasterDetailComponent),

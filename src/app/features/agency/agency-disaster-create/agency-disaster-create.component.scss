@@ -4,32 +4,52 @@
 
 h1 {
   margin-bottom: 20px;
+
   font-size: 24px;
+
   font-weight: 600;
+
   color: var(--color-brand-primary);
 }
 
-/* 新增表單外框 */
+/* =========================
+   表單外框
+========================= */
+
 .form-box {
-  background-color: var(--bg-layer-1);
+  background-color: #e3f2fd;
+
   border: 1px solid #ddd;
+
   border-radius: 15px;
+
   padding: 30px;
 }
 
-/* 標籤 */
+/* =========================
+   標籤
+========================= */
+
 label {
   display: block;
+
   margin-bottom: 8px;
+
   color: var(--color-text-main);
+
   font-weight: 500;
+
   font-size: 17px;
 }
 
-/* 輸入框 */
+/* =========================
+   輸入框
+========================= */
+
 input,
 select {
   width: 100%;
+
   box-sizing: border-box;
 
   padding: 12px;
@@ -42,66 +62,6 @@ select {
 
   font-size: 16px;
 }
-
-/* 按鈕區 */
-.button-area {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 25px;
-}
-
-/* 按鈕樣式跟列表一致 */
-.button-area button {
-  padding: 8px 18px;
-
-  border-radius: 15px;
-
-  border: none;
-
-  cursor: pointer;
-
-  color: var(--color-white);
-
-  font-size: 16px;
-
-  font-weight: 500;
-}
-
-.back-btn,
-.save-btn {
-  background-color: var(--color-brand-primary);
-}
-
-.button-area button:hover {
-  opacity: 0.85;
-}
-
-/* ========================= */
-/* 數量欄位 */
-/* ========================= */
-
-.amount-box {
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-}
-
-.amount-box input {
-  flex: none;
-}
-
-.amount-box span {
-  font-size: 14px;
-
-  color: var(--color-text-main);
-}
-
-/* ========================= */
-/* 多行文字欄位 */
-/* ========================= */
 
 textarea {
   width: 100%;
@@ -123,14 +83,79 @@ textarea {
   resize: vertical;
 }
 
-/* ========================= */
-/* 需求優先度 */
-/* ========================= */
+/* =========================
+   數量 + 單位
+========================= */
+
+.quantity-box {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+}
+
+.quantity-box input {
+  margin-bottom: 20px;
+}
+
+.short-input {
+  width: 250px;
+}
+
+/* 聯絡電話欄位 */
+.phone-input {
+  width: 420px;
+}
+
+.unit-input {
+  width: 250px;
+}
+
+.medium-input {
+  width: 450px;
+}
+
+/* =========================
+   物品完好度
+========================= */
+
+.condition-box {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 25px;
+
+  margin-bottom: 20px;
+}
+
+.condition-box label {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  cursor: pointer;
+
+  font-size: 16px;
+}
+
+.condition-box input[type='checkbox'] {
+  width: 18px;
+
+  height: 18px;
+
+  margin: 0;
+}
+
+/* =========================
+   優先度
+========================= */
 
 .priority-box {
   display: flex;
-
-  flex-direction: row;
 
   align-items: center;
 
@@ -139,16 +164,6 @@ textarea {
   margin-bottom: 20px;
 }
 
-.short-input {
-  width: 250px;
-}
-
-/* 中等欄位 */
-.medium-input {
-  width: 450px;
-}
-
-/* 覆蓋上方 label 的 block 設定 */
 .priority-box label {
   display: flex;
 
@@ -163,15 +178,85 @@ textarea {
   cursor: pointer;
 
   white-space: nowrap;
+
+  font-size: 16px;
 }
 
-/* radio 圓圈 */
 .priority-box input[type='radio'] {
   width: auto;
 
   margin: 0;
 }
 
-.priority-box label {
+/* 優先度顏色 */
+
+.priority-box .normal {
+  color: #333333;
+}
+
+.priority-box .urgent {
+  color: #f57c00;
+}
+
+.priority-box .very-urgent {
+  color: #d32f2f;
+}
+
+/* =========================
+   按鈕
+========================= */
+
+.button-area {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 25px;
+}
+
+.button-area button {
+  padding: 8px 18px;
+
+  border-radius: 15px;
+
+  border: none;
+
+  cursor: pointer;
+
+  color: white;
+
   font-size: 16px;
+
+  font-weight: 500;
+}
+
+.back-btn,
+.save-btn {
+  background-color: var(--color-brand-primary);
+}
+
+.button-area button:hover {
+  opacity: 0.85;
+}
+
+/* =========================
+   必填標記
+========================= */
+
+.required {
+  color: #d32f2f;
+
+  font-weight: bold;
+}
+
+/* =========================
+   錯誤紅框
+========================= */
+
+.error-input {
+  border: 2px solid #d32f2f !important;
+
+  background-color: #fff5f5;
 }

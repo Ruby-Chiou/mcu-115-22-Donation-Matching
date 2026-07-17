@@ -1,7 +1,9 @@
 <div class="container">
-  <h1>修改急難需求</h1>
+  <h1>批次修改急難需求</h1>
 
-  <div class="form-box">
+  <div class="form-box" *ngFor="let demand of editDemands; let i=index">
+    <h2>第 {{i + 1}} 筆需求</h2>
+
     <!-- 需求物 -->
 
     <label>
@@ -28,7 +30,7 @@
         [(ngModel)]="demand.amount"
       />
 
-      <input class="unit-input" type="text" placeholder="單位，例如：箱、袋、包" [(ngModel)]="demand.unit" />
+      <input class="short-input" type="text" placeholder="單位名稱，例如：箱、袋、包" [(ngModel)]="demand.unit" />
     </div>
 
     <!-- 數量描述 -->
@@ -66,20 +68,15 @@
 
     <div class="condition-box">
       <label *ngFor="let condition of conditionList">
-        <input
-          type="checkbox"
-          [value]="condition"
-          [checked]="demand.conditions?.includes(condition)"
-          (change)="toggleCondition(condition)"
-        />
+        <input type="checkbox" [checked]="demand.conditions?.includes(condition)" (change)="toggleCondition(demand, condition)" />
 
         {{condition}}
       </label>
     </div>
 
-    <!-- 自訂完好度 -->
+    <!-- 自訂狀態 -->
 
-    <input class="medium-input" type="text" placeholder="其他狀態（可自行輸入）" [(ngModel)]="demand.customCondition" />
+    <input class="medium-input" type="text" placeholder="其他物品狀態（可自行輸入）" [(ngModel)]="demand.customCondition" />
 
     <!-- 緊急優先度 -->
 
@@ -90,25 +87,25 @@
 
     <div class="priority-box">
       <label class="normal">
-        <input type="radio" name="priority" value="普通" [(ngModel)]="demand.priority" />
+        <input type="radio" [name]="'priority'+i" value="普通" [(ngModel)]="demand.priority" />
 
         普通
       </label>
 
       <label class="urgent">
-        <input type="radio" name="priority" value="緊急" [(ngModel)]="demand.priority" />
+        <input type="radio" [name]="'priority'+i" value="緊急" [(ngModel)]="demand.priority" />
 
         緊急
       </label>
 
       <label class="very-urgent">
-        <input type="radio" name="priority" value="非常緊急" [(ngModel)]="demand.priority" />
+        <input type="radio" [name]="'priority'+i" value="非常緊急" [(ngModel)]="demand.priority" />
 
         非常緊急
       </label>
     </div>
 
-    <!-- 接收地點 -->
+    <!-- 接收物資地點 -->
 
     <label>
       能夠接收物資的地點
@@ -126,7 +123,7 @@
     <!-- 聯絡電話 -->
 
     <label>
-      聯絡電話
+      可保持暢通的聯絡號碼
       <span class="required">*</span>
     </label>
 
@@ -138,18 +135,20 @@
       [(ngModel)]="demand.phone"
     />
 
-    <!-- 備註 -->
+    <!-- 其他說明 -->
 
     <label> 其他說明（備註） </label>
 
     <textarea placeholder="請輸入其他說明" [(ngModel)]="demand.note"> </textarea>
 
-    <!-- 按鈕 -->
+    <hr />
+  </div>
 
-    <div class="button-area">
-      <button class="back-btn" routerLink="/agency/disaster-post">取消</button>
+  <!-- 按鈕 -->
 
-      <button class="save-btn" (click)="save()">儲存</button>
-    </div>
+  <div class="button-area">
+    <button class="back-btn" (click)="cancel()">取消</button>
+
+    <button class="save-btn" (click)="saveAll()">儲存全部修改</button>
   </div>
 </div>
