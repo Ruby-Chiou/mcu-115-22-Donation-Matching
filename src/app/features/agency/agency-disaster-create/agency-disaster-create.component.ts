@@ -15,12 +15,6 @@ export class AgencyDisasterCreateComponent {
   @ViewChild('itemInput')
   itemInput!: ElementRef;
 
-  // 物品完好度選項
-  conditionList: string[] = ['全新', '二手', '過期', '毀損', '有擦痕'];
-
-  // 使用者勾選的狀態
-  selectedConditions: string[] = [];
-
   demand = {
     item: '',
 
@@ -34,13 +28,24 @@ export class AgencyDisasterCreateComponent {
 
     description: '',
 
-    // 新增物品完好度
-    conditions: [] as string[],
+    // 接受物資狀態
+    conditions: {
+      全新: '',
 
-    // 自訂狀態
+      二手: '',
+
+      有擦痕: '',
+
+      過期: '',
+
+      毀損: '',
+    },
+
     customCondition: '',
 
     priority: '普通',
+
+    status: '上架',
 
     address: '',
 
@@ -51,23 +56,9 @@ export class AgencyDisasterCreateComponent {
 
   constructor(
     private disasterDemandService: DisasterDemandService,
+
     private router: Router
   ) {}
-
-  // 勾選物品狀態
-  toggleCondition(condition: string) {
-    const index = this.selectedConditions.indexOf(condition);
-
-    if (index > -1) {
-      // 已存在 → 移除
-
-      this.selectedConditions.splice(index, 1);
-    } else {
-      // 不存在 → 加入
-
-      this.selectedConditions.push(condition);
-    }
-  }
 
   save() {
     this.submitted = true;
@@ -87,18 +78,6 @@ export class AgencyDisasterCreateComponent {
       });
 
       return;
-    }
-
-    // =========================
-    // 儲存物品完好度
-    // =========================
-
-    this.demand.conditions = [...this.selectedConditions];
-
-    // 如果有自訂狀態，加進去
-
-    if (this.demand.customCondition && this.demand.customCondition.trim()) {
-      this.demand.conditions.push(this.demand.customCondition.trim());
     }
 
     this.disasterDemandService.addDemand(this.demand);

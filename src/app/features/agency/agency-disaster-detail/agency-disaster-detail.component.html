@@ -2,48 +2,140 @@
   <h1>急難需求詳細資料</h1>
 
   <div class="detail-table" *ngIf="demand">
+    <!-- 需求物 -->
     <div class="detail-row">
       <div class="detail-title">需求物</div>
       <div class="detail-content">{{demand.item}}</div>
     </div>
 
+    <!-- 需求數量 -->
     <div class="detail-row">
       <div class="detail-title">需求數量</div>
-      <div class="detail-content">{{demand.amount}}</div>
+      <div class="detail-content">{{demand.amount}} {{demand.unit}}</div>
     </div>
 
+    <!-- 數量描述 -->
+    <div class="detail-row">
+      <div class="detail-title">數量描述</div>
+      <div class="detail-content">{{demand.amountDescription}}</div>
+    </div>
+
+    <!-- 需求原因 -->
     <div class="detail-row">
       <div class="detail-title">需求原因</div>
       <div class="detail-content">{{demand.reason}}</div>
     </div>
 
+    <!-- 需求描述 -->
+    <div class="detail-row">
+      <div class="detail-title">需求描述</div>
+      <div class="detail-content">{{demand.description}}</div>
+    </div>
+
+    <!-- 接受物資狀態 -->
+    <div class="detail-row">
+      <div class="detail-title">接受物資狀態</div>
+
+      <div class="detail-content condition-detail">
+        <div class="condition-item">
+          <span>全新：</span>
+
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['全新'])">
+            {{getConditionIcon(demand.conditions?.['全新'])}}
+          </span>
+
+          {{demand.conditions?.['全新'] || '未設定'}}
+        </div>
+
+        <div class="condition-item">
+          <span>二手：</span>
+
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['二手'])">
+            {{getConditionIcon(demand.conditions?.['二手'])}}
+          </span>
+
+          {{demand.conditions?.['二手'] || '未設定'}}
+        </div>
+
+        <div class="condition-item">
+          <span>有擦痕：</span>
+
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['有擦痕'])">
+            {{getConditionIcon(demand.conditions?.['有擦痕'])}}
+          </span>
+
+          {{demand.conditions?.['有擦痕'] || '未設定'}}
+        </div>
+
+        <div class="condition-item">
+          <span>過期：</span>
+
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['過期'])">
+            {{getConditionIcon(demand.conditions?.['過期'])}}
+          </span>
+
+          {{demand.conditions?.['過期'] || '未設定'}}
+        </div>
+
+        <div class="condition-item">
+          <span>毀損：</span>
+
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['毀損'])">
+            {{getConditionIcon(demand.conditions?.['毀損'])}}
+          </span>
+
+          {{demand.conditions?.['毀損'] || '未設定'}}
+        </div>
+
+        <!-- 其他物品狀態 -->
+        <div class="condition-item">
+          <span>其他：</span>
+
+          {{demand.customCondition || '無'}}
+        </div>
+      </div>
+    </div>
+    <!-- 緊急優先度 -->
     <div class="detail-row">
       <div class="detail-title">緊急優先度</div>
-      <div class="detail-content">{{demand.priority}}</div>
+
+      <div
+        class="detail-content priority-detail"
+        [ngClass]="{
+      'normal': demand.priority === '普通',
+      'urgent': demand.priority === '緊急',
+      'very-urgent': demand.priority === '非常緊急'
+    }"
+      >
+        {{demand.priority}}
+      </div>
     </div>
 
-    <div class="detail-row">
-      <div class="detail-title">剩餘需求</div>
-      <div class="detail-content">{{demand.remaining}}</div>
-    </div>
-
+    <!-- 狀態 -->
     <div class="detail-row">
       <div class="detail-title">狀態</div>
+
       <div class="detail-content">{{demand.status}}</div>
     </div>
 
+    <!-- 面交地點 -->
     <div class="detail-row">
-      <div class="detail-title">面交地址</div>
+      <div class="detail-title">面交地點</div>
+
       <div class="detail-content">{{demand.address}}</div>
     </div>
 
+    <!-- 聯絡電話 -->
     <div class="detail-row">
       <div class="detail-title">聯絡電話</div>
+
       <div class="detail-content">{{demand.phone}}</div>
     </div>
 
+    <!-- 其他說明 -->
     <div class="detail-row">
       <div class="detail-title">其他說明（備註）</div>
+
       <div class="detail-content">{{demand.note}}</div>
     </div>
   </div>

@@ -15,6 +15,16 @@ export class AgencyDisasterPostComponent implements OnInit {
 
   selectAll = false;
 
+  // =========================
+  // 刪除提示視窗控制
+  // =========================
+
+  showDeleteModal = false;
+
+  deleteId!: number;
+
+  deleteType: 'single' | 'batch' = 'single';
+
   constructor(
     private disasterDemandService: DisasterDemandService,
 
@@ -31,11 +41,7 @@ export class AgencyDisasterPostComponent implements OnInit {
     this.demands = this.disasterDemandService.getDemands().map((item) => ({
       ...item,
 
-      // 列表用，不存資料庫
-
       selected: false,
-
-      // 沒有狀態預設上架
 
       status: item.status || '已上架',
     }));
@@ -71,34 +77,59 @@ export class AgencyDisasterPostComponent implements OnInit {
     this.router.navigate(['/agency/disaster-batch-edit']);
   }
 
-  // 批次刪除
+  // =========================
+  // 開啟刪除視窗
+  // =========================
 
-  deleteSelected() {
-    const confirmDelete = confirm('是否確認刪除選取的需求？');
+  openDeleteModal(id: number) {
+    this.deleteId = id;
 
-    if (confirmDelete) {
-      const ids = this.demands.filter((item) => item.selected).map((item) => item.id);
+    this.deleteType = 'single';
+
+    this.showDeleteModal = true;
+  }
+
+  // 批次刪除開啟視窗
+
+  openBatchDeleteModal() {
+    this.deleteType = 'batch';
+
+    this.showDeleteModal = true;
+  }
+
+  // 確認刪除
+
+  confirmDelete() {
+    // 單筆刪除
+
+    if (this.deleteType === 'single') {
+      this.disasterDemandService.deleteDemand(this.deleteId);
+    }
+
+    // 批次刪除
+    else {
+      const ids = this.demands
+
+        .filter((item) => item.selected)
+
+        .map((item) => item.id);
 
       ids.forEach((id) => {
         this.disasterDemandService.deleteDemand(id);
       });
 
-      this.loadDemands();
-
       this.selectAll = false;
     }
+
+    this.loadDemands();
+
+    this.closeDeleteModal();
   }
 
-  // 單筆刪除
+  // 關閉視窗
 
-  deleteDemand(id: number) {
-    const confirmDelete = confirm('是否確認要刪除？');
-
-    if (confirmDelete) {
-      this.disasterDemandService.deleteDemand(id);
-
-      this.loadDemands();
-    }
+  closeDeleteModal() {
+    this.showDeleteModal = false;
   }
 
   // 修改上架狀態

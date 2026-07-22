@@ -14,7 +14,6 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
   editDemands: any[] = [];
 
   // 物品完好度選項
-  conditionList = ['全新', '二手', '有擦痕', '過期', '毀損'];
 
   constructor(
     private service: DisasterDemandService,
@@ -28,13 +27,21 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
       this.editDemands = JSON.parse(data).map((item: any) => ({
         ...item,
 
-        conditions: item.conditions || [],
+        conditions: item.conditions || {
+          全新: '',
+          二手: '',
+          有擦痕: '',
+          過期: '',
+          毀損: '',
+        },
 
         customCondition: item.customCondition || '',
 
         unit: item.unit || '',
 
         amountDescription: item.amountDescription || '',
+
+        status: item.status || '上架',
       }));
     }
 
@@ -63,7 +70,7 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
         item.itemError = true;
       }
 
-      if (!item.amount) {
+      if (item.amount === '') {
         item.amountError = true;
       }
 
@@ -110,6 +117,18 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
       return;
     }
 
+    this.editDemands.forEach((item) => {
+      if (!item.conditions) {
+        item.conditions = {
+          全新: '',
+          二手: '',
+          有擦痕: '',
+          過期: '',
+          毀損: '',
+        };
+      }
+    });
+
     // =========================
     // 全部通過，更新資料
     // =========================
@@ -127,24 +146,5 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
     localStorage.removeItem('editDemands');
 
     this.router.navigate(['/agency/disaster-post']);
-  }
-
-  // 勾選物品完好度
-  toggleCondition(demand: any, condition: string) {
-    if (!demand.conditions) {
-      demand.conditions = [];
-    }
-
-    const index = demand.conditions.indexOf(condition);
-
-    if (index > -1) {
-      // 已存在 → 移除
-
-      demand.conditions.splice(index, 1);
-    } else {
-      // 不存在 → 加入
-
-      demand.conditions.push(condition);
-    }
   }
 }

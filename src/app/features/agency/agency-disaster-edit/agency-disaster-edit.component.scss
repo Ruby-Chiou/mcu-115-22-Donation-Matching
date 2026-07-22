@@ -167,31 +167,57 @@ textarea {
 .condition-box {
   display: flex;
 
-  flex-wrap: wrap;
+  flex-direction: column;
 
-  gap: 25px;
+  gap: 15px;
 
   margin-bottom: 20px;
 }
 
-.condition-box label {
+.condition-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 30px;
+}
+
+.condition-name {
+  width: 100px;
+
+  font-size: 16px;
+
+  font-weight: 500;
+}
+
+.condition-row label {
   display: flex;
 
   align-items: center;
 
   gap: 6px;
 
-  cursor: pointer;
-
   font-size: 16px;
+
+  cursor: pointer;
 }
 
-.condition-box input[type='checkbox'] {
-  width: 18px;
-
-  height: 18px;
+.condition-row input[type='radio'] {
+  width: auto;
 
   margin: 0;
+}
+
+.accept-icon {
+  color: #2e7d32;
+
+  font-weight: bold;
+}
+
+.reject-icon {
+  color: #d32f2f;
+
+  font-weight: bold;
 }
 
 /* =========================
@@ -262,4 +288,40 @@ textarea {
   color: #d32f2f;
 
   font-weight: bold;
+}
+
+/* =========================
+   公開狀態
+========================= */
+
+.status-box {
+  display: flex;
+
+  align-items: center;
+
+  gap: 30px;
+
+  margin-bottom: 20px;
+}
+
+.status-box label {
+  display: flex;
+
+  flex-direction: row;
+
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 0;
+
+  cursor: pointer;
+
+  font-size: 16px;
+}
+
+.status-box input[type='radio'] {
+  width: auto;
+
+  margin: 0;
 }

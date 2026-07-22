@@ -1,7 +1,7 @@
 <div class="container">
-  <h1>批次修改急難需求</h1>
+  <h1>批次編輯緊急需求內容</h1>
 
-  <div class="form-box" *ngFor="let demand of editDemands; let i=index">
+  <div class="form-box" [ngClass]="i % 2 === 0 ? 'light-box' : 'dark-box'" *ngFor="let demand of editDemands; let i=index">
     <h2>第 {{i + 1}} 筆需求</h2>
 
     <!-- 需求物 -->
@@ -11,7 +11,7 @@
       <span class="required">*</span>
     </label>
 
-    <input class="short-input" [class.invalid]="demand.itemError" type="text" placeholder="請輸入需求物" [(ngModel)]="demand.item" />
+    <input class="short-input" [class.invalid]="demand.itemError" type="text" placeholder="請編輯需求物" [(ngModel)]="demand.item" />
 
     <!-- 需求數量 -->
 
@@ -26,18 +26,18 @@
         [class.invalid]="demand.amountError"
         type="number"
         min="0"
-        placeholder="請輸入數量"
+        placeholder="請編輯數量"
         [(ngModel)]="demand.amount"
       />
 
-      <input class="short-input" type="text" placeholder="單位名稱，例如：箱、袋、包" [(ngModel)]="demand.unit" />
+      <input class="short-input" type="text" placeholder="請編輯單位，例如：箱、袋、包" [(ngModel)]="demand.unit" />
     </div>
 
     <!-- 數量描述 -->
 
     <label> 數量描述 </label>
 
-    <textarea placeholder="例如：1箱內含10包，每包5公斤" [(ngModel)]="demand.amountDescription"> </textarea>
+    <textarea placeholder="請編輯數量描述，例如：1箱內含10包，每包5公斤" [(ngModel)]="demand.amountDescription"> </textarea>
 
     <!-- 需求原因 -->
 
@@ -46,7 +46,7 @@
       <span class="required">*</span>
     </label>
 
-    <textarea [class.invalid]="demand.reasonError" placeholder="請輸入需求原因" [(ngModel)]="demand.reason"> </textarea>
+    <textarea [class.invalid]="demand.reasonError" placeholder="請編輯需求原因" [(ngModel)]="demand.reason"> </textarea>
 
     <!-- 需求描述 -->
 
@@ -57,26 +57,135 @@
 
     <textarea
       [class.invalid]="demand.descriptionError"
-      placeholder="請輸入需求描述，例如可接受誤差程度、特定型號、款式等"
+      placeholder="請編輯需求描述，例如可接受誤差程度、特定型號、款式等"
       [(ngModel)]="demand.description"
     >
     </textarea>
 
-    <!-- 物品完好度 -->
+    <!-- 接受物資狀態 -->
 
-    <label> 物品完好度 </label>
+    <label> 接受物資狀態 </label>
 
     <div class="condition-box">
-      <label *ngFor="let condition of conditionList">
-        <input type="checkbox" [checked]="demand.conditions?.includes(condition)" (change)="toggleCondition(demand, condition)" />
+      <!-- 全新 -->
+      <div class="condition-row">
+        <span class="condition-name"> 全新 </span>
 
-        {{condition}}
-      </label>
+        <label>
+          <input type="radio" [name]="'newCondition'+i" value="接受" [(ngModel)]="demand.conditions['全新']" />
+
+          <span>
+            <span class="accept-icon">✔</span>
+            接受
+          </span>
+        </label>
+
+        <label>
+          <input type="radio" [name]="'newCondition'+i" value="不接受" [(ngModel)]="demand.conditions['全新']" />
+
+          <span>
+            <span class="reject-icon">✘</span>
+            不接受
+          </span>
+        </label>
+      </div>
+
+      <!-- 二手 -->
+      <div class="condition-row">
+        <span class="condition-name"> 二手 </span>
+
+        <label>
+          <input type="radio" [name]="'usedCondition'+i" value="接受" [(ngModel)]="demand.conditions['二手']" />
+
+          <span>
+            <span class="accept-icon">✔</span>
+            接受
+          </span>
+        </label>
+
+        <label>
+          <input type="radio" [name]="'usedCondition'+i" value="不接受" [(ngModel)]="demand.conditions['二手']" />
+
+          <span>
+            <span class="reject-icon">✘</span>
+            不接受
+          </span>
+        </label>
+      </div>
+
+      <!-- 有擦痕 -->
+      <div class="condition-row">
+        <span class="condition-name"> 有擦痕 </span>
+
+        <label>
+          <input type="radio" [name]="'scratchCondition'+i" value="接受" [(ngModel)]="demand.conditions['有擦痕']" />
+
+          <span>
+            <span class="accept-icon">✔</span>
+            接受
+          </span>
+        </label>
+
+        <label>
+          <input type="radio" [name]="'scratchCondition'+i" value="不接受" [(ngModel)]="demand.conditions['有擦痕']" />
+
+          <span>
+            <span class="reject-icon">✘</span>
+            不接受
+          </span>
+        </label>
+      </div>
+
+      <!-- 過期 -->
+      <div class="condition-row">
+        <span class="condition-name"> 過期 </span>
+
+        <label>
+          <input type="radio" [name]="'expiredCondition'+i" value="接受" [(ngModel)]="demand.conditions['過期']" />
+
+          <span>
+            <span class="accept-icon">✔</span>
+            接受
+          </span>
+        </label>
+
+        <label>
+          <input type="radio" [name]="'expiredCondition'+i" value="不接受" [(ngModel)]="demand.conditions['過期']" />
+
+          <span>
+            <span class="reject-icon">✘</span>
+            不接受
+          </span>
+        </label>
+      </div>
+
+      <!-- 毀損 -->
+      <div class="condition-row">
+        <span class="condition-name"> 毀損 </span>
+
+        <label>
+          <input type="radio" [name]="'brokenCondition'+i" value="接受" [(ngModel)]="demand.conditions['毀損']" />
+
+          <span>
+            <span class="accept-icon">✔</span>
+            接受
+          </span>
+        </label>
+
+        <label>
+          <input type="radio" [name]="'brokenCondition'+i" value="不接受" [(ngModel)]="demand.conditions['毀損']" />
+
+          <span>
+            <span class="reject-icon">✘</span>
+            不接受
+          </span>
+        </label>
+      </div>
     </div>
 
     <!-- 自訂狀態 -->
 
-    <input class="medium-input" type="text" placeholder="其他物品狀態（可自行輸入）" [(ngModel)]="demand.customCondition" />
+    <input class="medium-input" type="text" placeholder="請編輯其他物品狀態（可自行輸入）" [(ngModel)]="demand.customCondition" />
 
     <!-- 緊急優先度 -->
 
@@ -105,6 +214,33 @@
       </label>
     </div>
 
+    <!-- 公開狀態 -->
+
+    <label>
+      公開狀態
+      <span class="required">*</span>
+    </label>
+
+    <div class="status-box">
+      <label>
+        <input type="radio" [name]="'status'+i" value="上架" [(ngModel)]="demand.status" />
+
+        上架
+      </label>
+
+      <label>
+        <input type="radio" [name]="'status'+i" value="隱藏" [(ngModel)]="demand.status" />
+
+        隱藏
+      </label>
+
+      <label>
+        <input type="radio" [name]="'status'+i" value="下架" [(ngModel)]="demand.status" />
+
+        下架
+      </label>
+    </div>
+
     <!-- 接收物資地點 -->
 
     <label>
@@ -116,7 +252,7 @@
       class="medium-input"
       [class.invalid]="demand.addressError"
       type="text"
-      placeholder="請輸入能夠接收物資的地點"
+      placeholder="請編輯能夠接收物資的地點"
       [(ngModel)]="demand.address"
     />
 
@@ -131,7 +267,7 @@
       class="phone-input"
       [class.invalid]="demand.phoneError"
       type="tel"
-      placeholder="請輸入可保持暢通的號碼（方便聯絡時間可註明）"
+      placeholder="請編輯可保持暢通的號碼（方便聯絡時間可註明）"
       [(ngModel)]="demand.phone"
     />
 
@@ -139,7 +275,7 @@
 
     <label> 其他說明（備註） </label>
 
-    <textarea placeholder="請輸入其他說明" [(ngModel)]="demand.note"> </textarea>
+    <textarea placeholder="請編輯其他說明" [(ngModel)]="demand.note"> </textarea>
 
     <hr />
   </div>

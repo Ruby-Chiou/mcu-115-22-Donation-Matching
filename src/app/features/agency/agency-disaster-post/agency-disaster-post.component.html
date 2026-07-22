@@ -14,16 +14,16 @@
     </div>
 
     <div class="batch-buttons" *ngIf="hasSelected()">
-      <button (click)="editSelected()">修改</button>
+      <button (click)="editSelected()">編輯</button>
 
-      <button (click)="deleteSelected()">刪除</button>
+      <button (click)="openBatchDeleteModal()">刪除</button>
     </div>
   </div>
 
   <table>
     <!-- 無資料 -->
     <tr *ngIf="demands.length === 0">
-      <td colspan="5" class="empty-message">
+      <td colspan="6" class="empty-message">
         <div class="empty-title">尚未輸入需求</div>
 
         <div class="empty-description">
@@ -46,6 +46,8 @@
 
         <th>緊急優先度</th>
 
+        <th>留言區</th>
+
         <th class="operation-column">操作</th>
       </tr>
     </thead>
@@ -58,7 +60,7 @@
 
         <td>{{item.item}}</td>
 
-        <td>{{item.amount}}</td>
+        <td>{{item.amount}}{{item.unit}}</td>
 
         <!-- 優先度顏色 -->
 
@@ -76,15 +78,20 @@
           {{item.priority}}
         </td>
 
+        <td class="message-column">
+          <a [routerLink]="['/agency/disaster-message', item.id]"> {{item.messageCount || 0}} </a>
+        </td>
+
         <!-- 操作 -->
 
         <td class="operation-column">
           <div class="button-group">
             <button [routerLink]="['/agency/disaster-detail', item.id]">查看</button>
 
-            <button [routerLink]="['/agency/disaster-edit', item.id]">修改</button>
+            <button [routerLink]="['/agency/disaster-edit', item.id]">編輯</button>
 
-            <button (click)="deleteDemand(item.id)">刪除</button>
+            <!-- 修改這裡 -->
+            <button (click)="openDeleteModal(item.id)">刪除</button>
           </div>
 
           <div class="status-group">
@@ -102,4 +109,22 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- ==========================
+       自訂刪除確認視窗
+       ========================== -->
+
+  <div class="modal-backdrop" *ngIf="showDeleteModal">
+    <div class="modal-box">
+      <h2>確認刪除</h2>
+
+      <p>確定要刪除此筆急難需求嗎？</p>
+
+      <div class="modal-buttons">
+        <button class="cancel-btn" (click)="closeDeleteModal()">取消</button>
+
+        <button class="confirm-btn" (click)="confirmDelete()">確定刪除</button>
+      </div>
+    </div>
+  </div>
 </div>

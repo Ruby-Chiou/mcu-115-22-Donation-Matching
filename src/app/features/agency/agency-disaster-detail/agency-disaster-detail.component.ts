@@ -22,4 +22,30 @@ export class AgencyDisasterDetailComponent {
 
     this.demand = this.service.getDemandById(id);
   }
+
+  // 判斷接受 / 不接受顏色
+  getConditionClass(condition: string) {
+    if (condition === '接受') {
+      return 'accept';
+    }
+
+    if (condition === '不接受') {
+      return 'reject';
+    }
+
+    return '';
+  }
+
+  // 顯示符號
+  getConditionIcon(condition: string) {
+    if (condition === '接受') {
+      return '✔';
+    }
+
+    if (condition === '不接受') {
+      return '✘';
+    }
+
+    return '';
+  }
 }

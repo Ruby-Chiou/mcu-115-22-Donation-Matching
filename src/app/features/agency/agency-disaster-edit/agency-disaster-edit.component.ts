@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // ← 新增這行
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DisasterDemandService } from '../disaster-demand.service';
@@ -12,10 +12,6 @@ import { DisasterDemandService } from '../disaster-demand.service';
 })
 export class AgencyDisasterEditComponent implements OnInit {
   demand: any = {};
-
-  // 完好度選項
-
-  conditionList: string[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
 
   constructor(
     private route: ActivatedRoute,
@@ -34,32 +30,24 @@ export class AgencyDisasterEditComponent implements OnInit {
       this.demand = {
         ...data,
 
+        // 接受物資狀態
         // 防止舊資料沒有欄位
-
-        conditions: Array.isArray(data.conditions) ? [...data.conditions] : [],
+        conditions: data.conditions || {
+          全新: '',
+          二手: '',
+          有擦痕: '',
+          過期: '',
+          毀損: '',
+        },
 
         customCondition: data.customCondition || '',
 
         unit: data.unit || '',
 
         amountDescription: data.amountDescription || '',
+
+        status: data.status || '上架',
       };
-    }
-  }
-
-  // 完好度勾選
-
-  toggleCondition(condition: string) {
-    if (!this.demand.conditions) {
-      this.demand.conditions = [];
-    }
-
-    const index = this.demand.conditions.indexOf(condition);
-
-    if (index !== -1) {
-      this.demand.conditions.splice(index, 1);
-    } else {
-      this.demand.conditions.push(condition);
     }
   }
 
@@ -84,7 +72,8 @@ export class AgencyDisasterEditComponent implements OnInit {
       this.demand.itemError = true;
     }
 
-    if (!this.demand.amount) {
+    // 修正數量判斷
+    if (this.demand.amount === '') {
       this.demand.amountError = true;
     }
 
@@ -130,20 +119,20 @@ export class AgencyDisasterEditComponent implements OnInit {
       return;
     }
 
-    // 確保 conditions 存在
+    // 確保接受物資狀態存在
 
     if (!this.demand.conditions) {
-      this.demand.conditions = [];
-    }
+      this.demand.conditions = {
+        全新: '',
 
-    // 加入自訂完好度
+        二手: '',
 
-    if (this.demand.customCondition && this.demand.customCondition.trim()) {
-      const custom = this.demand.customCondition.trim();
+        有擦痕: '',
 
-      if (!this.demand.conditions.includes(custom)) {
-        this.demand.conditions.push(custom);
-      }
+        過期: '',
+
+        毀損: '',
+      };
     }
 
     // 更新資料
