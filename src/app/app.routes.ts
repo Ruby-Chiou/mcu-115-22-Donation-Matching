@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
+import { HomeComponent } from './features/home/home.component';
 
 export const routes: Routes = [
   // 1. 預設首頁修改：一進網站，直接自動導向日常物資大廳！
-  { path: '', redirectTo: 'donor/daily', pathMatch: 'full' },
+  { path: '', component: HomeComponent, pathMatch: 'full' },
 
   // 2. 認證模組 (需要下標、發布需求時才跳轉來這)
   {

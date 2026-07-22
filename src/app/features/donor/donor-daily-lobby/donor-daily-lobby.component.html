@@ -1,29 +1,3 @@
-<div class="lobby-grid">
-  <section class="main-content">
-    <h3 class="section-title">最新消息</h3>
-    <div class="news-card">
-      <div class="card-image">
-        <img [src]="currentNews().image" [alt]="currentNews().text" />
-      </div>
-      <div class="card-text">
-        <p>{{ currentNews().text }}</p>
-        <p class="highlight">{{ currentNews().highlight }}</p>
-      </div>
-    </div>
-    <div class="carousel-indicators">
-      @for (i of [0, 1, 2]; track i) {
-      <span class="dot" [class.active]="currentIndex() === i" (click)="setSlide(i)"> </span>
-      }
-    </div>
-  </section>
-
-  <aside class="right-sidebar">
-    <a routerLink="/news" class="sidebar-item"><i class="fa-solid fa-bullhorn"></i> 最新公告</a>
-    <a routerLink="/trends" class="sidebar-item"><i class="fa-solid fa-fire"></i> 熱門需求</a>
-    <a routerLink="/donor/disaster" class="sidebar-item"><i class="fa-solid fa-triangle-exclamation"></i> 災害救助</a>
-  </aside>
-</div>
-
 <div class="search">
   <h3>搜尋區塊</h3>
 </div>
