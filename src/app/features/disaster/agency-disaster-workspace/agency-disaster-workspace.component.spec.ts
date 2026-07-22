@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AgencyRequestManagementComponent } from './agency-request-management.component';
+import { AgencyDisasterWorkspaceComponent } from './agency-disaster-workspace.component';
 
 describe('AgencyRequestManagementComponent', () => {
-  let component: AgencyRequestManagementComponent;
-  let fixture: ComponentFixture<AgencyRequestManagementComponent>;
+  let component: AgencyDisasterWorkspaceComponent;
+  let fixture: ComponentFixture<AgencyDisasterWorkspaceComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AgencyRequestManagementComponent],
+      imports: [AgencyDisasterWorkspaceComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AgencyRequestManagementComponent);
+    fixture = TestBed.createComponent(AgencyDisasterWorkspaceComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
