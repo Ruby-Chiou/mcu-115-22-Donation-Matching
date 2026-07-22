@@ -1,1 +1,150 @@
-<p>login works!</p>
+<section class="login-shell">
+  <div class="login-card" [class.role-modal-active]="showRoleModal">
+    <div class="form-panel" [class.role-modal-active]="showRoleModal">
+      <div class="role-modal" *ngIf="showRoleModal">
+        <div class="role-modal-card">
+          <h2>請選擇登入身份</h2>
+          <p>有意願捐贈物資的民眾或企業視為捐贈者；社福團體與機構視為受助者。</p>
+
+          <div class="role-options">
+            <button type="button" class="role-card donor" (click)="selectRole('donor')">
+              <span class="role-title">捐助者</span>
+              <span class="role-subtitle">可快速登入、下單意願捐贈的物資</span>
+            </button>
+
+            <button type="button" class="role-card recipient" (click)="selectRole('recipient')">
+              <span class="role-title">受助者</span>
+              <span class="role-subtitle">需要先完成帳號註冊與身份驗證</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <form *ngIf="selectedRole" class="login-form" (ngSubmit)="onSubmit()">
+        <div class="form-header">
+          <div>
+            <h2>{{ roleHeading }}</h2>
+            <p>{{ roleDescription }}</p>
+          </div>
+          <button type="button" class="ghost-btn" (click)="backToRoleSelection()">切換身份</button>
+        </div>
+
+        <div class="social-login" *ngIf="!isRecipient">
+          <div class="social-row">
+            <p>或使用其它應用登入帳號</p>
+            <div class="social-buttons">
+              <button type="button" class="social-btn google">
+                Google
+                <i class="fa-brands fa-google"></i>
+              </button>
+              <button type="button" class="social-btn line">
+                LINE
+                <i class="fa-brands fa-line"></i>
+              </button>
+              <button type="button" class="social-btn facebook">
+                Facebook
+                <i class="fa-brands fa-facebook"></i>
+              </button>
+              <button type="button" class="social-btn apple">
+                Apple
+                <i class="fa-brands fa-apple"></i>
+              </button>
+              <button type="button" class="social-btn yahoo">
+                Yahoo
+                <i class="fa-brands fa-yahoo"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-grid" *ngIf="!isProfileStep">
+          <label class="field full">
+            <span>電子信箱</span>
+            <input type="email" [(ngModel)]="loginForm.email" name="email" required />
+          </label>
+
+          <label class="field full" *ngIf="isRecipient">
+            <span>帳號名稱</span>
+            <input type="text" [(ngModel)]="loginForm.accountName" name="accountName" required />
+          </label>
+
+          <label class="field full">
+            <span>密碼</span>
+            <input type="password" [(ngModel)]="loginForm.password" name="password" required />
+          </label>
+
+          <label class="field full">
+            <span>驗證碼</span>
+            <div class="otp-actions">
+              <div class="otp-group">
+                <input class="otp-input" type="text" maxlength="1" inputmode="numeric" [(ngModel)]="otpDigits[0]" name="otp0" />
+                <input class="otp-input" type="text" maxlength="1" inputmode="numeric" [(ngModel)]="otpDigits[1]" name="otp1" />
+                <input class="otp-input" type="text" maxlength="1" inputmode="numeric" [(ngModel)]="otpDigits[2]" name="otp2" />
+                <input class="otp-input" type="text" maxlength="1" inputmode="numeric" [(ngModel)]="otpDigits[3]" name="otp3" />
+                <input class="otp-input" type="text" maxlength="1" inputmode="numeric" [(ngModel)]="otpDigits[4]" name="otp4" />
+                <input class="otp-input" type="text" maxlength="1" inputmode="numeric" [(ngModel)]="otpDigits[5]" name="otp5" />
+              </div>
+              <button type="button" class="mini-btn">重新發送</button>
+            </div>
+          </label>
+        </div>
+        <div class="input-grid" *ngIf="isProfileStep">
+          <label class="field full">
+            <span>機構名稱</span>
+            <input type="text" [(ngModel)]="profileForm.agencyName" name="agencyName" />
+          </label>
+
+          <label class="field full">
+            <span>政府註冊字號</span>
+            <input type="text" [(ngModel)]="profileForm.registrationNumber" name="registrationNumber" />
+          </label>
+
+          <label class="field full">
+            <span>負責人姓名</span>
+            <input type="text" [(ngModel)]="profileForm.representative" name="representative" />
+          </label>
+
+          <label class="field full">
+            <span>聯絡電話</span>
+            <input type="tel" [(ngModel)]="profileForm.contactPhone" name="contactPhone" />
+          </label>
+
+          <label class="field full">
+            <span>預設可收件信箱</span>
+            <input type="text" [(ngModel)]="profileForm.defaultAddress" name="defaultAddress" />
+          </label>
+
+          <label class="field full">
+            <span>新密碼</span>
+            <input type="password" [(ngModel)]="profileForm.newPassword" name="newPassword" />
+          </label>
+
+          <label class="field full">
+            <span>確認新密碼</span>
+            <input type="password" [(ngModel)]="profileForm.confirmPassword" name="confirmPassword" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <label class="remember">
+            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
+            <span>記住我</span>
+          </label>
+
+          <div class="action-links">
+            <a routerLink="/register">尚未註冊帳號？</a>
+            <a routerLink="/home">返回首頁</a>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button type="submit" class="primary-btn">{{ isProfileStep ? '完成設定並登入' : (isRecipient ? '驗證登入' : '登入') }}</button>
+
+          <button *ngIf="isProfileStep" type="button" class="ghost-btn" (click)="backToLoginStep()">回上一步</button>
+        </div>
+
+        <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+      </form>
+    </div>
+  </div>
+</section>
