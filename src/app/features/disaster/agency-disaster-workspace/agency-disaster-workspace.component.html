@@ -1,1 +1,139 @@
-<p>agency-disaster-workspace works!</p>
+<div class="container">
+  <h1>急難需求列表</h1>
+
+  <div class="action-bar">
+    <button class="add-btn" routerLink="/agency/disaster-create">新增需求</button>
+  </div>
+
+  <!-- 全選 + 批次操作 -->
+  <div class="select-area">
+    <div class="select-all">
+      <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
+
+      <span>全選</span>
+    </div>
+
+    <div class="batch-buttons" *ngIf="hasSelected()">
+      <button (click)="editSelected()">編輯</button>
+
+      <button (click)="openBatchDeleteModal()">刪除</button>
+    </div>
+  </div>
+
+  <table>
+    <!-- 無資料 -->
+    <tr *ngIf="demands.length === 0">
+      <td colspan="7" class="empty-message">
+        <div class="empty-title">尚未輸入需求</div>
+
+        <div class="empty-description">
+          請點選上方「新增需求」建立急難需求。
+
+          <br />
+
+          新增後的需求將同步顯示於捐助者專區， 供民眾瀏覽並進行捐物。
+        </div>
+      </td>
+    </tr>
+
+    <thead>
+      <tr>
+        <th class="checkbox-column">勾選項目</th>
+
+        <th>需求物</th>
+
+        <th>需求數量</th>
+
+        <th>緊急優先度</th>
+
+        <th>剩餘需求</th>
+
+        <th>留言區</th>
+
+        <th class="operation-column">操作</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of demands">
+        <td class="checkbox-column">
+          <input type="checkbox" [(ngModel)]="item.selected" />
+        </td>
+
+        <td class="item-column">{{item.item}}</td>
+
+        <td>{{item.amount}}{{item.unit}}</td>
+
+        <!-- 優先度顏色 -->
+
+        <td
+          [ngClass]="{
+
+            'normal': item.priority === '普通',
+
+            'urgent': item.priority === '緊急',
+
+            'very-urgent': item.priority === '非常緊急'
+
+          }"
+        >
+          {{item.priority}}
+        </td>
+
+        <td>{{item.remaining}}{{item.unit}}</td>
+
+        <td class="message-column">
+          <a [routerLink]="['/agency/disaster-message', item.id]"> {{item.messageCount || 0}} </a>
+        </td>
+
+        <!-- 操作 -->
+
+        <td class="operation-column">
+          <div class="operation-flex">
+            <button [routerLink]="['/agency/disaster-detail', item.id]">查看</button>
+
+            <button [routerLink]="['/agency/disaster-edit', item.id]">編輯</button>
+
+            <button (click)="openDeleteModal(item.id)">刪除</button>
+
+            <label class="status-label"> 狀態： </label>
+
+            <select
+              [(ngModel)]="item.status"
+              (change)="changeStatus(item)"
+              [ngClass]="{
+        'status-on': item.status === '已上架',
+        'status-hide': item.status === '隱藏中',
+        'status-off': item.status === '已下架'
+      }"
+            >
+              <option value="已上架">已上架</option>
+
+              <option value="隱藏中">隱藏中</option>
+
+              <option value="已下架">已下架</option>
+            </select>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==========================
+       自訂刪除確認視窗
+       ========================== -->
+
+  <div class="modal-backdrop" *ngIf="showDeleteModal">
+    <div class="modal-box">
+      <h2>確認刪除</h2>
+
+      <p>確定要刪除此筆急難需求嗎？</p>
+
+      <div class="modal-buttons">
+        <button class="cancel-btn" (click)="closeDeleteModal()">取消</button>
+
+        <button class="confirm-btn" (click)="confirmDelete()">確定刪除</button>
+      </div>
+    </div>
+  </div>
+</div>

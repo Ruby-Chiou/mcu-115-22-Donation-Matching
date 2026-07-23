@@ -1,11 +1,12 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { DisasterDemandService } from '../disaster-demand.service';
 
 @Component({
   selector: 'app-agency-disaster-create',
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './agency-disaster-create.component.html',
   styleUrl: './agency-disaster-create.component.scss',
 })
@@ -41,7 +42,7 @@ export class AgencyDisasterCreateComponent {
       毀損: '',
     },
 
-    customCondition: '',
+    customConditions: [''],
 
     priority: '普通',
 
@@ -82,6 +83,15 @@ export class AgencyDisasterCreateComponent {
 
     this.disasterDemandService.addDemand(this.demand);
 
-    this.router.navigate(['/agency/disaster-post']);
+    this.router.navigate(['/agency/disaster']);
+  }
+  addCustomCondition() {
+    if (this.demand.customConditions.length < 5) {
+      this.demand.customConditions.push('');
+    }
+  }
+
+  removeCustomCondition(index: number) {
+    this.demand.customConditions.splice(index, 1);
   }
 }

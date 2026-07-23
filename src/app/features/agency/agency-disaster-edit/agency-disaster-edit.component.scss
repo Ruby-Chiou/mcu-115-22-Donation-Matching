@@ -325,3 +325,135 @@ textarea {
 
   margin: 0;
 }
+
+/* =========================
+   其他物品狀態
+========================= */
+
+.custom-condition-input {
+  width: 250px !important;
+}
+
+/* + - 上下排列 */
+
+.add-condition-btn,
+.delete-condition-btn {
+  width: 30px;
+
+  height: 30px;
+
+  border-radius: 5px;
+
+  background: white;
+
+  border: 1px solid #ccc;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+/* =========================
+   標題 + 字數提示
+========================= */
+
+.label-row {
+  display: flex !important;
+
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 8px;
+
+  font-weight: 600;
+}
+
+.word-count {
+  font-size: 13px;
+
+  color: #555;
+
+  font-weight: 400;
+
+  margin-left: 4px;
+
+  white-space: nowrap;
+}
+
+/* =========================
+   接受物資狀態 + 其他物品狀態左右排列
+========================= */
+
+.condition-area {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 40px;
+}
+
+.condition-section {
+  flex: 1;
+}
+
+.custom-condition-section {
+  flex: 1.5;
+}
+
+/* =========================
+   其他物品狀態排列
+========================= */
+
+.custom-condition-list {
+  display: grid;
+
+  grid-template-columns: 420px 420px;
+
+  grid-template-rows: repeat(3, auto);
+
+  grid-auto-flow: column;
+
+  column-gap: 30px;
+
+  row-gap: 15px;
+}
+
+.custom-condition-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.add-condition-btn,
+.delete-condition-btn {
+  width: 30px;
+
+  height: 30px;
+
+  flex-shrink: 0;
+
+  border-radius: 5px;
+
+  background: white;
+
+  border: 1px solid #ccc;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}

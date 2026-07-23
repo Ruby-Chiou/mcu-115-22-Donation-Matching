@@ -40,7 +40,7 @@ export class AgencyDisasterEditComponent implements OnInit {
           毀損: '',
         },
 
-        customCondition: data.customCondition || '',
+        customConditions: data.customConditions || [''],
 
         unit: data.unit || '',
 
@@ -139,6 +139,15 @@ export class AgencyDisasterEditComponent implements OnInit {
 
     this.service.updateDemand(this.demand);
 
-    this.router.navigate(['/agency/disaster-post']);
+    this.router.navigate(['/agency/disaster']);
+  }
+  addCustomCondition() {
+    if (this.demand.customConditions.length < 5) {
+      this.demand.customConditions.push('');
+    }
+  }
+
+  removeCustomCondition(index: number) {
+    this.demand.customConditions.splice(index, 1);
   }
 }

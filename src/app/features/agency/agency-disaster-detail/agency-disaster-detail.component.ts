@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DisasterDemandService } from '../disaster-demand.service';
 
 @Component({
@@ -14,13 +14,20 @@ export class AgencyDisasterDetailComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private service: DisasterDemandService
+    private service: DisasterDemandService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
     this.demand = this.service.getDemandById(id);
+
+    if (this.demand) {
+      this.demand.remaining ??= this.demand.amount;
+
+      this.demand.customConditions ??= [];
+    }
   }
 
   // 判斷接受 / 不接受顏色
@@ -47,5 +54,17 @@ export class AgencyDisasterDetailComponent {
     }
 
     return '';
+  }
+
+  deleteDemand() {
+    const confirmDelete = confirm('確定要刪除此筆急難需求嗎？');
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    this.service.deleteDemand(this.demand.id);
+
+    this.router.navigate(['/agency/disaster']);
   }
 }

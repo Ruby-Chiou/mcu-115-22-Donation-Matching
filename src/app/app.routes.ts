@@ -45,6 +45,31 @@ export const routes: Routes = [
         (m) => m.AgencyDisasterWorkspaceComponent
       ), // 急難救助需求管理區
   },
+  {
+    path: 'agency/disaster-create',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-create/agency-disaster-create.component').then((m) => m.AgencyDisasterCreateComponent),
+  },
+
+  {
+    path: 'agency/disaster-detail/:id',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-detail/agency-disaster-detail.component').then((m) => m.AgencyDisasterDetailComponent),
+  },
+
+  {
+    path: 'agency/disaster-edit/:id',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-edit/agency-disaster-edit.component').then((m) => m.AgencyDisasterEditComponent),
+  },
+
+  {
+    path: 'agency/disaster-batch-edit',
+    loadComponent: () =>
+      import('./features/agency/agency-disaster-batch-edit/agency-disaster-batch-edit.component').then(
+        (m) => m.AgencyDisasterBatchEditComponent
+      ),
+  },
 
   // 5. 系統後台模組 (管理員端)
   {

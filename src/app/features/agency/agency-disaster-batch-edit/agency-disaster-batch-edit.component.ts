@@ -35,7 +35,7 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
           毀損: '',
         },
 
-        customCondition: item.customCondition || '',
+        customConditions: item.customConditions || [''],
 
         unit: item.unit || '',
 
@@ -139,12 +139,22 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
 
     localStorage.removeItem('editDemands');
 
-    this.router.navigate(['/agency/disaster-post']);
+    this.router.navigate(['/agency/disaster']);
+  }
+  addCustomCondition(demand: any) {
+    if (demand.customConditions.length < 5) {
+      demand.customConditions.push('');
+    }
   }
 
+  removeCustomCondition(demand: any, index: number) {
+    if (demand.customConditions.length > 1) {
+      demand.customConditions.splice(index, 1);
+    }
+  }
   cancel() {
     localStorage.removeItem('editDemands');
 
-    this.router.navigate(['/agency/disaster-post']);
+    this.router.navigate(['/agency/disaster']);
   }
 }

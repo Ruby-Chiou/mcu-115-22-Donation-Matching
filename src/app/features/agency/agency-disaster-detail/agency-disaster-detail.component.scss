@@ -42,19 +42,26 @@ h1 {
 .detail-content {
   flex: 1;
 
+  max-width: 75%;
+
   padding: 15px;
 
   background-color: white;
 
   font-size: 16px;
+
+  word-break: break-word;
+
+  overflow-wrap: break-word;
+
+  white-space: pre-wrap;
 }
 
 /* 返回按鈕 */
 .button-area {
   display: flex;
-
   justify-content: flex-end;
-
+  gap: 10px;
   margin-top: 25px;
 }
 
@@ -77,6 +84,36 @@ h1 {
 }
 
 .back-btn:hover {
+  opacity: 0.85;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 8px 18px;
+
+  border-radius: 15px;
+
+  border: none;
+
+  cursor: pointer;
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 500;
+}
+
+.edit-btn {
+  background-color: var(--color-brand-primary);
+}
+
+.delete-btn {
+  background-color: #d32f2f;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
   opacity: 0.85;
 }
 

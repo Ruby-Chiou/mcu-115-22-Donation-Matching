@@ -14,6 +14,12 @@
       <div class="detail-content">{{demand.amount}} {{demand.unit}}</div>
     </div>
 
+    <!-- 剩餘需求 -->
+    <div class="detail-row">
+      <div class="detail-title">剩餘需求</div>
+      <div class="detail-content">{{demand.remaining}} {{demand.unit}}</div>
+    </div>
+
     <!-- 數量描述 -->
     <div class="detail-row">
       <div class="detail-title">數量描述</div>
@@ -86,15 +92,22 @@
 
           {{demand.conditions?.['毀損'] || '未設定'}}
         </div>
-
-        <!-- 其他物品狀態 -->
-        <div class="condition-item">
-          <span>其他：</span>
-
-          {{demand.customCondition || '無'}}
-        </div>
       </div>
     </div>
+
+    <!-- 其他物品狀態 -->
+    <div class="detail-row">
+      <div class="detail-title">其他物品狀態</div>
+
+      <div class="detail-content">
+        <div *ngIf="demand.customConditions?.length > 0">
+          <div class="condition-item" *ngFor="let condition of demand.customConditions">{{condition}}</div>
+        </div>
+
+        <div *ngIf="!demand.customConditions || demand.customConditions.length === 0">無</div>
+      </div>
+    </div>
+
     <!-- 緊急優先度 -->
     <div class="detail-row">
       <div class="detail-title">緊急優先度</div>
@@ -139,8 +152,14 @@
       <div class="detail-content">{{demand.note}}</div>
     </div>
   </div>
+  <!-- detail-table 結束 -->
 
   <div class="button-area">
-    <button class="back-btn" routerLink="/agency/disaster-post">返回</button>
+    <button class="back-btn" routerLink="/agency/disaster">返回</button>
+
+    <button class="edit-btn" [routerLink]="['/agency/disaster-edit', demand.id]">編輯</button>
+
+    <button class="delete-btn" (click)="deleteDemand()">刪除</button>
   </div>
 </div>
+<!-- container 結束 -->
