@@ -1,1 +1,19 @@
-<p>donor-disaster-lobby works!</p>
+<div class="lobby">
+  <section class="main">
+    <h3 class="section-title">災害救助</h3>
+    <div class="news-card">
+      <div class="card-image">
+        <img [src]="disasterNews().image" [alt]="disasterNews().text" />
+      </div>
+      <div class="card-text">
+        <p>{{ disasterNews().text }}</p>
+        <p class="highlight">{{ disasterNews().highlight }}</p>
+      </div>
+    </div>
+    <div class="disaster-indicators">
+      @for (i of [0, 1, 2]; track i) {
+      <span class="dot" [class.active]="disasterIndex() === i" (click)="setSlide(i)"> </span>
+      }
+    </div>
+  </section>
+</div>
