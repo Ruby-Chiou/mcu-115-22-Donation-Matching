@@ -1,16 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
+
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+
 import { DisasterDemandService } from '../disaster-demand.service';
 
 @Component({
   selector: 'app-agency-disaster-edit',
+
   imports: [CommonModule, FormsModule, RouterLink],
+
   templateUrl: './agency-disaster-edit.component.html',
+
   styleUrl: './agency-disaster-edit.component.scss',
 })
 export class AgencyDisasterEditComponent implements OnInit {
+  submitted = false;
+
+  hasServiceTarget = true;
+
+  @ViewChild('itemInput') itemInput!: ElementRef;
+
   demand: any = {};
 
   constructor(
@@ -30,96 +43,125 @@ export class AgencyDisasterEditComponent implements OnInit {
       this.demand = {
         ...data,
 
-        // 接受物資狀態
-        // 防止舊資料沒有欄位
         conditions: data.conditions || {
           全新: '',
+
           二手: '',
+
           有擦痕: '',
+
           過期: '',
+
           毀損: '',
         },
 
-        customConditions: data.customConditions || [''],
+        customConditions: data.customConditions?.length ? data.customConditions : [''],
 
         unit: data.unit || '',
 
         amountDescription: data.amountDescription || '',
 
         status: data.status || '上架',
+
+        remaining: data.remaining ?? data.amount,
+
+        brand: data.brand || '',
+        category: data.category || '',
+
+        serviceTargets: data.serviceTargets || {
+          老人: false,
+
+          嬰幼兒: false,
+
+          孩童: false,
+
+          青少年: false,
+
+          身障: false,
+
+          貧困: false,
+
+          重症照護: false,
+
+          寵物: false,
+
+          流浪: false,
+
+          野生: false,
+        },
+
+        customServiceTargets: data.customServiceTargets?.length ? data.customServiceTargets : [''],
       };
     }
   }
 
-  save() {
-    // 清除錯誤
+  // 限制剩餘需求最高只能填到需求數量
 
-    this.demand.itemError = false;
+  onRemainingChange() {
+    if (this.demand.amount !== undefined && this.demand.amount !== null && this.demand.amount !== '') {
+      const maxAmount = Number(this.demand.amount);
 
-    this.demand.amountError = false;
+      const currentRemaining = Number(this.demand.remaining);
 
-    this.demand.reasonError = false;
-
-    this.demand.descriptionError = false;
-
-    this.demand.addressError = false;
-
-    this.demand.phoneError = false;
-
-    // 必填檢查
-
-    if (!this.demand.item) {
-      this.demand.itemError = true;
-    }
-
-    // 修正數量判斷
-    if (this.demand.amount === '') {
-      this.demand.amountError = true;
-    }
-
-    if (!this.demand.reason) {
-      this.demand.reasonError = true;
-    }
-
-    if (!this.demand.description) {
-      this.demand.descriptionError = true;
-    }
-
-    if (!this.demand.address) {
-      this.demand.addressError = true;
-    }
-
-    if (!this.demand.phone) {
-      this.demand.phoneError = true;
-    }
-
-    const invalid =
-      this.demand.itemError ||
-      this.demand.amountError ||
-      this.demand.reasonError ||
-      this.demand.descriptionError ||
-      this.demand.addressError ||
-      this.demand.phoneError;
-
-    if (invalid) {
-      setTimeout(() => {
-        const firstErrorElement = document.querySelector('.invalid') as HTMLElement | null;
-
-        if (firstErrorElement) {
-          firstErrorElement.scrollIntoView({
-            behavior: 'smooth',
-
-            block: 'center',
-          });
-
-          firstErrorElement.focus();
+      if (!isNaN(maxAmount) && !isNaN(currentRemaining)) {
+        if (currentRemaining > maxAmount) {
+          this.demand.remaining = maxAmount;
         }
-      }, 0);
+      }
+    }
+  }
+
+  save() {
+    this.submitted = true;
+
+    // 1. 檢查服務對象必填（至少需要一項勾選或輸入自訂服務對象）
+
+    this.hasServiceTarget =
+      Object.values(this.demand.serviceTargets || {}).some((value: any) => value) ||
+      this.demand.customServiceTargets?.some((target: string) => target.trim());
+
+    // 2. 剩餘需求不可小於 0
+
+    if (Number(this.demand.remaining) < 0) {
+      alert('剩餘需求不可小於 0');
 
       return;
     }
 
-    // 確保接受物資狀態存在
+    // 3. 基本必填與數值驗證（含需求數量、單位、剩餘需求）
+
+    const isAmountInvalid = !this.demand.amount || isNaN(Number(this.demand.amount));
+
+    const isRemainingInvalid = this.demand.remaining === '' || this.demand.remaining === null || isNaN(Number(this.demand.remaining));
+
+    if (
+      !this.demand.item ||
+      isAmountInvalid ||
+      !this.demand.unit ||
+      isRemainingInvalid ||
+      !this.demand.reason ||
+      !this.demand.description ||
+      !this.demand.address ||
+      !this.demand.phone
+    ) {
+      this.itemInput.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+
+        block: 'center',
+      });
+
+      return;
+    }
+
+    // 4. 服務對象未填驗證與獨立滾動
+
+    if (!this.hasServiceTarget) {
+      this.scrollToServiceTarget();
+
+      return;
+    }
+
+    // 確保物資狀態物件齊全
 
     if (!this.demand.conditions) {
       this.demand.conditions = {
@@ -135,12 +177,31 @@ export class AgencyDisasterEditComponent implements OnInit {
       };
     }
 
-    // 更新資料
+    // 自動重新判斷需求分類
+    this.demand.category = this.service.getCategory(this.demand.item);
 
+    // 更新資料並返回頁面
     this.service.updateDemand(this.demand);
 
     this.router.navigate(['/agency/disaster']);
   }
+
+  isNaN(val: any): boolean {
+    return isNaN(Number(val));
+  }
+
+  scrollToServiceTarget() {
+    const element = document.querySelector('.service-target-area');
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+
+        block: 'center',
+      });
+    }
+  }
+
   addCustomCondition() {
     if (this.demand.customConditions.length < 5) {
       this.demand.customConditions.push('');
@@ -149,5 +210,15 @@ export class AgencyDisasterEditComponent implements OnInit {
 
   removeCustomCondition(index: number) {
     this.demand.customConditions.splice(index, 1);
+  }
+
+  addCustomServiceTarget() {
+    if (this.demand.customServiceTargets.length < 5) {
+      this.demand.customServiceTargets.push('');
+    }
+  }
+
+  removeCustomServiceTarget(index: number) {
+    this.demand.customServiceTargets.splice(index, 1);
   }
 }

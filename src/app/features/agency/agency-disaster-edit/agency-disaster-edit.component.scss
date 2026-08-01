@@ -12,7 +12,11 @@ h1 {
   color: var(--color-brand-primary);
 }
 
-/* 表單外框 */
+/* =========================
+
+   表單外框
+
+========================= */
 
 .form-box {
   background-color: #e3f2fd;
@@ -24,7 +28,11 @@ h1 {
   padding: 30px;
 }
 
-/* 標籤 */
+/* =========================
+
+   標籤
+
+========================= */
 
 label {
   display: block;
@@ -38,7 +46,17 @@ label {
   font-size: 17px;
 }
 
-/* 輸入框 */
+/* 確保表單內獨立 Label 上方有足夠呼吸空間 */
+
+.form-box > label {
+  margin-top: 15px;
+}
+
+/* =========================
+
+   輸入框
+
+========================= */
 
 input,
 select {
@@ -56,63 +74,6 @@ select {
 
   font-size: 16px;
 }
-
-/* 按鈕 */
-
-.button-area {
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 10px;
-
-  margin-top: 25px;
-}
-
-.button-area button {
-  padding: 8px 18px;
-
-  border-radius: 15px;
-
-  border: none;
-
-  cursor: pointer;
-
-  color: var(--color-white);
-
-  font-size: 16px;
-
-  font-weight: 500;
-}
-
-.back-btn,
-.save-btn {
-  background-color: var(--color-brand-primary);
-}
-
-.button-area button:hover {
-  opacity: 0.85;
-}
-
-/* =========================
-   數量欄位
-========================= */
-
-.amount-box {
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-}
-
-.amount-box input {
-  margin-bottom: 20px;
-}
-
-/* =========================
-   文字欄位
-========================= */
 
 textarea {
   width: 100%;
@@ -135,11 +96,55 @@ textarea {
 }
 
 /* =========================
+
+   數量 + 單位 容器
+
+========================= */
+
+.quantity-box {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+}
+
+.quantity-box input {
+  margin-bottom: 20px;
+}
+
+/* =========================
+
    欄位寬度
+
 ========================= */
 
 .short-input {
   width: 250px;
+
+  resize: none;
+
+  overflow-wrap: break-word;
+}
+
+/* 需求物 textarea */
+
+.item-input {
+  width: 250px;
+
+  min-height: 80px;
+
+  padding: 12px;
+
+  box-sizing: border-box;
+
+  border-radius: 10px;
+
+  border: 1px solid #ddd;
+
+  font-size: 16px;
+
+  resize: vertical;
 }
 
 /* 單位 */
@@ -161,7 +166,9 @@ textarea {
 }
 
 /* =========================
+
    物品完好度
+
 ========================= */
 
 .condition-box {
@@ -182,24 +189,13 @@ textarea {
   gap: 30px;
 }
 
-.condition-name {
-  width: 100px;
-
-  font-size: 16px;
-
-  font-weight: 500;
-}
-
 .condition-row label {
   display: flex;
-
   align-items: center;
-
   gap: 6px;
-
   font-size: 16px;
-
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .condition-row input[type='radio'] {
@@ -221,19 +217,19 @@ textarea {
 }
 
 /* =========================
-   優先度
+
+   優先度 (加大下邊距)
+
 ========================= */
 
 .priority-box {
   display: flex;
 
-  flex-direction: row;
-
   align-items: center;
 
   gap: 30px;
 
-  margin-bottom: 20px;
+  margin-bottom: 35px; /* 由 20px 拉大至 35px */
 }
 
 .priority-box label {
@@ -273,25 +269,9 @@ textarea {
 }
 
 /* =========================
-   錯誤紅框
-========================= */
 
-.invalid {
-  border: 2px solid #e53935 !important;
+   公開狀態 (加大下邊距)
 
-  outline: none;
-
-  background-color: #fff5f5;
-}
-
-.required {
-  color: #d32f2f;
-
-  font-weight: bold;
-}
-
-/* =========================
-   公開狀態
 ========================= */
 
 .status-box {
@@ -301,7 +281,7 @@ textarea {
 
   gap: 30px;
 
-  margin-bottom: 20px;
+  margin-bottom: 35px; /* 由 20px 拉大至 35px */
 }
 
 .status-box label {
@@ -327,41 +307,75 @@ textarea {
 }
 
 /* =========================
-   其他物品狀態
+
+   按鈕
+
 ========================= */
 
-.custom-condition-input {
-  width: 250px !important;
+.button-area {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 25px;
 }
 
-/* + - 上下排列 */
+.button-area button {
+  padding: 8px 18px;
 
-.add-condition-btn,
-.delete-condition-btn {
-  width: 30px;
+  border-radius: 15px;
 
-  height: 30px;
-
-  border-radius: 5px;
-
-  background: white;
-
-  border: 1px solid #ccc;
-
-  font-size: 18px;
+  border: none;
 
   cursor: pointer;
 
-  display: flex;
+  color: white;
 
-  align-items: center;
+  font-size: 16px;
 
-  justify-content: center;
+  font-weight: 500;
 }
 
+.save-btn {
+  background-color: var(--color-brand-primary);
+}
+
+.cancel-btn {
+  background-color: #64b5f6;
+  color: #1565c0;
+
+  &:hover {
+    background-color: #42a5f5;
+  }
+}
+
+.button-area button:hover {
+  opacity: 0.85;
+}
+
+.cancel-btn:hover {
+  background-color: #64b5f6;
+  opacity: 1;
+}
 /* =========================
-   標題 + 字數提示
+
+   必填標記與提示
+
 ========================= */
+
+.required {
+  color: #d32f2f;
+
+  font-weight: bold;
+}
+
+.error-input {
+  border: 2px solid #d32f2f !important;
+
+  background-color: #fff5f5;
+}
 
 .label-row {
   display: flex !important;
@@ -369,6 +383,8 @@ textarea {
   align-items: center;
 
   gap: 6px;
+
+  margin-top: 20px;
 
   margin-bottom: 8px;
 
@@ -388,7 +404,7 @@ textarea {
 }
 
 /* =========================
-   接受物資狀態 + 其他物品狀態左右排列
+   物資狀態區（與服務對象區完全對齊）
 ========================= */
 
 .condition-area {
@@ -396,33 +412,63 @@ textarea {
 
   align-items: flex-start;
 
-  gap: 40px;
+  gap: 350px;
+
+  margin-bottom: 20px;
+
+  /* 已移除 padding-left: 12px; 以確保上下完美切齊 */
 }
 
 .condition-section {
-  flex: 1;
+  width: 280px;
+
+  flex-shrink: 0;
 }
 
 .custom-condition-section {
-  flex: 1.5;
+  flex: 1;
 }
 
-/* =========================
-   其他物品狀態排列
-========================= */
+.condition-box {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.condition-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 30px;
+}
+
+.condition-name {
+  width: 80px;
+
+  font-size: 16px;
+
+  font-weight: 500;
+}
+
+/* 右側其他物品狀態 */
 
 .custom-condition-list {
   display: grid;
 
-  grid-template-columns: 420px 420px;
+  grid-template-columns: repeat(2, 400px);
 
   grid-template-rows: repeat(3, auto);
 
   grid-auto-flow: column;
 
-  column-gap: 30px;
+  column-gap: 80px;
 
-  row-gap: 15px;
+  row-gap: 35px;
 }
 
 .custom-condition-row {
@@ -431,6 +477,18 @@ textarea {
   align-items: center;
 
   gap: 8px;
+
+  width: 400px;
+
+  flex-shrink: 0;
+}
+
+.custom-condition-input {
+  width: 280px !important;
+
+  flex-shrink: 0;
+
+  margin-bottom: 0 !important;
 }
 
 .add-condition-btn,
@@ -439,15 +497,17 @@ textarea {
 
   height: 30px;
 
-  flex-shrink: 0;
-
   border-radius: 5px;
 
-  background: white;
+  background-color: white;
 
   border: 1px solid #ccc;
 
+  color: #333;
+
   font-size: 18px;
+
+  font-weight: bold;
 
   cursor: pointer;
 
@@ -456,4 +516,129 @@ textarea {
   align-items: center;
 
   justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.add-condition-btn:hover,
+.delete-condition-btn:hover {
+  background-color: #f5f5f5;
+}
+
+/* =========================
+   服務對象區
+========================= */
+.service-target-area {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 350px;
+  margin-bottom: 25px;
+}
+
+/* 整個服務對象區紅框 */
+.service-target-area.error-area::before {
+  content: '';
+
+  position: absolute;
+
+  top: 10px;
+
+  left: -12px;
+
+  width: 1040px;
+
+  height: calc(100% + 2px);
+
+  border: 2px solid #d32f2f;
+
+  background-color: #fff5f5;
+
+  border-radius: 12px;
+
+  z-index: 0;
+
+  pointer-events: none;
+}
+
+/* 讓內容浮在紅框上 */
+.service-target-section,
+.custom-service-target-section {
+  position: relative;
+
+  z-index: 1;
+}
+
+/* 移除舊紅框 */
+.service-target-area.error-area .service-target-section {
+  border: none !important;
+
+  background-color: transparent !important;
+}
+
+.service-target-section {
+  width: 280px;
+
+  flex-shrink: 0;
+}
+
+.custom-service-target-section {
+  flex: 1;
+}
+
+/* 左側 checkbox */
+
+.service-target-box {
+  display: grid;
+  grid-template-columns: repeat(2, 120px);
+  column-gap: 30px;
+  row-gap: 20px;
+}
+
+.service-target-box label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.service-target-box input[type='checkbox'] {
+  width: auto;
+  margin: 0;
+}
+
+/* 右側其他服務對象 */
+
+.custom-service-list {
+  display: grid;
+
+  grid-template-columns: repeat(2, 400px);
+
+  grid-template-rows: repeat(3, auto);
+
+  grid-auto-flow: column;
+
+  column-gap: 80px;
+
+  row-gap: 35px;
+}
+
+.custom-service-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  width: 400px;
+
+  flex-shrink: 0;
+}
+
+.custom-service-input {
+  width: 280px !important;
+
+  flex-shrink: 0;
+
+  margin-bottom: 0 !important;
 }

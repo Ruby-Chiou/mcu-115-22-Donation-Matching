@@ -12,16 +12,13 @@ h1 {
 /* 詳細資料表 */
 .detail-table {
   width: 100%;
-
   border-radius: 15px;
-
   overflow: hidden;
 }
 
 /* 每一列 */
 .detail-row {
   display: flex;
-
   border: 1px solid #ddd;
 }
 
@@ -29,35 +26,27 @@ h1 {
 .detail-title {
   width: 25%;
   padding: 15px;
-
   background-color: #e3f2fd;
-
   font-size: 16px;
-
   font-weight: 500;
-
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .detail-content {
   flex: 1;
-
   max-width: 75%;
-
   padding: 15px;
-
   background-color: white;
-
   font-size: 16px;
-
   word-break: break-word;
-
   overflow-wrap: break-word;
-
   white-space: pre-wrap;
 }
 
-/* 返回按鈕 */
+/* 按鈕區 */
 .button-area {
   display: flex;
   justify-content: flex-end;
@@ -65,43 +54,21 @@ h1 {
   margin-top: 25px;
 }
 
-.back-btn {
-  padding: 8px 18px;
-
-  border-radius: 15px;
-
-  border: none;
-
-  cursor: pointer;
-
-  background-color: var(--color-brand-primary);
-
-  color: var(--color-white);
-
-  font-size: 15px;
-
-  font-weight: 500;
-}
-
-.back-btn:hover {
-  opacity: 0.85;
-}
-
+.back-btn,
 .edit-btn,
 .delete-btn {
   padding: 8px 18px;
-
   border-radius: 15px;
-
   border: none;
-
   cursor: pointer;
-
   color: white;
-
   font-size: 15px;
-
   font-weight: 500;
+}
+
+.back-btn {
+  background-color: #64b5f6;
+  color: #1565c0;
 }
 
 .edit-btn {
@@ -112,26 +79,20 @@ h1 {
   background-color: #d32f2f;
 }
 
+.back-btn:hover {
+  background-color: #42a5f5;
+  opacity: 1;
+}
+
 .edit-btn:hover,
 .delete-btn:hover {
   opacity: 0.85;
 }
 
 /* 接受物資狀態 */
-
-.detail-title {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-}
-
 .condition-detail {
   display: flex;
-
   flex-direction: column;
-
   gap: 10px;
 }
 
@@ -157,7 +118,6 @@ h1 {
 }
 
 /* 緊急優先度顏色 */
-
 .priority-detail.normal {
   color: #333333;
   font-weight: 500;
@@ -171,4 +131,83 @@ h1 {
 .priority-detail.very-urgent {
   color: #d32f2f;
   font-weight: 500;
+}
+
+/* =========================
+   刪除確認 Modal 樣式（完全比照新增/編輯頁）
+========================= */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background-color: #ffffff;
+  width: 420px;
+  padding: 35px 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  h2 {
+    margin: 0 0 15px 0;
+    color: var(--color-brand-primary, #0056b3);
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 25px 0;
+    font-size: 16px;
+    color: #333333;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+
+  button {
+    min-width: 100px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #ffffff;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .cancel-btn {
+    background-color: #64b5f6;
+    color: #1565c0;
+
+    &:hover {
+      background-color: #42a5f5;
+    }
+  }
+
+  .confirm-btn {
+    background-color: #d32f2f;
+    color: white;
+
+    &:hover {
+      background-color: #b71c1c;
+    }
+  }
 }

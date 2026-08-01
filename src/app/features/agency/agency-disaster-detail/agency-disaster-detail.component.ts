@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DisasterDemandService } from '../disaster-demand.service';
@@ -9,8 +9,9 @@ import { DisasterDemandService } from '../disaster-demand.service';
   templateUrl: './agency-disaster-detail.component.html',
   styleUrl: './agency-disaster-detail.component.scss',
 })
-export class AgencyDisasterDetailComponent {
+export class AgencyDisasterDetailComponent implements OnInit {
   demand: any;
+  showDeleteModal: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,9 +26,37 @@ export class AgencyDisasterDetailComponent {
 
     if (this.demand) {
       this.demand.remaining ??= this.demand.amount;
-
       this.demand.customConditions ??= [];
+      this.demand.customServiceTargets ??= [];
+      this.demand.serviceTargets ??= {};
     }
+  }
+
+  // 取得勾選的服務對象，以頓號連結；若皆無則回傳 '無'
+  getSelectedServiceTargets(): string {
+    if (!this.demand || !this.demand.serviceTargets) {
+      return '無';
+    }
+
+    const selected = Object.keys(this.demand.serviceTargets).filter((key) => this.demand.serviceTargets[key]);
+
+    return selected.length > 0 ? selected.join('、') : '無';
+  }
+
+  // 檢查是否有有效填寫的其他服務對象
+  hasCustomServiceTargets(): boolean {
+    return (
+      Array.isArray(this.demand?.customServiceTargets) &&
+      this.demand.customServiceTargets.some((target: string) => target && target.trim() !== '')
+    );
+  }
+
+  // 檢查是否有有效填寫的其他物品狀態
+  hasCustomConditions(): boolean {
+    return (
+      Array.isArray(this.demand?.customConditions) &&
+      this.demand.customConditions.some((condition: string) => condition && condition.trim() !== '')
+    );
   }
 
   // 判斷接受 / 不接受顏色
@@ -56,15 +85,22 @@ export class AgencyDisasterDetailComponent {
     return '';
   }
 
-  deleteDemand() {
-    const confirmDelete = confirm('確定要刪除此筆急難需求嗎？');
+  // 開啟刪除 Modal
+  openDeleteModal() {
+    this.showDeleteModal = true;
+  }
 
-    if (!confirmDelete) {
-      return;
+  // 關閉刪除 Modal
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+  }
+
+  // 確認刪除執行動作
+  confirmDelete() {
+    if (this.demand) {
+      this.service.deleteDemand(this.demand.id);
+      this.showDeleteModal = false;
+      this.router.navigate(['/agency/disaster']);
     }
-
-    this.service.deleteDemand(this.demand.id);
-
-    this.router.navigate(['/agency/disaster']);
   }
 }

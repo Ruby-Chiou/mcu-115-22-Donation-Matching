@@ -4,114 +4,136 @@
 
 h1 {
   margin-bottom: 20px;
-
   font-size: 24px;
-
   font-weight: 600;
-
   color: var(--color-brand-primary);
 }
 
 /* =====================
-   新增按鈕
+   最上方新增按鈕區
 ===================== */
 
-.action-bar {
+.top-action-bar {
   display: flex;
-
   justify-content: flex-end;
-
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .add-btn {
-  padding: 8px 18px;
-
-  border-radius: 15px;
-
+  padding: 8px 22px;
+  border-radius: 20px;
   border: none;
-
   cursor: pointer;
-
   background-color: var(--color-brand-primary);
-
   color: var(--color-white);
-
   font-size: 15px;
-
   font-weight: 500;
-}
+  transition: opacity 0.2s;
 
-.add-btn:hover {
-  opacity: 0.85;
+  &:hover {
+    opacity: 0.85;
+  }
 }
 
 /* =====================
-   全選區
+   表格上方工具列 (左：全選 / 右：篩選按鈕)
 ===================== */
+
+.toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
 
 .select-area {
   display: flex;
-
   align-items: center;
-
-  margin-bottom: 15px;
 }
 
 .select-all {
   width: 104px;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   gap: 8px;
+
+  span {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
 }
-
-.select-all span {
-  font-size: 16px;
-
-  font-weight: 600;
-
-  white-space: nowrap;
-}
-
-.select-all input[type='checkbox'] {
-  width: 18px;
-
-  height: 18px;
-
-  cursor: pointer;
-}
-
-/* 批次按鈕 */
 
 .batch-buttons {
   display: flex;
-
   align-items: center;
-
   gap: 10px;
-
   margin-left: 15px;
+
+  button {
+    padding: 8px 18px;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--color-brand-primary);
+    color: white;
+    font-size: 15px;
+  }
 }
-
-.batch-buttons button {
-  padding: 8px 18px;
-
-  border-radius: 15px;
-
-  border: none;
-
-  cursor: pointer;
-
-  background-color: var(--color-brand-primary);
-
+/* 批次刪除按鈕 */
+.batch-delete-btn {
+  background-color: #d32f2f !important;
   color: white;
 
+  &:hover {
+    background-color: #b71c1c;
+  }
+}
+/* 篩選按鈕區 */
+.filter-trigger-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.filter-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: #bbdefb;
+  color: #1565c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  &:hover {
+    background-color: #90caf9;
+    transform: scale(1.05);
+  }
+}
+
+.filter-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.filter-label-text {
   font-size: 15px;
+  font-weight: 600;
+  color: #333333;
+  user-select: none;
 }
 
 /* =====================
@@ -120,24 +142,17 @@ h1 {
 
 table {
   width: 100%;
-
   border-collapse: separate;
-
   border-spacing: 0;
-
   border-radius: 15px;
-
   overflow: hidden;
 }
 
 th,
 td {
   border: 1px solid #ddd;
-
   padding: 12px;
-
   text-align: center;
-
   font-size: 16px;
 }
 
@@ -145,22 +160,16 @@ th {
   background-color: #e3f2fd;
 }
 
-/* checkbox欄 */
-
 .checkbox-column {
   width: 80px;
-
   min-width: 80px;
-
   text-align: center;
-}
 
-.checkbox-column input[type='checkbox'] {
-  width: 18px;
-
-  height: 18px;
-
-  cursor: pointer;
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
 }
 
 /* =====================
@@ -169,22 +178,30 @@ th {
 
 .operation-column {
   width: 430px;
-
   min-width: 430px;
 }
 
-/* 查看 修改 刪除 */
-
 .operation-flex {
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   gap: 8px;
-
   flex-wrap: nowrap;
+
+  select {
+    width: 110px;
+    height: 34px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  label {
+    font-size: 14px;
+    white-space: nowrap;
+  }
 }
 
 .status-label {
@@ -193,105 +210,66 @@ th {
   margin-left: 5px;
 }
 
-.operation-flex select {
-  width: 110px;
-
-  height: 34px;
-
-  padding: 6px 10px;
-
-  border-radius: 10px;
-
-  border: 1px solid #ccc;
-
-  font-size: 14px;
-
-  cursor: pointer;
-}
-
-.operation-flex label {
-  font-size: 14px;
-
-  white-space: nowrap;
-}
-
-/* =====================
-   狀態顏色
-===================== */
-
+/* 狀態顏色 */
 .status-on {
-  background-color: #c8e6c9;
-  color: #333;
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 
 .status-hide {
-  background-color: #fff3cd;
-  color: #333;
+  background-color: #fff8e1;
+  color: #8d6e00;
 }
 
 .status-off {
-  background-color: #ffcdd2;
-  color: #333;
+  background-color: #ffebee;
+  color: #c62828;
 }
-
-/* =====================
-   按鈕
-===================== */
 
 td button {
   padding: 7px 12px;
-
   border-radius: 10px;
-
   border: none;
-
   cursor: pointer;
-
   background-color: var(--color-brand-primary);
-
   color: var(--color-white);
-
   font-size: 14px;
-
   font-weight: 500;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
-td button:hover {
-  opacity: 0.8;
+/* 操作欄刪除按鈕 */
+td .delete-btn {
+  background-color: #d32f2f;
+  color: white;
+
+  &:hover {
+    background-color: #b71c1c;
+  }
 }
-
-/* =====================
-   空資料
-===================== */
-
+/* 空資料 */
 .empty-message {
   text-align: center;
-
   padding: 40px;
-
   color: var(--color-text-main);
 }
 
 .empty-title {
   font-size: 20px;
-
   font-weight: 600;
-
   margin-bottom: 12px;
 }
 
 .empty-description {
   font-size: 15px;
-
   line-height: 1.8;
-
   color: #666;
 }
 
-/* =====================
-   圓角
-===================== */
-
+/* 圓角 */
 thead tr:first-child th:first-child {
   border-top-left-radius: 15px;
 }
@@ -308,215 +286,196 @@ tbody tr:last-child td:last-child {
   border-bottom-right-radius: 15px;
 }
 
-/* =====================
-   緊急優先度顏色
-===================== */
-
+/* 優先度顏色 */
 .normal {
   color: #333333;
 }
-
 .urgent {
   color: #f57c00;
 }
-
 .very-urgent {
   color: #d32f2f;
 }
 
-/* =====================
-   留言區
-===================== */
-
+/* 留言區 */
 .message-column {
   width: 100px;
   text-align: center;
+
+  a {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
-
-.message-column a {
-  color: var(--color-brand-primary);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.modal-backdrop {
-  position: fixed;
-
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 100%;
-
-  background: rgba(0, 0, 0, 0.4);
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-}
-
-.modal-box {
-  background: white;
-
-  width: 350px;
-
-  padding: 30px;
-
-  border-radius: 15px;
-
-  text-align: center;
-
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-buttons {
-  display: flex;
-
-  justify-content: center;
-
-  gap: 20px;
-}
-
-/* =====================
-   需求物欄位
-===================== */
-
-/* =====================
-   需求物欄位
-===================== */
 
 .item-column {
   width: 200px;
-
   max-width: 200px;
-
   height: 48px;
-
   text-align: center;
-
   white-space: normal;
-
   word-break: break-all;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
-
   line-height: 24px;
 }
 
 /* =====================
-   刪除確認視窗
+   通用 Modal 彈窗樣式
 ===================== */
 
 .modal-backdrop {
   position: fixed;
-
   top: 0;
   left: 0;
-
   width: 100%;
   height: 100%;
-
   background: rgba(0, 0, 0, 0.4);
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   z-index: 999;
 }
 
 .modal-box {
   background: white;
-
   width: 420px;
-
-  padding: 40px;
-
+  padding: 30px;
   border-radius: 20px;
-
   text-align: center;
-
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--color-brand-primary);
+  }
+
+  p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: var(--color-text-main);
+  }
 }
-
-/* 標題 */
-
-.modal-box h2 {
-  font-size: 26px;
-
-  font-weight: 600;
-
-  margin-bottom: 20px;
-
-  color: var(--color-brand-primary);
-}
-
-/* 內容文字 */
-
-.modal-box p {
-  font-size: 18px;
-
-  margin-bottom: 30px;
-
-  color: var(--color-text-main);
-}
-
-/* 按鈕區 */
 
 .modal-buttons {
   display: flex;
-
   justify-content: center;
+  gap: 15px;
 
-  gap: 20px;
+  button {
+    padding: 9px 22px;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+}
+
+/* 【確定刪除按鈕】 */
+.confirm-btn {
+  background-color: #d32f2f;
+  color: white;
+
+  &:hover {
+    background-color: #b71c1c;
+  }
+}
+
+/* 【取消按鈕】 */
+.cancel-btn {
+  background-color: #90caf9;
+  color: #0d47a1;
+
+  &:hover {
+    background-color: #64b5f6;
+  }
+}
+
+/* 篩選確定按鈕 */
+.filter-confirm-btn {
+  background-color: var(--color-brand-primary);
+  color: var(--color-white);
+
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+/* 重置按鈕：微白淡藍 */
+.reset-btn {
+  background-color: #e1e6eb;
+  color: #4f5b66;
+  border: 1px solid #c8d0d8 !important;
+  margin-right: auto;
+
+  &:hover {
+    background-color: #d5dce3;
+  }
 }
 
 /* =====================
-   刪除確認視窗按鈕
+   篩選視窗專用樣式
 ===================== */
 
-.modal-buttons button {
-  padding: 10px 24px;
+.filter-modal-box {
+  width: 580px;
+  max-height: 85vh;
+  overflow-y: auto;
+  text-align: left;
+  padding: 30px 35px;
 
-  border-radius: 15px;
+  h2 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+}
 
+.filter-group {
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 10px;
+  }
+}
+
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* 【選項按鈕】 */
+.pill-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
   border: none;
-
+  font-size: 14px;
   cursor: pointer;
-
-  font-size: 16px;
-
+  transition: all 0.2s ease;
+  background-color: #e3f2fd;
+  color: #1565c0;
   font-weight: 500;
 
-  transition: 0.2s;
+  &:hover {
+    background-color: #bbdefb;
+  }
+
+  &.active {
+    background-color: var(--color-brand-primary);
+    color: #ffffff;
+    font-weight: 600;
+  }
 }
 
-/* 取消按鈕 */
-
-.cancel-btn {
-  background-color: var(--color-brand-primary);
-
-  color: var(--color-white);
-}
-
-.cancel-btn:hover {
-  opacity: 0.85;
-}
-
-/* 確定刪除按鈕 */
-
-.confirm-btn {
-  background-color: #d32f2f;
-
-  color: var(--color-white);
-}
-
-.confirm-btn:hover {
-  background-color: #b71c1c;
+.filter-buttons {
+  margin-top: 30px;
+  justify-content: flex-end;
 }

@@ -12,22 +12,38 @@ import { DisasterDemandService } from '../../agency/disaster-demand.service';
 })
 export class AgencyDisasterWorkspaceComponent implements OnInit {
   demands: any[] = [];
+  filteredDemands: any[] = []; // 存放篩選過後的結果列表
 
   selectAll = false;
 
   // =========================
   // 刪除提示視窗控制
   // =========================
-
   showDeleteModal = false;
-
   deleteId!: number;
-
   deleteType: 'single' | 'batch' = 'single';
+
+  // =========================
+  // 篩選視窗控制與選項
+  // =========================
+  showFilterModal = false;
+
+  statusOptions = ['已上架', '隱藏中', '已下架'];
+  priorityOptions = ['普通', '緊急', '非常緊急'];
+  categoryOptions = ['食物', '衣物', '醫療', '嬰幼兒', '生活用品', '其他'];
+  messageOptions = ['已回覆', '未回覆'];
+
+  // 儲存當前選中的篩選條件
+  selectedFilters = {
+    status: [] as string[],
+    priority: [] as string[],
+    lowRemaining: false,
+    category: [] as string[],
+    messageStatus: [] as string[],
+  };
 
   constructor(
     private disasterDemandService: DisasterDemandService,
-
     private router: Router
   ) {}
 
@@ -36,85 +52,141 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
   }
 
   // 載入資料
-
   loadDemands() {
-    this.demands = this.disasterDemandService.getDemands().map((item) => ({
-      ...item,
+    this.demands = this.disasterDemandService.getDemands().map((item) => {
+      // 容錯自動轉換：將單字「上架/隱藏/下架」對齊為下拉選單的「已上架/隱藏中/已下架」
+      let currentStatus = item.status || '已上架';
+      if (currentStatus === '上架') currentStatus = '已上架';
+      if (currentStatus === '隱藏') currentStatus = '隱藏中';
+      if (currentStatus === '下架') currentStatus = '已下架';
 
-      selected: false,
+      return {
+        ...item,
+        selected: false,
+        status: item.status || '上架',
+        displayStatus: currentStatus,
+        remaining: item.remaining ?? item.amount,
+        category: item.category || '其他',
+      };
+    });
 
-      status: item.status || '已上架',
-
-      remaining: item.remaining ?? item.amount,
-    }));
+    // 初始化顯示資料
+    this.applyFilters();
   }
 
   // 全選
-
   toggleAll() {
-    this.demands.forEach((item) => {
+    this.filteredDemands.forEach((item) => {
       item.selected = this.selectAll;
     });
   }
 
   // 判斷是否選取
-
   hasSelected() {
-    return this.demands.some((item) => item.selected);
+    return this.filteredDemands.some((item) => item.selected);
   }
 
   // 批次修改
-
   editSelected() {
-    const selectedItems = this.demands.filter((item) => item.selected);
+    const selectedItems = this.filteredDemands.filter((item) => item.selected);
 
     if (selectedItems.length === 0) {
       alert('請先選擇要修改的需求');
-
       return;
     }
 
     localStorage.setItem('editDemands', JSON.stringify(selectedItems));
-
     this.router.navigate(['/agency/disaster-batch-edit']);
   }
 
   // =========================
-  // 開啟刪除視窗
+  // 篩選功能邏輯
+  // =========================
+
+  openFilterModal() {
+    this.showFilterModal = true;
+  }
+
+  closeFilterModal() {
+    this.showFilterModal = false;
+  }
+
+  // 切換選取標籤 (多選切換)
+  toggleFilter(key: 'status' | 'priority' | 'category' | 'messageStatus', value: string) {
+    const index = this.selectedFilters[key].indexOf(value);
+    if (index > -1) {
+      this.selectedFilters[key].splice(index, 1);
+    } else {
+      this.selectedFilters[key].push(value);
+    }
+  }
+
+  // 重置篩選條件（僅還原彈窗內按鈕狀態，不離開頁面）
+  resetFilters() {
+    this.selectedFilters = {
+      status: [],
+      priority: [],
+      lowRemaining: false,
+      category: [],
+      messageStatus: [],
+    };
+  }
+
+  // 執行篩選並更新表格
+  applyFilters() {
+    this.filteredDemands = this.demands.filter((item) => {
+      // 1. 依上架狀態
+      if (this.selectedFilters.status.length > 0 && !this.selectedFilters.status.includes(item.displayStatus)) {
+        return false;
+      }
+      // 2. 依緊急優先度
+      if (this.selectedFilters.priority.length > 0 && !this.selectedFilters.priority.includes(item.priority)) {
+        return false;
+      }
+      // 3. 低剩餘項目 (設定剩餘數量 <= 5 為低剩餘)
+      if (this.selectedFilters.lowRemaining && item.remaining > 5) {
+        return false;
+      }
+      // 4. 依類別
+      if (this.selectedFilters.category.length > 0 && !this.selectedFilters.category.includes(item.category)) {
+        return false;
+      }
+      // 5. 依留言/聯絡狀態
+      if (this.selectedFilters.messageStatus.length > 0) {
+        const hasMsg = (item.messageCount || 0) > 0;
+        const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
+        const wantsUnreplied = this.selectedFilters.messageStatus.includes('未回覆');
+
+        if (wantsReplied && !wantsUnreplied && !hasMsg) return false;
+        if (wantsUnreplied && !wantsReplied && hasMsg) return false;
+      }
+
+      return true;
+    });
+
+    this.closeFilterModal();
+  }
+
+  // =========================
+  // 刪除控制邏輯
   // =========================
 
   openDeleteModal(id: number) {
     this.deleteId = id;
-
     this.deleteType = 'single';
-
     this.showDeleteModal = true;
   }
-
-  // 批次刪除開啟視窗
 
   openBatchDeleteModal() {
     this.deleteType = 'batch';
-
     this.showDeleteModal = true;
   }
 
-  // 確認刪除
-
   confirmDelete() {
-    // 單筆刪除
-
     if (this.deleteType === 'single') {
       this.disasterDemandService.deleteDemand(this.deleteId);
-    }
-
-    // 批次刪除
-    else {
-      const ids = this.demands
-
-        .filter((item) => item.selected)
-
-        .map((item) => item.id);
+    } else {
+      const ids = this.filteredDemands.filter((item) => item.selected).map((item) => item.id);
 
       ids.forEach((id) => {
         this.disasterDemandService.deleteDemand(id);
@@ -124,19 +196,22 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
     }
 
     this.loadDemands();
-
     this.closeDeleteModal();
   }
-
-  // 關閉視窗
 
   closeDeleteModal() {
     this.showDeleteModal = false;
   }
 
-  // 修改上架狀態
-
   changeStatus(item: any) {
+    let status = item.displayStatus;
+
+    if (status === '已上架') status = '上架';
+    if (status === '隱藏中') status = '隱藏';
+    if (status === '已下架') status = '下架';
+
+    item.status = status;
+
     this.disasterDemandService.updateDemand(item);
   }
 }
