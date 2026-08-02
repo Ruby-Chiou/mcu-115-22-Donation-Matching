@@ -1,0 +1,86 @@
+.lobby {
+  display: flex;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  gap: 25px;
+
+  // 讓左右兩邊的卡片拉到一樣高
+  align-items: stretch;
+
+  // 【左邊 80% 獨立底色大框】
+  .main {
+    flex: 8;
+    background-color: var(--bg-layer-1);
+    border-radius: var(--border-radius-main);
+    padding: 30px;
+    border: 1px solid var(--border-default);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+
+    .title {
+      font-size: 22px;
+      color: var(--color-text-main);
+      margin-top: 0;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+    .news-card {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+
+      .card-image {
+      width: 60%;
+      height: 500px; // 統一高度，可改成 250、350 等
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .card-text {
+        flex: 1; // 佔 50%
+        color: var(--color-text-main);
+        font-size: 16px;
+        line-height: 1.8;
+
+        .highlight {
+          color: var(--color-brand-primary);
+          font-weight: 600;
+          margin-top: 15px;
+        }
+      }
+    }
+    .disaster-indicators {
+      display: flex;
+      justify-content: center; // 讓點點在卡片下方水平置中
+      gap: 8px; // 點與點之間的精緻間距
+      margin-top: 20px; // 跟上方卡片空出一些距離
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        background-color: #bdc3c7; // 預設是暗淡的淺灰色
+        border-radius: 50%; // 強制變成正圓形
+        display: inline-block; // 確保圓形有實體能渲染
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: var(--color-text-muted);
+          transform: scale(1.2);
+        }
+
+        &.active {
+          background-color: var(--color-brand-primary);
+          width: 24px; // 亮起時自動變成「膠囊狀」長條
+          border-radius: 5px;
+        }
+      }
+    }
+  }
+}
