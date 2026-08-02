@@ -3,7 +3,7 @@
 
   <!-- 頂部按鈕區 -->
   <div class="top-action-bar">
-    <button class="add-btn" routerLink="/agency/disaster-create">新增需求</button>
+    <button class="add-btn" routerLink="/agency/disaster-item-create">新增需求</button>
   </div>
 
   <!-- 表格上方工具列：左側全選/批次 + 右側紅框處的篩選 -->
@@ -84,8 +84,8 @@
         <!-- 操作 -->
         <td class="operation-column">
           <div class="operation-flex">
-            <button [routerLink]="['/agency/disaster-detail', item.id]">查看</button>
-            <button [routerLink]="['/agency/disaster-edit', item.id]">編輯</button>
+            <button [routerLink]="['/agency/disaster-item-detail', item.id]">查看</button>
+            <button [routerLink]="['/agency/disaster-item-edit', item.id]">編輯</button>
             <button class="delete-btn" (click)="openDeleteModal(item.id)">刪除</button>
 
             <label class="status-label"> 狀態： </label>

@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemand } from '../../../models/user/agency';
 
 @Component({
-  selector: 'app-agency-disaster-detail',
+  selector: 'app-supply-detail',
   imports: [CommonModule, RouterLink],
-  templateUrl: './agency-disaster-detail.component.html',
-  styleUrl: './agency-disaster-detail.component.scss',
+  templateUrl: './supply-detail.component.html',
+  styleUrl: './supply-detail.component.scss',
 })
-export class AgencyDisasterDetailComponent implements OnInit {
-  demand: any;
+export class SupplyDetailComponent implements OnInit {
+  demand?: DisasterDemand;
   showDeleteModal: boolean = false;
 
   constructor(
@@ -25,7 +26,7 @@ export class AgencyDisasterDetailComponent implements OnInit {
     this.demand = this.service.getDemandById(id);
 
     if (this.demand) {
-      this.demand.remaining ??= this.demand.amount;
+      this.demand.remaining ??= this.demand.amount ?? 0;
       this.demand.customConditions ??= [];
       this.demand.customServiceTargets ??= [];
       this.demand.serviceTargets ??= {};
@@ -34,15 +35,16 @@ export class AgencyDisasterDetailComponent implements OnInit {
 
   // 取得勾選的服務對象，以頓號連結；若皆無則回傳 '無'
   getSelectedServiceTargets(): string {
-    if (!this.demand || !this.demand.serviceTargets) {
+    if (!this.demand) {
       return '無';
     }
 
-    const selected = Object.keys(this.demand.serviceTargets).filter((key) => this.demand.serviceTargets[key]);
+    const selected = Object.entries(this.demand.serviceTargets || {})
+      .filter(([_, value]) => value)
+      .map(([key]) => key);
 
     return selected.length > 0 ? selected.join('、') : '無';
   }
-
   // 檢查是否有有效填寫的其他服務對象
   hasCustomServiceTargets(): boolean {
     return (
@@ -60,7 +62,7 @@ export class AgencyDisasterDetailComponent implements OnInit {
   }
 
   // 判斷接受 / 不接受顏色
-  getConditionClass(condition: string) {
+  getConditionClass(condition?: string) {
     if (condition === '接受') {
       return 'accept';
     }
@@ -73,7 +75,7 @@ export class AgencyDisasterDetailComponent implements OnInit {
   }
 
   // 顯示符號
-  getConditionIcon(condition: string) {
+  getConditionIcon(condition?: string) {
     if (condition === '接受') {
       return '✔';
     }
@@ -97,7 +99,7 @@ export class AgencyDisasterDetailComponent implements OnInit {
 
   // 確認刪除執行動作
   confirmDelete() {
-    if (this.demand) {
+    if (this.demand?.id !== undefined) {
       this.service.deleteDemand(this.demand.id);
       this.showDeleteModal = false;
       this.router.navigate(['/agency/disaster']);

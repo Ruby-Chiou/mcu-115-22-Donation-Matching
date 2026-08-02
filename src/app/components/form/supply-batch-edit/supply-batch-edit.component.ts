@@ -2,16 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DisasterDemandService } from '../disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { EditableDisasterDemand } from '../../../models/user/agency';
 
 @Component({
-  selector: 'app-agency-disaster-batch-edit',
+  selector: 'app-supply-batch-edit',
   imports: [CommonModule, FormsModule],
-  templateUrl: './agency-disaster-batch-edit.component.html',
-  styleUrl: './agency-disaster-batch-edit.component.scss',
+  templateUrl: './supply-batch-edit.component.html',
+  styleUrl: './supply-batch-edit.component.scss',
 })
-export class AgencyDisasterBatchEditComponent implements OnInit {
-  editDemands: any[] = [];
+export class SupplyBatchEditComponent implements OnInit {
+  editDemands: EditableDisasterDemand[] = [];
 
   constructor(
     private service: DisasterDemandService,
@@ -112,8 +113,7 @@ export class AgencyDisasterBatchEditComponent implements OnInit {
       if (!item.unit || !item.unit.trim()) {
         item.unitError = true;
       }
-
-      if (item.remaining === '' || item.remaining === null || isNaN(Number(item.remaining))) {
+      if (item.remaining === undefined || item.remaining === null) {
         item.remainingError = true;
       }
 

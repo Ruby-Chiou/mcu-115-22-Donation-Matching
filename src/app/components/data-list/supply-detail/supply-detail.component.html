@@ -169,7 +169,7 @@
 
   <div class="button-area">
     <button class="back-btn" routerLink="/agency/disaster">返回</button>
-    <button class="edit-btn" [routerLink]="['/agency/disaster-edit', demand.id]">編輯</button>
+    <button class="edit-btn" [routerLink]="['/agency/disaster-item-edit', demand?.id]">編輯</button>
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>

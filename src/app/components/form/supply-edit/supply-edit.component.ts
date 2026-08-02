@@ -1,30 +1,24 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
-
 import { FormsModule } from '@angular/forms';
-
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-
-import { DisasterDemandService } from '../disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemand, DisasterConditions } from '../../../models/user/agency';
 
 @Component({
-  selector: 'app-agency-disaster-edit',
-
+  selector: 'app-supply-edit',
   imports: [CommonModule, FormsModule, RouterLink],
-
-  templateUrl: './agency-disaster-edit.component.html',
-
-  styleUrl: './agency-disaster-edit.component.scss',
+  templateUrl: './supply-edit.component.html',
+  styleUrl: './supply-edit.component.scss',
 })
-export class AgencyDisasterEditComponent implements OnInit {
+export class SupplyEditComponent implements OnInit {
   submitted = false;
 
   hasServiceTarget = true;
 
   @ViewChild('itemInput') itemInput!: ElementRef;
 
-  demand: any = {};
+  demand: DisasterDemand = {} as DisasterDemand;
 
   constructor(
     private route: ActivatedRoute,
@@ -63,10 +57,11 @@ export class AgencyDisasterEditComponent implements OnInit {
 
         status: data.status || '上架',
 
-        remaining: data.remaining ?? data.amount,
+        remaining: data.remaining ?? data.amount ?? 0,
 
         brand: data.brand || '',
-        category: data.category || '',
+
+        category: data.category,
 
         serviceTargets: data.serviceTargets || {
           老人: false,
@@ -98,15 +93,9 @@ export class AgencyDisasterEditComponent implements OnInit {
   // 限制剩餘需求最高只能填到需求數量
 
   onRemainingChange() {
-    if (this.demand.amount !== undefined && this.demand.amount !== null && this.demand.amount !== '') {
-      const maxAmount = Number(this.demand.amount);
-
-      const currentRemaining = Number(this.demand.remaining);
-
-      if (!isNaN(maxAmount) && !isNaN(currentRemaining)) {
-        if (currentRemaining > maxAmount) {
-          this.demand.remaining = maxAmount;
-        }
+    if (this.demand.amount !== null && this.demand.remaining !== undefined) {
+      if (this.demand.remaining > this.demand.amount) {
+        this.demand.remaining = this.demand.amount;
       }
     }
   }
@@ -122,7 +111,7 @@ export class AgencyDisasterEditComponent implements OnInit {
 
     // 2. 剩餘需求不可小於 0
 
-    if (Number(this.demand.remaining) < 0) {
+    if (this.demand.remaining !== undefined && this.demand.remaining < 0) {
       alert('剩餘需求不可小於 0');
 
       return;
@@ -132,7 +121,7 @@ export class AgencyDisasterEditComponent implements OnInit {
 
     const isAmountInvalid = !this.demand.amount || isNaN(Number(this.demand.amount));
 
-    const isRemainingInvalid = this.demand.remaining === '' || this.demand.remaining === null || isNaN(Number(this.demand.remaining));
+    const isRemainingInvalid = this.demand.remaining === undefined || this.demand.remaining === null || isNaN(this.demand.remaining);
 
     if (
       !this.demand.item ||
@@ -166,17 +155,12 @@ export class AgencyDisasterEditComponent implements OnInit {
     if (!this.demand.conditions) {
       this.demand.conditions = {
         全新: '',
-
         二手: '',
-
         有擦痕: '',
-
         過期: '',
-
         毀損: '',
-      };
+      } as DisasterConditions;
     }
-
     // 自動重新判斷需求分類
     this.demand.category = this.service.getCategory(this.demand.item);
 

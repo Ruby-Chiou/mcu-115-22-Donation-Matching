@@ -46,29 +46,23 @@ export const routes: Routes = [
       ), // 急難救助需求管理區
   },
   {
-    path: 'agency/disaster-create',
-    loadComponent: () =>
-      import('./features/agency/agency-disaster-create/agency-disaster-create.component').then((m) => m.AgencyDisasterCreateComponent),
+    path: 'agency/disaster-item-create',
+    loadComponent: () => import('./components/form/supply-create/supply-create.component').then((m) => m.SupplyCreateComponent),
   },
 
   {
-    path: 'agency/disaster-detail/:id',
-    loadComponent: () =>
-      import('./features/agency/agency-disaster-detail/agency-disaster-detail.component').then((m) => m.AgencyDisasterDetailComponent),
+    path: 'agency/disaster-item-detail/:id',
+    loadComponent: () => import('./components/data-list/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
   },
 
   {
-    path: 'agency/disaster-edit/:id',
-    loadComponent: () =>
-      import('./features/agency/agency-disaster-edit/agency-disaster-edit.component').then((m) => m.AgencyDisasterEditComponent),
+    path: 'agency/disaster-item-edit/:id',
+    loadComponent: () => import('./components/form/supply-edit/supply-edit.component').then((m) => m.SupplyEditComponent),
   },
 
   {
-    path: 'agency/disaster-batch-edit',
-    loadComponent: () =>
-      import('./features/agency/agency-disaster-batch-edit/agency-disaster-batch-edit.component').then(
-        (m) => m.AgencyDisasterBatchEditComponent
-      ),
+    path: 'agency/disaster-item-batch-edit',
+    loadComponent: () => import('./components/form/supply-batch-edit/supply-batch-edit.component').then((m) => m.SupplyBatchEditComponent),
   },
 
   // 5. 系統後台模組 (管理員端)

@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../agency/disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/user/agency';
 
 @Component({
   selector: 'app-agency-disaster-workspace',
@@ -11,8 +12,15 @@ import { DisasterDemandService } from '../../agency/disaster-demand.service';
   styleUrl: './agency-disaster-workspace.component.scss',
 })
 export class AgencyDisasterWorkspaceComponent implements OnInit {
-  demands: any[] = [];
-  filteredDemands: any[] = []; // 存放篩選過後的結果列表
+  demands: (DisasterDemand & {
+    selected: boolean;
+    displayStatus: DisplayStatus;
+  })[] = [];
+
+  filteredDemands: (DisasterDemand & {
+    selected: boolean;
+    displayStatus: DisplayStatus;
+  })[] = [];
 
   selectAll = false;
 
@@ -28,9 +36,12 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
   // =========================
   showFilterModal = false;
 
-  statusOptions = ['已上架', '隱藏中', '已下架'];
-  priorityOptions = ['普通', '緊急', '非常緊急'];
-  categoryOptions = ['食物', '衣物', '醫療', '嬰幼兒', '生活用品', '其他'];
+  statusOptions: DisplayStatus[] = ['已上架', '隱藏中', '已下架'];
+
+  priorityOptions: DisasterDemand['priority'][] = ['普通', '緊急', '非常緊急'];
+
+  categoryOptions: NonNullable<DisasterDemand['category']>[] = ['食物', '衣物', '醫療', '嬰幼兒', '生活用品', '其他'];
+
   messageOptions = ['已回覆', '未回覆'];
 
   // 儲存當前選中的篩選條件
@@ -54,23 +65,22 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
   // 載入資料
   loadDemands() {
     this.demands = this.disasterDemandService.getDemands().map((item) => {
-      // 容錯自動轉換：將單字「上架/隱藏/下架」對齊為下拉選單的「已上架/隱藏中/已下架」
-      let currentStatus = item.status || '已上架';
-      if (currentStatus === '上架') currentStatus = '已上架';
-      if (currentStatus === '隱藏') currentStatus = '隱藏中';
-      if (currentStatus === '下架') currentStatus = '已下架';
+      let currentStatus: DisplayStatus = '已上架';
+
+      if (item.status === '上架') currentStatus = '已上架';
+      if (item.status === '隱藏') currentStatus = '隱藏中';
+      if (item.status === '下架') currentStatus = '已下架';
 
       return {
         ...item,
         selected: false,
-        status: item.status || '上架',
+        status: item.status,
         displayStatus: currentStatus,
-        remaining: item.remaining ?? item.amount,
-        category: item.category || '其他',
+        remaining: item.remaining ?? item.amount ?? 0,
+        category: item.category ?? '其他',
       };
     });
 
-    // 初始化顯示資料
     this.applyFilters();
   }
 
@@ -96,7 +106,7 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
     }
 
     localStorage.setItem('editDemands', JSON.stringify(selectedItems));
-    this.router.navigate(['/agency/disaster-batch-edit']);
+    this.router.navigate(['/agency/disaster-item-batch-edit']);
   }
 
   // =========================
@@ -144,11 +154,11 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
         return false;
       }
       // 3. 低剩餘項目 (設定剩餘數量 <= 5 為低剩餘)
-      if (this.selectedFilters.lowRemaining && item.remaining > 5) {
+      if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) > 5) {
         return false;
       }
       // 4. 依類別
-      if (this.selectedFilters.category.length > 0 && !this.selectedFilters.category.includes(item.category)) {
+      if (this.selectedFilters.category.length > 0 && (!item.category || !this.selectedFilters.category.includes(item.category))) {
         return false;
       }
       // 5. 依留言/聯絡狀態
@@ -186,7 +196,7 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
     if (this.deleteType === 'single') {
       this.disasterDemandService.deleteDemand(this.deleteId);
     } else {
-      const ids = this.filteredDemands.filter((item) => item.selected).map((item) => item.id);
+      const ids = this.filteredDemands.filter((item) => item.selected && item.id !== undefined).map((item) => item.id as number);
 
       ids.forEach((id) => {
         this.disasterDemandService.deleteDemand(id);
@@ -203,12 +213,30 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
     this.showDeleteModal = false;
   }
 
-  changeStatus(item: any) {
-    let status = item.displayStatus;
+  changeStatus(
+    item: DisasterDemand & {
+      selected: boolean;
+      displayStatus: DisplayStatus;
+    }
+  ) {
+    let status: DisasterStatus;
 
-    if (status === '已上架') status = '上架';
-    if (status === '隱藏中') status = '隱藏';
-    if (status === '已下架') status = '下架';
+    switch (item.displayStatus) {
+      case '已上架':
+        status = '上架';
+        break;
+
+      case '隱藏中':
+        status = '隱藏';
+        break;
+
+      case '已下架':
+        status = '下架';
+        break;
+
+      default:
+        status = '上架';
+    }
 
     item.status = status;
 

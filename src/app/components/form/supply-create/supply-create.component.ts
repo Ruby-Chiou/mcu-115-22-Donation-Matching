@@ -2,24 +2,25 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { CreateDisasterDemand } from '../../../models/user/agency';
 
 @Component({
-  selector: 'app-agency-disaster-create',
+  selector: 'app-supply-create',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './agency-disaster-create.component.html',
-  styleUrl: './agency-disaster-create.component.scss',
+  templateUrl: './supply-create.component.html',
+  styleUrl: './supply-create.component.scss',
 })
-export class AgencyDisasterCreateComponent {
+export class SupplyCreateComponent {
   submitted = false;
   hasServiceTarget = true;
 
   @ViewChild('itemInput') itemInput!: ElementRef;
 
-  demand = {
+  demand: CreateDisasterDemand = {
     item: '',
-    amount: '',
+    amount: null,
     unit: '',
     amountDescription: '',
     reason: '',
@@ -42,7 +43,7 @@ export class AgencyDisasterCreateComponent {
     phone: '',
     note: '',
     brand: '',
-    category: '',
+    category: '其他',
 
     serviceTargets: {
       老人: false,

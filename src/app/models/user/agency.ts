@@ -2,10 +2,117 @@ import { UserBase } from './user-base';
 
 export interface AgencyProfile extends UserBase {
   role: 'AGENCY';
-  agencyName: string; // 機構全銜
-  registrationNumber: string; // 衛福部註冊字號
-  isVerified: 'PENDING' | 'APPROVED' | 'REJECTED'; // 審核狀態
-  representative: string; // 機構負責人姓名
-  contactPhone: string; // 機構辦公室電話
-  defaultAddress: string; // 機構日常預設收件地址
+  agencyName: string;
+  registrationNumber: string;
+  isVerified: 'PENDING' | 'APPROVED' | 'REJECTED';
+  representative: string;
+  contactPhone: string;
+  defaultAddress: string;
 }
+
+// 接受物資狀態
+export type ConditionStatus = '接受' | '不接受' | '';
+
+export interface DisasterConditions {
+  全新: ConditionStatus;
+  二手: ConditionStatus;
+  有擦痕: ConditionStatus;
+  過期: ConditionStatus;
+  毀損: ConditionStatus;
+}
+
+// 急難救助需求資料
+export interface DisasterDemand {
+  id: number;
+
+  item: string;
+
+  amount: number | null;
+
+  remaining?: number;
+
+  unit: string;
+
+  amountDescription?: string;
+
+  reason: string;
+
+  description: string;
+
+  // 接受物資狀態
+  conditions: DisasterConditions;
+
+  customConditions: string[];
+
+  priority: '普通' | '緊急' | '非常緊急';
+
+  status: '上架' | '隱藏' | '下架';
+
+  address: string;
+
+  phone: string;
+
+  note?: string;
+
+  brand?: string;
+
+  // TODO: 留言功能完成後，由 Message 資料計算，不存資料庫
+  messageCount?: number;
+
+  category?: '食物' | '衣物' | '醫療' | '嬰幼兒' | '生活用品' | '其他';
+
+  // 服務對象
+  serviceTargets: {
+    老人?: boolean;
+
+    嬰幼兒?: boolean;
+
+    孩童?: boolean;
+
+    青少年?: boolean;
+
+    身障?: boolean;
+
+    貧困?: boolean;
+
+    重症照護?: boolean;
+
+    寵物?: boolean;
+
+    流浪?: boolean;
+
+    野生?: boolean;
+  };
+
+  customServiceTargets: string[];
+}
+
+// 編輯用錯誤提示欄位
+export interface EditableDisasterDemand extends DisasterDemand {
+  itemError?: boolean;
+
+  amountError?: boolean;
+
+  unitError?: boolean;
+
+  reasonError?: boolean;
+
+  descriptionError?: boolean;
+
+  addressError?: boolean;
+
+  phoneError?: boolean;
+
+  remainingError?: boolean;
+
+  serviceTargetError?: boolean;
+}
+
+// 新增需求用
+export type CreateDisasterDemand = Omit<DisasterDemand, 'id'>;
+
+// 狀態
+export type DisasterStatus = '上架' | '隱藏' | '下架';
+
+// 顯示狀態
+export type DisplayStatus = '已上架' | '隱藏中' | '已下架';
