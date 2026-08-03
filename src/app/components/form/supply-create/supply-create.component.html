@@ -122,7 +122,7 @@
         <label class="label-row"> 其他服務對象 </label>
 
         <div class="custom-service-list">
-          <div class="custom-service-row" *ngFor="let target of demand.customServiceTargets; let i = index">
+          <div class="custom-service-row" *ngFor="let target of demand.customServiceTargets; let i = index; trackBy: trackByIndex">
             <input
               class="custom-service-input"
               maxlength="100"
@@ -247,7 +247,7 @@
         <label class="label-row"> 其他物品狀態</label>
 
         <div class="custom-condition-list">
-          <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let i = index">
+          <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let i = index; trackBy: trackByIndex">
             <input
               class="custom-condition-input"
               maxlength="100"

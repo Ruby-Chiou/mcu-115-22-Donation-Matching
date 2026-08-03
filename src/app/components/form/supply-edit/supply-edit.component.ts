@@ -164,6 +164,20 @@ export class SupplyEditComponent implements OnInit {
     // 自動重新判斷需求分類
     this.demand.category = this.service.getCategory(this.demand.item);
 
+    // 清除空白的自訂欄位
+    this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
+
+    this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
+
+    // 保留至少一個輸入框
+    if (this.demand.customConditions.length === 0) {
+      this.demand.customConditions.push('');
+    }
+
+    if (this.demand.customServiceTargets.length === 0) {
+      this.demand.customServiceTargets.push('');
+    }
+
     // 更新資料並返回頁面
     this.service.updateDemand(this.demand);
 
@@ -194,6 +208,18 @@ export class SupplyEditComponent implements OnInit {
 
   removeCustomCondition(index: number) {
     this.demand.customConditions.splice(index, 1);
+
+    if (this.demand.customConditions.length === 0) {
+      this.demand.customConditions.push('');
+    }
+  }
+
+  removeCustomServiceTarget(index: number) {
+    this.demand.customServiceTargets.splice(index, 1);
+
+    if (this.demand.customServiceTargets.length === 0) {
+      this.demand.customServiceTargets.push('');
+    }
   }
 
   addCustomServiceTarget() {
@@ -201,8 +227,7 @@ export class SupplyEditComponent implements OnInit {
       this.demand.customServiceTargets.push('');
     }
   }
-
-  removeCustomServiceTarget(index: number) {
-    this.demand.customServiceTargets.splice(index, 1);
+  trackByIndex(index: number) {
+    return index;
   }
 }

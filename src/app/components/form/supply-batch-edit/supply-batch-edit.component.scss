@@ -269,7 +269,7 @@ textarea {
 .condition-area {
   display: flex;
   align-items: flex-start;
-  gap: 350px;
+  gap: 100px;
   margin-bottom: 20px;
 }
 
@@ -283,13 +283,13 @@ textarea {
 }
 
 .custom-service-input {
-  width: 280px !important;
+  width: 320px !important;
   flex-shrink: 0;
   margin-bottom: 0 !important;
 }
 
 .custom-condition-input {
-  width: 280px !important;
+  width: 320px !important;
   flex-shrink: 0;
   margin-bottom: 0 !important;
 }
@@ -298,14 +298,16 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 440px;
+  flex-shrink: 0;
 }
 
 .custom-condition-list {
   display: grid;
-  grid-template-columns: repeat(2, 400px);
+  grid-template-columns: repeat(2, 440px);
   grid-template-rows: repeat(3, auto);
   grid-auto-flow: column;
-  column-gap: 80px;
+  column-gap: 30px;
   row-gap: 35px;
 }
 
@@ -317,7 +319,7 @@ textarea {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 350px;
+  gap: 100px;
   margin-bottom: 25px;
 }
 
@@ -326,7 +328,7 @@ textarea {
   position: absolute;
   top: 10px;
   left: -12px;
-  width: 1040px;
+  width: 850px;
   height: calc(100% + 2px);
   border: 2px solid #d32f2f;
   background-color: #fff5f5;
@@ -377,10 +379,10 @@ textarea {
 
 .custom-service-list {
   display: grid;
-  grid-template-columns: repeat(2, 400px);
+  grid-template-columns: repeat(2, 440px);
   grid-template-rows: repeat(3, auto);
   grid-auto-flow: column;
-  column-gap: 80px;
+  column-gap: 30px;
   row-gap: 35px;
 }
 
@@ -388,6 +390,8 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 440px;
+  flex-shrink: 0;
 }
 
 /* =========================

@@ -412,11 +412,9 @@ textarea {
 
   align-items: flex-start;
 
-  gap: 350px;
+  gap: 100px;
 
   margin-bottom: 20px;
-
-  /* 已移除 padding-left: 12px; 以確保上下完美切齊 */
 }
 
 .condition-section {
@@ -460,13 +458,13 @@ textarea {
 .custom-condition-list {
   display: grid;
 
-  grid-template-columns: repeat(2, 400px);
+  grid-template-columns: repeat(2, 440px);
 
   grid-template-rows: repeat(3, auto);
 
   grid-auto-flow: column;
 
-  column-gap: 80px;
+  column-gap: 30px;
 
   row-gap: 35px;
 }
@@ -478,13 +476,13 @@ textarea {
 
   gap: 8px;
 
-  width: 400px;
+  width: 440px;
 
   flex-shrink: 0;
 }
 
 .custom-condition-input {
-  width: 280px !important;
+  width: 320px !important;
 
   flex-shrink: 0;
 
@@ -532,7 +530,7 @@ textarea {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 350px;
+  gap: 100px;
   margin-bottom: 25px;
 }
 
@@ -546,7 +544,7 @@ textarea {
 
   left: -12px;
 
-  width: 1040px;
+  width: 850px;
 
   height: calc(100% + 2px);
 
@@ -612,13 +610,13 @@ textarea {
 .custom-service-list {
   display: grid;
 
-  grid-template-columns: repeat(2, 400px);
+  grid-template-columns: repeat(2, 440px);
 
   grid-template-rows: repeat(3, auto);
 
   grid-auto-flow: column;
 
-  column-gap: 80px;
+  column-gap: 30px;
 
   row-gap: 35px;
 }
@@ -630,13 +628,13 @@ textarea {
 
   gap: 8px;
 
-  width: 400px;
+  width: 440px;
 
   flex-shrink: 0;
 }
 
 .custom-service-input {
-  width: 280px !important;
+  width: 320px !important;
 
   flex-shrink: 0;
 

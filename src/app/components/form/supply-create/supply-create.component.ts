@@ -122,6 +122,10 @@ export class SupplyCreateComponent {
     this.demand.customServiceTargets.splice(index, 1);
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   scrollToServiceTarget() {
     const element = document.querySelector('.service-target-area');
 

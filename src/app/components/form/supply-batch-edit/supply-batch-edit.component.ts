@@ -190,10 +190,21 @@ export class SupplyBatchEditComponent implements OnInit {
       item.category = this.service.getCategory(item.item);
     });
 
-    // =========================
-    // 全部通過，更新資料
-    // =========================
+    // 清除空白自訂欄位
     this.editDemands.forEach((item) => {
+      item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
+
+      item.customServiceTargets = item.customServiceTargets.filter((target) => target.trim() !== '');
+
+      // 至少保留一個輸入框
+      if (item.customConditions.length === 0) {
+        item.customConditions.push('');
+      }
+
+      if (item.customServiceTargets.length === 0) {
+        item.customServiceTargets.push('');
+      }
+
       this.service.updateDemand(item);
     });
 
@@ -219,6 +230,10 @@ export class SupplyBatchEditComponent implements OnInit {
     if (demand.customServiceTargets.length < 5) {
       demand.customServiceTargets.push('');
     }
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   removeCustomServiceTarget(demand: any, index: number) {

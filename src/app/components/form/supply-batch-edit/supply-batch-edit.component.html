@@ -181,7 +181,7 @@
 
         <div class="custom-service-target-box">
           <div class="custom-service-list">
-            <div class="custom-service-row" *ngFor="let target of demand.customServiceTargets; let j = index">
+            <div class="custom-service-row" *ngFor="let target of demand.customServiceTargets; let j = index; trackBy: trackByIndex">
               <input
                 class="custom-service-input"
                 maxlength="100"
@@ -303,7 +303,7 @@
         <label class="label-row"> 其他物品狀態</label>
 
         <div class="custom-condition-list">
-          <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let j = index">
+          <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let j = index; trackBy: trackByIndex">
             <input
               class="custom-condition-input"
               maxlength="100"
