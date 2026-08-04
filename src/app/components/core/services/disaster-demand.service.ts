@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DisasterDemand, CreateDisasterDemand } from '../../models/user/agency';
+import { DisasterDemand, CreateDisasterDemand } from '../../../models/user/agency';
 
 @Injectable({
   providedIn: 'root',

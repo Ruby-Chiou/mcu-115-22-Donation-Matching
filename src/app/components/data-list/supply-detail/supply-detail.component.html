@@ -70,42 +70,44 @@
       <div class="detail-content condition-detail">
         <div class="condition-item">
           <span>全新：</span>
-          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['全新'])">
-            {{ getConditionIcon(demand.conditions?.['全新']) }}
+
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions['全新'])">
+            {{ getConditionIcon(demand.conditions['全新']) }}
           </span>
-          {{ demand.conditions?.['全新'] || '未設定' }}
+
+          {{ demand.conditions['全新'] || '未設定' }}
         </div>
 
         <div class="condition-item">
           <span>二手：</span>
-          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['二手'])">
-            {{ getConditionIcon(demand.conditions?.['二手']) }}
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions['二手'])">
+            {{ getConditionIcon(demand.conditions['二手']) }}
           </span>
-          {{ demand.conditions?.['二手'] || '未設定' }}
+          {{ demand.conditions['二手'] || '未設定' }}
         </div>
 
         <div class="condition-item">
           <span>有擦痕：</span>
-          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['有擦痕'])">
-            {{ getConditionIcon(demand.conditions?.['有擦痕']) }}
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions['有擦痕'])">
+            {{ getConditionIcon(demand.conditions['有擦痕']) }}
           </span>
-          {{ demand.conditions?.['有擦痕'] || '未設定' }}
+          {{ demand.conditions['有擦痕'] || '未設定' }}
         </div>
 
         <div class="condition-item">
           <span>過期：</span>
-          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['過期'])">
-            {{ getConditionIcon(demand.conditions?.['過期']) }}
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions['過期'])">
+            {{ getConditionIcon(demand.conditions['過期']) }}
           </span>
-          {{ demand.conditions?.['過期'] || '未設定' }}
+          {{ demand.conditions['過期'] || '未設定' }}
         </div>
 
         <div class="condition-item">
           <span>毀損：</span>
-          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions?.['毀損'])">
-            {{ getConditionIcon(demand.conditions?.['毀損']) }}
+          <span class="condition-icon" [ngClass]="getConditionClass(demand.conditions['毀損'])">
+            {{ getConditionIcon(demand.conditions['毀損']) }}
           </span>
-          {{ demand.conditions?.['毀損'] || '未設定' }}
+          {{ demand.conditions['毀損'] || '未設定' }}
         </div>
       </div>
     </div>

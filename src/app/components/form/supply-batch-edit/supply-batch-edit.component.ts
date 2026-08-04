@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../core/services/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../models/user/agency';
 
 @Component({
@@ -220,11 +220,8 @@ export class SupplyBatchEditComponent implements OnInit {
   }
 
   removeCustomCondition(demand: any, index: number) {
-    if (demand.customConditions.length > 1) {
-      demand.customConditions.splice(index, 1);
-    }
+    demand.customConditions.splice(index, 1);
   }
-
   // 其他服務對象動態增減
   addCustomServiceTarget(demand: any) {
     if (demand.customServiceTargets.length < 5) {

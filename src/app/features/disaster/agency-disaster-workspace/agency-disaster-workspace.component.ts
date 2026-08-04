@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../components/core/services/disaster-demand.service';
 import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/user/agency';
 
 @Component({

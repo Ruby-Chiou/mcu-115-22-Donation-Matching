@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../core/services/disaster-demand.service';
 import { DisasterDemand } from '../../../models/user/agency';
 
 @Component({

@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../core/services/disaster-demand.service';
 import { CreateDisasterDemand } from '../../../models/user/agency';
 
 @Component({
@@ -95,6 +95,20 @@ export class SupplyCreateComponent {
       return;
     }
 
+    // 清除空白的自訂欄位
+    this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
+
+    this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
+
+    // 保留至少一個輸入框
+    if (this.demand.customConditions.length === 0) {
+      this.demand.customConditions.push('');
+    }
+
+    if (this.demand.customServiceTargets.length === 0) {
+      this.demand.customServiceTargets.push('');
+    }
+
     // 自動判斷需求分類
     this.demand.category = this.disasterDemandService.getCategory(this.demand.item);
 
@@ -110,6 +124,10 @@ export class SupplyCreateComponent {
 
   removeCustomCondition(index: number) {
     this.demand.customConditions.splice(index, 1);
+
+    if (this.demand.customConditions.length === 0) {
+      this.demand.customConditions.push('');
+    }
   }
 
   addCustomServiceTarget() {
@@ -120,6 +138,10 @@ export class SupplyCreateComponent {
 
   removeCustomServiceTarget(index: number) {
     this.demand.customServiceTargets.splice(index, 1);
+
+    if (this.demand.customServiceTargets.length === 0) {
+      this.demand.customServiceTargets.push('');
+    }
   }
 
   trackByIndex(index: number): number {
