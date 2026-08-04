@@ -31,6 +31,11 @@ export const routes: Routes = [
     path: 'donor/history',
     loadComponent: () => import('./features/donor-history/donor-history.component').then((m) => m.DonorHistoryComponent), // 歷史紀錄與進度追蹤
   },
+   {
+    path: 'tracking',
+    loadComponent: () =>
+      import('./features/logistics/tracking/tracking.component').then(m => m.TrackingComponent)
+  },
 
   // 4. 社福機構模組 (機構端)
   {
