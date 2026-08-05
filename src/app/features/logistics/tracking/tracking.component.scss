@@ -1,7 +1,11 @@
+.search{
+   padding-left: 35px;
+}
+
 .search-box {
-  display: flex;
   gap: 15px;
   margin: 20px 0;
+  padding-left: 35px;
 }
 
 .search-box input {
@@ -19,4 +23,8 @@
   font-size: 18px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.show{
+  padding-left: 35px;
 }

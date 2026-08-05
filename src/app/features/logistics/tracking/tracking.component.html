@@ -4,7 +4,7 @@
 <div class="search-box">
   <input
     type="text"
-    placeholder="輸入行動名稱查詢配送進度"
+    placeholder="輸入物流單號查詢配送進度"
     [(ngModel)]="keyword"
   />
 
@@ -12,5 +12,16 @@
     搜尋
   </button>
 
+</div>
+<div class="show">
+  <div *ngIf="showResult">
+    <div *ngFor="let item of resultList">
+      <p>
+        物流單號：{{ item.id }}
+        <br>
+        配送進度：{{ item.status }}
+      </p>
+    </div>
+  </div>
 </div>
 
