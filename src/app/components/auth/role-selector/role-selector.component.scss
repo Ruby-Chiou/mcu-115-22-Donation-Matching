@@ -1,0 +1,71 @@
+/* filepath: c:\mcu-115-22-Donation-Matching\src\app\components\auth\role-selector\role-selector.component.scss */
+.role-selector-card {
+  width: min(620px, 100%);
+  padding: 32px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(12, 45, 75, 0.12);
+}
+
+.role-selector-card h2 {
+  margin: 0 0 8px;
+  color: #143a55;
+  font-size: 24px;
+}
+
+.role-selector-card p {
+  margin: 0 0 20px;
+  color: #5f7184;
+  line-height: 1.6;
+}
+
+.role-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.role-card {
+  min-height: 140px;
+  padding: 18px;
+  border: 1px solid #dce7f2;
+  border-radius: 18px;
+  background: #fbfdff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(19, 55, 79, 0.08);
+}
+
+.role-card.donor {
+  border-color: #9dc9ff;
+}
+
+.role-card.recipient {
+  border-color: #ffd7a4;
+}
+
+.role-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #17394c;
+}
+
+.role-subtitle {
+  font-size: 15px;
+  color: #5f7184;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .role-options {
+    grid-template-columns: 1fr;
+  }
+}
