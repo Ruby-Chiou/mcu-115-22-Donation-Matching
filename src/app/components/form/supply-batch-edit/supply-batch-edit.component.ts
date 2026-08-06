@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DisasterDemandService } from '../../core/services/disaster-demand.service';
-import { EditableDisasterDemand } from '../../../models/user/agency';
+import { EditableDisasterDemand } from '../../../models/agency/demand';
 
 @Component({
   selector: 'app-supply-batch-edit',
@@ -38,8 +38,9 @@ export class SupplyBatchEditComponent implements OnInit {
 
         unit: item.unit || '',
         amountDescription: item.amountDescription || '',
-        status: item.status || '上架',
+        status: item.status ?? '上架',
         remaining: item.remaining ?? item.amount,
+        createdAt: item.createdAt,
         brand: item.brand || '',
         category: item.category || '',
 
@@ -78,6 +79,34 @@ export class SupplyBatchEditComponent implements OnInit {
     }
   }
 
+  limitNumberLength(event: Event, demand: any, field: 'amount' | 'remaining') {
+    const input = event.target as HTMLInputElement;
+
+    input.value = input.value.replace(/[^0-9]/g, '');
+
+    if (input.value.length > 10) {
+      input.value = input.value.slice(0, 10);
+    }
+
+    const value = input.value ? Number(input.value) : null;
+
+    if (field === 'amount') {
+      demand.amount = value;
+
+      // 需求數量變更時，剩餘需求同步更新
+      demand.remaining = value;
+    }
+
+    if (field === 'remaining') {
+      if (value !== null && demand.amount !== null && value > demand.amount) {
+        demand.remaining = demand.amount;
+        input.value = demand.amount.toString();
+      } else {
+        demand.remaining = value;
+      }
+    }
+  }
+
   saveAll() {
     // =========================
     // 清除舊錯誤 + 檢查必填
@@ -92,6 +121,7 @@ export class SupplyBatchEditComponent implements OnInit {
       item.phoneError = false;
       item.remainingError = false;
       item.serviceTargetError = false;
+      item.categoryError = false;
 
       // 服務對象檢查
       const hasServiceTarget =
@@ -129,6 +159,10 @@ export class SupplyBatchEditComponent implements OnInit {
         item.descriptionError = true;
       }
 
+      if (!item.category) {
+        item.categoryError = true;
+      }
+
       if (!item.address) {
         item.addressError = true;
       }
@@ -148,6 +182,7 @@ export class SupplyBatchEditComponent implements OnInit {
         item.unitError ||
         item.reasonError ||
         item.descriptionError ||
+        item.categoryError ||
         item.addressError ||
         item.phoneError ||
         item.remainingError ||
@@ -155,19 +190,7 @@ export class SupplyBatchEditComponent implements OnInit {
     );
 
     if (invalid) {
-      setTimeout(() => {
-        const firstErrorElement = document.querySelector('.invalid, .invalid-box') as HTMLElement | null;
-
-        if (firstErrorElement) {
-          firstErrorElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          });
-
-          firstErrorElement.focus();
-        }
-      }, 0);
-
+      this.scrollToFirstError();
       return;
     }
 
@@ -181,13 +204,6 @@ export class SupplyBatchEditComponent implements OnInit {
           毀損: '',
         };
       }
-    });
-
-    // =========================
-    // 自動重新判斷需求分類
-    // =========================
-    this.editDemands.forEach((item) => {
-      item.category = this.service.getCategory(item.item);
     });
 
     // 清除空白自訂欄位
@@ -205,11 +221,62 @@ export class SupplyBatchEditComponent implements OnInit {
         item.customServiceTargets.push('');
       }
 
+      // 上架 / 下架 都需要發布時間
+      if ((item.status === '上架' || item.status === '下架') && !item.createdAt) {
+        item.createdAt = new Date().toISOString();
+      }
+
+      // 隱藏代表尚未發布，清除發布時間
+      if (item.status === '隱藏') {
+        item.createdAt = undefined;
+      }
+
       this.service.updateDemand(item);
     });
 
     localStorage.removeItem('editDemands');
     this.router.navigate(['/agency/disaster']);
+  }
+
+  scrollToFirstError() {
+    setTimeout(() => {
+      const firstErrorElement = document.querySelector('.invalid, .invalid-box') as HTMLElement | null;
+
+      if (firstErrorElement) {
+        const top = firstErrorElement.getBoundingClientRect().top + window.scrollY - 120;
+
+        window.scrollTo({
+          top,
+          behavior: 'smooth',
+        });
+      }
+    }, 100);
+  }
+
+  // 接受物資狀態切換
+  toggleCondition(demand: EditableDisasterDemand, key: keyof EditableDisasterDemand['conditions']) {
+    const current = demand.conditions[key];
+
+    if (current === '') {
+      demand.conditions[key] = '接受';
+    } else if (current === '接受') {
+      demand.conditions[key] = '不接受';
+    } else {
+      demand.conditions[key] = '';
+    }
+  }
+
+  // 顯示接受物資狀態圖示
+  getConditionIcon(status: '接受' | '不接受' | '') {
+    if (status === '接受') {
+      return '✔';
+    }
+
+    if (status === '不接受') {
+      return '✘';
+    }
+
+    return '―';
   }
 
   // 其他物品狀態動態增減

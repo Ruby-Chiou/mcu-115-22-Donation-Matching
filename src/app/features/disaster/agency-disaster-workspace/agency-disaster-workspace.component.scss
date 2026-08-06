@@ -1,5 +1,6 @@
 .container {
   padding: 30px;
+  padding-bottom: 120px; /* 避免底部被跑馬燈/頁尾擋住 */
 }
 
 h1 {
@@ -36,7 +37,7 @@ h1 {
 }
 
 /* =====================
-   表格上方工具列 (左：全選 / 右：篩選按鈕)
+   表格上方工具列 (左：全選 / 右：排序 + 篩選)
 ===================== */
 
 .toolbar-row {
@@ -87,6 +88,7 @@ h1 {
     font-size: 15px;
   }
 }
+
 /* 批次刪除按鈕 */
 .batch-delete-btn {
   background-color: #d32f2f !important;
@@ -96,6 +98,138 @@ h1 {
     background-color: #b71c1c;
   }
 }
+
+/* 右側工具欄包裝容器 */
+.right-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 排序區 */
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 1. 精準居中的排序按鈕 */
+.sort-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background-color: #bbdefb;
+  color: #1565c0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  &:hover {
+    background-color: #90caf9;
+    transform: scale(1.05);
+  }
+
+  .sort-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+}
+
+/* ====================================
+   客製化高質感下拉選單 (Custom Dropdown)
+==================================== */
+.custom-dropdown {
+  position: relative;
+
+  .dropdown-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 18px;
+    border: 1.5px solid #90caf9;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+
+    &:hover,
+    &.active {
+      border-color: #1565c0;
+      background-color: #f4f8ff;
+      box-shadow: 0 3px 8px rgba(21, 101, 192, 0.12);
+    }
+
+    .arrow-icon {
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid #1565c0;
+      border-bottom: 2px solid #1565c0;
+      transform: rotate(45deg);
+      margin-top: -3px;
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 100%;
+    width: max-content;
+    background-color: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e3f2fd;
+    padding: 6px;
+    z-index: 100;
+    animation: fadeInDown 0.18s ease-out;
+
+    .dropdown-item {
+      padding: 9px 16px;
+      font-size: 14px;
+      color: #333333;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      font-weight: 500;
+
+      &:hover {
+        background-color: #e3f2fd;
+        color: #1565c0;
+      }
+
+      &.selected {
+        background-color: #1565c0;
+        color: #ffffff;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 篩選按鈕區 */
 .filter-trigger-group {
   display: flex;
@@ -108,7 +242,7 @@ h1 {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: none;
+  border: 1.5px solid #90caf9;
   background-color: #bbdefb;
   color: #1565c0;
   display: flex;
@@ -146,24 +280,29 @@ table {
   border-spacing: 0;
   border-radius: 15px;
   overflow: hidden;
+  table-layout: fixed;
 }
 
 th,
 td {
   border: 1px solid #ddd;
-  padding: 12px;
+  padding: 16px 6px;
   text-align: center;
   font-size: 16px;
+  vertical-align: middle;
 }
 
 th {
   background-color: #e3f2fd;
+  white-space: nowrap;
+  padding: 16px 6px;
 }
 
+/* 1. 勾選欄 */
 .checkbox-column {
-  width: 80px;
-  min-width: 80px;
+  white-space: nowrap;
   text-align: center;
+  padding: 16px 4px;
 
   input[type='checkbox'] {
     width: 18px;
@@ -172,26 +311,80 @@ th {
   }
 }
 
-/* =====================
-   操作欄
-===================== */
+/* 2. 需求物欄位：使用 Grid + Place-Content 置中，並支援多行截斷 */
+.item-column {
+  text-align: center;
+  padding: 16px 4px !important;
+  vertical-align: middle;
 
+  .item-text {
+    font-size: 16px;
+    line-height: 1.4;
+
+    /* 固定高度為 2.8em (剛好 2 行高度) */
+    height: 2.8em;
+    max-height: 2.8em;
+
+    /* 💡 使用 Grid 進行絕對水平 + 垂直雙向置中 */
+    display: grid;
+    place-content: center;
+    text-align: center;
+
+    /* 解決 -webkit-box 不配合水平置中的問題，使用現代標準截斷語法 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    word-break: break-all;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* 3. 類別欄位 */
+.category-column {
+  white-space: nowrap;
+  text-align: center;
+  padding: 16px 2px !important;
+}
+
+/* 發布時間欄 */
+.created-time-column {
+  text-align: center;
+  padding: 16px 2px !important;
+}
+
+/* 留言區 */
+.message-column {
+  text-align: center;
+  padding: 16px 2px !important;
+
+  a {
+    color: var(--color-brand-primary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+/* 4. 操作欄 */
 .operation-column {
-  width: 430px;
-  min-width: 430px;
+  width: 370px;
+  padding: 16px 6px;
 }
 
 .operation-flex {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: nowrap;
 
   select {
-    width: 110px;
-    height: 34px;
-    padding: 6px 10px;
+    width: 95px;
+    height: 36px;
+    padding: 4px 4px;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 14px;
@@ -207,7 +400,7 @@ th {
 .status-label {
   font-size: 14px;
   white-space: nowrap;
-  margin-left: 5px;
+  margin-left: 2px;
 }
 
 /* 狀態顏色 */
@@ -235,6 +428,7 @@ td button {
   color: var(--color-white);
   font-size: 14px;
   font-weight: 500;
+  white-space: nowrap;
 
   &:hover {
     opacity: 0.8;
@@ -250,6 +444,7 @@ td .delete-btn {
     background-color: #b71c1c;
   }
 }
+
 /* 空資料 */
 .empty-message {
   text-align: center;
@@ -283,7 +478,7 @@ tbody tr:last-child td:first-child {
 }
 
 tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
 }
 
 /* 優先度顏色 */
@@ -295,30 +490,6 @@ tbody tr:last-child td:last-child {
 }
 .very-urgent {
   color: #d32f2f;
-}
-
-/* 留言區 */
-.message-column {
-  width: 100px;
-  text-align: center;
-
-  a {
-    color: var(--color-brand-primary);
-    text-decoration: underline;
-    cursor: pointer;
-  }
-}
-
-.item-column {
-  width: 200px;
-  max-width: 200px;
-  height: 48px;
-  text-align: center;
-  white-space: normal;
-  word-break: break-all;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 24px;
 }
 
 /* =====================

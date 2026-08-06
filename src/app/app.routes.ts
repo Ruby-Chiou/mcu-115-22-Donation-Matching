@@ -46,22 +46,19 @@ export const routes: Routes = [
       ), // 急難救助需求管理區
   },
   {
-    path: 'agency/disaster-item-create',
+    path: 'agency/supply-create',
     loadComponent: () => import('./components/form/supply-create/supply-create.component').then((m) => m.SupplyCreateComponent),
   },
-
   {
-    path: 'agency/disaster-item-detail/:id',
+    path: 'agency/supply-edit/:id',
+    loadComponent: () => import('./components/form/supply-create/supply-create.component').then((m) => m.SupplyCreateComponent),
+  },
+  {
+    path: 'agency/supply-detail/:id',
     loadComponent: () => import('./components/data-list/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
   },
-
   {
-    path: 'agency/disaster-item-edit/:id',
-    loadComponent: () => import('./components/form/supply-edit/supply-edit.component').then((m) => m.SupplyEditComponent),
-  },
-
-  {
-    path: 'agency/disaster-item-batch-edit',
+    path: 'agency/supply-batch-edit',
     loadComponent: () => import('./components/form/supply-batch-edit/supply-batch-edit.component').then((m) => m.SupplyBatchEditComponent),
   },
 

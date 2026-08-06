@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { DisasterDemandService } from '../../../components/core/services/disaster-demand.service';
-import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/user/agency';
+import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
+
+type SortType = 'createdAt' | 'amount' | 'remaining';
 
 @Component({
   selector: 'app-agency-disaster-workspace',
@@ -15,14 +17,51 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
   demands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
+    displayCreatedAt: string;
   })[] = [];
 
   filteredDemands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
+    displayCreatedAt: string;
   })[] = [];
 
   selectAll = false;
+
+  // =========================
+  // 自訂排序下拉選單控制
+  // =========================
+
+  selectedSort: SortType = 'createdAt';
+  sortAscending = true;
+  isSortDropdownOpen = false;
+
+  sortOptions: { label: string; value: SortType }[] = [
+    { label: '發布時間', value: 'createdAt' },
+    { label: '需求數量', value: 'amount' },
+    { label: '剩餘需求', value: 'remaining' },
+  ];
+
+  // 點擊頁面其他地方自動關閉下拉選單
+  @HostListener('document:click')
+  closeSortDropdown() {
+    this.isSortDropdownOpen = false;
+  }
+
+  toggleSortDropdown() {
+    this.isSortDropdownOpen = !this.isSortDropdownOpen;
+  }
+
+  getSelectedSortLabel(): string {
+    const found = this.sortOptions.find((opt) => opt.value === this.selectedSort);
+    return found ? found.label : '發布時間';
+  }
+
+  selectSortOption(value: SortType) {
+    this.selectedSort = value;
+    this.isSortDropdownOpen = false;
+    this.applySort();
+  }
 
   // =========================
   // 刪除提示視窗控制
@@ -76,6 +115,9 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
         selected: false,
         status: item.status,
         displayStatus: currentStatus,
+
+        displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
+
         remaining: item.remaining ?? item.amount ?? 0,
         category: item.category ?? '其他',
       };
@@ -106,7 +148,7 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
     }
 
     localStorage.setItem('editDemands', JSON.stringify(selectedItems));
-    this.router.navigate(['/agency/disaster-item-batch-edit']);
+    this.router.navigate(['/agency/supply-batch-edit']);
   }
 
   // =========================
@@ -153,8 +195,8 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
       if (this.selectedFilters.priority.length > 0 && !this.selectedFilters.priority.includes(item.priority)) {
         return false;
       }
-      // 3. 低剩餘項目 (設定剩餘數量 <= 5 為低剩餘)
-      if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) > 5) {
+      // 3. 顯示尚有剩餘項目（剩餘數量必須大於 0）
+      if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) <= 0) {
         return false;
       }
       // 4. 依類別
@@ -165,16 +207,48 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
       if (this.selectedFilters.messageStatus.length > 0) {
         const hasMsg = (item.messageCount || 0) > 0;
         const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
-        const wantsUnreplied = this.selectedFilters.messageStatus.includes('未回覆');
+        const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
 
-        if (wantsReplied && !wantsUnreplied && !hasMsg) return false;
-        if (wantsUnreplied && !wantsReplied && hasMsg) return false;
+        if (wantsReplied && !wantsNotReplied && !hasMsg) return false;
+        if (wantsNotReplied && !wantsReplied && hasMsg) return false;
       }
 
       return true;
     });
 
+    this.applySort();
+
     this.closeFilterModal();
+  }
+
+  // 切換排序方向
+  toggleSortOrder() {
+    this.sortAscending = !this.sortAscending;
+    this.applySort();
+  }
+
+  // 執行排序
+  applySort() {
+    this.filteredDemands.sort((a, b) => {
+      let result = 0;
+
+      if (this.selectedSort === 'createdAt') {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : Date.now();
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : Date.now();
+
+        result = aTime - bTime;
+      }
+
+      if (this.selectedSort === 'amount') {
+        result = Number(a.amount ?? 0) - Number(b.amount ?? 0);
+      }
+
+      if (this.selectedSort === 'remaining') {
+        result = Number(a.remaining ?? 0) - Number(b.remaining ?? 0);
+      }
+
+      return this.sortAscending ? result : -result;
+    });
   }
 
   // =========================
@@ -238,8 +312,24 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
         status = '上架';
     }
 
+    // 原本狀態
+    const oldData = this.disasterDemandService.getDemands().find((d) => d.id === item.id);
+
+    // 更新狀態
     item.status = status;
 
+    // 隱藏時清除發布時間
+    if (status === '隱藏') {
+      item.createdAt = undefined;
+    }
+
+    // 隱藏 → 上架，重新產生發布時間
+    if (status === '上架' && !item.createdAt) {
+      item.createdAt = new Date().toISOString();
+    }
+
     this.disasterDemandService.updateDemand(item);
+
+    this.loadDemands();
   }
 }

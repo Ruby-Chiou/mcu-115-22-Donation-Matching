@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DisasterDemandService } from '../../core/services/disaster-demand.service';
-import { DisasterDemand } from '../../../models/user/agency';
+import { DisasterDemand } from '../../../models/agency/demand';
 
 @Component({
   selector: 'app-supply-detail',
@@ -61,6 +61,11 @@ export class SupplyDetailComponent implements OnInit {
     );
   }
 
+  // 取得其他物品狀態文字
+  getCustomConditions(): string {
+    return this.demand?.customConditions?.filter((condition) => condition && condition.trim()).join('、') || '無';
+  }
+
   // 判斷接受 / 不接受顏色
   getConditionClass(condition?: string) {
     if (condition === '接受') {
@@ -104,5 +109,50 @@ export class SupplyDetailComponent implements OnInit {
       this.showDeleteModal = false;
       this.router.navigate(['/agency/disaster']);
     }
+  }
+
+  // 取得其他自訂服務對象文字
+  getCustomServiceTargets(): string {
+    return this.demand?.customServiceTargets?.filter((target) => target && target.trim()).join('、') || '無';
+  }
+
+  // 取得接受物資狀態文字
+  getConditionsText(): string {
+    if (!this.demand) {
+      return '無';
+    }
+
+    const conditions = [
+      {
+        name: '全新',
+        value: this.demand.conditions['全新'],
+      },
+      {
+        name: '二手',
+        value: this.demand.conditions['二手'],
+      },
+      {
+        name: '有擦痕',
+        value: this.demand.conditions['有擦痕'],
+      },
+      {
+        name: '過期',
+        value: this.demand.conditions['過期'],
+      },
+      {
+        name: '毀損',
+        value: this.demand.conditions['毀損'],
+      },
+    ];
+
+    return (
+      conditions
+        .filter((condition) => condition.value)
+        .map(
+          (condition) =>
+            `${condition.name}：<span class="${condition.value === '接受' ? 'accept' : 'reject'}">${this.getConditionIcon(condition.value)}</span> ${condition.value}`
+        )
+        .join(' ｜ ') || '無'
+    );
   }
 }

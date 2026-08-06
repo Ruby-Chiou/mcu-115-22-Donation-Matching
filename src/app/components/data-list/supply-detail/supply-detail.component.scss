@@ -1,5 +1,6 @@
 .container {
   padding: 30px;
+  padding-bottom: 50px; /* 確保最外層底部有足夠空間 */
 }
 
 h1 {
@@ -52,6 +53,7 @@ h1 {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 25px;
+  margin-bottom: 30px; /* 👈 新增這行：將按鈕向上推開，避免被 Footer 遮擋 */
 }
 
 .back-btn,
@@ -91,9 +93,8 @@ h1 {
 
 /* 接受物資狀態 */
 .condition-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: block;
+  line-height: 1.8;
 }
 
 .condition-item {
@@ -109,11 +110,11 @@ h1 {
   margin-right: 5px;
 }
 
-.accept {
+::ng-deep .accept {
   color: #2e7d32;
 }
 
-.reject {
+::ng-deep .reject {
   color: #d32f2f;
 }
 
