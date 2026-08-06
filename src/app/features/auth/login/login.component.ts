@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AgencyProfile } from '../../../models/user/agency';
+import { RoleSelectorComponent } from '../../../components/auth/role-selector/role-selector.component';
 
 type UserRole = 'donor' | 'recipient';
 type LoginStep = 'login' | 'profile';
@@ -10,7 +10,7 @@ type LoginStep = 'login' | 'profile';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, RoleSelectorComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
@@ -39,37 +39,21 @@ export class LoginComponent {
     confirmPassword: '',
     needDescription: '',
   };
-
   selectRole(role: UserRole): void {
     this.selectedRole = role;
     this.showRoleModal = false;
-    this.submitMessage = '';
-    this.loginStep = 'login';
   }
 
   backToRoleSelection(): void {
     this.selectedRole = null;
     this.showRoleModal = true;
-    this.loginStep = 'login';
     this.submitMessage = '';
+    this.loginStep = 'login';
   }
 
   backToLoginStep(): void {
     this.loginStep = 'login';
     this.submitMessage = '';
-  }
-
-  buildAgencyPayload(): Partial<AgencyProfile> {
-    return {
-      role: 'AGENCY',
-      email: this.loginForm.email,
-      agencyName: this.profileForm.agencyName,
-      registrationNumber: this.profileForm.registrationNumber,
-      representative: this.profileForm.representative,
-      contactPhone: this.profileForm.contactPhone,
-      defaultAddress: this.profileForm.defaultAddress,
-      isVerified: 'PENDING',
-    };
   }
 
   onSubmit(): void {
@@ -94,10 +78,7 @@ export class LoginComponent {
       return;
     }
 
-    const payload = this.buildAgencyPayload();
-    console.log('受助者首次資料設定 payload:', payload);
-
-    this.submitMessage = '受助者資料已完成設定，之後可使用帳密登入。';
+    this.submitMessage = '受助者資料已完成設定。';
   }
 
   get isRecipient(): boolean {
@@ -108,15 +89,11 @@ export class LoginComponent {
     return this.selectedRole === 'recipient' && this.loginStep === 'profile';
   }
 
-  get otpValue(): string {
-    return this.otpDigits.join('');
-  }
-
   get roleHeading(): string {
     return this.selectedRole === 'recipient' ? '受助者登入' : '捐助者登入';
   }
 
   get roleDescription(): string {
-    return this.selectedRole === 'recipient' ? '初次註冊時，需輸入臨時帳密登入成功後，再完成註冊資料。' : '歡迎回來，請輸入信箱與密碼。';
+    return this.selectedRole === 'recipient' ? '請輸入信箱、帳號名稱與密碼；驗證碼由兩種身份共用。' : '歡迎回來，請輸入信箱與密碼。';
   }
 }

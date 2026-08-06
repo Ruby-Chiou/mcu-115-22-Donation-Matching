@@ -1,134 +1,36 @@
+/* filepath: c:\mcu-115-22-Donation-Matching\src\app\features\auth\login\login.component.scss */
 :host {
   display: block;
 }
 
 .login-shell {
-  min-height: 80dvh;
+  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: flex-start;
   padding: 24px;
+  box-sizing: border-box;
   background: linear-gradient(135deg, #eef6ff 0%, #fdf8f0 100%);
 }
 
-.login-card {
+.role-page {
   width: min(820px, 100%);
-  min-height: 500px;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(12, 45, 75, 0.16);
-  background: #fff;
-  transition:
-    background-color 0.2s ease,
-    box-shadow 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 48px;
 }
 
-.login-card.role-modal-active {
-  background: transparent;
-  box-shadow: none;
-}
-
-.form-panel {
-  position: relative;
-  min-height: 500px;
+.form-card {
+  width: min(820px, 100%);
   padding: 40px 44px;
+  border-radius: 24px;
   background: #f7fbff;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  transition: background-color 0.2s ease;
-}
-
-.form-panel.role-modal-active {
-  background: transparent;
-}
-
-.role-modal {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 32px 32px 24px;
-  background: transparent;
-  backdrop-filter: none;
-}
-
-.role-modal-card {
-  width: 100%;
-  max-width: 560px;
-  min-height: 330px;
-  padding: 30px;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 16px 40px rgba(12, 45, 75, 0.15);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.role-modal-card h2 {
-  margin: 0 0 8px;
-  color: #13374f;
-  font-size: 24px;
-}
-
-.role-modal-card p {
-  margin: 0 0 20px;
-  color: #5f7386;
-  line-height: 1.6;
-  font-size: 15px;
-}
-
-.role-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.role-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 150px;
-  padding: 20px 18px;
-  border: 1px solid #dfeaf3;
-  border-radius: 16px;
-  background: #fbfdff;
-  color: #173b56;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.role-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(19, 55, 79, 0.08);
-}
-
-.role-card.donor {
-  border-color: #8ec5ff;
-}
-
-.role-card.recipient {
-  border-color: #ffd28d;
-}
-
-.role-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.role-subtitle {
-  font-size: 15px;
-  line-height: 1.45;
-  color: #5f7386;
+  box-shadow: 0 20px 60px rgba(12, 45, 75, 0.16);
 }
 
 .login-form {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -136,77 +38,20 @@
 
 .form-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 12px;
 }
 
 .form-header h2 {
   margin: 0 0 6px;
   color: #163a53;
-  font-size: 24px;
 }
 
 .form-header p {
   margin: 0;
   color: #638096;
   line-height: 1.6;
-  font-size: 15px;
-}
-
-.social-login {
-  padding: 8px 10px;
-  border: 1px solid #dfeaf3;
-  border-radius: 14px;
-  background: #fff;
-}
-
-.social-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.social-login p {
-  margin: 0;
-  color: #4f6473;
-  font-size: 15px;
-}
-
-.social-buttons {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.social-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 1px solid #d0e2ef;
-  background: #fff;
-  color: #2d5870;
-  padding: 8px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  min-height: 40px;
-
-  i {
-    align-items: center;
-    font-size: 20px;
-    display: inline-flex;
-    justify-content: center;
-    line-height: 1;
-  }
-
-  :hover {
-    background: #f6fbff;
-  }
 }
 
 .ghost-btn {
@@ -232,62 +77,37 @@
   color: #27506b;
 }
 
-.field.full {
-  grid-column: 1 / -1;
-}
-
 input,
 textarea {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid #d7e4ef;
   border-radius: 12px;
-  font: inherit;
   background: #fff;
   color: #163a53;
   box-sizing: border-box;
-}
-
-input[type='checkbox'] {
-  width: auto;
-  margin: 0;
-}
-
-textarea {
-  min-height: 100px;
-  resize: vertical;
 }
 
 .actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  flex-direction: row;
 }
 
 .remember {
   display: flex;
   align-items: center;
-  flex-direction: row;
   gap: 8px;
-  color: #4b6478;
+  flex-direction: row;
 }
 
 .action-links {
   display: flex;
+  align-items: center;
   gap: 16px;
-}
-
-.action-links a {
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.button-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: row;
 }
 
 .primary-btn {
@@ -298,6 +118,44 @@ textarea {
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+}
+
+.social-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-self: center;
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #d0e2ef;
+  background: #fff;
+  color: #2d5870;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.otp-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .otp-group {
@@ -315,11 +173,57 @@ textarea {
   border-radius: 12px;
 }
 
-.otp-actions {
+.submit-message {
+  margin: 0;
+  color: #0f7a43;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .form-card {
+    padding: 24px;
+  }
+
+  .form-header,
+  .social-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+/* 專門針對「記住我」區塊做修正，絕不影響其他按鈕或連結 */
+.actions {
+  .remember {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: row;
+    writing-mode: horizontal-tb;
+    white-space: nowrap;
+    gap: 6px;
+
+    span {
+      writing-mode: horizontal-tb;
+      display: inline-block;
+      white-space: nowrap;
+    }
+  }
+}
+
+.button-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 12px;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 .mini-btn {
@@ -329,29 +233,6 @@ textarea {
   padding: 8px 12px;
   border-radius: 999px;
   cursor: pointer;
-}
-
-.submit-message {
-  margin: 0;
-  color: #0f7a43;
-  font-weight: 600;
-}
-
-@media (max-width: 700px) {
-  .form-panel {
-    padding: 24px;
-  }
-
-  .role-options {
-    grid-template-columns: 1fr;
-  }
-
-  .actions {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .form-header {
-    flex-direction: column;
-  }
+  font-size: 0.95rem;
+  line-height: 1;
 }
