@@ -27,6 +27,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/disaster/donor-disaster-lobby/donor-disaster-lobby.component').then((m) => m.DonorDisasterLobbyComponent), // 災害救助大廳
   },
+  //{
+ // path: 'needs',
+ // loadComponent: () =>
+    //import('./features/disaster/needs/needs.component').then(
+      //(m) => m.NeedsComponent
+    //),
+//},
   {
     path: 'donor/history',
     loadComponent: () => import('./features/donor-history/donor-history.component').then((m) => m.DonorHistoryComponent), // 歷史紀錄與進度追蹤
