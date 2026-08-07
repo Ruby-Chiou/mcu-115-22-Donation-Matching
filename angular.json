@@ -3,8 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "dc69d88e-1ce8-42ed-b14e-1d22ee11b233"
-  },
+    "analytics": "dc69d88e-1ce8-42ed-b14e-1d22ee11b233"  },
   "newProjectRoot": "projects",
   "projects": {
     "donation-matching": {
