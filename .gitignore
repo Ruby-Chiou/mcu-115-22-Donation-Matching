@@ -30,7 +30,7 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-.angular/
+/.angular/cache
 .sass-cache/
 /connect.lock
 /coverage
@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Force ignore general folders
+/node_modules/
+/dist/
+.angular/
