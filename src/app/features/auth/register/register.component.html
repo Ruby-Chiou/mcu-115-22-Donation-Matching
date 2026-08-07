@@ -14,6 +14,25 @@
         <button type="button" class="ghost-btn" (click)="backToRoleSelection()">重新選擇身份</button>
       </div>
 
+      <!-- 捐助者：第三方註冊提示 -->
+      <div class="input-grid" *ngIf="!isRecipient">
+        <div class="social-login">
+          <div class="social-row">
+            <p>或使用其他應用註冊</p>
+            <div class="social-buttons">
+              <button type="button" class="social-btn google" (click)="socialRegister('google')">
+                Google<i class="fa-brands fa-google"></i>
+              </button>
+              <button type="button" class="social-btn line" (click)="socialRegister('line')">LINE<i class="fa-brands fa-line"></i></button>
+              <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')">
+                Facebook<i class="fa-brands fa-facebook"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 共用基本欄位 -->
       <div class="input-grid">
         <label class="field full" *ngIf="isRecipient">
           <span>電子信箱</span>
@@ -34,6 +53,60 @@
           <span>帳號名稱</span>
           <input type="text" [(ngModel)]="donorForm.accountName" name="donorAccountName" required />
         </label>
+
+        <label class="field full" *ngIf="isRecipient">
+          <span>機構統一編號</span>
+          <input type="text" [(ngModel)]="recipientForm.registrationNumber" name="recipientRegistrationNumber" />
+        </label>
+
+        <label class="field full" *ngIf="isRecipient">
+          <span>負責人姓名</span>
+          <input type="text" [(ngModel)]="recipientForm.representative" name="recipientRepresentative" />
+        </label>
+
+        <label class="field full" *ngIf="isRecipient">
+          <span>聯絡電話</span>
+          <input type="tel" [(ngModel)]="recipientForm.contactPhone" name="recipientContactPhone" />
+        </label>
+
+        <label class="field full" *ngIf="isRecipient">
+          <span>機構預設地址</span>
+          <input type="text" [(ngModel)]="recipientForm.defaultAddress" name="recipientDefaultAddress" />
+        </label>
+
+        <!-- 聯絡人（自然人）區塊：選填，用於後續驗證 -->
+        <div *ngIf="isRecipient" class="field-group">
+          <h3>聯絡人資訊（選填，供後續確認使用）</h3>
+
+          <label class="field full">
+            <span>聯絡人姓名</span>
+            <input type="text" [(ngModel)]="recipientForm.contactPersonName" name="contactPersonName" />
+          </label>
+
+          <label class="field full">
+            <span>聯絡人電話</span>
+            <input type="tel" [(ngModel)]="recipientForm.contactPersonPhone" name="contactPersonPhone" />
+          </label>
+
+          <label class="field full">
+            <span>聯絡人電子信箱</span>
+            <input type="email" [(ngModel)]="recipientForm.contactPersonEmail" name="contactPersonEmail" />
+          </label>
+
+          <!-- 國民身分證號等高敏感欄位建議先不強制填寫 -->
+          <label class="field full">
+            <span>是否同意我們後續聯絡以確認身分？</span>
+            <label class="checkbox-inline">
+              <input type="checkbox" [(ngModel)]="recipientForm.consentToContact" name="consentToContact" />
+              <span>同意被聯絡</span>
+            </label>
+          </label>
+
+          <label class="field full">
+            <span>驗證文件（選填，上傳後會由後端審核）</span>
+            <input type="file" (change)="onVerificationFile($event)" />
+          </label>
+        </div>
 
         <label class="field full" *ngIf="isRecipient">
           <span>密碼</span>
