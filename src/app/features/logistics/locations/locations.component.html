@@ -1,0 +1,51 @@
+<div class="container">
+
+  <div class="sidebar">
+
+    <h3>災害救助列表</h3>
+
+     <select
+    class="location-select"
+    (change)="selectLocation($event)">
+
+    <option value="">
+      請選擇災害
+    </option>
+
+
+    @for(item of disasterList; track item.name){
+
+      <option [value]="item.name">
+        {{item.name}}
+      </option>
+
+    }
+
+  </select>
+ <h3 class="daily-title">
+    日常捐助列表
+  </h3>
+
+
+  <select
+    class="location-select"
+    (change)="selectDonation($event)">
+
+    <option value="">
+      請選擇地點
+    </option>
+
+    @for(item of donationList; track item.name){
+
+      <option [value]="item.name">
+        {{item.name}}
+      </option>
+
+    }
+
+  </select>
+
+</div>
+
+
+<div id="map"></div>

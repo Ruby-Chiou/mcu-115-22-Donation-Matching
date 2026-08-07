@@ -43,6 +43,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/logistics/tracking/tracking.component').then(m => m.TrackingComponent)
   },
+  {
+    path: 'locations',
+    loadComponent: () =>
+      import('./features/logistics/locations/locations.component').then(m => m.LocationsComponent)
+  },
 
   // 4. 社福機構模組 (機構端)
   {
