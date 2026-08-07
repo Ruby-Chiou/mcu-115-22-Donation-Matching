@@ -1,6 +1,10 @@
-<div class="lobby">
-  <section class="main">
-    <h3 class="section-title">災害救助</h3>
+<h1 class="title">災害救助大廳</h1>
+<div class="title-row">
+  <div class="title-box">政府最新消息</div>
+  <div class="title-box">歷史紀錄</div>
+</div>
+<div class="menu-container">
+  <aside class="left-menu">
     <div class="news-card">
       <div class="card-image">
         <img [src]="disasterNews().image" [alt]="disasterNews().text" />
@@ -8,6 +12,9 @@
       <div class="card-text">
         <p>{{ disasterNews().text }}</p>
         <p class="highlight">{{ disasterNews().highlight }}</p>
+        <a routerLink="/needs">
+    查看更多
+  </a>
       </div>
     </div>
     <div class="disaster-indicators">
@@ -15,5 +22,42 @@
       <span class="dot" [class.active]="disasterIndex() === i" (click)="setSlide(i)"> </span>
       }
     </div>
-  </section>
+  </aside>
+<aside class="right-menu">
+  @for (item of historyList; track item.text) {
+
+    <div class="info-card">
+
+      <h3>
+        {{ item.text }}
+      </h3>
+
+      <p>
+        {{ item.highlight }}
+      </p>
+
+    </div>
+
+  }
+  </aside>
+</div>
+<div class="world">世界災害新聞</div>
+
+<div class="card-container">
+  @for(item of worldList; track $index) {
+    <div class="card">
+      <!-- 1. 最上方大標題 -->
+      <h3 class="card-title">{{item.text}}</h3>
+
+      <!-- 2. 下方內容區（圖左、文右） -->
+      <div class="card-body">
+        <div class="item-image">
+          <img [src]="item.image" alt="">
+        </div>
+        <div class="item-text">
+          <p>{{item.highlight}}</p>
+        </div>
+      </div>
+    </div>
+  }
 </div>

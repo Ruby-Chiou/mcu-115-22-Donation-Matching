@@ -32,6 +32,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/donor-history/donor-history.component').then((m) => m.DonorHistoryComponent), // 歷史紀錄與進度追蹤
   },
 
+  {
+    path: 'needs',
+    loadComponent: () =>import('./features/disaster/needs/needs.component').then((m) => m.NeedsComponent),
+  },
+
   // 4. 社福機構模組 (機構端)
   {
     path: 'agency/daily',
@@ -41,9 +46,7 @@ export const routes: Routes = [
   {
     path: 'agency/disaster',
     loadComponent: () =>
-      import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then(
-        (m) => m.AgencyDisasterWorkspaceComponent
-      ), // 急難救助需求管理區
+      import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then((m) => m.AgencyDisasterWorkspaceComponent), // 急難救助需求管理區
   },
   {
     path: 'agency/supply-create',
