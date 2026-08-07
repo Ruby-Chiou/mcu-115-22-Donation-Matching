@@ -41,6 +41,11 @@ export class TrackingComponent {
     this.resultList = this.trackingList.filter(item =>
       item.id.includes(this.keyword)
     );
+    if (this.resultList.length === 0) {
+    alert('查無此資訊');
+  } else {
+    this.keyword = '';
+  }
     this.showResult = true;
   }
 }
