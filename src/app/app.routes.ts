@@ -36,6 +36,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/logistics/tracking/tracking.component').then(m => m.TrackingComponent)
   },
+  {
+    path: 'faq',
+    loadComponent: () =>
+      import('./features/Customer-Service-Center/faq/faq.component').then(m => m.FaqComponent)
+  },
+  {
+    path: 'disaster-locations',
+    loadComponent: () =>
+      import('./features/disaster-locations/disaster-locations.component').then(m => m.DisasterLocationsComponent)
+  },
+  {
+    path: 'daily-locations',
+    loadComponent: () =>
+      import('./features/daily-locations/daily-locations.component').then(m => m.DailyLocationsComponent)
+  },
 
   // 4. 社福機構模組 (機構端)
   {
