@@ -1,18 +1,18 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DisasterDemandService } from '../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DisasterDemand } from '../../../models/agency/demand';
 
 @Component({
-  selector: 'app-supply-create',
+  selector: 'app-supply-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './supply-create.component.html',
-  styleUrl: './supply-create.component.scss',
+  templateUrl: './supply-form.component.html',
+  styleUrl: './supply-form.component.scss',
 })
-export class SupplyCreateComponent implements OnInit {
+export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
   submitted = false;
   hasServiceTarget = true;
@@ -108,6 +108,15 @@ export class SupplyCreateComponent implements OnInit {
         };
       }
     }
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant',
+      });
+    }, 0);
   }
 
   save() {

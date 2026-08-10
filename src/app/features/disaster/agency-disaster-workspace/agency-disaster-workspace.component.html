@@ -3,10 +3,10 @@
 
   <!-- 頂部按鈕區 -->
   <div class="top-action-bar">
-    <button class="add-btn" routerLink="/agency/supply-create">新增需求</button>
+    <button class="add-btn" routerLink="/agency/supply-form">新增需求</button>
   </div>
 
-  <!-- 表格上方工具列：左側全選/批次 + 右側排序與篩選 -->
+  <!-- 表格上方工具列：左側全選/批次 + 右側搜尋、排序與篩選 -->
   <div class="toolbar-row">
     <div class="select-area">
       <div class="select-all">
@@ -20,8 +20,28 @@
       </div>
     </div>
 
-    <!-- 右側操作區：排序 + 篩選 -->
+    <!-- 右側操作區：搜尋 + 排序 + 篩選 -->
     <div class="right-toolbar">
+      <!-- 搜尋框區 -->
+      <div class="search-box">
+        <svg
+          class="search-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          (click)="onSearch()"
+          title="搜尋"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="搜尋需求物或類別..." [(ngModel)]="searchTerm" (input)="onSearch()" (keyup.enter)="onSearch()" />
+        <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()" title="清除搜尋">✕</button>
+      </div>
+
       <!-- 排序區 -->
       <div class="sort-group">
         <button class="sort-icon-btn" (click)="toggleSortOrder()" title="切換排序方向">
@@ -83,7 +103,7 @@
       </td>
     </tr>
 
-    <thead>
+    <thead *ngIf="filteredDemands.length > 0">
       <tr>
         <th class="checkbox-column" style="width: 70px">勾選項目</th>
         <th class="item-column" style="width: 17%">需求物</th>
@@ -98,7 +118,7 @@
     </thead>
 
     <tbody>
-      <tr *ngFor="let item of filteredDemands">
+      <tr *ngFor="let item of pagedDemands">
         <td class="checkbox-column">
           <input type="checkbox" [(ngModel)]="item.selected" />
         </td>
@@ -131,9 +151,9 @@
         <!-- 操作 -->
         <td class="operation-column">
           <div class="operation-flex">
-            <button [routerLink]="['/agency/supply-detail', item.id]">查看</button>
-            <button [routerLink]="['/agency/supply-edit', item.id]">編輯</button>
-            <button class="delete-btn" (click)="openDeleteModal(item.id)">刪除</button>
+            <button (click)="goToDetail(item.id!)">查看</button>
+            <button (click)="goToEdit(item.id!)">編輯</button>
+            <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
 
             <label class="status-label"> 狀態： </label>
             <select
@@ -154,6 +174,19 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- 分頁控制區 -->
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <button class="page-btn nav-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">上一頁</button>
+
+    <div class="page-numbers">
+      <button *ngFor="let page of pageNumbers" class="page-btn num-btn" [class.active]="page === currentPage" (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    </div>
+
+    <button class="page-btn nav-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">下一頁</button>
+  </div>
 
   <!-- 自訂篩選彈出視窗 Modal -->
   <div class="modal-backdrop" *ngIf="showFilterModal">
@@ -244,16 +277,11 @@
     </div>
   </div>
 
-  <!-- 自訂刪除確認視窗 -->
-  <div class="modal-backdrop" *ngIf="showDeleteModal">
-    <div class="modal-box">
-      <h2>確認刪除</h2>
-      <p>確定要刪除此筆急難需求嗎？</p>
-
-      <div class="modal-buttons">
-        <button class="cancel-btn" (click)="closeDeleteModal()">取消</button>
-        <button class="confirm-btn" (click)="confirmDelete()">確定刪除</button>
-      </div>
-    </div>
-  </div>
+  <app-supply-delete
+    *ngIf="showDeleteModal"
+    [demandIds]="deleteIds"
+    [deleteType]="deleteType"
+    (closed)="closeDeleteModal()"
+    (deleted)="onDeleted()"
+  ></app-supply-delete>
 </div>

@@ -31,10 +31,9 @@ export const routes: Routes = [
     path: 'donor/history',
     loadComponent: () => import('./features/donor-history/donor-history.component').then((m) => m.DonorHistoryComponent), // 歷史紀錄與進度追蹤
   },
-   {
+  {
     path: 'tracking',
-    loadComponent: () =>
-      import('./features/logistics/tracking/tracking.component').then(m => m.TrackingComponent)
+    loadComponent: () => import('./features/logistics/tracking/tracking.component').then((m) => m.TrackingComponent),
   },
 
   // 4. 社福機構模組 (機構端)
@@ -51,12 +50,12 @@ export const routes: Routes = [
       ), // 急難救助需求管理區
   },
   {
-    path: 'agency/supply-create',
-    loadComponent: () => import('./components/form/supply-create/supply-create.component').then((m) => m.SupplyCreateComponent),
+    path: 'agency/supply-form',
+    loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
     path: 'agency/supply-edit/:id',
-    loadComponent: () => import('./components/form/supply-create/supply-create.component').then((m) => m.SupplyCreateComponent),
+    loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
     path: 'agency/supply-detail/:id',

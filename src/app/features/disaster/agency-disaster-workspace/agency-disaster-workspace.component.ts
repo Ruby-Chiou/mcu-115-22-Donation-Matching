@@ -1,19 +1,21 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../../components/core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
+import { SupplyDeleteComponent } from '../../../components/modal/supply-delete/supply-delete.component';
 
 type SortType = 'createdAt' | 'amount' | 'remaining';
 
 @Component({
   selector: 'app-agency-disaster-workspace',
-  imports: [CommonModule, FormsModule, RouterLink],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, SupplyDeleteComponent],
   templateUrl: './agency-disaster-workspace.component.html',
   styleUrl: './agency-disaster-workspace.component.scss',
 })
-export class AgencyDisasterWorkspaceComponent implements OnInit {
+export class AgencyDisasterWorkspaceComponent implements OnInit, AfterViewInit {
   demands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
@@ -26,15 +28,32 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
     displayCreatedAt: string;
   })[] = [];
 
+  pagedDemands: (DisasterDemand & {
+    selected: boolean;
+    displayStatus: DisplayStatus;
+    displayCreatedAt: string;
+  })[] = [];
+
   selectAll = false;
 
-  // =========================
-  // 自訂排序下拉選單控制
-  // =========================
+  // 關鍵字搜尋
+  searchTerm = '';
 
+  // 分頁控制
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 1;
+  pageNumbers: number[] = [];
+
+  // 保存列表離開前的位置
+  private readonly scrollPositionKey = 'agency-disaster-workspace-scroll';
+  private readonly pagePositionKey = 'agency-disaster-workspace-page';
+
+  // 下拉選單與排序
   selectedSort: SortType = 'createdAt';
   sortAscending = true;
   isSortDropdownOpen = false;
+  private userHasSorted = false;
 
   sortOptions: { label: string; value: SortType }[] = [
     { label: '發布時間', value: 'createdAt' },
@@ -42,10 +61,15 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
     { label: '剩餘需求', value: 'remaining' },
   ];
 
-  // 點擊頁面其他地方自動關閉下拉選單
   @HostListener('document:click')
   closeSortDropdown() {
     this.isSortDropdownOpen = false;
+  }
+
+  @HostListener('window:beforeunload')
+  saveScrollPosition() {
+    sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
+    sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
   }
 
   toggleSortDropdown() {
@@ -58,32 +82,36 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
   }
 
   selectSortOption(value: SortType) {
+    const scrollY = window.scrollY;
+
     this.selectedSort = value;
+
+    // 使用者明確選擇排序後，才開始套用排序
+    this.userHasSorted = true;
+
     this.isSortDropdownOpen = false;
     this.applySort();
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: scrollY,
+        behavior: 'instant',
+      });
+    }, 0);
   }
 
-  // =========================
-  // 刪除提示視窗控制
-  // =========================
+  // 刪除控制
   showDeleteModal = false;
-  deleteId!: number;
+  deleteIds: number[] = [];
   deleteType: 'single' | 'batch' = 'single';
 
-  // =========================
-  // 篩選視窗控制與選項
-  // =========================
+  // 篩選選單
   showFilterModal = false;
-
   statusOptions: DisplayStatus[] = ['已上架', '隱藏中', '已下架'];
-
   priorityOptions: DisasterDemand['priority'][] = ['普通', '緊急', '非常緊急'];
-
   categoryOptions: NonNullable<DisasterDemand['category']>[] = ['食物', '衣物', '醫療', '嬰幼兒', '生活用品', '其他'];
-
   messageOptions = ['已回覆', '未回覆'];
 
-  // 儲存當前選中的篩選條件
   selectedFilters = {
     status: [] as string[],
     priority: [] as string[],
@@ -95,13 +123,54 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
   constructor(
     private disasterDemandService: DisasterDemandService,
     private router: Router
-  ) {}
+  ) {
+    history.scrollRestoration = 'manual';
+  }
 
   ngOnInit() {
+    const savedPage = sessionStorage.getItem(this.pagePositionKey);
+
+    if (savedPage) {
+      const page = Number(savedPage);
+
+      if (page >= 1) {
+        this.currentPage = page;
+      }
+    }
+
     this.loadDemands();
   }
 
-  // 載入資料
+  ngAfterViewInit() {
+    const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
+
+    if (savedScroll) {
+      const scrollY = Number(savedScroll);
+
+      window.scrollTo({
+        top: scrollY,
+        behavior: 'instant',
+      });
+    }
+  }
+
+  goToDetail(id: number) {
+    this.saveListPosition();
+
+    this.router.navigate(['/agency/supply-detail', id]);
+  }
+
+  goToEdit(id: number) {
+    this.saveListPosition();
+
+    this.router.navigate(['/agency/supply-edit', id]);
+  }
+
+  saveListPosition() {
+    sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
+    sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
+  }
+
   loadDemands() {
     this.demands = this.disasterDemandService.getDemands().map((item) => {
       let currentStatus: DisplayStatus = '已上架';
@@ -115,95 +184,43 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
         selected: false,
         status: item.status,
         displayStatus: currentStatus,
-
-        displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
-
+        displayCreatedAt:
+          item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
         remaining: item.remaining ?? item.amount ?? 0,
         category: item.category ?? '其他',
       };
     });
 
-    this.applyFilters();
-  }
-
-  // 全選
-  toggleAll() {
-    this.filteredDemands.forEach((item) => {
-      item.selected = this.selectAll;
-    });
-  }
-
-  // 判斷是否選取
-  hasSelected() {
-    return this.filteredDemands.some((item) => item.selected);
-  }
-
-  // 批次修改
-  editSelected() {
-    const selectedItems = this.filteredDemands.filter((item) => item.selected);
-
-    if (selectedItems.length === 0) {
-      alert('請先選擇要修改的需求');
-      return;
-    }
-
-    localStorage.setItem('editDemands', JSON.stringify(selectedItems));
-    this.router.navigate(['/agency/supply-batch-edit']);
-  }
-
-  // =========================
-  // 篩選功能邏輯
-  // =========================
-
-  openFilterModal() {
-    this.showFilterModal = true;
-  }
-
-  closeFilterModal() {
-    this.showFilterModal = false;
-  }
-
-  // 切換選取標籤 (多選切換)
-  toggleFilter(key: 'status' | 'priority' | 'category' | 'messageStatus', value: string) {
-    const index = this.selectedFilters[key].indexOf(value);
-    if (index > -1) {
-      this.selectedFilters[key].splice(index, 1);
-    } else {
-      this.selectedFilters[key].push(value);
-    }
-  }
-
-  // 重置篩選條件（僅還原彈窗內按鈕狀態，不離開頁面）
-  resetFilters() {
-    this.selectedFilters = {
-      status: [],
-      priority: [],
-      lowRemaining: false,
-      category: [],
-      messageStatus: [],
-    };
-  }
-
-  // 執行篩選並更新表格
-  applyFilters() {
+    // 只套用篩選，不重新排序
     this.filteredDemands = this.demands.filter((item) => {
-      // 1. 依上架狀態
+      if (this.searchTerm && this.searchTerm.trim() !== '') {
+        const term = this.searchTerm.trim().toLowerCase();
+
+        const matchItem = item.item ? item.item.toLowerCase().includes(term) : false;
+
+        const matchCategory = item.category ? item.category.toLowerCase().includes(term) : false;
+
+        if (!matchItem && !matchCategory) {
+          return false;
+        }
+      }
+
       if (this.selectedFilters.status.length > 0 && !this.selectedFilters.status.includes(item.displayStatus)) {
         return false;
       }
-      // 2. 依緊急優先度
+
       if (this.selectedFilters.priority.length > 0 && !this.selectedFilters.priority.includes(item.priority)) {
         return false;
       }
-      // 3. 顯示尚有剩餘項目（剩餘數量必須大於 0）
+
       if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) <= 0) {
         return false;
       }
-      // 4. 依類別
+
       if (this.selectedFilters.category.length > 0 && (!item.category || !this.selectedFilters.category.includes(item.category))) {
         return false;
       }
-      // 5. 依留言/聯絡狀態
+
       if (this.selectedFilters.messageStatus.length > 0) {
         const hasMsg = (item.messageCount || 0) > 0;
         const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
@@ -216,18 +233,155 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
       return true;
     });
 
-    this.applySort();
+    this.updatePagination();
+  }
+
+  // 搜尋處理方法
+  onSearch() {
+    this.applyFilters();
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.applyFilters();
+  }
+
+  toggleAll() {
+    this.pagedDemands.forEach((item) => {
+      item.selected = this.selectAll;
+    });
+  }
+
+  hasSelected() {
+    return this.filteredDemands.some((item) => item.selected);
+  }
+
+  editSelected() {
+    const selectedItems = this.filteredDemands.filter((item) => item.selected);
+
+    if (selectedItems.length === 0) {
+      alert('請先選擇要修改的需求');
+      return;
+    }
+
+    localStorage.setItem('editDemands', JSON.stringify(selectedItems));
+
+    this.saveListPosition();
+
+    this.router.navigate(['/agency/supply-batch-edit']);
+  }
+
+  openFilterModal() {
+    this.showFilterModal = true;
+  }
+
+  closeFilterModal() {
+    this.showFilterModal = false;
+  }
+
+  toggleFilter(key: 'status' | 'priority' | 'category' | 'messageStatus', value: string) {
+    const index = this.selectedFilters[key].indexOf(value);
+    if (index > -1) {
+      this.selectedFilters[key].splice(index, 1);
+    } else {
+      this.selectedFilters[key].push(value);
+    }
+  }
+
+  resetFilters() {
+    this.selectedFilters = {
+      status: [],
+      priority: [],
+      lowRemaining: false,
+      category: [],
+      messageStatus: [],
+    };
+  }
+
+  applyFilters(resetPage: boolean = true) {
+    this.filteredDemands = this.demands.filter((item) => {
+      // 關鍵字搜尋
+      if (this.searchTerm && this.searchTerm.trim() !== '') {
+        const term = this.searchTerm.trim().toLowerCase();
+
+        const matchItem = item.item ? item.item.toLowerCase().includes(term) : false;
+
+        const matchCategory = item.category ? item.category.toLowerCase().includes(term) : false;
+
+        if (!matchItem && !matchCategory) {
+          return false;
+        }
+      }
+
+      // 上架狀態
+      if (this.selectedFilters.status.length > 0 && !this.selectedFilters.status.includes(item.displayStatus)) {
+        return false;
+      }
+
+      // 優先度
+      if (this.selectedFilters.priority.length > 0 && !this.selectedFilters.priority.includes(item.priority)) {
+        return false;
+      }
+
+      // 剩餘數量
+      if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) <= 0) {
+        return false;
+      }
+
+      // 類別
+      if (this.selectedFilters.category.length > 0 && (!item.category || !this.selectedFilters.category.includes(item.category))) {
+        return false;
+      }
+
+      // 留言狀態
+      if (this.selectedFilters.messageStatus.length > 0) {
+        const hasMsg = (item.messageCount || 0) > 0;
+        const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
+        const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
+
+        if (wantsReplied && !wantsNotReplied && !hasMsg) {
+          return false;
+        }
+
+        if (wantsNotReplied && !wantsReplied && hasMsg) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    if (resetPage) {
+      this.currentPage = 1;
+    }
+
+    // 只有使用者曾經主動排序，篩選後才維持排序
+    if (this.userHasSorted) {
+      this.applySort();
+    } else {
+      this.updatePagination();
+    }
 
     this.closeFilterModal();
   }
 
-  // 切換排序方向
   toggleSortOrder() {
+    const scrollY = window.scrollY;
+
+    // 使用者明確切換排序方向
+    this.userHasSorted = true;
+
     this.sortAscending = !this.sortAscending;
     this.applySort();
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: scrollY,
+        behavior: 'instant',
+      });
+    }, 0);
   }
 
-  // 執行排序
   applySort() {
     this.filteredDemands.sort((a, b) => {
       let result = 0;
@@ -235,7 +389,6 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
       if (this.selectedSort === 'createdAt') {
         const aTime = a.createdAt ? new Date(a.createdAt).getTime() : Date.now();
         const bTime = b.createdAt ? new Date(b.createdAt).getTime() : Date.now();
-
         result = aTime - bTime;
       }
 
@@ -249,48 +402,61 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
 
       return this.sortAscending ? result : -result;
     });
+
+    this.updatePagination();
   }
 
-  // =========================
-  // 刪除控制邏輯
-  // =========================
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredDemands.length / this.pageSize) || 1;
+
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+
+    this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+
+    this.pagedDemands = this.filteredDemands.slice(startIndex, endIndex);
+    this.selectAll = this.pagedDemands.length > 0 && this.pagedDemands.every((item) => item.selected);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
 
   openDeleteModal(id: number) {
-    this.deleteId = id;
+    this.deleteIds = [id];
     this.deleteType = 'single';
     this.showDeleteModal = true;
   }
 
   openBatchDeleteModal() {
+    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id !== undefined).map((item) => item.id as number);
     this.deleteType = 'batch';
     this.showDeleteModal = true;
-  }
-
-  confirmDelete() {
-    if (this.deleteType === 'single') {
-      this.disasterDemandService.deleteDemand(this.deleteId);
-    } else {
-      const ids = this.filteredDemands.filter((item) => item.selected && item.id !== undefined).map((item) => item.id as number);
-
-      ids.forEach((id) => {
-        this.disasterDemandService.deleteDemand(id);
-      });
-
-      this.selectAll = false;
-    }
-
-    this.loadDemands();
-    this.closeDeleteModal();
   }
 
   closeDeleteModal() {
     this.showDeleteModal = false;
   }
 
+  onDeleted() {
+    this.showDeleteModal = false;
+    this.deleteIds = [];
+    this.selectAll = false;
+    this.loadDemands();
+  }
+
   changeStatus(
     item: DisasterDemand & {
       selected: boolean;
       displayStatus: DisplayStatus;
+      displayCreatedAt: string;
     }
   ) {
     let status: DisasterStatus;
@@ -312,24 +478,35 @@ export class AgencyDisasterWorkspaceComponent implements OnInit {
         status = '上架';
     }
 
-    // 原本狀態
-    const oldData = this.disasterDemandService.getDemands().find((d) => d.id === item.id);
-
-    // 更新狀態
+    // 更新實際狀態
     item.status = status;
 
-    // 隱藏時清除發布時間
+    // =========================
+    // 隱藏中
+    // =========================
+    // 不刪除 createdAt
+    // 只改變畫面上的顯示文字
     if (status === '隱藏') {
-      item.createdAt = undefined;
+      item.displayCreatedAt = '尚未發布';
     }
 
-    // 隱藏 → 上架，重新產生發布時間
-    if (status === '上架' && !item.createdAt) {
-      item.createdAt = new Date().toISOString();
+    // =========================
+    // 已上架
+    // =========================
+    // 保留原本發布時間
+    if (status === '上架') {
+      item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布';
     }
 
+    // =========================
+    // 已下架
+    // =========================
+    // 保留原本發布時間
+    if (status === '下架') {
+      item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布';
+    }
+
+    // 儲存狀態
     this.disasterDemandService.updateDemand(item);
-
-    this.loadDemands();
   }
 }
