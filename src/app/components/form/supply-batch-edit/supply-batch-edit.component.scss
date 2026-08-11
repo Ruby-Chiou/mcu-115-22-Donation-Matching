@@ -301,12 +301,6 @@ textarea {
   flex: 1;
 }
 
-.custom-service-input {
-  width: 320px !important;
-  flex-shrink: 0;
-  margin-bottom: 0 !important;
-}
-
 .custom-condition-input {
   width: 320px !important;
   flex-shrink: 0;
@@ -328,87 +322,6 @@ textarea {
   grid-auto-flow: column;
   column-gap: 30px;
   row-gap: 28px;
-}
-
-/* =========================
-   服務對象左右排列 (與圖一對齊)
-========================= */
-
-.service-target-area {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 100px;
-  margin-bottom: 35px;
-}
-
-.service-target-area.invalid-box::before {
-  content: '';
-  position: absolute;
-  top: 10px;
-  left: -12px;
-  width: 850px;
-  height: calc(100% + 2px);
-  border: 2px solid #d32f2f;
-  background-color: #fff5f5;
-  border-radius: 12px;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.service-target-section,
-.custom-service-target-section {
-  position: relative;
-  z-index: 1;
-}
-
-.service-target-section {
-  width: 280px;
-  flex-shrink: 0;
-}
-
-.custom-service-target-section {
-  flex: 1;
-}
-
-.custom-service-target-section .label-row {
-  margin-bottom: 20px;
-}
-
-.service-target-box {
-  display: grid;
-  grid-template-columns: repeat(2, 120px);
-  column-gap: 30px;
-  row-gap: 10px;
-}
-
-.service-target-box label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-}
-
-.service-target-box input[type='checkbox'] {
-  width: auto;
-  margin: 0;
-}
-
-.custom-service-list {
-  display: grid;
-  grid-template-columns: repeat(2, 440px);
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column;
-  column-gap: 30px;
-  row-gap: 28px;
-}
-
-.custom-service-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 440px;
-  flex-shrink: 0;
 }
 
 /* =========================

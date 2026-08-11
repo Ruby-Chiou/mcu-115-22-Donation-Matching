@@ -15,7 +15,6 @@ import { DisasterDemand } from '../../../models/agency/demand';
 export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
   submitted = false;
-  hasServiceTarget = true;
 
   fromDetail = false;
 
@@ -54,21 +53,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     note: '',
     brand: '',
     category: '',
-
-    serviceTargets: {
-      老人: false,
-      嬰幼兒: false,
-      孩童: false,
-      青少年: false,
-      身障: false,
-      貧困: false,
-      重症照護: false,
-      寵物: false,
-      流浪: false,
-      野生: false,
-    },
-
-    customServiceTargets: [''],
   };
 
   constructor(
@@ -103,8 +87,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
           },
 
           customConditions: data.customConditions?.length ? data.customConditions : [''],
-
-          customServiceTargets: data.customServiceTargets?.length ? data.customServiceTargets : [''],
         };
       }
     }
@@ -121,10 +103,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
   save() {
     this.submitted = true;
-
-    this.hasServiceTarget =
-      Object.values(this.demand.serviceTargets).some((value: boolean) => value) ||
-      this.demand.customServiceTargets.some((target) => target.trim());
 
     if (
       !this.demand.item ||
@@ -177,23 +155,12 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    if (!this.hasServiceTarget) {
-      this.scrollToServiceTarget();
-      return;
-    }
-
     // 清除空白的自訂欄位
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
-
-    this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
 
     // 保留至少一個輸入框
     if (this.demand.customConditions.length === 0) {
       this.demand.customConditions.push('');
-    }
-
-    if (this.demand.customServiceTargets.length === 0) {
-      this.demand.customServiceTargets.push('');
     }
 
     if (this.isEditMode) {
@@ -310,32 +277,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  addCustomServiceTarget() {
-    if (this.demand.customServiceTargets.length < 5) {
-      this.demand.customServiceTargets.push('');
-    }
-  }
-
-  removeCustomServiceTarget(index: number) {
-    this.demand.customServiceTargets.splice(index, 1);
-
-    if (this.demand.customServiceTargets.length === 0) {
-      this.demand.customServiceTargets.push('');
-    }
-  }
-
   trackByIndex(index: number): number {
     return index;
-  }
-
-  scrollToServiceTarget() {
-    const element = document.querySelector('.service-target-area');
-
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }
   }
 }

@@ -61,23 +61,6 @@
       <div class="detail-content">{{ demand.brand || '無' }}</div>
     </div>
 
-    <!-- 服務對象 -->
-    <div class="detail-row">
-      <div class="detail-title">服務對象</div>
-      <div class="detail-content">{{ getSelectedServiceTargets() }}</div>
-    </div>
-
-    <!-- 其他自訂服務對象 -->
-    <div class="detail-row">
-      <div class="detail-title">其他自訂服務對象</div>
-
-      <div class="detail-content">
-        <ng-container *ngIf="hasCustomServiceTargets(); else noServiceTarget"> {{ getCustomServiceTargets() }} </ng-container>
-
-        <ng-template #noServiceTarget>無</ng-template>
-      </div>
-    </div>
-
     <!-- 接受物資狀態 -->
     <div class="detail-row">
       <div class="detail-title">接受物資狀態</div>

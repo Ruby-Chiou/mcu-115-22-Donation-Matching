@@ -1,0 +1,12 @@
+<!-- 分頁控制區 -->
+<div class="pagination-container" *ngIf="totalPages > 1">
+  <button class="page-btn nav-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">上一頁</button>
+
+  <div class="page-numbers">
+    <button *ngFor="let page of pageNumbers" class="page-btn num-btn" [class.active]="page === currentPage" (click)="goToPage(page)">
+      {{ page }}
+    </button>
+  </div>
+
+  <button class="page-btn nav-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">下一頁</button>
+</div>

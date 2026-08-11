@@ -32,8 +32,6 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
     if (this.demand) {
       this.demand.remaining ??= this.demand.amount ?? 0;
       this.demand.customConditions ??= [];
-      this.demand.customServiceTargets ??= [];
-      this.demand.serviceTargets ??= {};
     }
   }
 
@@ -67,26 +65,6 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
   }
   getDeleteIds(): number[] {
     return this.demand?.id != null ? [this.demand.id] : [];
-  }
-
-  // 取得勾選的服務對象，以頓號連結；若皆無則回傳 '無'
-  getSelectedServiceTargets(): string {
-    if (!this.demand) {
-      return '無';
-    }
-
-    const selected = Object.entries(this.demand.serviceTargets || {})
-      .filter(([_, value]) => value)
-      .map(([key]) => key);
-
-    return selected.length > 0 ? selected.join('、') : '無';
-  }
-  // 檢查是否有有效填寫的其他服務對象
-  hasCustomServiceTargets(): boolean {
-    return (
-      Array.isArray(this.demand?.customServiceTargets) &&
-      this.demand.customServiceTargets.some((target: string) => target && target.trim() !== '')
-    );
   }
 
   // 檢查是否有有效填寫的其他物品狀態
@@ -126,10 +104,6 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
     }
 
     return '';
-  }
-  // 取得其他自訂服務對象文字
-  getCustomServiceTargets(): string {
-    return this.demand?.customServiceTargets?.filter((target) => target && target.trim()).join('、') || '無';
   }
 
   // 取得接受物資狀態文字
