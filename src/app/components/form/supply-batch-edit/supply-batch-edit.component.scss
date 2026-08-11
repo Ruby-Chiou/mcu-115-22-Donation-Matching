@@ -10,6 +10,44 @@ h1 {
   color: var(--color-brand-primary);
 }
 
+.batch-edit-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+/* 修改 .info-tag 及其子元素 */
+.info-tag {
+  display: inline-flex;
+  align-items: center; /* 確保內部元件垂直置中 */
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px;
+  gap: 8px;
+}
+
+.info-label {
+  font-size: 19px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1; /* 保留 line-height: 1 */
+}
+
+.info-value {
+  font-size: 19px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1;
+
+  /* 💡 新增這行：微調數字向上提升 1 px，達到視覺完美對齊 */
+  transform: translateY(-1px);
+}
+
 /* =========================
    表單外框
 ========================= */

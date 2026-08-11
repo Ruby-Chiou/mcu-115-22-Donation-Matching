@@ -1,11 +1,22 @@
 <div class="container">
   <h1>急難需求詳細資料</h1>
 
+  <!-- 方案一：資訊膠囊樣式（已加大編號字體） -->
+  <div class="detail-header-info" *ngIf="demand">
+    <div class="info-tag">
+      <span class="info-label">需求編號</span>
+      <span class="info-value">#{{ listNumber }}</span>
+    </div>
+  </div>
+
   <div class="detail-table" *ngIf="demand">
     <!-- 需求物 -->
     <div class="detail-row">
       <div class="detail-title">需求物</div>
-      <div class="detail-content">{{ demand.item }}</div>
+
+      <div class="detail-content item-detail-content">
+        <div class="detail-item-name">{{ demand.item }}</div>
+      </div>
     </div>
 
     <!-- 需求數量 -->
@@ -133,6 +144,7 @@
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>
+
 <app-supply-delete
   *ngIf="showDeleteModal"
   [demandIds]="getDeleteIds()"

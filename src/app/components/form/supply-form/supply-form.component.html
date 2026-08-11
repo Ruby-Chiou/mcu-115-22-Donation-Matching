@@ -1,6 +1,14 @@
 <div class="container">
   <h1>{{ isEditMode ? '編輯緊急需求內容' : '新增急難需求' }}</h1>
 
+  <!-- 編輯模式才顯示需求編號 -->
+  <div class="edit-header-info" *ngIf="isEditMode && demand">
+    <div class="info-tag">
+      <span class="info-label">需求編號</span>
+      <span class="info-value">#{{ demand.id }}</span>
+    </div>
+  </div>
+
   <div class="form-box">
     <!-- 需求物 -->
     <label class="label-row">

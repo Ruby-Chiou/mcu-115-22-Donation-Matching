@@ -10,6 +10,44 @@ h1 {
 }
 
 /* =========================
+編輯頁需求編號
+========================= */
+
+.edit-header-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.info-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px; /* 👈 稍微加大上下 padding，讓空間均勻 */
+  gap: 8px;
+  line-height: 1; /* 👈 新增：重置行高，防止文字向上偏移 */
+}
+
+.info-label {
+  font-size: 15px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+}
+
+.info-value {
+  font-size: 15px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+}
+
+/* =========================
    表單外框
 ========================= */
 

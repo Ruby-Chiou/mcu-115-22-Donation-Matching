@@ -2,7 +2,12 @@
   <h1>批次編輯緊急需求內容</h1>
 
   <div class="form-box" [ngClass]="i % 2 === 0 ? 'light-box' : 'dark-box'" *ngFor="let demand of editDemands; let i = index">
-    <h2>第 {{ i + 1 }} 筆需求</h2>
+    <div class="batch-edit-header">
+      <div class="info-tag" *ngIf="demand.id">
+        <span class="info-label">需求編號</span>
+        <span class="info-value">#{{ demand.id }}</span>
+      </div>
+    </div>
 
     <!-- 需求物 -->
     <label class="label-row">

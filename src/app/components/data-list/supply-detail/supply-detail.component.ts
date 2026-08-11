@@ -14,6 +14,7 @@ import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.c
 export class SupplyDetailComponent implements OnInit, AfterViewInit {
   demand?: DisasterDemand;
   showDeleteModal: boolean = false;
+  listNumber?: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,6 +24,8 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
 
     this.demand = this.service.getDemandById(id);
 

@@ -16,6 +16,34 @@ type SortType = 'createdAt' | 'amount' | 'remaining';
   styleUrl: './agency-disaster-workspace.component.scss',
 })
 export class AgencyDisasterWorkspaceComponent implements OnInit, AfterViewInit {
+  // 新增需求類型選擇
+  showAddDemandModal = false;
+  selectedDemandType: 'supply' | 'volunteer' = 'supply';
+
+  // 開啟新增需求類型選擇視窗
+  openAddDemandModal() {
+    this.selectedDemandType = 'supply';
+    this.showAddDemandModal = true;
+  }
+
+  // 關閉新增需求類型選擇視窗
+  closeAddDemandModal() {
+    this.showAddDemandModal = false;
+  }
+
+  // 確認需求類型並前往對應頁面
+  confirmAddDemand() {
+    this.showAddDemandModal = false;
+
+    if (this.selectedDemandType === 'supply') {
+      // 物資需求 → 你的新增需求頁面
+      this.router.navigate(['/agency/supply-form']);
+    } else {
+      // 志工需求 → 組員的志工需求頁面
+      this.router.navigate(['/agency/volunteer-create']);
+    }
+  }
+
   demands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
@@ -157,7 +185,9 @@ export class AgencyDisasterWorkspaceComponent implements OnInit, AfterViewInit {
   goToDetail(id: number) {
     this.saveListPosition();
 
-    this.router.navigate(['/agency/supply-detail', id]);
+    this.router.navigate(['/agency/supply-detail', id], {
+      queryParams: { number: id },
+    });
   }
 
   goToEdit(id: number) {
@@ -481,27 +511,14 @@ export class AgencyDisasterWorkspaceComponent implements OnInit, AfterViewInit {
     // 更新實際狀態
     item.status = status;
 
-    // =========================
-    // 隱藏中
-    // =========================
-    // 不刪除 createdAt
-    // 只改變畫面上的顯示文字
     if (status === '隱藏') {
       item.displayCreatedAt = '尚未發布';
     }
 
-    // =========================
-    // 已上架
-    // =========================
-    // 保留原本發布時間
     if (status === '上架') {
       item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布';
     }
 
-    // =========================
-    // 已下架
-    // =========================
-    // 保留原本發布時間
     if (status === '下架') {
       item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布';
     }
