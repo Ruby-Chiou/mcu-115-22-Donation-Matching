@@ -154,6 +154,384 @@
       </tr>
     </tbody>
   </table>
+<!-- ========================================= -->
+<!-- 志工需求列表 -->
+<!-- ========================================= -->
+
+<div class="volunteer-section">
+
+  <h1>志工需求列表</h1>
+
+  <!-- 新增志工需求 -->
+  <div class="top-action-bar">
+    <button
+      class="add-btn"
+      routerLink="/agency/volunteer-create"
+    >
+      新增志工需求
+    </button>
+  </div>
+
+
+  <!-- 志工工具列 -->
+  <div class="toolbar-row">
+
+    <!-- 左側 -->
+    <div class="select-area">
+
+      <div class="select-all">
+        <input
+          type="checkbox"
+          [(ngModel)]="volunteerSelectAll"
+          (change)="toggleVolunteerAll()"
+        />
+
+        <span>全選</span>
+      </div>
+
+
+      <div
+        class="batch-buttons"
+        *ngIf="hasSelectedVolunteer()"
+      >
+
+        <button
+          (click)="editSelectedVolunteer()"
+        >
+          編輯
+        </button>
+
+        <button
+          class="batch-delete-btn"
+          (click)="deleteSelectedVolunteer()"
+        >
+          刪除
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- 右側 -->
+    <div class="right-toolbar">
+
+      <!-- 志工排序 -->
+      <div class="sort-group">
+
+        <button
+          class="sort-icon-btn"
+          (click)="toggleVolunteerSortOrder()"
+          title="切換排序方向"
+        >
+          <svg
+            class="sort-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M7 4v16M7 4l-4 4M7 4l4 4M17 20V4M17 20l4-4M17 20l-4-4"
+            />
+          </svg>
+        </button>
+
+
+        <div
+          class="custom-dropdown"
+          (click)="$event.stopPropagation()"
+        >
+
+          <button
+            class="dropdown-trigger"
+            (click)="toggleVolunteerSortDropdown()"
+            [class.active]="volunteerSortDropdownOpen"
+          >
+
+            <span>
+              {{ getVolunteerSortLabel() }}
+            </span>
+
+            <span class="arrow-icon"></span>
+
+          </button>
+
+
+          <div
+            class="dropdown-menu"
+            *ngIf="volunteerSortDropdownOpen"
+          >
+
+            <div
+              *ngFor="let opt of volunteerSortOptions"
+              class="dropdown-item"
+              [class.selected]="volunteerSelectedSort === opt.value"
+              (click)="selectVolunteerSort(opt.value)"
+            >
+              {{ opt.label }}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- 志工篩選 -->
+      <div class="filter-trigger-group">
+
+        <button
+          class="filter-icon-btn"
+          (click)="openVolunteerFilterModal()"
+          title="開啟條件篩選"
+        >
+
+          <svg
+            class="filter-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon
+              points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+            ></polygon>
+
+            <line x1="15" y1="11" x2="21" y2="11"></line>
+            <line x1="17" y1="15" x2="21" y2="15"></line>
+            <line x1="19" y1="19" x2="21" y2="19"></line>
+          </svg>
+
+        </button>
+
+        <span class="filter-label-text">
+          篩選
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 志工列表 -->
+  <table class="volunteer-table">
+
+    <!-- 沒有資料 -->
+    <tr
+      *ngIf="filteredVolunteerDemands.length === 0"
+    >
+
+      <td
+        colspan="10"
+        class="empty-message"
+      >
+
+        <div class="empty-title">
+          尚未輸入志工需求或無符合條件的需求
+        </div>
+
+        <div class="empty-description">
+          請點選上方「新增志工需求」建立需求。
+        </div>
+
+      </td>
+
+    </tr>
+
+
+    <thead>
+
+      <tr>
+
+        <th style="width: 70px">
+          勾選項目
+        </th>
+
+        <th>
+          需求類型
+        </th>
+
+        <th>
+          需求人數
+        </th>
+
+        <th>
+          服務日期
+        </th>
+
+        <th>
+          服務地點
+        </th>
+
+        <th>
+          緊急優先度
+        </th>
+
+        <th>
+          發布時間
+        </th>
+
+       <th class="message-column" style="width: 80px">留言區</th>
+        <th class="operation-column">操作</th>
+
+      </tr>
+
+    </thead>
+
+
+    <tbody>
+
+      <tr
+        *ngFor="let item of filteredVolunteerDemands"
+      >
+
+        <!-- 勾選 -->
+        <td>
+
+          <input
+            type="checkbox"
+            [(ngModel)]="item.selected"
+          />
+
+        </td>
+
+
+        <!-- 需求類型 -->
+        <td>
+          {{ item.type }}
+        </td>
+
+
+        <!-- 需求人數 -->
+        <td>
+          {{ item.people }} 人
+        </td>
+
+
+        <!-- 服務日期 -->
+        <td>
+          {{ item.date }}
+        </td>
+
+        <!-- 服務地點 -->
+        <td>
+          {{ item.location }}
+        </td>
+
+
+        <!-- 優先度 -->
+        <td
+          [ngClass]="{
+            'normal': item.priority === '普通',
+            'urgent': item.priority === '緊急',
+            'very-urgent': item.priority === '非常緊急'
+          }"
+        >
+          {{ item.priority }}
+        </td>
+
+
+        <!-- 發布時間 -->
+        <td>
+          {{ item.displayCreatedAt || '尚未發布' }}
+        </td>
+
+
+        <!-- 留言 -->
+        <td>
+
+          <a
+            [routerLink]="[
+              '/agency/volunteer-message',
+              item.id
+            ]"
+          >
+            {{ item.messageCount || 0 }}
+          </a>
+
+        </td>
+
+
+        <!-- 操作 -->
+        <td>
+
+          <div class="operation-flex">
+
+            <button
+              [routerLink]="[
+                '/agency/volunteer-detail',
+                item.id
+              ]"
+            >
+              查看
+            </button>
+
+
+            <button
+              [routerLink]="[
+                '/agency/volunteer-edit',
+                item.id
+              ]"
+            >
+              編輯
+            </button>
+
+
+            <button
+              class="delete-btn"
+              (click)="deleteVolunteer(item.id)"
+            >
+              刪除
+            </button>
+
+
+            <label class="status-label">
+              狀態：
+            </label>
+
+
+            <select
+              [(ngModel)]="item.displayStatus"
+              (change)="changeVolunteerStatus(item)"
+              [ngClass]="{
+                'status-on': item.displayStatus === '已上架',
+                'status-hide': item.displayStatus === '隱藏中',
+                'status-off': item.displayStatus === '已下架'
+              }"
+            >
+
+              <option value="已上架">
+                已上架
+              </option>
+
+              <option value="隱藏中">
+                隱藏中
+              </option>
+
+              <option value="已下架">
+                已下架
+              </option>
+
+            </select>
+
+          </div>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+
 
   <!-- 自訂篩選彈出視窗 Modal -->
   <div class="modal-backdrop" *ngIf="showFilterModal">

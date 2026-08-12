@@ -14,7 +14,7 @@ export class HeaderComponent {
       link: '/donor',
       sub: [
         { name: '更多需求', link: '/donor/daily' },
-        { name: '訂單詳情', link: '/orders' },
+        { name: '捐助地圖', link: '/daily-locations' },
         { name: '捐助感謝', link: '/thanks-wall' },
       ],
     },

@@ -650,3 +650,88 @@ tbody tr:last-child td:last-child {
   margin-top: 30px;
   justify-content: flex-end;
 }
+
+/* =================================
+   志工需求列表
+================================= */
+
+.volunteer-section {
+  margin-top: 70px;
+  padding-top: 40px;
+  border-top: 3px solid #e5e7eb;
+}
+
+
+.volunteer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+
+.volunteer-header h1 {
+  margin: 0;
+}
+
+
+.volunteer-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+
+.volunteer-table th,
+.volunteer-table td {
+  padding: 14px 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+
+.volunteer-table th {
+  background-color: #e3f2fd;
+  white-space: nowrap;
+  padding: 16px 6px;
+}
+
+
+/* 優先度 */
+
+.volunteer-table .normal {
+  color: #4b5563;
+  font-weight: bold;
+}
+
+
+.volunteer-table .urgent {
+  color: #f59e0b;
+  font-weight: bold;
+}
+
+
+.volunteer-table .very-urgent {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+
+.volunteer-empty {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+}
+
+
+.volunteer-empty .empty-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+
+.volunteer-empty .empty-description {
+  color: #777;
+}
