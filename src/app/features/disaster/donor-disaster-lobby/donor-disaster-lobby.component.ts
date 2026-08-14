@@ -111,7 +111,7 @@ export class DonorDisasterLobbyComponent {
     {
       image: 'https://upload.wikimedia.org/wikipedia/commons/7/70/Shenzhen_during_Typhoon_Noul_%282026%29_06.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original',
       text:'紅霞颱風侵襲中國',
-      highlight:'7月20日生成，7月24日升格熱帶風暴-編號2612「紅霞」(Noul)。 7月25日8時，升格為中度颱風；7月26日香港天文台將其升格為強颱風，凌晨3點50分前後在廣東省惠州市惠東縣平海鎮沿海登陸，廣州約89萬人轉移。',
+      highlight:'7月20日生成，7月24日升格熱帶風暴-編號2612紅霞。 7月25日8時，升格為中度颱風；7月26日香港天文台將其升格為強颱風，凌晨3點50分前後在廣東省惠州市惠東縣平海鎮沿海登陸，廣州約89萬人轉移。',
 
     },
   ];

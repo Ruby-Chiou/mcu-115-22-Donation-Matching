@@ -33,9 +33,13 @@ export const routes: Routes = [
   },
 
   {
-    path: 'needs',
-    loadComponent: () =>import('./features/disaster/needs/needs.component').then((m) => m.NeedsComponent),
+    path: 'donor/disaster/needs',
+    loadComponent: () =>import('./features/disaster/needs/needs.component').then((m) => m.NeedsComponent),  //災害歷史紀錄
   },
+  /*/{
+  path: 'disaster/open',
+  loadComponent: () =>import('./features/disaster/disaster-open/disaster-open.component').then((m) => m.DisasterOpenComponent),
+  }, */
 
   // 4. 社福機構模組 (機構端)
   {

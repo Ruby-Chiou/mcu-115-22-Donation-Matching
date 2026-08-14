@@ -12,9 +12,6 @@
       <div class="card-text">
         <p>{{ disasterNews().text }}</p>
         <p class="highlight">{{ disasterNews().highlight }}</p>
-        <a routerLink="/needs">
-    查看更多
-  </a>
       </div>
     </div>
     <div class="disaster-indicators">
@@ -39,6 +36,7 @@
     </div>
 
   }
+  <a [routerLink]="['/donor/disaster/needs']">查看歷史紀錄</a>
   </aside>
 </div>
 <div class="world">世界災害新聞</div>

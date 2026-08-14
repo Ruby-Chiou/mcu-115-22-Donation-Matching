@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router,RouterLink } from '@angular/router';
+
 
 interface MaterialNeed {
   id: number;
@@ -34,11 +35,37 @@ interface DisasterSection {
   templateUrl: './needs.component.html',
   styleUrl: './needs.component.scss',
 })
-export class NeedsComponent {
 
+export class NeedsComponent {
+    showSuccessModal = false;
+  constructor(private router: Router) {
+  }
+  donate(disasterId: number) {
+    // 讀取管理者針對這個災害設定的狀態
+    const savedStatus = localStorage.getItem(
+      `disaster_${disasterId}`
+    );
+    const isDisasterActive = savedStatus === 'true';
+    // 如果這個災害有開啟
+    if (isDisasterActive) {
+      this.router.navigate(['/災害捐助表單']);
+      return;
+    }
+    // 管理者沒有開啟
+    // 保留原本的「捐贈物資已達標」Modal
+    this.showSuccess();
+  }
+  showSuccess() {
+      this.showSuccessModal = true;
+  }
+  closeSuccess() {
+      this.showSuccessModal = false;
+  }
   protected readonly sections = signal<DisasterSection[]>([
+
     {
-      id: 1,
+
+      id: 2,
       sectionTitle: '土石流災害救助',
       title: '花蓮馬太鞍溪堰塞湖災害',
       description:
@@ -99,7 +126,7 @@ export class NeedsComponent {
       ],
     },
     {
-      id: 2,
+      id: 3,
       sectionTitle: '地震救助',
       title: '2024年花蓮地震（又稱0403花蓮地震）',
       description:
@@ -164,11 +191,11 @@ export class NeedsComponent {
       ],
     },
     {
-      id: 3,
+      id: 4,
       sectionTitle: '風災救助',
       title: '米克拉颱風災害救援支持行動',
       description:
-        '第7號輕度/強烈颱風米克拉（Typhoon Mekkhala）\n\n'+
+        '第7號輕度/強烈颱風米克拉\n\n'+
         '於2026年6月下旬北上經過琉球附近海面。雖然其暴風圈未直接登陸台灣， \n\n'+
         '但其外圍環流與滯留鋒面、增強西南風疊加，猶如「大氣引水幫浦」般灌入大量水氣，\n\n'+
         '導致南部地區降下致災性暴雨，高雄市旗山溪洲地區道路瞬間化為汪洋，黃色泥水灌進整條街道，農會周邊與眾多商家貨物全數泡水，高屏地區共發布高達93條土石流警戒。 \n\n'+

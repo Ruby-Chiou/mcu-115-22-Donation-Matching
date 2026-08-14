@@ -26,18 +26,14 @@
 /* 4. 通用按鈕基礎樣式 (保留你原本的設定，移除 width) */
 .title-box {
   height: 60px;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   font-size: 24px;
   font-weight: bold;
-
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: rgb(133, 212, 255);
-
+  //border: 1px solid #ccc;
+  border-radius: 0px;
+  background: transparent;
   box-sizing: border-box;
 }
 /* .history {
