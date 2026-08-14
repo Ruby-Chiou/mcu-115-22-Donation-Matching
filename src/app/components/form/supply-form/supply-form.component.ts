@@ -1,21 +1,20 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DisasterDemandService } from '../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DisasterDemand } from '../../../models/agency/demand';
 
 @Component({
-  selector: 'app-supply-create',
+  selector: 'app-supply-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './supply-create.component.html',
-  styleUrl: './supply-create.component.scss',
+  templateUrl: './supply-form.component.html',
+  styleUrl: './supply-form.component.scss',
 })
-export class SupplyCreateComponent implements OnInit {
+export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
   submitted = false;
-  hasServiceTarget = true;
 
   fromDetail = false;
 
@@ -54,21 +53,6 @@ export class SupplyCreateComponent implements OnInit {
     note: '',
     brand: '',
     category: '',
-
-    serviceTargets: {
-      老人: false,
-      嬰幼兒: false,
-      孩童: false,
-      青少年: false,
-      身障: false,
-      貧困: false,
-      重症照護: false,
-      寵物: false,
-      流浪: false,
-      野生: false,
-    },
-
-    customServiceTargets: [''],
   };
 
   constructor(
@@ -103,19 +87,22 @@ export class SupplyCreateComponent implements OnInit {
           },
 
           customConditions: data.customConditions?.length ? data.customConditions : [''],
-
-          customServiceTargets: data.customServiceTargets?.length ? data.customServiceTargets : [''],
         };
       }
     }
   }
 
+  ngAfterViewInit() {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant',
+      });
+    }, 0);
+  }
+
   save() {
     this.submitted = true;
-
-    this.hasServiceTarget =
-      Object.values(this.demand.serviceTargets).some((value: boolean) => value) ||
-      this.demand.customServiceTargets.some((target) => target.trim());
 
     if (
       !this.demand.item ||
@@ -168,23 +155,12 @@ export class SupplyCreateComponent implements OnInit {
       return;
     }
 
-    if (!this.hasServiceTarget) {
-      this.scrollToServiceTarget();
-      return;
-    }
-
     // 清除空白的自訂欄位
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
-
-    this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
 
     // 保留至少一個輸入框
     if (this.demand.customConditions.length === 0) {
       this.demand.customConditions.push('');
-    }
-
-    if (this.demand.customServiceTargets.length === 0) {
-      this.demand.customServiceTargets.push('');
     }
 
     if (this.isEditMode) {
@@ -301,32 +277,7 @@ export class SupplyCreateComponent implements OnInit {
     }
   }
 
-  addCustomServiceTarget() {
-    if (this.demand.customServiceTargets.length < 5) {
-      this.demand.customServiceTargets.push('');
-    }
-  }
-
-  removeCustomServiceTarget(index: number) {
-    this.demand.customServiceTargets.splice(index, 1);
-
-    if (this.demand.customServiceTargets.length === 0) {
-      this.demand.customServiceTargets.push('');
-    }
-  }
-
   trackByIndex(index: number): number {
     return index;
-  }
-
-  scrollToServiceTarget() {
-    const element = document.querySelector('.service-target-area');
-
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }
   }
 }

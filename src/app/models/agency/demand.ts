@@ -50,31 +50,6 @@ export interface DisasterDemand {
   messageCount?: number;
 
   category: '食物' | '衣物' | '醫療' | '嬰幼兒' | '生活用品' | '其他' | '';
-
-  // 服務對象
-  serviceTargets: {
-    老人?: boolean;
-
-    嬰幼兒?: boolean;
-
-    孩童?: boolean;
-
-    青少年?: boolean;
-
-    身障?: boolean;
-
-    貧困?: boolean;
-
-    重症照護?: boolean;
-
-    寵物?: boolean;
-
-    流浪?: boolean;
-
-    野生?: boolean;
-  };
-
-  customServiceTargets: string[];
 }
 
 // 編輯用錯誤提示欄位
@@ -96,8 +71,6 @@ export interface EditableDisasterDemand extends DisasterDemand {
   phoneError?: boolean;
 
   remainingError?: boolean;
-
-  serviceTargetError?: boolean;
 }
 
 // 新增需求用

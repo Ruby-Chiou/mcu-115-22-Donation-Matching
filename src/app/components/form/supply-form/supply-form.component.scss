@@ -10,6 +10,44 @@ h1 {
 }
 
 /* =========================
+編輯頁需求編號
+========================= */
+
+.edit-header-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.info-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px; /* 👈 稍微加大上下 padding，讓空間均勻 */
+  gap: 8px;
+  line-height: 1; /* 👈 新增：重置行高，防止文字向上偏移 */
+}
+
+.info-label {
+  font-size: 15px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+}
+
+.info-value {
+  font-size: 15px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+}
+
+/* =========================
    表單外框
 ========================= */
 
@@ -365,98 +403,6 @@ textarea {
 .add-condition-btn:hover,
 .delete-condition-btn:hover {
   background-color: #f5f5f5;
-}
-
-/* =========================
-   服務對象區與精準紅框範圍
-========================= */
-
-.service-target-area {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 100px;
-  margin-bottom: 35px;
-}
-
-.service-target-area.error-area::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: -12px;
-  width: 850px;
-  height: calc(100% + 10px);
-  border: 2px solid #d32f2f;
-  background-color: #fff5f5;
-  border-radius: 12px;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.service-target-section,
-.custom-service-target-section {
-  position: relative;
-  z-index: 1;
-}
-
-.service-target-area.error-area .service-target-section {
-  border: none !important;
-  background-color: transparent !important;
-}
-
-.service-target-section {
-  width: 280px;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-/* 修改重點：將服務對象列間距 row-gap 從 20px 縮小為 10px */
-.service-target-box {
-  display: grid;
-  grid-template-columns: repeat(2, 120px);
-  column-gap: 30px;
-  row-gap: 10px; /* 縮小垂直間距 */
-}
-
-.service-target-box label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-}
-
-.service-target-box input[type='checkbox'] {
-  width: auto;
-  margin: 0;
-}
-
-.custom-service-target-section {
-  width: calc(100% - 380px);
-  flex-shrink: 0;
-}
-
-.custom-service-list {
-  display: grid;
-  grid-template-columns: repeat(2, 440px);
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column;
-  column-gap: 30px;
-  row-gap: 28px;
-}
-
-.custom-service-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 440px;
-  height: 42px;
-  flex-shrink: 0;
-}
-
-.custom-service-input {
-  width: 320px !important;
-  flex-shrink: 0;
-  margin-bottom: 0 !important;
 }
 
 /* =========================

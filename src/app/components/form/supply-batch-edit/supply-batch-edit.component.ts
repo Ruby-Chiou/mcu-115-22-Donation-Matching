@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DisasterDemandService } from '../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../models/agency/demand';
 
 @Component({
@@ -43,22 +43,6 @@ export class SupplyBatchEditComponent implements OnInit {
         createdAt: item.createdAt,
         brand: item.brand || '',
         category: item.category || '',
-
-        // 服務對象初始化（相容舊資料）
-        serviceTargets: item.serviceTargets || {
-          老人: false,
-          嬰幼兒: false,
-          孩童: false,
-          青少年: false,
-          身障: false,
-          貧困: false,
-          重症照護: false,
-          寵物: false,
-          流浪: false,
-          野生: false,
-        },
-
-        customServiceTargets: item.customServiceTargets?.length ? item.customServiceTargets : [''],
       }));
     }
 
@@ -120,17 +104,8 @@ export class SupplyBatchEditComponent implements OnInit {
       item.addressError = false;
       item.phoneError = false;
       item.remainingError = false;
-      item.serviceTargetError = false;
+
       item.categoryError = false;
-
-      // 服務對象檢查
-      const hasServiceTarget =
-        Object.values(item.serviceTargets || {}).some((value: any) => value) ||
-        item.customServiceTargets?.some((target: string) => target.trim());
-
-      if (!hasServiceTarget) {
-        item.serviceTargetError = true;
-      }
 
       if (!item.item) {
         item.itemError = true;
@@ -185,8 +160,7 @@ export class SupplyBatchEditComponent implements OnInit {
         item.categoryError ||
         item.addressError ||
         item.phoneError ||
-        item.remainingError ||
-        item.serviceTargetError
+        item.remainingError
     );
 
     if (invalid) {
@@ -210,15 +184,9 @@ export class SupplyBatchEditComponent implements OnInit {
     this.editDemands.forEach((item) => {
       item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
 
-      item.customServiceTargets = item.customServiceTargets.filter((target) => target.trim() !== '');
-
       // 至少保留一個輸入框
       if (item.customConditions.length === 0) {
         item.customConditions.push('');
-      }
-
-      if (item.customServiceTargets.length === 0) {
-        item.customServiceTargets.push('');
       }
 
       // 上架 / 下架 都需要發布時間
@@ -289,21 +257,9 @@ export class SupplyBatchEditComponent implements OnInit {
   removeCustomCondition(demand: any, index: number) {
     demand.customConditions.splice(index, 1);
   }
-  // 其他服務對象動態增減
-  addCustomServiceTarget(demand: any) {
-    if (demand.customServiceTargets.length < 5) {
-      demand.customServiceTargets.push('');
-    }
-  }
 
   trackByIndex(index: number): number {
     return index;
-  }
-
-  removeCustomServiceTarget(demand: any, index: number) {
-    if (demand.customServiceTargets.length > 1) {
-      demand.customServiceTargets.splice(index, 1);
-    }
   }
 
   cancel() {

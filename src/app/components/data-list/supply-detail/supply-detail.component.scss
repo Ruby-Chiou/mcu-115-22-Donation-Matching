@@ -4,10 +4,45 @@
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   font-size: 24px;
   font-weight: 600;
   color: var(--color-brand-primary);
+}
+
+/* 需求編號資訊區塊 (修正垂直居中與偏上問題) */
+.detail-header-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.info-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px; /* 👈 稍微加大上下 padding，讓空間均勻 */
+  gap: 8px;
+  line-height: 1; /* 👈 新增：重置行高，防止文字向上偏移 */
+}
+
+.info-label {
+  font-size: 15px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+}
+
+.info-value {
+  font-size: 15px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
 }
 
 /* 詳細資料表 */
@@ -47,13 +82,28 @@ h1 {
   white-space: pre-wrap;
 }
 
+/* 需求物欄位 */
+.item-detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* 需求物名稱 */
+.detail-item-name {
+  font-size: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 /* 按鈕區 */
 .button-area {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 25px;
-  margin-bottom: 30px; /* 👈 新增這行：將按鈕向上推開，避免被 Footer 遮擋 */
+  margin-bottom: 30px; /* 將按鈕向上推開，避免被 Footer 遮擋 */
 }
 
 .back-btn,
@@ -132,83 +182,4 @@ h1 {
 .priority-detail.very-urgent {
   color: #d32f2f;
   font-weight: 500;
-}
-
-/* =========================
-   刪除確認 Modal 樣式（完全比照新增/編輯頁）
-========================= */
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.modal-box {
-  background-color: #ffffff;
-  width: 420px;
-  padding: 35px 30px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-
-  h2 {
-    margin: 0 0 15px 0;
-    color: var(--color-brand-primary, #0056b3);
-    font-size: 24px;
-    font-weight: 600;
-  }
-
-  p {
-    margin: 0 0 25px 0;
-    font-size: 16px;
-    color: #333333;
-  }
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-
-  button {
-    min-width: 100px;
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: none;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    color: #ffffff;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 0.9;
-    }
-  }
-
-  .cancel-btn {
-    background-color: #64b5f6;
-    color: #1565c0;
-
-    &:hover {
-      background-color: #42a5f5;
-    }
-  }
-
-  .confirm-btn {
-    background-color: #d32f2f;
-    color: white;
-
-    &:hover {
-      background-color: #b71c1c;
-    }
-  }
 }
