@@ -12,13 +12,13 @@ import { PaginationComponent } from '../pagination/pagination.component';
 type SortType = 'createdAt' | 'amount' | 'remaining';
 
 @Component({
-  selector: 'app-demand-list',
+  selector: 'app-disaster-list',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SupplyDeleteComponent, PaginationComponent],
-  templateUrl: './demand-list.component.html',
-  styleUrl: './demand-list.component.scss',
+  templateUrl: './disaster-list.component.html',
+  styleUrl: './disaster-list.component.scss',
 })
-export class DemandListComponent implements OnInit, AfterViewInit {
+export class DisasterListComponent implements OnInit, AfterViewInit {
   demands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
