@@ -1,0 +1,197 @@
+.container {
+  padding: 30px;
+  padding-bottom: 50px; /* 確保最外層底部有足夠空間 */
+}
+
+h1 {
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
+/* 需求編號資訊區塊 (修正垂直居中與偏上問題) */
+.detail-header-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.info-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px;
+  gap: 8px;
+  line-height: 1;
+}
+
+.info-label {
+  font-size: 15px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.info-value {
+  font-size: 15px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+/* 詳細資料表 */
+.detail-table {
+  width: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid #ddd; /* 最外框 */
+}
+
+/* 每一列 */
+.detail-row {
+  display: flex;
+  border-bottom: 1px solid #ddd; /* 統一使用下邊框分隔每一列 */
+}
+
+/* 最後一列移除下邊框，避免重複 */
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+/* 左側標題 */
+.detail-title {
+  width: 25%;
+  padding: 15px;
+  background-color: #e3f2fd;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* 右側內容 (統一靠左對齊 + 垂直置中) */
+.detail-content {
+  flex: 1;
+  max-width: 75%;
+  padding: 15px;
+  background-color: white;
+  font-size: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+/* 需求物欄位 */
+.item-detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* 需求物名稱 */
+.detail-item-name {
+  font-size: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* 按鈕區 */
+.button-area {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+  margin-bottom: 30px;
+}
+
+.back-btn,
+.edit-btn,
+.delete-btn {
+  padding: 8px 18px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.back-btn {
+  background-color: #64b5f6;
+  color: #1565c0;
+}
+
+.edit-btn {
+  background-color: var(--color-brand-primary);
+}
+
+.delete-btn {
+  background-color: #d32f2f;
+}
+
+.back-btn:hover {
+  background-color: #42a5f5;
+  opacity: 1;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  opacity: 0.85;
+}
+
+/* 接受物資狀態 */
+.condition-detail {
+  display: block;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.condition-item {
+  line-height: 1.6;
+}
+
+.condition-item span {
+  font-weight: 500;
+}
+
+.condition-icon {
+  font-weight: 700;
+  margin-right: 5px;
+}
+
+::ng-deep .accept {
+  color: #2e7d32;
+}
+
+::ng-deep .reject {
+  color: #d32f2f;
+}
+
+/* 緊急優先度顏色 */
+.priority-detail.normal {
+  color: #333333;
+  font-weight: 500;
+}
+
+.priority-detail.urgent {
+  color: #f57c00;
+  font-weight: 500;
+}
+
+.priority-detail.very-urgent {
+  color: #d32f2f;
+  font-weight: 500;
+}

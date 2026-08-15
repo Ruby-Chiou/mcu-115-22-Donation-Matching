@@ -43,6 +43,22 @@ export const routes: Routes = [
       import('./features/daily/agency-daily-workspace/agency-daily-workspace.component').then((m) => m.AgencyDailyWorkspaceComponent), // 日常需求發布管理區
   },
   {
+    path: 'agency/daily-form',
+    loadComponent: () => import('./components/form/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
+  },
+  {
+    path: 'agency/daily-edit/:id',
+    loadComponent: () => import('./components/form/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
+  },
+  {
+    path: 'agency/daily-detail/:id',
+    loadComponent: () => import('./components/data-list/daily-detail/daily-detail.component').then((m) => m.DailyDetailComponent),
+  },
+  {
+    path: 'agency/daily-batch-edit',
+    loadComponent: () => import('./components/form/daily-batch-edit/daily-batch-edit.component').then((m) => m.DailyBatchEditComponent),
+  },
+  {
     path: 'agency/disaster',
     loadComponent: () =>
       import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then(

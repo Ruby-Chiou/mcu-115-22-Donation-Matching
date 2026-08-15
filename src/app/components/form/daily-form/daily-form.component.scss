@@ -1,0 +1,575 @@
+.container {
+  padding: 30px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
+/* =========================
+編輯頁需求編號
+========================= */
+
+.edit-header-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.info-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px; /* 👈 稍微加大上下 padding，讓空間均勻 */
+  gap: 8px;
+  line-height: 1; /* 👈 新增：重置行高，防止文字向上偏移 */
+}
+
+.info-label {
+  font-size: 15px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+}
+
+.info-value {
+  font-size: 15px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+}
+
+/* =========================
+   表單外框
+========================= */
+
+.form-box {
+  background-color: #e3f2fd;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 30px;
+}
+
+/* =========================
+   標籤
+========================= */
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-main);
+  font-weight: 500;
+  font-size: 17px;
+}
+
+.form-box > label {
+  margin-top: 15px;
+}
+
+/* =========================
+   輸入框
+========================= */
+
+input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100px;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.short-input {
+  width: 250px;
+  resize: none;
+  overflow-wrap: break-word;
+}
+
+.item-input {
+  width: 450px;
+  min-height: 100px;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  resize: vertical;
+}
+
+/* =========================
+   數量 + 單位
+========================= */
+
+.quantity-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.quantity-box input {
+  margin-bottom: 20px;
+}
+
+.phone-input {
+  width: 420px;
+}
+
+.unit-input {
+  width: 250px;
+}
+
+.medium-input {
+  width: 450px;
+}
+/* =========================
+   接收方式
+========================= */
+
+.receive-method-box {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.receive-method-box label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.receive-method-box input[type='radio'] {
+  width: auto;
+  margin: 0;
+}
+
+.receive-info-box {
+  margin-bottom: 10px;
+}
+
+.receive-info-box .label-row:first-child {
+  margin-top: 0;
+}
+
+/* =========================
+   短欄位（數量描述、可選類別）
+========================= */
+
+.short-field {
+  width: 515px;
+}
+
+.short-field textarea,
+.short-field select {
+  width: 100%;
+}
+
+.note-textarea {
+  width: 100%;
+  position: relative;
+  left: 0px;
+}
+
+/* =========================
+   接受物資狀態（緊湊排列）
+========================= */
+
+.condition-left {
+  width: 180px; /* 收窄欄位寬度，把按鈕拉近 */
+}
+
+/* 修改重點：縮小 Padding 與 Margin，微調極窄垂直間隔 */
+.condition-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px; /* 縮小上下內邊距 (原為 10px) */
+  margin-bottom: 2px; /* 縮小底部外邊距 (原為 6px) */
+  border-bottom: 1px dashed #1e88e5;
+  transition: background-color 0.2s ease;
+  border-radius: 6px;
+}
+
+.condition-row:hover {
+  background-color: rgba(255, 255, 255, 0.4); /* 滑鼠懸停微亮 */
+}
+
+.condition-row:last-child {
+  border-bottom: none; /* 最後一行不加上劃線 */
+  margin-bottom: 0;
+}
+
+.condition-name {
+  color: var(--color-text-main, #333333);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.condition-toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background-color: #90a4ae;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.condition-toggle.accept {
+  background-color: #66a96b;
+}
+
+.condition-toggle.reject {
+  background-color: #c75b5b;
+}
+
+.condition-toggle:hover {
+  opacity: 0.85;
+  transform: scale(1.05); /* 輕微放大效果，增加手感 */
+}
+
+/* =========================
+   優先度
+========================= */
+
+.priority-box {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.priority-box label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 16px;
+}
+
+.priority-box input[type='radio'] {
+  width: auto;
+  margin: 0;
+}
+
+.priority-box .normal {
+  color: #333333;
+}
+
+.priority-box .urgent {
+  color: #f57c00;
+}
+
+.priority-box .very-urgent {
+  color: #d32f2f;
+}
+
+/* =========================
+   公開狀態
+========================= */
+
+.status-box {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.status-box label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.status-box input[type='radio'] {
+  width: auto;
+  margin: 0;
+}
+
+/* =========================
+   按鈕
+========================= */
+
+.button-area {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.button-area button {
+  padding: 8px 18px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* =========================
+   按鈕顏色
+========================= */
+
+.save-btn {
+  background-color: var(--color-brand-primary);
+  color: white;
+}
+
+.back-btn {
+  background-color: #64b5f6;
+  color: #0d47a1;
+}
+
+.save-btn:hover {
+  opacity: 0.85;
+}
+
+.back-btn:hover {
+  background-color: #42a5f5;
+}
+
+.button-area button:hover {
+  opacity: 0.85;
+}
+
+/* =========================
+   必填標記與提示
+========================= */
+
+.required {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.error-input {
+  border: 2px solid #d32f2f !important;
+  background-color: #fff5f5;
+}
+
+.label-row {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* 統一標題間距，確保上下對齊 */
+.align-title {
+  margin-top: 0 !important;
+  margin-bottom: 15px !important;
+  height: 25px;
+}
+
+.word-count {
+  font-size: 13px;
+  color: #555;
+  font-weight: 400;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+/* =========================
+   按鈕通用元件設定
+========================= */
+
+.add-condition-btn,
+.delete-condition-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  background-color: white;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.add-condition-btn:hover,
+.delete-condition-btn:hover {
+  background-color: #f5f5f5;
+}
+
+/* =========================
+   服務對象區與精準紅框範圍
+========================= */
+
+.service-target-area {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 100px;
+  margin-bottom: 35px;
+}
+
+.service-target-area.error-area::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -12px;
+  width: 850px;
+  height: calc(100% + 10px);
+  border: 2px solid #d32f2f;
+  background-color: #fff5f5;
+  border-radius: 12px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.service-target-section,
+.custom-service-target-section {
+  position: relative;
+  z-index: 1;
+}
+
+.service-target-area.error-area .service-target-section {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.service-target-section {
+  width: 280px;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+/* 修改重點：將服務對象列間距 row-gap 從 20px 縮小為 10px */
+.service-target-box {
+  display: grid;
+  grid-template-columns: repeat(2, 120px);
+  column-gap: 30px;
+  row-gap: 10px; /* 縮小垂直間距 */
+}
+
+.service-target-box label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.service-target-box input[type='checkbox'] {
+  width: auto;
+  margin: 0;
+}
+
+.custom-service-target-section {
+  width: calc(100% - 380px);
+  flex-shrink: 0;
+}
+
+.custom-service-list {
+  display: grid;
+  grid-template-columns: repeat(2, 440px);
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  column-gap: 30px;
+  row-gap: 28px;
+}
+
+.custom-service-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 440px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.custom-service-input {
+  width: 320px !important;
+  flex-shrink: 0;
+  margin-bottom: 0 !important;
+}
+
+/* =========================
+   物資狀態區（與服務對象區完全對稱）
+========================= */
+
+.condition-area {
+  display: flex;
+  align-items: flex-start;
+  gap: 100px;
+  margin-bottom: 35px;
+}
+
+.condition-section {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.custom-condition-section {
+  width: calc(100% - 380px);
+  flex-shrink: 0;
+}
+
+.custom-condition-list {
+  display: grid;
+  grid-template-columns: repeat(2, 440px);
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  column-gap: 30px;
+  row-gap: 28px;
+}
+
+.custom-condition-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 440px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.custom-condition-input {
+  width: 320px !important;
+  flex-shrink: 0;
+  margin-bottom: 0 !important;
+}

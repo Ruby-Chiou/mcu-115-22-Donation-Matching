@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DailyDemandService } from '../../../core/services/daily-demand.service';
 
 @Component({
   selector: 'app-supply-delete',
@@ -10,12 +11,20 @@ import { DisasterDemandService } from '../../../core/services/disaster-demand.se
 })
 export class SupplyDeleteComponent {
   @Input() demandIds: number[] = [];
+
   @Input() deleteType: 'single' | 'batch' = 'single';
 
+  // 判斷要刪除急難還是日常
+  @Input() demandType: 'disaster' | 'daily' = 'disaster';
+
   @Output() closed = new EventEmitter<void>();
+
   @Output() deleted = new EventEmitter<void>();
 
-  constructor(private service: DisasterDemandService) {}
+  constructor(
+    private disasterService: DisasterDemandService,
+    private dailyService: DailyDemandService
+  ) {}
 
   // 取消
   cancel() {
@@ -25,7 +34,11 @@ export class SupplyDeleteComponent {
   // 確定刪除
   confirmDelete() {
     this.demandIds.forEach((id) => {
-      this.service.deleteDemand(id);
+      if (this.demandType === 'daily') {
+        this.dailyService.deleteDemand(id);
+      } else {
+        this.disasterService.deleteDemand(id);
+      }
     });
 
     this.deleted.emit();
