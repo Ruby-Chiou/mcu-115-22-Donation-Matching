@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { RoleSelectorComponent } from '../../../components/auth/role-selector/role-selector.component';
 
-type UserRole = 'donor' | 'recipient';
+type UserRole = 'donor' | 'agency';
 
 @Component({
   selector: 'app-register',
@@ -27,7 +27,7 @@ export class RegisterComponent {
     phone: '',
   };
 
-  recipientForm: any = {
+  agencyForm: any = {
     email: '',
     accountName: '',
     password: '',
@@ -65,8 +65,8 @@ export class RegisterComponent {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
     if (!file) return;
-    // TODO: 上傳檔案取得 URL / key，再存到 recipientForm.verificationDocumentUrl
-    this.recipientForm.verificationDocumentUrl = file.name; // 示意
+    // TODO: 上傳檔案取得 URL / key，再存到 AgencyForm.verificationDocumentUrl
+    this.agencyForm.verificationDocumentUrl = file.name; // 示意
     this.submitMessage = '已選取驗證文件（示意）';
   }
 
@@ -93,25 +93,25 @@ export class RegisterComponent {
       return;
     }
 
-    // recipient
-    if (this.selectedRole === 'recipient') {
-      if (this.recipientForm.password !== this.recipientForm.confirmPassword) {
+    // agency
+    if (this.selectedRole === 'agency') {
+      if (this.agencyForm.password !== this.agencyForm.confirmPassword) {
         this.submitMessage = '密碼與確認密碼不一致。';
         return;
       }
       const payload = {
-        email: this.recipientForm.email,
-        password: this.recipientForm.password || undefined,
-        agencyName: this.recipientForm.agencyName,
-        registrationNumber: this.recipientForm.registrationNumber || undefined,
-        representative: this.recipientForm.representative || undefined,
-        contactPhone: this.recipientForm.contactPhone || undefined,
-        defaultAddress: this.recipientForm.defaultAddress || undefined,
-        contactPersonName: this.recipientForm.contactPersonName || undefined,
-        contactPersonPhone: this.recipientForm.contactPersonPhone || undefined,
-        contactPersonEmail: this.recipientForm.contactPersonEmail || undefined,
-        verificationDocumentUrl: this.recipientForm.verificationDocumentUrl || undefined,
-        consentToContact: !!this.recipientForm.consentToContact,
+        email: this.agencyForm.email,
+        password: this.agencyForm.password || undefined,
+        agencyName: this.agencyForm.agencyName,
+        registrationNumber: this.agencyForm.registrationNumber || undefined,
+        representative: this.agencyForm.representative || undefined,
+        contactPhone: this.agencyForm.contactPhone || undefined,
+        defaultAddress: this.agencyForm.defaultAddress || undefined,
+        contactPersonName: this.agencyForm.contactPersonName || undefined,
+        contactPersonPhone: this.agencyForm.contactPersonPhone || undefined,
+        contactPersonEmail: this.agencyForm.contactPersonEmail || undefined,
+        verificationDocumentUrl: this.agencyForm.verificationDocumentUrl || undefined,
+        consentToContact: !!this.agencyForm.consentToContact,
       };
       // TODO: 呼叫 API registerAgency(payload)
       this.submitMessage = '受助者註冊送出（示意）';
@@ -119,7 +119,7 @@ export class RegisterComponent {
     }
   }
 
-  get isRecipient(): boolean {
-    return this.selectedRole === 'recipient';
+  get isAgency(): boolean {
+    return this.selectedRole === 'agency';
   }
 }

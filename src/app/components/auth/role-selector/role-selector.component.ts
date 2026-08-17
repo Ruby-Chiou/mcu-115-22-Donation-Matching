@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-export type UserRole = 'donor' | 'recipient';
+export type UserRole = 'donor' | 'agency';
 
 @Component({
   selector: 'app-role-selector',
