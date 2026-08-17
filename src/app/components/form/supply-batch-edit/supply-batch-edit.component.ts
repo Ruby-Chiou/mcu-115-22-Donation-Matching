@@ -9,7 +9,7 @@ import { EditableDisasterDemand } from '../../../models/agency/demand';
   selector: 'app-supply-batch-edit',
   imports: [CommonModule, FormsModule],
   templateUrl: './supply-batch-edit.component.html',
-  styleUrl: './supply-batch-edit.component.scss',
+  styleUrls: ['./supply-batch-edit-A.component.scss', './supply-batch-edit-B.component.scss'],
 })
 export class SupplyBatchEditComponent implements OnInit {
   editDemands: EditableDisasterDemand[] = [];

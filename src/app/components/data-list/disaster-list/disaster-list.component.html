@@ -1,6 +1,4 @@
 <div class="container">
-  <h1>急難需求列表</h1>
-
   <!-- 頂部按鈕區 -->
   <div class="top-action-bar">
     <button class="add-btn" (click)="goToAddDemand()">新增需求</button>
@@ -109,14 +107,13 @@
         <th class="checkbox-column" style="width: 55px">選取</th>
         <th style="width: 60px">編號</th>
         <th class="item-column" style="width: auto">需求物</th>
-        <!-- 自動吸收到最大剩餘空間 -->
         <th class="category-column" style="width: 90px">類別</th>
         <th style="width: 100px">需求數量</th>
         <th style="width: 105px">緊急優先度</th>
         <th style="width: 100px">剩餘需求</th>
         <th class="created-time-column" style="width: 110px">發布時間</th>
         <th class="message-column" style="width: 75px">留言區</th>
-        <th class="operation-column" style="width: 380px">操作</th>
+        <th class="operation-column" style="width: 340px">操作</th>
       </tr>
     </thead>
 
@@ -160,7 +157,6 @@
             <button (click)="goToEdit(item.id!)">編輯</button>
             <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
 
-            <label class="status-label"> 狀態： </label>
             <select
               [(ngModel)]="item.displayStatus"
               (change)="changeStatus(item)"

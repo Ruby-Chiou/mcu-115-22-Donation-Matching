@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DisasterListComponent } from '../../../components/disaster-list/disaster-list.component';
+import { DisasterListComponent } from '../../../components/data-list/disaster-list/disaster-list.component';
 
 @Component({
   selector: 'app-agency-disaster-workspace',
