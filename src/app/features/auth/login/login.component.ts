@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import { RoleSelectorComponent } from '../../../components/auth/role-selector/role-selector.component';
 
 type UserRole = 'donor' | 'recipient';
-type LoginStep = 'login' | 'profile';
 
 @Component({
   selector: 'app-login',
@@ -17,83 +16,113 @@ type LoginStep = 'login' | 'profile';
 export class LoginComponent {
   selectedRole: UserRole | null = null;
   showRoleModal = true;
-  rememberMe = false;
+  isForgotPasswordStep = false;
   submitMessage = '';
-  loginStep: LoginStep = 'login';
+  rememberMe = false;
 
   loginForm = {
     email: '',
-    accountName: '',
     password: '',
+    credentialPin: '',
   };
 
-  otpDigits = ['', '', '', '', '', ''];
-
-  profileForm = {
-    agencyName: '',
-    registrationNumber: '',
-    representative: '',
-    contactPhone: '',
-    defaultAddress: '',
-    newPassword: '',
-    confirmPassword: '',
-    needDescription: '',
+  forgotPasswordForm = {
+    email: '',
   };
+
   selectRole(role: UserRole): void {
     this.selectedRole = role;
     this.showRoleModal = false;
+    this.isForgotPasswordStep = false;
+    this.submitMessage = '';
+    this.resetForms();
   }
 
   backToRoleSelection(): void {
     this.selectedRole = null;
     this.showRoleModal = true;
+    this.isForgotPasswordStep = false;
     this.submitMessage = '';
-    this.loginStep = 'login';
+    this.resetForms();
   }
 
-  backToLoginStep(): void {
-    this.loginStep = 'login';
+  goToForgotPassword(): void {
+    this.isForgotPasswordStep = true;
+    this.submitMessage = '';
+    this.forgotPasswordForm.email = '';
+  }
+
+  backToLogin(): void {
+    this.isForgotPasswordStep = false;
     this.submitMessage = '';
   }
 
   onSubmit(): void {
     if (!this.selectedRole) {
-      this.submitMessage = '請先選擇角色';
+      this.submitMessage = '請先選擇登入身分。';
       return;
     }
 
-    if (this.selectedRole === 'recipient' && this.loginStep === 'login') {
-      this.submitMessage = '驗證成功，請完成首次資料設定。';
-      this.loginStep = 'profile';
-      return;
-    }
-
+    // 捐助者登入
     if (this.selectedRole === 'donor') {
-      this.submitMessage = '捐助者登入成功';
+      if (!this.loginForm.email || !this.loginForm.password) {
+        this.submitMessage = '請輸入電子信箱與密碼。';
+        return;
+      }
+      // TODO: 呼叫捐助者登入 API
+      this.submitMessage = '捐助者登入成功（示意）';
       return;
     }
 
-    if (this.profileForm.newPassword !== this.profileForm.confirmPassword) {
-      this.submitMessage = '新密碼與確認密碼不一致';
+    // 受助者（憑證PIN碼驗證）登入
+    if (this.selectedRole === 'recipient') {
+      if (!this.loginForm.credentialPin) {
+        this.submitMessage = '請輸入憑證PIN碼。';
+        return;
+      }
+      // TODO: 呼叫憑證PIN碼驗證 API
+      this.submitMessage = '憑證驗證登入成功（示意）';
+      return;
+    }
+  }
+
+  onSubmitForgotPassword(): void {
+    if (!this.forgotPasswordForm.email) {
+      this.submitMessage = '請輸入您的電子信箱。';
       return;
     }
 
-    this.submitMessage = '受助者資料已完成設定。';
+    // TODO: 呼叫忘記密碼 API，寄送重設連結
+    this.submitMessage = '重設連結已寄送至您的電子信箱（示意）';
+    setTimeout(() => {
+      this.backToLogin();
+    }, 2000);
+  }
+
+  private resetForms(): void {
+    this.loginForm = {
+      email: '',
+      password: '',
+      credentialPin: '',
+    };
+    this.forgotPasswordForm = {
+      email: '',
+    };
+    this.rememberMe = false;
+  }
+
+  get roleHeading(): string {
+    return this.isRecipient ? '受助者登入' : '捐助者登入';
+  }
+
+  get roleDescription(): string {
+    if (this.isRecipient) {
+      return '請輸入您的憑證PIN碼進行驗證。';
+    }
+    return '歡迎登入，請輸入帳號與密碼。';
   }
 
   get isRecipient(): boolean {
     return this.selectedRole === 'recipient';
-  }
-
-  get isProfileStep(): boolean {
-    return this.selectedRole === 'recipient' && this.loginStep === 'profile';
-  }
-
-  get roleHeading(): string {
-    return this.selectedRole === 'recipient' ? '受助者登入' : '捐助者登入';
-  }
-
-  get roleDescription(): string {
-    return this.selectedRole === 'recipient' ? '請輸入信箱、帳號名稱與密碼；驗證碼由兩種身份共用。' : '歡迎回來，請輸入信箱與密碼。';
   }
 }
