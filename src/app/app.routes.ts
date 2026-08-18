@@ -71,6 +71,22 @@ export const routes: Routes = [
     path: 'agency/supply-batch-edit',
     loadComponent: () => import('./components/form/supply-batch-edit/supply-batch-edit.component').then((m) => m.SupplyBatchEditComponent),
   },
+  {
+    path: 'agency/volunteer-form',
+    loadComponent: () => import('./components/form/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
+  },
+  {
+    path: 'agency/volunteer-edit/:id',
+    loadComponent: () => import('./components/form/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
+  },
+  {
+    path: 'agency/volunteer-detail/:id',
+    loadComponent: () => import('./components/data-list/volunteer-detail/volunteer-detail.component').then((m) => m.VolunteerDetailComponent),
+  },
+  {
+    path: 'agency/volunteer-batch-edit',
+    loadComponent: () => import('./components/form/volunteer-batch-edit/volunteer-batch-edit.component').then((m) => m.VolunteerBatchEditComponent),
+  },
 
   // 5. 系統後台模組 (管理員端)
   {

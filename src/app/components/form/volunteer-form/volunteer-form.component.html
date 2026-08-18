@@ -1,0 +1,255 @@
+<div class="form-container">
+
+  <h1>{{ isEditMode ? '編輯志工需求內容' : '新增志工需求' }}</h1>
+
+
+  <!-- 志工需求類型 -->
+  <div class="form-label">
+    <div class="batch-edit-header">
+      <div class="info-tag" *ngIf="demand.id">
+        <span class="info-label">需求編號</span>
+        <span class="info-value">#{{ demand.id }}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>
+        志工需求類型 <span>*</span>
+      </label>
+
+      <select
+        [(ngModel)]="demand.type"
+        [class.invalid-field]="isInvalid('type')"
+      >
+        <option value="">請選擇志工類型</option>
+        <option value="勞力服務">勞力服務</option>
+        <option value="環境清潔">環境清潔</option>
+        <option value="物資整理">物資整理</option>
+        <option value="醫療照護">醫療照護</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+
+
+    <!-- 需求人數 -->
+    <div class="form-group">
+      <label>
+        需求人數 <span>*</span>
+      </label>
+
+      <div class="input-row">
+        <input
+          type="number"
+          placeholder="請輸入需求人數"
+          min="1"
+          [(ngModel)]="demand.people"
+          [class.invalid-field]="isInvalid('people')"
+        />
+      </div>
+    </div>
+
+
+    <!-- 服務日期 -->
+    <div class="form-group">
+      <label>
+        服務日期 <span>*</span>
+      </label>
+
+      <input
+        type="date"
+        [(ngModel)]="demand.date"
+        [class.invalid-field]="isInvalid('date')"
+      />
+    </div>
+
+
+
+    <!-- 服務地點 -->
+    <div class="form-group">
+      <label>
+        服務地點 <span>*</span>
+      </label>
+
+      <input
+        type="text"
+        placeholder="請輸入服務地點"
+        [(ngModel)]="demand.location"
+        [class.invalid-field]="isInvalid('location')"
+      />
+    </div>
+
+
+    <!-- 志工條件 -->
+    <div class="form-group">
+      <label>
+        志工條件／專長<span>*</span>
+      </label>
+
+      <select
+        [(ngModel)]="demand.condition"
+        [class.invalid-field]="isInvalid('condition')"
+      >
+        <option value="">請選擇志工條件／專長</option>
+        <option value="專業照顧">專業照顧</option>
+        <option value="語言專長">語言專長</option>
+        <option value="需具備相關證照">需具備相關證照</option>
+        <option value="無特殊條件">無特殊條件</option>
+      </select>
+    </div>
+
+
+    <!-- 工作內容 -->
+    <div class="form-group">
+      <label>
+        志工工作內容 <span>*</span>
+
+        <span class="word-count">
+          {{ demand.note?.length || 0 }}/300
+        </span>
+      </label>
+        <textarea
+        class="note-textarea"
+        maxlength="300"
+        [(ngModel)]="demand.workContent"
+        [placeholder]="isEditMode ? '請編輯工需要協助的工作內容' : '請詳細說明志工需要協助的工作內容'"
+        [class.invalid-field]="isInvalid('workContent')"
+      ></textarea>
+    </div>
+
+
+    <!-- 需求原因 -->
+    <div class="form-group">
+      <label>
+        需求原因 <span>*</span>
+
+        <span class="word-count">
+          {{ demand.reason ?.length || 0 }}/300
+        </span>
+      </label>
+      <textarea
+        class="note-textarea"
+        maxlength="300"
+        [(ngModel)]="demand.reason"
+        [placeholder]="isEditMode ? '請編輯此次志工需求的原因' : '請輸入此次志工需求的原因'"
+        [class.invalid-field]="isInvalid('reason')"
+      ></textarea>
+    </div>
+<div class="form-group">
+    <label>
+      緊急優先度 <span>*</span>
+    </label>
+
+<div class="priority-box">
+      <label class="normal">
+        <input type="radio" name="priority" value="普通" [(ngModel)]="demand.priority" />
+        普通
+      </label>
+
+      <label class="urgent">
+        <input type="radio" name="priority" value="緊急" [(ngModel)]="demand.priority" />
+        緊急
+      </label>
+
+      <label class="very-urgent">
+        <input type="radio" name="priority" value="非常緊急" [(ngModel)]="demand.priority" />
+        非常緊急
+      </label>
+    </div>
+    </div>
+
+    <div class="form-group">
+    <label>
+      公開狀態 <span>*</span>
+    </label>
+    <div class="status-box">
+      <label>
+        <input type="radio" name="status" value="上架" [(ngModel)]="demand.status" />
+        上架
+      </label>
+
+      <label>
+        <input type="radio" name="status" value="隱藏" [(ngModel)]="demand.status" />
+        隱藏
+      </label>
+
+      <!-- 編輯模式才顯示下架 -->
+      <label *ngIf="isEditMode">
+        <input type="radio" name="status" value="下架" [(ngModel)]="demand.status" />
+        下架
+      </label>
+    </div>
+
+    <!-- 聯絡人 -->
+    <div class="form-group">
+      <label>
+        聯絡人 <span>*</span>
+      </label>
+
+      <input
+        type="text"
+        placeholder="請輸入聯絡人姓名"
+        [(ngModel)]="demand.contact"
+        [class.invalid-field]="isInvalid('contact')"
+      />
+    </div>
+
+
+    <!-- 聯絡電話 -->
+    <div class="form-group">
+      <label>
+        聯絡電話 <span>*</span>
+      </label>
+
+      <input
+        type="tel"
+        placeholder="請輸入聯絡電話"
+        [(ngModel)]="demand.phone"
+        [class.invalid-field]="isInvalid('phone')"
+      />
+    </div>
+
+
+    <!-- 其他說明 -->
+    <div class="note-section">
+
+      <label class="label-row">
+        其他說明（備註）
+
+        <span class="word-count">
+          {{ demand.note?.length || 0 }}/300
+        </span>
+      </label>
+
+      <textarea
+        class="note-textarea"
+        maxlength="300"
+        [(ngModel)]="demand.note"
+        [placeholder]="isEditMode ? '請編輯其他說明' : '請輸入其他說明'"
+      ></textarea>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- 右下角按鈕 -->
+<div class="form-actions">
+
+  <button
+    type="button"
+    class="cancel-btn"
+    (click)="onCancel()"
+  >
+    取消
+  </button>
+
+  <button
+    type="button"
+    class="publish-btn"
+    (click)="onPublish()"
+  >
+    發布需求
+  </button>
+
+</div>

@@ -1,0 +1,297 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
+import { VolunteerDemand } from '../../../models/agency/vdemand';
+
+@Component({
+  selector: 'app-volunteer-form',
+  standalone: true,
+  imports: [CommonModule, RouterLink, FormsModule],
+  templateUrl: './volunteer-form.component.html',
+  styleUrls: ['./volunteer-form.component.scss']
+})
+export class VolunteerFormComponent implements OnInit {
+
+  // 是否為編輯模式
+  isEditMode: boolean = false;
+
+  // 編輯中的需求 ID
+  editId: number | null = null;
+
+  // 有錯誤的欄位
+  invalidFields: string[] = [];
+
+  // 志工需求資料
+  demand: VolunteerDemand = {
+    id: 0,
+    type: '',
+    people: null,
+    date: '',
+    location: '',
+    condition: '',
+    workContent: '',
+    reason: '',
+    priority: '普通',
+    status: '上架',
+    contact: '',
+    phone: '',
+    note: ''
+  };
+
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private volunteerDemandService: VolunteerDemandService
+  ) {}
+
+  ngOnInit(): void {
+
+    // 從網址取得 id
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      this.editId = Number(id);
+      this.isEditMode = true;
+
+      this.loadEditDemand(this.editId);
+    }
+  }
+
+  // ==========================================
+  // 載入要編輯的資料
+  // ==========================================
+
+  loadEditDemand(id: number): void {
+
+    const demands = this.volunteerDemandService.getDemands();
+
+    const target = demands.find(
+      demand => demand.id === id
+    );
+
+    if (!target) {
+      alert('找不到這筆志工需求');
+      this.router.navigate(['/agency/disaster']);
+      return;
+    }
+
+    // 深拷貝
+    this.demand = JSON.parse(
+      JSON.stringify(target)
+    );
+
+    console.log('目前編輯資料：', this.demand);
+  }
+
+  // ==========================================
+  // 判斷欄位是否需要紅框
+  // ==========================================
+
+  isInvalid(field: string): boolean {
+
+    if (!this.invalidFields.includes(field)) {
+      return false;
+    }
+
+    switch (field) {
+
+      case 'type':
+        return !this.demand.type;
+
+      case 'people':
+        return !this.demand.people ||
+               this.demand.people < 1;
+
+      case 'date':
+        return !this.demand.date;
+
+      case 'location':
+        return !this.demand.location.trim();
+
+      case 'condition':
+        return !this.demand.condition.trim();
+
+      case 'workContent':
+        return !this.demand.workContent.trim();
+
+      case 'reason':
+        return !this.demand.reason.trim();
+
+      case 'contact':
+        return !this.demand.contact.trim();
+
+      case 'phone':
+        return !this.demand.phone.trim();
+
+      default:
+        return false;
+    }
+  }
+
+  // ==========================================
+  // 儲存 / 發布
+  // ==========================================
+
+  onPublish(): void {
+
+    // 清除之前錯誤
+    this.invalidFields = [];
+
+    // ==========================================
+    // 必填欄位檢查
+    // ==========================================
+
+    if (!this.demand.type) {
+      this.invalidFields.push('type');
+    }
+
+    if (
+      !this.demand.people ||
+      this.demand.people < 1
+    ) {
+      this.invalidFields.push('people');
+    }
+
+    if (!this.demand.date) {
+      this.invalidFields.push('date');
+    }
+
+    if (!this.demand.location.trim()) {
+      this.invalidFields.push('location');
+    }
+
+    if (!this.demand.condition.trim()) {
+      this.invalidFields.push('condition');
+    }
+
+    if (!this.demand.workContent.trim()) {
+      this.invalidFields.push('workContent');
+    }
+
+    if (!this.demand.reason.trim()) {
+      this.invalidFields.push('reason');
+    }
+
+    if (!this.demand.contact.trim()) {
+      this.invalidFields.push('contact');
+    }
+
+    if (!this.demand.phone.trim()) {
+      this.invalidFields.push('phone');
+    }
+
+    // ==========================================
+    // 有欄位錯誤
+    // ==========================================
+
+    if (this.invalidFields.length > 0) {
+
+      setTimeout(() => {
+
+        const firstInvalid =
+          document.querySelector(
+            '.invalid-field'
+          ) as HTMLElement;
+
+        if (firstInvalid) {
+
+          firstInvalid.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+
+          firstInvalid.focus();
+        }
+
+      }, 0);
+
+      return;
+    }
+
+    // ==========================================
+    // 編輯模式
+    // ==========================================
+
+    if (this.isEditMode) {
+
+      this.volunteerDemandService.updateDemand(
+        this.demand
+      );
+
+      console.log(
+        '修改後的志工需求：',
+        this.demand
+      );
+
+      alert('志工需求修改成功！');
+
+      // 回到 demand-list
+      this.router.navigate([
+        '/agency/disaster'
+      ]);
+
+      return;
+    }
+
+    // ==========================================
+    // 新增模式
+    // ==========================================
+
+    const newDemand: VolunteerDemand = {
+      ...this.demand,
+
+      id: Date.now(),
+
+      createdAt:
+        new Date().toISOString(),
+
+      status: this.demand.status,
+
+      messageCount: 0
+    };
+
+    this.volunteerDemandService.addDemand(
+      newDemand
+    );
+
+    console.log(
+      '新增志工需求：',
+      newDemand
+    );
+
+    alert('志工需求發布成功！');
+
+    // 回到需求列表
+    this.router.navigate([
+      '/agency/disaster'
+    ]);
+  }
+
+  // ==========================================
+  // 取消
+  // ==========================================
+
+  onCancel(): void {
+
+    if (this.isEditMode) {
+
+      if (
+        confirm(
+          '確定要取消嗎？未儲存的修改將會遺失。'
+        )
+      ) {
+        this.router.navigate([
+          '/agency/disaster'
+        ]);
+      }
+
+      return;
+    }
+
+    this.router.navigate([
+      '/agency/disaster'
+    ]);
+  }
+}
