@@ -38,7 +38,7 @@ export interface DailyDemand {
 
   status: '上架' | '隱藏' | '下架';
 
-  receiveMethod: '郵寄' | '面交';
+  receiveMethod: '寄送' | '面交';
 
   recipient: string;
 

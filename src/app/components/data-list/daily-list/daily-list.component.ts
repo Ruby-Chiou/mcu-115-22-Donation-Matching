@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { DailyDemandService } from '../../core/services/daily-demand.service';
-import { DailyDemand, DailyStatus, DailyDisplayStatus } from '../../models/agency/daily-demand';
+import { DailyDemandService } from '../../../core/services/daily-demand.service';
+import { DailyDemand, DailyStatus, DailyDisplayStatus } from '../../../models/agency/daily-demand';
 
-import { SupplyDeleteComponent } from '../modal/supply-delete/supply-delete.component';
-import { PaginationComponent } from '../pagination/pagination.component';
+import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
+import { PaginationComponent } from '../../pagination/pagination.component';
 
 type SortType = 'createdAt' | 'amount' | 'remaining';
 
@@ -16,7 +16,7 @@ type SortType = 'createdAt' | 'amount' | 'remaining';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SupplyDeleteComponent, PaginationComponent],
   templateUrl: './daily-list.component.html',
-  styleUrl: './daily-list.component.scss',
+  styleUrls: ['./daily-list-A.component.scss', './daily-list-B.component.scss', './daily-list-C.component.scss'],
 })
 export class DailyListComponent implements OnInit, AfterViewInit {
   demands: (DailyDemand & {
@@ -39,33 +39,20 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
   selectAll = false;
 
-  // =========================
   // 搜尋
-  // =========================
-
   searchTerm = '';
 
-  // =========================
   // 分頁
-  // =========================
-
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
   pageNumbers: number[] = [];
 
-  // =========================
   // 保留列表位置
-  // =========================
-
   private readonly scrollPositionKey = 'agency-daily-workspace-scroll';
-
   private readonly pagePositionKey = 'agency-daily-workspace-page';
 
-  // =========================
   // 排序
-  // =========================
-
   selectedSort: SortType = 'createdAt';
   sortAscending = true;
   isSortDropdownOpen = false;
@@ -78,18 +65,12 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     { label: '剩餘需求', value: 'remaining' },
   ];
 
-  // =========================
   // 刪除
-  // =========================
-
   showDeleteModal = false;
   deleteIds: number[] = [];
   deleteType: 'single' | 'batch' = 'single';
 
-  // =========================
   // 篩選
-  // =========================
-
   showFilterModal = false;
 
   statusOptions: DailyDisplayStatus[] = ['已上架', '隱藏中', '已下架'];
@@ -99,7 +80,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   categoryOptions: NonNullable<DailyDemand['category']>[] = ['食物', '衣物', '醫療', '嬰幼兒', '生活用品', '其他'];
 
   messageOptions = ['已回覆', '未回覆'];
-  receiveMethodOptions: DailyDemand['receiveMethod'][] = ['郵寄', '面交'];
+  receiveMethodOptions: DailyDemand['receiveMethod'][] = ['寄送', '面交'];
 
   selectedFilters = {
     status: [] as string[],
@@ -117,10 +98,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     history.scrollRestoration = 'manual';
   }
 
-  // =========================
   // 初始化
-  // =========================
-
   ngOnInit() {
     const savedPage = sessionStorage.getItem(this.pagePositionKey);
 
@@ -148,18 +126,12 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // =========================
   // 新增
-  // =========================
-
   goToAddDemand() {
     this.router.navigate(['/agency/daily-form']);
   }
 
-  // =========================
-  // 查看
-  // =========================
-
+  //
   goToDetail(id: number) {
     this.saveListPosition();
 
@@ -168,20 +140,14 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // =========================
   // 編輯
-  // =========================
-
   goToEdit(id: number) {
     this.saveListPosition();
 
     this.router.navigate(['/agency/daily-edit', id]);
   }
 
-  // =========================
   // 儲存列表位置
-  // =========================
-
   saveListPosition() {
     sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
 
@@ -195,10 +161,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
   }
 
-  // =========================
   // 排序下拉選單
-  // =========================
-
   @HostListener('document:click')
   closeSortDropdown() {
     this.isSortDropdownOpen = false;
@@ -250,10 +213,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  // =========================
   // 讀取需求
-  // =========================
-
   loadDemands() {
     this.demands = this.dailyDemandService.getDemands().map((item) => {
       let currentStatus: DailyDisplayStatus = '已上架';
@@ -291,10 +251,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     this.applyFilters(false);
   }
 
-  // =========================
   // 搜尋
-  // =========================
-
   onSearch() {
     this.applyFilters();
   }
@@ -304,10 +261,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
-  // =========================
   // 全選
-  // =========================
-
   toggleAll() {
     this.pagedDemands.forEach((item) => {
       item.selected = this.selectAll;
@@ -318,10 +272,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     return this.filteredDemands.some((item) => item.selected);
   }
 
-  // =========================
   // 批次編輯
-  // =========================
-
   editSelected() {
     const selectedItems = this.filteredDemands.filter((item) => item.selected);
 
@@ -337,10 +288,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/agency/daily-batch-edit']);
   }
 
-  // =========================
   // 篩選 Modal
-  // =========================
-
   openFilterModal() {
     this.showFilterModal = true;
   }
@@ -370,10 +318,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     };
   }
 
-  // =========================
   // 套用篩選
-  // =========================
-
   applyFilters(resetPage: boolean = true) {
     this.filteredDemands = this.demands.filter((item) => {
       // 關鍵字
@@ -447,10 +392,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     this.closeFilterModal();
   }
 
-  // =========================
   // 排序
-  // =========================
-
   applySort() {
     this.filteredDemands.sort((a, b) => {
       let result = 0;
@@ -477,10 +419,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     this.updatePagination();
   }
 
-  // =========================
   // 分頁
-  // =========================
-
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredDemands.length / this.pageSize) || 1;
 
@@ -511,11 +450,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
       this.updatePagination();
     }
   }
-
-  // =========================
   // 刪除
-  // =========================
-
   openDeleteModal(id: number) {
     this.deleteIds = [id];
 
@@ -546,10 +481,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     this.loadDemands();
   }
 
-  // =========================
   // 修改狀態
-  // =========================
-
   changeStatus(
     item: DailyDemand & {
       selected: boolean;

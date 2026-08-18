@@ -383,11 +383,11 @@
         <input
           type="radio"
           name="receiveMethod"
-          value="郵寄"
+          value="寄送"
           [(ngModel)]="demand.receiveMethod"
           (ngModelChange)="onReceiveMethodChange($event)"
         />
-        郵寄
+        寄送
       </label>
 
       <label>
@@ -402,8 +402,8 @@
       </label>
     </div>
 
-    <!-- 郵寄資訊 -->
-    <div *ngIf="demand.receiveMethod === '郵寄'" class="receive-info-box">
+    <!-- 收件資訊 -->
+    <div *ngIf="demand.receiveMethod === '寄送'" class="receive-info-box">
       <label class="label-row">
         收件人
         <span class="required">*</span>
@@ -413,14 +413,14 @@
       <input
         class="medium-input"
         maxlength="30"
-        [class.error-input]="submitted && demand.receiveMethod === '郵寄' && !demand.recipient"
+        [class.error-input]="submitted && demand.receiveMethod === '寄送' && !demand.recipient"
         type="text"
         placeholder="請輸入收件人姓名"
         [(ngModel)]="demand.recipient"
       />
 
       <label class="label-row">
-        郵寄地址
+        寄送地址
         <span class="required">*</span>
         <span class="word-count" *ngIf="demand.address"> {{ demand.address.length }}/35 </span>
       </label>
@@ -428,7 +428,7 @@
       <input
         class="medium-input"
         maxlength="35"
-        [class.error-input]="submitted && demand.receiveMethod === '郵寄' && !demand.address"
+        [class.error-input]="submitted && demand.receiveMethod === '寄送' && !demand.address"
         type="text"
         placeholder="請輸入收件地址"
         [(ngModel)]="demand.address"

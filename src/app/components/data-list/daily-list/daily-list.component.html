@@ -1,6 +1,4 @@
 <div class="container">
-  <h1>日常需求列表</h1>
-
   <!-- 頂部按鈕區 -->
   <div class="top-action-bar">
     <button class="add-btn" (click)="goToAddDemand()">新增需求</button>
@@ -110,7 +108,7 @@
         <tr>
           <th class="checkbox-column" style="width: 5%">選取</th>
           <th style="width: 5%">編號</th>
-          <th class="item-column" style="width: 23%">需求物</th>
+          <th class="item-column" style="width: 24%">需求物</th>
           <th class="category-column" style="width: 6%">類別</th>
           <th style="width: 7%">需求數量</th>
           <th style="width: 8%">緊急優先度</th>
@@ -118,7 +116,7 @@
           <th style="width: 7%">接收方式</th>
           <th class="created-time-column" style="width: 8%">發布時間</th>
           <th class="message-column" style="width: 5%">留言區</th>
-          <th class="operation-column" style="width: 29%">操作</th>
+          <th class="operation-column" style="width: 28%">操作</th>
         </tr>
       </thead>
 
@@ -151,8 +149,22 @@
 
           <!-- 接收方式欄位 -->
           <td class="receive-method-column">
-            <span *ngIf="item.receiveMethod === '郵寄'">📦 郵寄</span>
-            <span *ngIf="item.receiveMethod === '面交'">🤝 面交</span>
+            <span *ngIf="item.receiveMethod === '寄送'" class="receive-method">
+              <!-- 車子 + 左側速度線 -->
+              <span class="custom-truck-wrapper">
+                <span class="speed-lines"></span>
+                <i class="fa-solid fa-truck"></i>
+              </span>
+              寄送
+            </span>
+            <span *ngIf="item.receiveMethod === '面交'" class="receive-method">
+              <!-- 組合圖示：手 + 箱子 -->
+              <span class="custom-hand-box">
+                <i class="fa-solid fa-box box-icon"></i>
+                <i class="fa-solid fa-hand-holding hand-icon"></i>
+              </span>
+              面交
+            </span>
             <span *ngIf="!item.receiveMethod">-</span>
           </td>
 
@@ -169,7 +181,6 @@
               <button (click)="goToEdit(item.id!)">編輯</button>
               <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
 
-              <span class="status-label">狀態：</span>
               <select
                 [(ngModel)]="item.displayStatus"
                 (change)="changeStatus(item)"

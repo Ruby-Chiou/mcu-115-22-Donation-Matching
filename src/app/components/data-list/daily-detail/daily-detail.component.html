@@ -116,17 +116,17 @@
       <div class="detail-content">{{ demand.receiveMethod }}</div>
     </div>
 
-    <!-- 郵寄資訊 -->
-    <ng-container *ngIf="demand.receiveMethod === '郵寄'">
+    <!-- 收件資訊 -->
+    <ng-container *ngIf="demand.receiveMethod === '寄送'">
       <!-- 收件人 -->
       <div class="detail-row">
         <div class="detail-title">收件人</div>
         <div class="detail-content">{{ demand.recipient }}</div>
       </div>
 
-      <!-- 郵寄地址 -->
+      <!-- 寄送地址 -->
       <div class="detail-row">
-        <div class="detail-title">郵寄地址</div>
+        <div class="detail-title">寄送地址</div>
         <div class="detail-content">{{ demand.address }}</div>
       </div>
     </ng-container>

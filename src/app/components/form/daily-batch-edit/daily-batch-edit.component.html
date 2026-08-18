@@ -414,11 +414,11 @@
           <input
             type="radio"
             [name]="'receiveMethod' + i"
-            value="郵寄"
+            value="寄送"
             [(ngModel)]="demand.receiveMethod"
             (ngModelChange)="onReceiveMethodChange(demand, $event)"
           />
-          郵寄
+          寄送
         </label>
 
         <label>
@@ -434,7 +434,7 @@
       </div>
 
       <!-- 郵寄 -->
-      <div *ngIf="demand.receiveMethod === '郵寄'">
+      <div *ngIf="demand.receiveMethod === '寄送'">
         <!-- 收件人 -->
         <label class="label-row">
           收件人

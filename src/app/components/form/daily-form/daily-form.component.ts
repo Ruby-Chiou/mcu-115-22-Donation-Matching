@@ -10,7 +10,7 @@ import { DailyDemand } from '../../../models/agency/daily-demand';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './daily-form.component.html',
-  styleUrl: './daily-form.component.scss',
+  styleUrls: ['./daily-form-A.component.scss', './daily-form-B.component.scss'],
 })
 export class DailyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
@@ -66,7 +66,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     status: '上架',
 
     // 接收方式
-    receiveMethod: '郵寄',
+    receiveMethod: '寄送',
     recipient: '',
     address: '',
     phone: '',
@@ -98,7 +98,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
           ...data,
           status: data.status ?? '上架',
           remaining: data.remaining ?? null,
-          receiveMethod: data.receiveMethod ?? '郵寄',
+          receiveMethod: data.receiveMethod ?? '寄送',
           recipient: data.recipient ?? '',
 
           serviceTargets: data.serviceTargets ?? {
@@ -148,7 +148,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     const invalidReceiveInfo =
       !this.demand.receiveMethod ||
-      (this.demand.receiveMethod === '郵寄' && (!this.demand.recipient || !this.demand.address)) ||
+      (this.demand.receiveMethod === '寄送' && (!this.demand.recipient || !this.demand.address)) ||
       (this.demand.receiveMethod === '面交' && !this.demand.address);
 
     if (
@@ -202,12 +202,12 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
           behavior: 'smooth',
           block: 'center',
         });
-      } else if (this.demand.receiveMethod === '郵寄' && !this.demand.recipient) {
+      } else if (this.demand.receiveMethod === '寄送' && !this.demand.recipient) {
         document.querySelector('.receive-info-box')?.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
         });
-      } else if (this.demand.receiveMethod === '郵寄' && !this.demand.address) {
+      } else if (this.demand.receiveMethod === '寄送' && !this.demand.address) {
         document.querySelector('.receive-info-box')?.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
@@ -375,17 +375,13 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onReceiveMethodChange(method: '郵寄' | '面交') {
-    if (method === '郵寄') {
-      // 切換成郵寄時，清除原本的面交地點
+  onReceiveMethodChange(method: '寄送' | '面交') {
+    if (method === '寄送') {
       this.demand.address = '';
     }
 
     if (method === '面交') {
-      // 切換成面交時，清除郵寄專用的收件人
       this.demand.recipient = '';
-
-      // 清除原本的郵寄地址
       this.demand.address = '';
     }
   }

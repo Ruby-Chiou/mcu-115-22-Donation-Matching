@@ -9,7 +9,7 @@ import { EditableDailyDemand } from '../../../models/agency/daily-demand';
   selector: 'app-daily-batch-edit',
   imports: [CommonModule, FormsModule],
   templateUrl: './daily-batch-edit.component.html',
-  styleUrl: './daily-batch-edit.component.scss',
+  styleUrls: ['./daily-batch-edit-A.component.scss', './daily-batch-edit-B.component.scss'],
 })
 export class DailyBatchEditComponent implements OnInit {
   editDemands: EditableDailyDemand[] = [];
@@ -59,7 +59,7 @@ export class DailyBatchEditComponent implements OnInit {
         createdAt: item.createdAt,
         brand: item.brand || '',
         category: item.category || '',
-        receiveMethod: item.receiveMethod ?? '郵寄',
+        receiveMethod: item.receiveMethod ?? '寄送',
         recipient: item.recipient ?? '',
       }));
     }
@@ -156,7 +156,7 @@ export class DailyBatchEditComponent implements OnInit {
       // 接收方式檢查
       if (
         !item.receiveMethod ||
-        (item.receiveMethod === '郵寄' && (!item.recipient || !item.address)) ||
+        (item.receiveMethod === '寄送' && (!item.recipient || !item.address)) ||
         (item.receiveMethod === '面交' && !item.address)
       ) {
         item.invalidReceiveInfo = true;
@@ -310,17 +310,11 @@ export class DailyBatchEditComponent implements OnInit {
     return index;
   }
 
-  onReceiveMethodChange(demand: EditableDailyDemand, method: '郵寄' | '面交') {
-    if (method === '郵寄') {
-      // 面交 → 郵寄
-      // 清除原本的面交地點
+  onReceiveMethodChange(demand: EditableDailyDemand, method: '寄送' | '面交') {
+    if (method === '寄送') {
       demand.address = '';
     } else if (method === '面交') {
-      // 郵寄 → 面交
-      // 清除郵寄專用的收件人
       demand.recipient = '';
-
-      // 清除原本的郵寄地址
       demand.address = '';
     }
   }
