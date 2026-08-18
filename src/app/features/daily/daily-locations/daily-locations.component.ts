@@ -52,21 +52,21 @@ export class DailyLocationsComponent implements AfterViewInit, OnDestroy {
   volunteerList: VolunteerItem[] = [
     {
       name: '華山基金會',
-      location: '📍台北市士林區中正路420號7樓',
+      location: '台北市士林區中正路420號7樓',
       lat: 25.093419,
       lng: 121.519570,
       needs: ['清潔用品']
     },
     {
       name: '勵馨基金會',
-      location: '📍台北市大安區羅斯福路二段75號8樓',
+      location: '台北市大安區羅斯福路二段75號8樓',
       lat: 25.026359,
       lng: 121.523107,
       needs: ['奶粉']
     },
     {
       name: '台灣關愛基金會',
-      location: '📍高雄市三民區本揚里黃興路39號',
+      location: '高雄市三民區本揚里黃興路39號',
       lat: 22.646324,
       lng: 120.343439,
       needs: ['嬰幼童用品']
@@ -162,6 +162,7 @@ export class DailyLocationsComponent implements AfterViewInit, OnDestroy {
         .addTo(this.map)
         .bindPopup(`
           <b>${item.name}</b><br><br>
+          <i class="fa-solid fa-location-dot"></i>
           <b>${item.location}</b><br><br>
           <b>目前需要幫助：</b><br>
           ・${item.needs.join('<br>・')}
