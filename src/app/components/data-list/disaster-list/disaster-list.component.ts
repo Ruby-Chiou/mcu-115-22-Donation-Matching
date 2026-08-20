@@ -3,14 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { DisasterDemandService } from '../../core/services/disaster-demand.service';
-import { DisasterDemand,  DisasterStatus, DisplayStatus } from '../../models/agency/demand';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemand,  DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
 
-import { SupplyDeleteComponent } from '../modal/supply-delete/supply-delete.component';
-import { PaginationComponent } from '../pagination/pagination.component';
-
-import { VolunteerDemandService  } from '../../core/services/volunteer-demand.service';
-import {  VolunteerDemand } from '../../models/agency/vdemand';
+import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
+import { PaginationComponent } from '../../pagination/pagination.component';
 
 type SortType = 'createdAt' | 'amount' | 'remaining';
 
@@ -21,13 +18,13 @@ type VolunteerDisplayStatus =
   | '隱藏中'
   | '已下架';
 @Component({
-  selector: 'app-demand-list',
+  selector: 'app-disaster-list',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SupplyDeleteComponent, PaginationComponent],
-  templateUrl: './demand-list.component.html',
-  styleUrl: './demand-list.component.scss',
+  templateUrl: './disaster-list.component.html',
+  styleUrls: ['./disaster-list-A.component.scss', './disaster-list-B.component.scss'],
 })
-export class DemandListComponent implements OnInit, AfterViewInit {
+export class DisasterListComponent implements OnInit, AfterViewInit {
   demands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
@@ -118,7 +115,6 @@ export class DemandListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private disasterDemandService: DisasterDemandService,
-    private volunteerDemandService: VolunteerDemandService,
     private router: Router
   ) {
     history.scrollRestoration = 'manual';
@@ -140,8 +136,6 @@ export class DemandListComponent implements OnInit, AfterViewInit {
     }
 
     this.loadDemands();
-    // 志工需求
-  this.loadVolunteerDemands();
   }
 
   ngAfterViewInit() {
@@ -591,356 +585,4 @@ export class DemandListComponent implements OnInit, AfterViewInit {
 
     this.disasterDemandService.updateDemand(item);
   }
-// ======================================================
-// 志工需求資料
-// ======================================================
-
-volunteerDemands: (
-  VolunteerDemand & {
-    selected: boolean;
-    displayCreatedAt: string;
-    displayStatus: VolunteerDisplayStatus;
-  }
-)[] = [];
-
-filteredVolunteerDemands: (
-  VolunteerDemand & {
-    selected: boolean;
-    displayCreatedAt: string;
-    displayStatus: VolunteerDisplayStatus;
-  }
-)[] = [];
-showVolunteerDeleteModal = false;
-selectedVolunteerIds: number[] = [];
-selectedVolunteerId: number | null = null;
-// 志工全選
-volunteerSelectAll = false;
-// 志工排序
-
-// 志工篩選 Modal
-showVolunteerFilterModal = false;
-// 載入志工需求
-loadVolunteerDemands(){
-  this.volunteerDemands = this.volunteerDemandService.getDemands().map((item) => {
-      let displayStatus: VolunteerDisplayStatus = '已上架';
-        if (item.status === '上架') {
-          displayStatus = '已上架';
-        }
-        if (item.status === '隱藏') {
-          displayStatus = '隱藏中';
-        }
-        if (item.status === '下架') {
-          displayStatus = '已下架';
-        }
-        return {
-          ...item,
-          selected: false,
-          displayStatus,
-          displayCreatedAt:
-            item.status === '隱藏'
-              ? '尚未發布'
-              : item.createdAt
-                ? new Date(item.createdAt)
-                    .toLocaleDateString('zh-TW')
-                : '尚未發布'
-        };
-      });
-  // 跟物資需求一樣
-  this.filteredVolunteerDemands = [
-  ...this.volunteerDemands
-];
-
-this.applyVolunteerSort();
-
-this.volunteerCurrentPage = 1;
-
-this.updateVolunteerPagination();
-
-}
-// 志工全選
-toggleVolunteerAll(): void {
-
-  this.filteredVolunteerDemands.forEach(item => {
-    item.selected = this.volunteerSelectAll;
-  });
-
-}
-
-// 志工是否有選取
-hasSelectedVolunteer(): boolean {
-  return this.filteredVolunteerDemands
-    .some((item) => item.selected);
-}
-// 志工單筆編輯
-goToVolunteerEdit(id: number) {
-    this.saveListPosition();
-
-    this.router.navigate(['/agency/volunteer-edit', id]);
-  }
-
-// 志工批次編輯
-editSelectedVolunteer(): void {
-  const selectedItems =
-    this.filteredVolunteerDemands
-      .filter((item) => item.selected);
-  if (selectedItems.length === 0) {
-    alert('請先選擇要修改的志工需求');
-    return;
-  }
-
-  localStorage.setItem(
-    'editVolunteerDemands',
-    JSON.stringify(selectedItems)
-  );
-  this.saveListPosition();
-  this.router.navigate([
-    '/agency/volunteer-batch-edit'
-  ]);
-}
-
-// 1. 開啟刪除 Modal（同時支援單筆與批次）
-openVolunteerDeleteModal(id?: number): void {
-  if (id !== undefined) {
-    // 單筆刪除
-    this.selectedVolunteerIds = [id];
-  } else {
-    // 批次刪除
-    const selectedItems = this.filteredVolunteerDemands.filter(
-      item => item.selected && item.id !== undefined
-    );
-
-    if (selectedItems.length === 0) {
-      alert('請先選擇要刪除的志工需求');
-      return;
-    }
-
-    this.selectedVolunteerIds = selectedItems.map(item => item.id!);
-  }
-
-  this.showVolunteerDeleteModal = true;
-}
-
-// 2. 關閉刪除 Modal
-closeVolunteerDeleteModal(): void {
-  this.showVolunteerDeleteModal = false;
-  this.selectedVolunteerIds = [];
-}
-
-// 3. 確認執行刪除
-confirmVolunteerDelete(): void {
-  if (this.selectedVolunteerIds.length === 0) {
-    this.closeVolunteerDeleteModal();
-    return;
-  }
-
-  // 執行刪除 (若 deleteDemand 回傳 Observable，請記得 subscribe 或用 forkJoin)
-  this.selectedVolunteerIds.forEach(id => {
-    this.volunteerDemandService.deleteDemand(id);
-  });
-
-  // 狀態清理與重新載入
-  this.showVolunteerDeleteModal = false;
-  this.selectedVolunteerIds = [];
-  this.volunteerSelectAll = false;
-  this.loadVolunteerDemands();
-}
-// 志工排序下拉選單
-volunteerSelectedSort: string = 'createdAt';
-
-volunteerSortAscending: boolean = false;
-
-volunteerSortDropdownOpen: boolean = false;
-
-volunteerSortOptions = [
-  {
-    value: 'createdAt',
-    label: '發布時間'
-  },
-  {
-    value: 'people',
-    label: '需求人數'
-  },
-];
-toggleVolunteerSortDropdown(): void {
-  this.volunteerSortDropdownOpen =
-    !this.volunteerSortDropdownOpen;
-}
-
-// 志工排序名稱
-getVolunteerSortLabel(): string {
-  const found =
-    this.volunteerSortOptions.find(
-      (opt) =>
-        opt.value ===
-        this.volunteerSelectedSort
-    );
-  return found
-    ? found.label
-    : '發布時間';
-}
-// 志工選擇排序
-toggleVolunteerSortOrder(): void {
-  // 切換排序方向
-  this.volunteerSortAscending =
-    !this.volunteerSortAscending;
-
-  // 重新排序
-  this.applyVolunteerSort();
-}
-// 志工選擇排序
-applyVolunteerSort(): void {
-
-  this.filteredVolunteerDemands.sort((a, b) => {
-
-    let result = 0;
-
-    // =========================
-    // 建立時間
-    // =========================
-    if (this.volunteerSelectedSort === 'createdAt') {
-
-      const aTime = a.createdAt
-        ? new Date(a.createdAt).getTime()
-        : Number.MAX_SAFE_INTEGER;
-
-      const bTime = b.createdAt
-        ? new Date(b.createdAt).getTime()
-        : Number.MAX_SAFE_INTEGER;
-
-      result = aTime - bTime;
-    }
-    // =========================
-    // 需求人數
-    // =========================
-    else if (this.volunteerSelectedSort === 'people') {
-
-      result =
-        Number(a.people ?? 0) -
-        Number(b.people ?? 0);
-    }
-    // =========================
-    // 排序方向
-    // =========================
-    return this.volunteerSortAscending
-      ? result
-      : -result;
-  });
-
-  this.updatePagination();
-}
-selectVolunteerSort(value: string): void {
-  this.volunteerSelectedSort = value;
-
-  this.volunteerSortDropdownOpen = false;
-
-  this.applyVolunteerSort();
-}
-// 志工篩選 Modal
-openVolunteerFilterModal(): void {
-  this.showVolunteerFilterModal =
-    true;
-}
-closeVolunteerFilterModal(): void {
-  this.showVolunteerFilterModal =
-    false;
-}
-// 志工狀態修改
-changeVolunteerStatus(
-  item: VolunteerDemand & {
-    selected: boolean;
-    displayCreatedAt: string;
-    displayStatus: VolunteerDisplayStatus;
-  }
-): void {
-
-  // 將顯示狀態轉換成資料實際狀態
-  switch (item.displayStatus) {
-
-    case '已上架':
-      item.status = '上架';
-
-      item.displayCreatedAt = item.createdAt
-        ? new Date(item.createdAt).toLocaleDateString('zh-TW')
-        : '尚未發布';
-
-      break;
-
-    case '隱藏中':
-      item.status = '隱藏';
-
-      item.displayCreatedAt = '尚未發布';
-
-      break;
-
-    case '已下架':
-      item.status = '下架';
-
-      item.displayCreatedAt = item.createdAt
-        ? new Date(item.createdAt).toLocaleDateString('zh-TW')
-        : '尚未發布';
-
-      break;
-
-    default:
-      item.status = '上架';
-
-      item.displayStatus = '已上架';
-
-      item.displayCreatedAt = item.createdAt
-        ? new Date(item.createdAt).toLocaleDateString('zh-TW')
-        : '尚未發布';
-
-      break;
-  }
-
-  // 如果你的 Service 有更新方法，這裡要同步更新資料
-  // this.volunteerDemandService.updateDemand(item);
-}
-volunteerCurrentPage = 1;
-volunteerPageSize = 10;
-volunteerTotalPages = 1;
-volunteerPageNumbers: number[] = [];
-
-updateVolunteerPagination(): void {
-
-  this.volunteerTotalPages = Math.ceil(
-    this.volunteerDemands.length /
-    this.volunteerPageSize
-  );
-
-  if (this.volunteerTotalPages < 1) {
-    this.volunteerTotalPages = 1;
-  }
-
-  if (
-    this.volunteerCurrentPage >
-    this.volunteerTotalPages
-  ) {
-    this.volunteerCurrentPage =
-      this.volunteerTotalPages;
-  }
-
-  const start =
-    (this.volunteerCurrentPage - 1) *
-    this.volunteerPageSize;
-
-  const end =
-    start + this.volunteerPageSize;
-
-  // ★ 直接改目前顯示的資料
-  this.filteredVolunteerDemands =
-    this.volunteerDemands.slice(start, end);
-
-  this.volunteerPageNumbers =
-    Array.from(
-      { length: this.volunteerTotalPages },
-      (_, i) => i + 1
-    );
-}
-goToVolunteerPage(page: number): void {
-
-  this.volunteerCurrentPage = page;
-
-  this.updateVolunteerPagination();
-}
 }

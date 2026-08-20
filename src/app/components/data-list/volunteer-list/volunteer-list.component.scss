@@ -4,11 +4,6 @@
   --color-text-main: #333333;
 }
 
-.container {
-  padding: 30px;
-  padding-bottom: 120px;
-}
-
 h1 {
   margin-bottom: 20px;
   font-size: 24px;
@@ -679,10 +674,14 @@ tbody tr:last-child td:last-child {
 
 .volunteer-section {
   margin-top: 70px;
-  padding-top: 40px;
+  padding: 40px 30px 80px;
   border-top: 3px solid #e5e7eb;
+  box-sizing: border-box;
 }
-
+.volunteer-section app-pagination {
+  display: block;
+  margin-top: 25px;
+}
 .volunteer-header {
   display: flex;
   justify-content: space-between;
@@ -696,10 +695,13 @@ tbody tr:last-child td:last-child {
 
 .volunteer-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-top: 20px;
+  table-layout: fixed;
+  border-radius: 15px;
+  overflow: hidden;
 }
-
 .volunteer-table th,
 .volunteer-table td {
   padding: 14px 10px;
@@ -745,4 +747,12 @@ tbody tr:last-child td:last-child {
 
 .volunteer-empty .empty-description {
   color: #777;
+}
+
+.volunteer-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
 }

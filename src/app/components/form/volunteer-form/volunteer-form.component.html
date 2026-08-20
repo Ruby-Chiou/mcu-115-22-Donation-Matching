@@ -21,9 +21,9 @@
         [class.invalid-field]="isInvalid('type')"
       >
         <option value="">請選擇志工類型</option>
-        <option value="勞力服務">勞力服務</option>
-        <option value="環境清潔">環境清潔</option>
+        <option value="物資搬運">物資搬運</option>
         <option value="物資整理">物資整理</option>
+        <option value="環境清潔">環境清潔</option>
         <option value="醫療照護">醫療照護</option>
         <option value="其他">其他</option>
       </select>
@@ -67,9 +67,14 @@
     <div class="form-group">
       <label>
         服務地點 <span>*</span>
+        <span class="word-count">
+          {{ demand.location?.length || 0 }}/50
+        </span>
       </label>
 
       <input
+      class="location-textarea"
+        maxlength="50"
         type="text"
         placeholder="請輸入服務地點"
         [(ngModel)]="demand.location"

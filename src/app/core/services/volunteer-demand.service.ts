@@ -8,7 +8,7 @@ export class VolunteerDemandService {
  demands: VolunteerDemand[] =[
   {
   id: 1,
-  type: '勞力服務',
+  type: '物資搬運',
   people: 5,
   date: '8/10',
   location: '花蓮縣光復鄉武昌街87號 ',
@@ -42,7 +42,7 @@ export class VolunteerDemandService {
   },
   {
   id: 3,
-  type: '勞力服務',
+  type: '環境清潔',
   people: 10,
   date: '8/11',
   location: '花蓮縣光復鄉中央產業道路33號 ',
@@ -113,7 +113,7 @@ export class VolunteerDemandService {
   messageCount: 8,
   },{
   id: 7,
-  type: '勞力服務',
+  type: '物資搬運',
   people: 10,
   date: '8/16',
   location: '花蓮縣光復鄉仁愛路55號 ',
@@ -157,7 +157,7 @@ export class VolunteerDemandService {
   workContent: '清理家園',
   reason: '花蓮光復救災',
   priority: '普通',
-  status: '上架',
+  status: '隱藏',
   contact: '陳先生',
   phone: '0922022279',
   note: '家中人員不便移動',
@@ -175,7 +175,7 @@ export class VolunteerDemandService {
   workContent: '協助看診及照護',
   reason: '花蓮光復救災',
   priority: '緊急',
-  status: '上架',
+  status: '隱藏',
   contact: '光復火車站醫療站',
   phone: '無',
   note: '',

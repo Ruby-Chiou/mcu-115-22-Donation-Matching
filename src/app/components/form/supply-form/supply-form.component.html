@@ -154,7 +154,7 @@
     <!-- 特殊品牌需求 -->
     <label class="label-row">
       特殊品牌需求
-      <span class="word-count"> {{ demand.brand?.length || 0 }}/100 </span>
+      <span class="word-count" *ngIf="demand.brand"> {{ demand.brand.length }}/100 </span>
     </label>
 
     <textarea

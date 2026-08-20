@@ -10,7 +10,7 @@ import { DisasterDemand } from '../../../models/agency/demand';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './supply-form.component.html',
-  styleUrl: './supply-form.component.scss',
+  styleUrls: ['./supply-form-A.component.scss', './supply-form-B.component.scss'],
 })
 export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
