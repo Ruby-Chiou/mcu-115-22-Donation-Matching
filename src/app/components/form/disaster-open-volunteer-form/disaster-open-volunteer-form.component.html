@@ -1,0 +1,109 @@
+<div class="volunteer-form">
+
+  <h1>志工報名表單</h1>
+
+  <div class="form-group">
+    <label>志工姓名</label>
+    <input
+      type="text"
+      [(ngModel)]="volunteerName"
+      placeholder="請輸入姓名"
+      required>
+  </div>
+ <div class="form-group">
+    <label>聯絡電話</label>
+    <input
+      type="tel"
+      [(ngModel)]="phone"
+      placeholder="請輸入 09 開頭的手機號碼"
+      maxlength="10"
+      inputmode="numeric"
+      required>
+  </div>
+  <div class="form-group">
+    <label>Email</label>
+    <input
+      type="email"
+      [(ngModel)]="email"
+      placeholder="請輸入 Email"
+      required>
+  </div>
+
+  <div class="form-group">
+    <label>服務項目</label>
+    <input
+      type="text"
+      [(ngModel)]="serviceItem"
+      placeholder="請輸入服務細目"
+      required>
+  </div>
+  <div class="form-group">
+  <label>服務地點</label>
+    <input
+      type="text"
+      [(ngModel)]="location"
+      placeholder="請輸入服務地點"
+      required>
+  </div>
+  <div class="form-group">
+    <label>服務日期</label>
+
+    <input
+      type="date"
+      [(ngModel)]="serviceDate"
+      required>
+  </div>
+
+  <div class="form-group">
+    <label>服務時間</label>
+
+    <div class="time-group">
+      <input
+        type="time"
+        [(ngModel)]="startTime"
+        required>
+
+      <span>～</span>
+
+      <input
+        type="time"
+        [(ngModel)]="endTime"
+        required>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>參與人數</label>
+    <input
+      type="text"
+      value="1 人"
+      readonly>
+
+  </div>
+  <div class="form-group">
+    <label>備註</label>
+    <textarea
+      [(ngModel)]="note"
+      placeholder="如果有其他需要告知的事項，請填寫"
+      required>
+    </textarea>
+  </div>
+
+  <div class="button-group">
+
+    <button
+      type="button"
+      class="cancel-btn"
+      (click)="cancel()">
+      取消
+    </button>
+
+    <button
+      type="button"
+      class="submit-btn"
+      (click)="submitForm()">
+      確認捐助
+    </button>
+
+  </div>
+
+</div>

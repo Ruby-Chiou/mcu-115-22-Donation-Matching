@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
+import { disasterOpenGuard} from './components/card/disaster-open.guard';
 
 export const routes: Routes = [
   // 1. 預設首頁
@@ -24,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'donor/disaster',
+    canActivate: [disasterOpenGuard],
     loadComponent: () =>
       import('./features/disaster/donor-disaster-lobby/donor-disaster-lobby.component').then((m) => m.DonorDisasterLobbyComponent), // 災害救助大廳
   },
@@ -36,10 +38,27 @@ export const routes: Routes = [
     path: 'donor/disaster/needs',
     loadComponent: () =>import('./features/disaster/needs/needs.component').then((m) => m.NeedsComponent),  //災害歷史紀錄
   },
-  /*/{
+  {
   path: 'disaster/open',
+  canActivate: [disasterOpenGuard],
   loadComponent: () =>import('./features/disaster/disaster-open/disaster-open.component').then((m) => m.DisasterOpenComponent),
-  }, */
+  },
+  {
+  path: 'disaster/open/detail',
+  loadComponent: () => import('./components/page/disaster-open-detail-page/disaster-open-detail-page.component').then((m) => m.DisasterOpenDetailPageComponent),
+  },
+  {
+  path: 'disaster/open/volunteer/detail',
+  loadComponent: () => import('./components/page/disaster-open-volunteer-detail-page/disaster-open-volunteer-detail-page.component').then((m) => m.DisasterOpenVolunteerDetailPageComponent),
+  },
+  {
+  path: 'disaster/open/supply/form',
+  loadComponent: () => import('./components/form/disaster-open-supply-form/disaster-open-supply-form.component').then((m) => m.DisasterOpenSupplyFormComponent),
+  },
+  {
+  path: 'disaster/open/volunteer/form',
+  loadComponent: () => import('./components/form/disaster-open-volunteer-form/disaster-open-volunteer-form.component').then((m) => m.DisasterOpenVolunteerFormComponent),
+  },
 
   // 4. 社福機構模組 (機構端)
   {

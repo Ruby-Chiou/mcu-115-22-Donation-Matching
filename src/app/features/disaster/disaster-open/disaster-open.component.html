@@ -1,0 +1,33 @@
+<app-disaster-open-page></app-disaster-open-page>
+<div class="container">
+
+  <div class="sidebar">
+    <h1>災害救助地圖</h1>
+
+    <h2>災害救助列表</h2>
+
+    <select
+      class="location-select"
+      (change)="selectType($event)"
+    >
+
+      <option value="">
+        請選擇
+      </option>
+
+      <option value="volunteer">
+        志工
+      </option>
+
+      <option value="donation">
+        物資
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div id="map"></div>
+
+</div>

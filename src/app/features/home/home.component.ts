@@ -1,13 +1,14 @@
 import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DonorDailyLobbyComponent } from '../daily/donor-daily-lobby/donor-daily-lobby.component';
-
+import { Router } from '@angular/router';
 // 1. 定義最新消息的資料結構
 interface NewsItem {
   image: string;
   text: string;
   highlight: string;
 }
+
 
 @Component({
   selector: 'app-home',
@@ -16,6 +17,20 @@ interface NewsItem {
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  constructor(
+    private router: Router
+  ) {}
+  goToDisaster(event: Event) {
+  event.preventDefault();
+  const disasterOpen =
+    localStorage.getItem('disasterOpen') === 'true';
+    if (disasterOpen) {
+      this.router.navigate(['/disaster/open']);
+    }
+    else {
+      this.router.navigate(['/donor/disaster']);
+    }
+  }
   protected readonly newsList: NewsItem[] = [
     {
       image: 'assets/images/lobby.jpg',

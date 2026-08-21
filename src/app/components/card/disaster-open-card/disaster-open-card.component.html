@@ -1,0 +1,265 @@
+<div
+  class="card"
+  (click)="openDetail($event)">
+  <!-- 圖片 -->
+  <div class="card-image">
+  @if (type === 'material') {
+    <img
+      src="assets/images/lobby.jpg"
+      alt="礦泉水">
+  }
+  @else {
+    <img
+      src="assets/images/lobby.jpg"
+      alt="志工需求">
+  }
+  </div>
+  <!-- 卡片內容 -->
+  <div class="card-content">
+@if (type === 'material') {
+  <h2 class="material-name">
+    礦泉水
+  </h2>
+  <div class="urgency urgent">
+    ● 緊急物資
+  </div>
+  <p class="organization">
+    受助機構：
+    <strong>花蓮縣救災中心</strong>
+  </p>
+  <div class="quantity">
+    <span>剩餘數量</span>
+    <strong>100 箱</strong>
+  </div>
+  }
+  @else {
+  <h2 class="material-name">
+    物資搬運
+  </h2>
+  <div class="urgency urgent">
+    ● 緊急需求
+  </div>
+  <p class="organization">
+    需求單位：
+    <strong>花蓮縣救災中心</strong>
+  </p>
+  <div class="quantity">
+    <span>需求人數</span>
+    <strong>10 人</strong>
+  </div>
+  <div class="quantity">
+    <span>已報名</span>
+    <strong>6 人</strong>
+  </div>
+  <div class="quantity">
+    <span>剩餘需求</span>
+    <strong>4 人</strong>
+  </div>
+  <div class="quantity">
+    <span>服務地點</span>
+    <strong>花蓮縣光復鄉</strong>
+  </div>
+  }
+<!-- 按鈕 -->
+<div class="card-buttons">
+    <button
+      type="button"
+      class="detail-button"
+      (click)="openDetail($event)">
+      @if (type === 'material') {
+        了解詳情
+      } @else {
+       了解詳情
+      }
+    </button>
+  </div>
+  </div>
+</div>
+
+<!-- =================================================
+     彈跳視窗
+================================================= -->
+
+@if (showDetail) {
+  <div
+    class="modal-overlay"
+    (click)="closeDetail($event)">
+  <div
+  class="detail-modal"
+  (click)="$event.stopPropagation()">
+  <!-- 標題 -->
+  <div class="modal-header">
+    @if (type === 'material') {
+      <h2>
+        災害物資需求詳情
+      </h2>
+    }
+    @else {
+      <h2>
+        災害志工需求詳情
+      </h2>
+    }
+    <button
+      type="button"
+      class="close-button"
+      (click)="closeDetail($event)">
+      ×
+    </button>
+  </div>
+  <!-- =========================
+       物資內容
+  ========================== -->
+
+  @if (type === 'material') {
+    <div class="modal-content">
+      <img
+        src="assets/images/lobby.jpg"
+        alt="礦泉水"
+        class="modal-image">
+      <div class="modal-info">
+        <h3>
+          礦泉水
+        </h3>
+        <div class="urgency urgent">
+          ● 緊急物資
+        </div>
+        <div class="modal-item">
+          <span>
+            受助機構
+          </span>
+          <strong>
+            花蓮縣救災中心
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            需求數量
+          </span>
+          <strong>
+            150 箱
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            已募集
+          </span>
+          <strong>
+            50 箱
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            剩餘需求
+          </span>
+          <strong>
+            100 箱
+          </strong>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- =========================
+       志工內容
+  ========================== -->
+  @if (type === 'volunteer') {
+    <div class="modal-content">
+      <img
+        src="assets/images/lobby.jpg"
+        alt="志工需求"
+        class="modal-image">
+      <div class="modal-info">
+        <h3>
+          物資搬運
+        </h3>
+        <div class="urgency urgent">
+          ● 緊急需求
+        </div>
+        <div class="modal-item">
+          <span>
+            需求單位
+          </span>
+          <strong>
+            花蓮縣救災中心
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            需求人數
+          </span>
+          <strong>
+            10 人
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            已報名
+          </span>
+          <strong>
+            6 人
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            剩餘需求
+          </span>
+          <strong>
+            4 人
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            服務地點
+          </span>
+          <strong>
+            花蓮縣光復鄉
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            服務時間
+          </span>
+          <strong>
+            08:00 ～ 17:00
+          </strong>
+        </div>
+        <div class="modal-item">
+          <span>
+            工作內容
+          </span>
+          <strong>
+            協助物資搬運、分類及整理。
+          </strong>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- =========================
+       彈窗按鈕
+  ========================== -->
+  <div class="modal-buttons">
+  @if (type === 'material') {
+
+  <button
+    type="button"
+    class="modal-detail-button"
+    (click)="goToFullDetail($event)">
+    我要捐助
+  </button>
+  }
+  @else {
+    <button
+      type="button"
+      class="modal-detail-button"
+      (click)="goToFullDetail($event)">
+      我要報名
+    </button>
+  }
+  </div>
+  </div>
+  </div>
+
+}

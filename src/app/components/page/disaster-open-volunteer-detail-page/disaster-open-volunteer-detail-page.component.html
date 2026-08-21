@@ -1,0 +1,273 @@
+<div class="detail-page">
+  <!-- 返回需求清單 -->
+  <button
+    type="button"
+    class="back-button"
+    (click)="goBackToList()">
+    ← 返回需求清單
+  </button>
+  <!-- 頁面標題 -->
+  <div class="detail-header">
+    <h1>
+      災害志工需求詳情
+    </h1>
+  </div>
+
+  <!-- =========================
+       志工主要資訊
+  ========================== -->
+  <div class="detail-main">
+  <!-- 左邊：圖片 -->
+  <div class="detail-image">
+    <img
+      src="assets/images/lobby.jpg"
+      alt="志工需求">
+  </div>
+<!-- 右邊：志工資訊 -->
+  <div class="detail-info">
+    <h2>
+      物資搬運
+    </h2>
+    <!-- 緊急程度 -->
+    <div class="urgency urgent">
+      <span class="urgency-icon">
+        ●
+      </span>
+      緊急需求
+    </div>
+  <!-- 人數資訊 -->
+  <div class="quantity-info">
+    <div class="info-item">
+      <span>
+        需求人數
+      </span>
+      <strong>
+        10 人
+      </strong>
+    </div>
+    <div class="info-item">
+      <span>
+        已報名
+      </span>
+      <strong>
+        6 人
+      </strong>
+    </div>
+    <div class="info-item">
+      <span>
+        剩餘需求
+      </span>
+      <strong>
+        4 人
+      </strong>
+    </div>
+  </div>
+  <!-- 報名進度 -->
+  <div class="progress-section">
+    <div class="progress-info">
+      <span>
+        報名進度
+      </span>
+      <strong>
+        60%
+      </strong>
+    </div>
+    <div class="progress-bar">
+      <div
+        class="progress"
+        style="width: 60%;">
+      </div>
+    </div>
+  </div>
+  <!-- 需求單位 -->
+    <div class="organization-box">
+      <span class="organization-label">
+        需求單位
+      </span>
+      <strong>
+        🏢 花蓮縣救災中心
+      </strong>
+    </div>
+    <div class="join-section">
+    <button
+      type="button"
+      class="join-button"
+      (click)="goToVolunteerForm()">
+      我要報名
+    </button>
+
+  </div>
+    </div>
+  </div>
+
+  <!-- =========================
+       服務資訊
+  ========================== -->
+  <div class="service-detail">
+    <h2>
+      服務資訊
+    </h2>
+  <div class="service-info">
+  <div class="service-item">
+    <span>
+      📍 服務地點
+    </span>
+    <strong>
+      花蓮縣光復鄉
+    </strong>
+  </div>
+  <div class="service-item">
+    <span>
+      🏠 詳細地址
+    </span>
+    <strong>
+      花蓮縣光復鄉大馬村中學街158號
+    </strong>
+  </div>
+  <div class="service-item">
+    <span>
+      📅 服務日期
+    </span>
+    <strong>
+      2026/08/20
+    </strong>
+  </div>
+  <div class="service-item">
+    <span>
+      🕐 服務時間
+    </span>
+    <strong>
+      08:00 ～ 17:00
+    </strong>
+  </div>
+  </div>
+  </div>
+
+  <!-- =========================
+       工作內容
+  ========================== -->
+  <div class="description">
+    <h2>
+      工作內容
+    </h2>
+    <p>
+      協助災區物資搬運、分類及整理。
+    </p>
+    <p>
+      志工將協助救災中心處理每日收到的救援物資，
+      並將物資分類後分送至有需要的災區。
+    </p>
+  </div>
+
+  <!-- =========================
+       志工需求條件
+  ========================== -->
+  <div class="requirement-detail">
+    <h2>
+      志工需求條件
+    </h2>
+    <ul>
+      <li>
+        年滿 18 歲
+      </li>
+      <li>
+        能配合物資搬運工作
+      </li>
+      <li>
+        請穿著方便活動的服裝
+      </li>
+      <li>
+        工作期間請遵守現場工作人員指示
+      </li>
+      <li>
+        如有身體不適，請立即告知現場工作人員
+      </li>
+    </ul>
+  </div>
+
+  <!-- =========================
+       需求單位
+  ========================== -->
+  <div class="organization-detail">
+    <h2>
+      需求單位
+    </h2>
+  <div class="organization-info">
+    <div class="organization-item">
+      <span>
+        單位名稱
+      </span>
+      <strong>
+        花蓮縣救災中心
+      </strong>
+    </div>
+  <div class="organization-item">
+    <span>
+      聯絡人
+    </span>
+    <strong>
+      王先生
+    </strong>
+  </div>
+  <div class="organization-item">
+    <span>
+      聯絡電話
+    </span>
+    <strong>
+      03-1234567
+    </strong>
+  </div>
+  <div class="organization-item">
+    <span>
+      聯絡地址
+    </span>
+    <strong>
+      花蓮縣花蓮市中山路 100 號
+    </strong>
+  </div>
+  </div>
+  </div>
+
+  <!-- =========================
+       留言區
+  ========================== -->
+  <div class="comment-section">
+    <h2>
+      留言區
+    </h2>
+<!-- 留言輸入 -->
+<div class="comment-form">
+  <textarea
+    [(ngModel)]="newComment"
+    rows="4"
+    placeholder="輸入你想說的話...">
+  </textarea>
+  <button
+    type="button"
+    class="comment-button"
+    (click)="addComment()">
+    發布留言
+  </button>
+</div>
+
+<!-- 留言列表 -->
+<div class="comment-list">
+  @for (comment of comments; track $index) {
+    <div class="comment">
+      <div class="comment-header">
+        <strong>
+          {{ comment.user }}
+        </strong>
+        <span>
+          {{ comment.date }}
+        </span>
+      </div>
+      <p>
+        {{ comment.content }}
+      </p>
+    </div>
+  }
+  </div>
+    </div>
+</div>
+
