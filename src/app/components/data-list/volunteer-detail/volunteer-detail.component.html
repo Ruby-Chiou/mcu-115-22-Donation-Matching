@@ -86,15 +86,11 @@
   </div>
 </div>
 
-<!-- 刪除確認 Modal -->
-<div class="modal-backdrop" *ngIf="showDeleteModal">
-  <div class="modal-box">
-    <h2>確認刪除</h2>
-    <p>確定要刪除此筆急難需求嗎？</p>
-
-    <div class="modal-actions">
-      <button class="cancel-btn" (click)="closeDeleteModal()">取消</button>
-      <button class="confirm-btn" (click)="confirmDelete()">確定刪除</button>
-    </div>
-  </div>
-</div>
+<app-volunteer-delete
+  *ngIf="showDeleteModal"
+  [demandIds]="getDeleteIds()"
+  [deleteType]="'single'"
+  (closed)="closeDeleteModal()"
+  (deleted)="onDeleted()"
+>
+</app-volunteer-delete>

@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-
+import { VolunteerDeleteComponent } from '../../modal/volunteer-delete/volunteer-delete.component';
 import {VolunteerDemandService} from '../../../core/services/volunteer-demand.service';
 import {  VolunteerDemand } from '../../../models/agency/vdemand';
 
 @Component({
   selector: 'app-volunteer-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink,VolunteerDeleteComponent ],
   templateUrl: './volunteer-detail.component.html',
   styleUrl: './volunteer-detail.component.scss'
 })
@@ -59,40 +59,27 @@ export class VolunteerDetailComponent implements OnInit {
   }
 
 
-  // =========================
   // 開啟刪除視窗
-  // =========================
-  openDeleteModal(): void {
+  openDeleteModal() {
     this.showDeleteModal = true;
   }
 
-
-  // =========================
   // 關閉刪除視窗
-  // =========================
-  closeDeleteModal(): void {
+  closeDeleteModal() {
     this.showDeleteModal = false;
   }
 
-
-  // =========================
-  // 確定刪除
-  // =========================
-  confirmDelete(): void {
-
-    if (!this.demand) {
-      return;
-    }
-
-    this.volunteerDemandService.deleteDemand(
-      this.demand.id
-    );
-
+  // 刪除完成後返回列表
+  onDeleted() {
     this.showDeleteModal = false;
-
-    alert('志工需求已刪除！');
-
     this.router.navigate(['/agency/disaster']);
+  }
+
+  goBack() {
+    this.router.navigate(['/agency/disaster']);
+  }
+  getDeleteIds(): number[] {
+    return this.demand?.id != null ? [this.demand.id] : [];
   }
 
 }

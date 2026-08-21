@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-
+import { VolunteerDeleteComponent } from '../../modal/volunteer-delete/volunteer-delete.component';
 import { VolunteerDemandService  } from '../../../core/services/volunteer-demand.service';
 import {  VolunteerDemand } from '../../../models/agency/vdemand';
 import { PaginationComponent } from '../../pagination/pagination.component';
@@ -15,7 +15,7 @@ type VolunteerDisplayStatus =
   | '已下架';
 @Component({
   selector: 'app-volunteer-list',
-  imports: [CommonModule,FormsModule,RouterLink,PaginationComponent],
+  imports: [CommonModule,FormsModule,RouterLink,PaginationComponent,VolunteerDeleteComponent ],
   templateUrl: './volunteer-list.component.html',
   styleUrl: './volunteer-list.component.scss',
 })
@@ -56,6 +56,9 @@ filteredVolunteerDemands: (
 
   searchTerm = '';
 
+  // =========================
+  // 刪除
+  // =========================
 // ======================================================
 // 分頁
 // ======================================================
@@ -65,9 +68,9 @@ volunteerPageSize = 10;
 volunteerTotalPages = 1;
 volunteerPageNumbers: number[] = [];
 
-showVolunteerDeleteModal = false;
-selectedVolunteerIds: number[] = [];
-selectedVolunteerId: number | null = null;
+showDeleteModal = false;
+deleteIds: number[] = [];
+deleteType: 'single' | 'batch' = 'single';
 // =========================
   // 搜尋
   // =========================
@@ -205,52 +208,36 @@ editSelectedVolunteer(): void {
   ]);
 }
 
-// 1. 開啟刪除 Modal（同時支援單筆與批次）
-openVolunteerDeleteModal(id?: number): void {
-  if (id !== undefined) {
-    // 單筆刪除
-    this.selectedVolunteerIds = [id];
-  } else {
-    // 批次刪除
-    const selectedItems = this.filteredVolunteerDemands.filter(
-      item => item.selected && item.id !== undefined
-    );
-
-    if (selectedItems.length === 0) {
-      alert('請先選擇要刪除的志工需求');
-      return;
-    }
-
-    this.selectedVolunteerIds = selectedItems.map(item => item.id!);
-  }
-
-  this.showVolunteerDeleteModal = true;
+ // 開啟單筆刪除 Modal
+openDeleteModal(id: number): void {
+  this.deleteIds = [id];
+  this.deleteType = 'single';
+  this.showDeleteModal = true;
 }
 
-// 2. 關閉刪除 Modal
-closeVolunteerDeleteModal(): void {
-  this.showVolunteerDeleteModal = false;
-  this.selectedVolunteerIds = [];
+// 開啟批次刪除 Modal
+openBatchDeleteModal(): void {
+  this.deleteIds = this.filteredVolunteerDemands
+    .filter((item) => item.selected && item.id !== undefined)
+    .map((item) => item.id as number);
+
+  this.deleteType = 'batch';
+  this.showDeleteModal = true;
 }
 
-// 3. 確認執行刪除
-confirmVolunteerDelete(): void {
-  if (this.selectedVolunteerIds.length === 0) {
-    this.closeVolunteerDeleteModal();
-    return;
-  }
+// 關閉 / 取消 Modal (點擊「取消」或「背景」時觸發)
+closeDeleteModal(): void {
+  this.showDeleteModal = false;
+  this.deleteIds = [];
+}
 
-  // 執行刪除 (若 deleteDemand 回傳 Observable，請記得 subscribe 或用 forkJoin)
-  this.selectedVolunteerIds.forEach(id => {
-    this.volunteerDemandService.deleteDemand(id);
-  });
-
-  // 狀態清理與重新載入
-  this.showVolunteerDeleteModal = false;
-  this.selectedVolunteerIds = [];
+// 確定刪除成功後的處置
+onDeleted(): void {
+  this.closeDeleteModal();
   this.volunteerSelectAll = false;
   this.loadVolunteerDemands();
 }
+
 // 志工排序下拉選單
 volunteerSelectedSort: string = 'id';
 

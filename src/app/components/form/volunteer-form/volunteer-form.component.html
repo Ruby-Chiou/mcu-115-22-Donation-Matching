@@ -142,7 +142,9 @@
     <label>
       緊急優先度 <span>*</span>
     </label>
-
+<span>
+  (普通:14天內&nbsp;&nbsp;&nbsp;緊急:7天內&nbsp;&nbsp;&nbsp;非常緊急:3天內)
+</span>
 <div class="priority-box">
       <label class="normal">
         <input type="radio" name="priority" value="普通" [(ngModel)]="demand.priority" />
@@ -254,7 +256,7 @@
     class="publish-btn"
     (click)="onPublish()"
   >
-    發布需求
+    {{ isEditMode ? '儲存' : '發布需求' }}
   </button>
 
 </div>

@@ -11,12 +11,6 @@ import { PaginationComponent } from '../../pagination/pagination.component';
 
 type SortType = 'createdAt' | 'amount' | 'remaining';
 
-type VolunteerSortType = 'createdAt' | 'people';
-type VolunteerStatus = '上架' | '隱藏' | '下架';
-type VolunteerDisplayStatus =
-  | '已上架'
-  | '隱藏中'
-  | '已下架';
 @Component({
   selector: 'app-disaster-list',
   standalone: true,
