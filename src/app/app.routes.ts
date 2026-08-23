@@ -45,18 +45,22 @@ export const routes: Routes = [
   },
   {
   path: 'disaster/open/detail',
+  canActivate: [disasterOpenGuard],
   loadComponent: () => import('./components/page/disaster-open-detail-page/disaster-open-detail-page.component').then((m) => m.DisasterOpenDetailPageComponent),
   },
   {
   path: 'disaster/open/volunteer/detail',
+  canActivate: [disasterOpenGuard],
   loadComponent: () => import('./components/page/disaster-open-volunteer-detail-page/disaster-open-volunteer-detail-page.component').then((m) => m.DisasterOpenVolunteerDetailPageComponent),
   },
   {
   path: 'disaster/open/supply/form',
+  canActivate: [disasterOpenGuard],
   loadComponent: () => import('./components/form/disaster-open-supply-form/disaster-open-supply-form.component').then((m) => m.DisasterOpenSupplyFormComponent),
   },
   {
   path: 'disaster/open/volunteer/form',
+  canActivate: [disasterOpenGuard],
   loadComponent: () => import('./components/form/disaster-open-volunteer-form/disaster-open-volunteer-form.component').then((m) => m.DisasterOpenVolunteerFormComponent),
   },
 

@@ -1,8 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { DisasterClosedModalService } from '../../core/services/disaster-closed-modal.service';
 export const disasterOpenGuard : CanActivateFn = (route, state) => {
 
   const router = inject(Router);
+  const closedModal = inject(DisasterClosedModalService);
 
   const disasterOpen =
     localStorage.getItem('disasterOpen') === 'true';
@@ -28,6 +30,8 @@ export const disasterOpenGuard : CanActivateFn = (route, state) => {
     state.url.startsWith('/disaster/open') &&
     !disasterOpen
   ) {
+
+    closedModal.show();
 
     return router.createUrlTree([
       '/donor/disaster'
