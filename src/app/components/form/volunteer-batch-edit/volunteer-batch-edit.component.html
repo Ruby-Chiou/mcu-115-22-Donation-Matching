@@ -1,0 +1,215 @@
+<div class="container">
+  <h1>批次編輯志工急難需求</h1>
+
+  <!-- 多筆卡片逐一編輯 -->
+  <div
+    class="form-box"
+    [ngClass]="i % 2 === 0 ? 'light-box' : 'dark-box'"
+    *ngFor="let demand of editDemands; let i = index"
+  >
+    <div class="batch-edit-header">
+      <div class="info-tag" *ngIf="demand.id">
+        <span class="info-label">需求編號</span>
+        <span class="info-value">#{{ demand.id }}</span>
+      </div>
+    </div>
+
+    <!-- 志工需求類型 -->
+    <label class="label-row">
+      志工需求類型
+      <span class="required">*</span>
+    </label>
+    <div class="short-field">
+      <select [class.invalid]="demand.typeError" [(ngModel)]="demand.type">
+        <option value="">請選擇志工類型</option>
+        <option value="物資搬運">物資搬運</option>
+        <option value="物資整理">物資整理</option>
+        <option value="環境清潔">環境清潔</option>
+        <option value="醫療照護">醫療照護</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+
+    <!-- 需求人數 -->
+    <label class="label-row">
+      需求人數
+      <span class="required">*</span>
+    </label>
+    <div class="input-row">
+      <input
+        type="number"
+        class="short-input"
+        placeholder="請輸入需求人數"
+        min="1"
+        [class.invalid]="demand.peopleError"
+        [(ngModel)]="demand.people"
+      />
+    </div>
+
+    <!-- 服務日期 -->
+    <label class="label-row">
+      服務日期
+      <span class="required">*</span>
+    </label>
+    <div class="input-row">
+      <input
+        type="date"
+        class="medium-input"
+        [class.invalid]="demand.dateError"
+        [(ngModel)]="demand.date"
+      />
+    </div>
+
+    <!-- 服務地點 -->
+    <label class="label-row">
+      服務地點
+      <span class="required">*</span>
+    </label>
+    <input
+      type="text"
+      class="medium-input"
+      placeholder="請輸入服務地點"
+      [class.invalid]="demand.locationError"
+      [(ngModel)]="demand.location"
+    />
+
+    <!-- 志工條件／專長 -->
+    <label class="label-row">
+      志工條件／專長
+      <span class="required">*</span>
+    </label>
+    <div class="short-field">
+      <select [class.invalid]="demand.conditionError" [(ngModel)]="demand.condition">
+        <option value="">請選擇志工條件／專長</option>
+        <option value="專業照顧">專業照顧</option>
+        <option value="語言專長">語言專長</option>
+        <option value="需具備相關證照">需具備相關證照</option>
+        <option value="無特殊條件">無特殊條件</option>
+      </select>
+    </div>
+
+    <!-- 志工工作內容 -->
+    <label class="label-row">
+      志工工作內容
+      <span class="required">*</span>
+      <span class="word-count">
+        {{ demand.workContent?.length || 0 }}/300
+      </span>
+    </label>
+    <textarea
+      class="note-textarea"
+      maxlength="300"
+      placeholder="請詳細說明志工需要協助的工作內容"
+      [class.invalid]="demand.workContentError"
+      [(ngModel)]="demand.workContent"
+    ></textarea>
+
+    <!-- 需求原因 -->
+    <label class="label-row">
+      需求原因
+      <span class="required">*</span>
+      <span class="word-count">
+        {{ demand.reason?.length || 0 }}/300
+      </span>
+    </label>
+    <textarea
+      class="note-textarea"
+      maxlength="300"
+      placeholder="請輸入此次志工需求的原因"
+      [class.invalid]="demand.reasonError"
+      [(ngModel)]="demand.reason"
+    ></textarea>
+
+    <!-- 緊急優先度 -->
+    <label class="label-row">
+      緊急優先度
+      <span class="required">*</span>
+    </label>
+    <div class="priority-box">
+      <label class="normal">
+        <input type="radio" [name]="'priority' + i" value="普通" [(ngModel)]="demand.priority" />
+        普通
+      </label>
+
+      <label class="urgent">
+        <input type="radio" [name]="'priority' + i" value="緊急" [(ngModel)]="demand.priority" />
+        緊急
+      </label>
+
+      <label class="very-urgent">
+        <input type="radio" [name]="'priority' + i" value="非常緊急" [(ngModel)]="demand.priority" />
+        非常緊急
+      </label>
+    </div>
+
+    <!-- 公開狀態 -->
+    <label class="label-row">
+      公開狀態
+      <span class="required">*</span>
+    </label>
+    <div class="status-box">
+      <label>
+        <input type="radio" [name]="'status' + i" value="上架" [(ngModel)]="demand.status" />
+        上架
+      </label>
+
+      <label>
+        <input type="radio" [name]="'status' + i" value="隱藏" [(ngModel)]="demand.status" />
+        隱藏
+      </label>
+
+      <label>
+        <input type="radio" [name]="'status' + i" value="下架" [(ngModel)]="demand.status" />
+        下架
+      </label>
+    </div>
+
+    <!-- 聯絡人 -->
+    <label class="label-row">
+      聯絡人
+      <span class="required">*</span>
+    </label>
+    <input
+      type="text"
+      class="medium-input"
+      placeholder="請輸入聯絡人姓名"
+      [class.invalid]="demand.contactError"
+      [(ngModel)]="demand.contact"
+    />
+
+    <!-- 聯絡電話 -->
+    <label class="label-row">
+      聯絡電話
+      <span class="required">*</span>
+    </label>
+    <input
+      type="tel"
+      class="medium-input"
+      placeholder="請輸入聯絡電話"
+      [class.invalid]="demand.phoneError"
+      [(ngModel)]="demand.phone"
+    />
+
+    <!-- 其他說明（備註） -->
+    <label class="label-row">
+      其他說明（備註）
+      <span class="word-count">
+        {{ demand.note?.length || 0 }}/300
+      </span>
+    </label>
+    <textarea
+      class="note-textarea"
+      maxlength="300"
+      placeholder="請輸入其他說明"
+      [(ngModel)]="demand.note"
+    ></textarea>
+
+    <hr />
+  </div>
+
+  <!-- 操作按鈕 -->
+  <div class="button-area">
+    <button type="button" class="back-btn" (click)="cancel()">取消</button>
+    <button type="button" class="save-btn" (click)="saveAll()">儲存全部修改</button>
+  </div>
+</div>

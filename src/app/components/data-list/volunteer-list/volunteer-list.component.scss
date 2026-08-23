@@ -4,11 +4,6 @@
   --color-text-main: #333333;
 }
 
-.container {
-  padding: 30px;
-  padding-bottom: 120px;
-}
-
 h1 {
   margin-bottom: 20px;
   font-size: 24px;
@@ -523,44 +518,6 @@ tbody tr:last-child td:last-child {
 .very-urgent {
   color: #d32f2f;
 }
-/* =====================
-    通用 Modal 彈窗樣式
-===================== */
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-box {
-  background: white;
-  width: 420px;
-  padding: 30px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
-
-  h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: var(--color-brand-primary);
-  }
-
-  p {
-    font-size: 18px;
-    margin-bottom: 30px;
-    color: var(--color-text-main);
-  }
-}
 
 .modal-buttons {
   display: flex;
@@ -616,13 +573,27 @@ tbody tr:last-child td:last-child {
   }
 }
 
+/* 篩選彈窗 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
 /* 篩選視窗專用樣式 */
 .filter-modal-box {
   width: 580px;
   max-height: 85vh;
   overflow-y: auto;
+  border-radius: 20px;
+  background: #ffffff;
   text-align: left;
   padding: 30px 35px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
 
   h2 {
     text-align: center;
@@ -672,4 +643,92 @@ tbody tr:last-child td:last-child {
 .filter-buttons {
   margin-top: 30px;
   justify-content: flex-end;
+}
+/* =================================
+   志工需求列表
+================================= */
+
+.volunteer-section {
+  margin-top: 70px;
+  padding: 40px 30px 80px;
+  border-top: 3px solid #e5e7eb;
+  box-sizing: border-box;
+}
+.volunteer-section app-pagination {
+  display: block;
+  margin-top: 25px;
+}
+.volunteer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.volunteer-header h1 {
+  margin: 0;
+}
+
+.volunteer-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 20px;
+  table-layout: fixed;
+  border-radius: 15px;
+  overflow: hidden;
+}
+.volunteer-table th,
+.volunteer-table td {
+  padding: 14px 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.volunteer-table th {
+  background-color: #e3f2fd;
+  white-space: nowrap;
+  padding: 16px 6px;
+}
+
+/* 優先度 */
+
+.volunteer-table .normal {
+  color: #4b5563;
+  font-weight: bold;
+}
+
+.volunteer-table .urgent {
+  color: #f59e0b;
+  font-weight: bold;
+}
+
+.volunteer-table .very-urgent {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.volunteer-empty {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+}
+
+.volunteer-empty .empty-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.volunteer-empty .empty-description {
+  color: #777;
+}
+
+.volunteer-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
 }

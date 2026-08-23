@@ -1,0 +1,96 @@
+<div class="container">
+  <h1>志工需求詳細資料</h1>
+
+  <div class="detail-table" *ngIf="demand">
+    <!-- 需求類型 -->
+    <div class="detail-row">
+      <div class="detail-title">需求類型</div>
+      <div class="detail-content">{{ demand.type }}</div>
+    </div>
+
+    <!-- 需求人數 -->
+    <div class="detail-row">
+      <div class="detail-title">需求人數</div>
+      <div class="detail-content">{{ demand.people }} </div>
+    </div>
+
+    <!-- 服務日期 -->
+    <div class="detail-row">
+      <div class="detail-title">服務日期</div>
+      <div class="detail-content">{{ demand.date }}</div>
+    </div>
+
+    <!-- 服務地點 -->
+    <div class="detail-row">
+      <div class="detail-title">服務地點</div>
+      <div class="detail-content">{{ demand.location }}</div>
+    </div>
+
+    <!--志工條件／專長 -->
+    <div class="detail-row">
+      <div class="detail-title">志工條件／專長</div>
+      <div class="detail-content">{{ demand.condition }}</div>
+    </div>
+
+    <!-- 志工工作內容-->
+    <div class="detail-row">
+      <div class="detail-title">志工工作內容</div>
+      <div class="detail-content">{{ demand.workContent }}</div>
+    </div>
+
+    <!-- 需求原因／活動說明 -->
+    <div class="detail-row">
+      <div class="detail-title">需求原因／活動說明</div>
+      <div class="detail-content">{{ demand.reason }}</div>
+    </div>
+
+    <!-- 緊急優先度 -->
+    <div class="detail-row">
+      <div class="detail-title">緊急優先度</div>
+
+      <div
+        class="detail-content priority-detail"
+        [ngClass]="{
+          'normal': demand.priority === '普通',
+          'urgent': demand.priority === '緊急',
+          'very-urgent': demand.priority === '非常緊急'
+        }"
+      >
+        {{ demand.priority }}
+      </div>
+    </div>
+
+    <!-- 聯絡人 -->
+    <div class="detail-row">
+      <div class="detail-title">聯絡人</div>
+      <div class="detail-content">{{ demand.contact }}</div>
+    </div>
+    <!-- 聯絡電話 -->
+    <div class="detail-row">
+      <div class="detail-title">聯絡電話</div>
+      <div class="detail-content">{{ demand.phone }}</div>
+    </div>
+
+    <!-- 其他說明 -->
+    <div class="detail-row">
+      <div class="detail-title">其他說明（備註）</div>
+      <div class="detail-content">{{ demand.note || '無' }}</div>
+    </div>
+  </div>
+  <!-- detail-table 結束 -->
+
+  <div class="button-area">
+    <button class="back-btn" routerLink="/agency/disaster">返回</button>
+    <button class="edit-btn" [routerLink]="['/agency/volunteer-edit', demand?.id]" [queryParams]="{ from: 'detail' }">編輯</button>
+    <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
+  </div>
+</div>
+
+<app-volunteer-delete
+  *ngIf="showDeleteModal"
+  [demandIds]="getDeleteIds()"
+  [deleteType]="'single'"
+  (closed)="closeDeleteModal()"
+  (deleted)="onDeleted()"
+>
+</app-volunteer-delete>

@@ -1,0 +1,492 @@
+.form-container {
+  padding: 30px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
+.batch-edit-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+/* 修改 .info-tag 及其子元素 */
+.info-tag {
+  display: inline-flex;
+  align-items: center; /* 確保內部元件垂直置中 */
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px;
+  gap: 8px;
+}
+
+.info-label {
+  font-size: 19px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1; /* 保留 line-height: 1 */
+}
+
+.info-value {
+  font-size: 19px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1;
+
+  /* 💡 新增這行：微調數字向上提升 1 px，達到視覺完美對齊 */
+  transform: translateY(-1px);
+}
+
+.form-label {
+  background-color: #e3f2fd;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 30px;
+}
+
+
+/* 每一個欄位 */
+.form-group {
+  margin-bottom: 45px;
+}
+
+
+/* 標題 */
+.form-group label {
+  display: block;
+
+  margin-bottom: 12px;
+
+  font-size: 20px;
+  font-weight: bold;
+
+  color: #222;
+}
+
+
+/* 必填星號 */
+.form-group label span {
+  color: #e53935;
+}
+.form-group span {
+  color: #898888;
+}
+
+/* 所有輸入框 */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 640px;
+
+  padding: 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+
+  background-color: #ffffff;
+
+  font-size: 18px;
+
+  outline: none;
+}
+
+
+/* textarea */
+.form-group textarea {
+  height: 125px;
+
+  resize: vertical;
+}
+
+
+
+/* placeholder */
+.priority-box {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.priority-box label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 16px;
+}
+
+.priority-box input[type='radio'] {
+  width: auto;
+  margin: 0;
+}
+
+.priority-box .normal {
+  color: #333333;
+}
+
+.priority-box .urgent {
+  color: #f57c00;
+}
+
+.priority-box .very-urgent {
+  color: #d32f2f;
+}
+
+.status-box {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 35px;
+}
+
+.status-box label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.status-box input[type='radio'] {
+  width: auto;
+  margin: 0;
+}
+/* =========================
+   其他說明
+   放在原本的藍色大框裡
+========================= */
+
+.note-section {
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+
+
+/* 其他說明標題 */
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 20px;
+  font-weight: bold;
+
+  margin-bottom: 12px;
+
+  color: #222;
+}
+
+
+/* 字數 */
+.word-count {
+  font-size: 16px;
+  font-weight: normal;
+  color: #777;
+}
+
+
+/* 其他說明輸入框 */
+.note-textarea {
+  width: 640px;
+  height: 125px;
+
+  padding: 14px;
+
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+
+  font-size: 18px;
+
+  outline: none;
+
+  resize: vertical;
+}
+
+
+/* placeholder */
+.note-textarea::placeholder {
+  color: #999;
+}
+
+
+/* 點擊其他說明 */
+.note-textarea:focus {
+  border-color: #7bbbdc;
+}
+
+
+/* =========================
+   藍色大框外面的按鈕
+========================= */
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 35px 40px 20px;
+
+  background-color: white;
+}
+
+
+/* 取消 */
+.cancel-btn {
+  background-color: #65b8ed;
+  color: white;
+
+  border: none;
+  border-radius: 30px;
+
+  padding: 14px 28px;
+
+  font-size: 20px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+
+/* 發布需求 */
+.publish-btn {
+  background-color: #0868c7;
+  color: white;
+
+  border: none;
+  border-radius: 30px;
+
+  padding: 14px 28px;
+
+  font-size: 20px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+
+/* 滑鼠移上去 */
+.cancel-btn:hover {
+  background-color: #478fb8;
+}
+
+.publish-btn:hover {
+  background-color: #075aa9;
+}
+
+.cancel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 35, 55, 0.45);
+  backdrop-filter: blur(4px);
+  animation: cancel-modal-fade-in 0.18s ease-out;
+}
+
+.cancel-modal {
+  width: min(100%, 420px);
+  box-sizing: border-box;
+  padding: 34px 32px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 20px 55px rgba(20, 49, 75, 0.25);
+  text-align: center;
+  animation: cancel-modal-slide-up 0.22s ease-out;
+}
+
+.cancel-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #fff1df;
+  color: #d97706;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.cancel-modal h2 {
+  margin: 0 0 10px;
+  color: #17324d;
+  font-size: 23px;
+}
+
+.cancel-modal p {
+  margin: 0;
+  color: #64748b;
+  font-size: 16px;
+}
+
+.cancel-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.cancel-modal-actions button {
+  min-width: 130px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.cancel-modal-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.stay-btn {
+  background: #e8f3fb;
+  color: #1565c0;
+}
+
+.stay-btn:hover {
+  background: #d5eafa;
+  box-shadow: 0 5px 12px rgba(21, 101, 192, 0.12);
+}
+
+.leave-btn {
+  background: #d9534f;
+  color: #ffffff;
+}
+
+.leave-btn:hover {
+  background: #c43f3b;
+  box-shadow: 0 5px 12px rgba(217, 83, 79, 0.2);
+}
+
+.success-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 35, 55, 0.45);
+  backdrop-filter: blur(4px);
+  animation: cancel-modal-fade-in 0.18s ease-out;
+}
+
+.success-modal {
+  width: min(100%, 420px);
+  box-sizing: border-box;
+  padding: 34px 32px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 20px 55px rgba(20, 49, 75, 0.25);
+  text-align: center;
+  animation: cancel-modal-slide-up 0.22s ease-out;
+}
+
+.success-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #e7f7ed;
+  color: #1f9d55;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.success-modal h2 {
+  margin: 0 0 10px;
+  color: #17324d;
+  font-size: 23px;
+}
+
+.success-modal p {
+  margin: 0;
+  color: #64748b;
+  font-size: 16px;
+}
+
+.success-modal-button {
+  margin-top: 28px;
+  padding: 11px 24px;
+  border: 0;
+  border-radius: 12px;
+  background: #1f9d55;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.success-modal-button:hover {
+  background: #188647;
+  box-shadow: 0 5px 12px rgba(31, 157, 85, 0.2);
+  transform: translateY(-1px);
+}
+
+@keyframes cancel-modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cancel-modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 未填寫必填欄位 */
+.invalid-field {
+  border: 2px solid red !important;
+  background-color: #fff5f5;
+}
+
+.invalid-field:focus {
+  border: 2px solid red !important;
+  outline: none;
+}

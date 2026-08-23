@@ -1,0 +1,237 @@
+/* 搜尋 */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
+    cursor: pointer;
+  }
+
+  input {
+    width: 200px;
+    height: 36px;
+    padding: 0 32px 0 36px;
+    border: 1.5px solid #90caf9;
+    border-radius: 18px;
+    outline: 0;
+    background: #fff;
+    color: var(--text);
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+
+    &:focus {
+      border-color: var(--primary);
+      box-shadow: 0 3px 8px rgba(21, 101, 192, 0.15);
+    }
+
+    &::placeholder {
+      color: #9e9e9e;
+    }
+  }
+
+  .clear-search-btn {
+    position: absolute;
+    right: 10px;
+    border: 0;
+    background: none;
+    color: #9e9e9e;
+    cursor: pointer;
+  }
+}
+
+/* 排序與篩選群組 */
+.sort-group {
+  gap: 8px;
+}
+
+.filter-trigger-group {
+  gap: 8px;
+}
+
+.sort-icon-btn,
+.filter-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #bbdefb;
+  color: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  &:hover {
+    background: #90caf9;
+    transform: scale(1.05);
+  }
+}
+
+.sort-icon-btn {
+  border: 0;
+  padding: 0;
+
+  .sort-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.filter-icon-btn {
+  border: 1.5px solid #90caf9;
+}
+
+.filter-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.filter-label-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 下拉選單 */
+.custom-dropdown {
+  position: relative;
+
+  .dropdown-trigger {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 16px;
+    border: 1.5px solid #90caf9;
+    border-radius: 18px;
+    background: #fff;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+      border-color: var(--primary);
+      background: #f4f8ff;
+    }
+
+    .arrow-icon {
+      width: 7px;
+      height: 7px;
+      display: inline-block;
+      border-right: 2px solid var(--primary);
+      border-bottom: 2px solid var(--primary);
+      transform: rotate(45deg);
+      margin-top: -3px;
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 100;
+    min-width: 100%;
+    width: max-content;
+    padding: 6px;
+    border: 1px solid #e3f2fd;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+    .dropdown-item {
+      padding: 9px 16px;
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+
+      &:hover {
+        background: #e3f2fd;
+        color: var(--primary);
+      }
+
+      &.selected {
+        background: var(--primary);
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+/* 篩選彈窗 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.filter-modal-box {
+  width: 580px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 30px 35px;
+  border-radius: 20px;
+  background: #fff;
+  text-align: left;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+
+  h2 {
+    margin-bottom: 25px;
+    color: var(--primary);
+    font-size: 24px;
+    text-align: center;
+  }
+}
+
+.filter-group {
+  margin-bottom: 20px;
+
+  h3 {
+    margin-bottom: 10px;
+    color: #444;
+    font-size: 16px;
+  }
+}
+
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pill-btn {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 20px;
+  background: #e3f2fd;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: #bbdefb;
+  }
+
+  &.active {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+  }
+}

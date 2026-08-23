@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { DisasterDemandService } from '../../core/services/disaster-demand.service';
-import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../models/agency/demand';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemand,  DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
 
-import { SupplyDeleteComponent } from '../modal/supply-delete/supply-delete.component';
-import { PaginationComponent } from '../pagination/pagination.component';
+import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
+import { PaginationComponent } from '../../pagination/pagination.component';
 
 type SortType = 'createdAt' | 'amount' | 'remaining';
 
@@ -16,7 +16,7 @@ type SortType = 'createdAt' | 'amount' | 'remaining';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SupplyDeleteComponent, PaginationComponent],
   templateUrl: './disaster-list.component.html',
-  styleUrl: './disaster-list.component.scss',
+  styleUrls: ['./disaster-list-A.component.scss', './disaster-list-B.component.scss'],
 })
 export class DisasterListComponent implements OnInit, AfterViewInit {
   demands: (DisasterDemand & {
@@ -77,7 +77,6 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     { label: '需求數量', value: 'amount' },
     { label: '剩餘需求', value: 'remaining' },
   ];
-
   // =========================
   // 刪除
   // =========================
