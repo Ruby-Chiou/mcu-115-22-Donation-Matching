@@ -26,8 +26,8 @@
       <div class="select-all">
         <input
           type="checkbox"
-          [(ngModel)]="volunteerSelectAll"
-          (change)="toggleVolunteerAll()"
+          [(ngModel)]="selectAll"
+          (change)="toggleAll()"
         />
 
         <span>全選</span>
@@ -35,12 +35,10 @@
 
       <div
         class="batch-buttons"
-        *ngIf="hasSelectedVolunteer()"
+        *ngIf="hasSelected()"
       >
 
-        <button
-          (click)="editSelectedVolunteer()"
-        >
+        <button (click)="editSelected()">
           編輯
         </button>
 
@@ -82,7 +80,7 @@
 
         <button
           class="sort-icon-btn"
-          (click)="toggleVolunteerSortOrder()"
+          (click)="toggleSortOrder()"
           title="切換排序方向"
         >
           <svg
@@ -107,11 +105,11 @@
 
           <button
             class="dropdown-trigger"
-            (click)="toggleVolunteerSortDropdown()"
-            [class.active]="volunteerSortDropdownOpen"
+            (click)="toggleSortDropdown()"
+            [class.active]="toggleSortDropdown"
           >
             <span>
-              {{ getVolunteerSortLabel() }}
+              {{  getSelectedSortLabel() }}
             </span>
 
             <span class="arrow-icon"></span>
@@ -119,14 +117,14 @@
 
           <div
             class="dropdown-menu"
-            *ngIf="volunteerSortDropdownOpen"
+            *ngIf="isSortDropdownOpen"
           >
 
             <div
-              *ngFor="let opt of volunteerSortOptions"
+              *ngFor="let opt of sortOptions"
               class="dropdown-item"
-              [class.selected]="volunteerSelectedSort === opt.value"
-              (click)="selectVolunteerSort(opt.value)"
+              [class.selected]="selectedSort === opt.value"
+              (click)="selectSortOption(opt.value)"
             >
               {{ opt.label }}
             </div>
@@ -142,7 +140,7 @@
 
         <button
           class="filter-icon-btn"
-          (click)="openVolunteerFilterModal()"
+          (click)="openFilterModal()"
           title="開啟條件篩選"
         >
 
@@ -255,7 +253,7 @@
 
       <!-- 有資料 -->
       <tr
-        *ngFor="let item of filteredVolunteerDemands"
+        *ngFor="let item of pagedDemands"
       >
 
         <!-- 選取 -->
@@ -352,7 +350,7 @@
             </button>
 
             <button
-              (click)="goToVolunteerEdit(item.id!)"
+              (click)="goToEdit(item.id!)"
             >
               編輯
             </button>
@@ -370,7 +368,7 @@
 
             <select
               [(ngModel)]="item.displayStatus"
-              (change)="changeVolunteerStatus(item)"
+              (change)="changeStatus(item)"
               [ngClass]="{
                 'status-on': item.displayStatus === '已上架',
                 'status-hide': item.displayStatus === '隱藏中',
@@ -401,7 +399,7 @@
 
       <!-- 沒有資料 -->
       <tr
-        *ngIf="filteredVolunteerDemands.length === 0"
+        *ngIf="filteredDemands.length === 0"
       >
 
         <td
@@ -426,18 +424,13 @@
   </table>
 
 
-  <!-- =========================
-       志工分頁
-       ★ 放在 volunteer-section 裡
-  ========================== -->
-  <app-pagination
-    [pageSize]="volunteerPageSize"
-    [currentPage]="volunteerCurrentPage"
-    [totalPages]="volunteerTotalPages"
-    [pageNumbers]="volunteerPageNumbers"
-    (pageChange)="goToVolunteerPage($event)"
-  >
-  </app-pagination>
+ <app-pagination
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [pageNumbers]="pageNumbers"
+    (pageChange)="goToPage($event)"
+  ></app-pagination>
 
 </div>
 
@@ -445,15 +438,10 @@
 <!-- =========================
      志工篩選 Modal
 ========================== -->
-<div
-  class="modal-backdrop"
-  *ngIf="showVolunteerFilterModal"
->
-
 <!-- 自訂志工篩選 Modal -->
 <div
   class="modal-backdrop"
-  *ngIf="showVolunteerFilterModal"
+  *ngIf="showFilterModal"
 >
   <div class="modal-box filter-modal-box">
 
@@ -583,7 +571,7 @@
       <button
         type="button"
         class="cancel-btn"
-        (click)="closeVolunteerFilterModal()"
+        (click)="closeFilterModal()"
       >
         取消
       </button>
@@ -601,10 +589,10 @@
   </div>
 </div>
 
-  <app-volunteer-delete
+<app-volunteer-delete
     *ngIf="showDeleteModal"
     [demandIds]="deleteIds"
     [deleteType]="deleteType"
     (closed)="closeDeleteModal()"
     (deleted)="onDeleted()"
-  ></app-volunteer-delete>
+></app-volunteer-delete>

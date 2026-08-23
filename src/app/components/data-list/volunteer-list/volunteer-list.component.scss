@@ -573,13 +573,27 @@ tbody tr:last-child td:last-child {
   }
 }
 
+/* 篩選彈窗 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
 /* 篩選視窗專用樣式 */
 .filter-modal-box {
   width: 580px;
   max-height: 85vh;
   overflow-y: auto;
+  border-radius: 20px;
+  background: #ffffff;
   text-align: left;
   padding: 30px 35px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
 
   h2 {
     text-align: center;

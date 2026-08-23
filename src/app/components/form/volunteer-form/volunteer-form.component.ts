@@ -17,6 +17,14 @@ export class VolunteerFormComponent implements OnInit {
   // 是否為編輯模式
   isEditMode: boolean = false;
 
+  // 是否顯示取消編輯確認視窗
+  showCancelModal = false;
+
+  // 是否顯示儲存成功視窗
+  showSuccessModal = false;
+
+  successMessage = '';
+
   // 編輯中的需求 ID
   editId: number | null = null;
 
@@ -225,12 +233,8 @@ export class VolunteerFormComponent implements OnInit {
         this.demand
       );
 
-      alert('志工需求修改成功！');
-
-      // 回到 demand-list
-      this.router.navigate([
-        '/agency/disaster'
-      ]);
+      this.successMessage = '志工需求修改成功！';
+      this.showSuccessModal = true;
 
       return;
     }
@@ -242,7 +246,7 @@ export class VolunteerFormComponent implements OnInit {
     const newDemand: VolunteerDemand = {
       ...this.demand,
 
-      id: Date.now(),
+      id: this.getNextDemandId(),
 
       createdAt:
         new Date().toISOString(),
@@ -261,12 +265,15 @@ export class VolunteerFormComponent implements OnInit {
       newDemand
     );
 
-    alert('志工需求發布成功！');
+    this.successMessage = '志工需求發布成功！';
+    this.showSuccessModal = true;
+  }
 
-    // 回到需求列表
-    this.router.navigate([
-      '/agency/disaster'
-    ]);
+  private getNextDemandId(): number {
+    const demands = this.volunteerDemandService.getDemands();
+    const maxId = demands.reduce((currentMax, demand) => Math.max(currentMax, demand.id), 0);
+
+    return maxId + 1;
   }
 
   // ==========================================
@@ -277,15 +284,7 @@ export class VolunteerFormComponent implements OnInit {
 
     if (this.isEditMode) {
 
-      if (
-        confirm(
-          '確定要取消嗎？未儲存的修改將會遺失。'
-        )
-      ) {
-        this.router.navigate([
-          '/agency/disaster'
-        ]);
-      }
+      this.showCancelModal = true;
 
       return;
     }
@@ -293,5 +292,19 @@ export class VolunteerFormComponent implements OnInit {
     this.router.navigate([
       '/agency/disaster'
     ]);
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+  }
+
+  confirmCancel(): void {
+    this.showCancelModal = false;
+    this.router.navigate(['/agency/disaster']);
+  }
+
+  closeSuccessModal(): void {
+    this.showSuccessModal = false;
+    this.router.navigate(['/agency/disaster']);
   }
 }

@@ -50,4 +50,8 @@ export type CreateVolunteerDemand = Omit<VolunteerDemand, 'id'>;
 
 
 // 志工需求狀態
-export type VolunteerStatus = '已上架' | '隱藏中' | '已下架';
+// 1. 後端/資料庫真正的狀態型態
+export type VolunteerStatus = '上架' | '隱藏' | '下架';
+
+// 2. 前端畫面 UI 呈現的狀態型態
+export type DisplayVolunteerStatus = '已上架' | '隱藏中' | '已下架';
