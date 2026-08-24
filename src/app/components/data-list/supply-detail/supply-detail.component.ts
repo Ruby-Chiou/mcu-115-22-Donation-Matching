@@ -1,18 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { DisasterDemand } from '../../../models/agency/demand';
+import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
 
 @Component({
   selector: 'app-supply-detail',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SupplyDeleteComponent],
   templateUrl: './supply-detail.component.html',
   styleUrl: './supply-detail.component.scss',
 })
-export class SupplyDetailComponent implements OnInit {
+export class SupplyDetailComponent implements OnInit, AfterViewInit {
   demand?: DisasterDemand;
   showDeleteModal: boolean = false;
+  listNumber?: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,34 +25,46 @@ export class SupplyDetailComponent implements OnInit {
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
+    this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
+
     this.demand = this.service.getDemandById(id);
 
     if (this.demand) {
       this.demand.remaining ??= this.demand.amount ?? 0;
       this.demand.customConditions ??= [];
-      this.demand.customServiceTargets ??= [];
-      this.demand.serviceTargets ??= {};
     }
   }
 
-  // 取得勾選的服務對象，以頓號連結；若皆無則回傳 '無'
-  getSelectedServiceTargets(): string {
-    if (!this.demand) {
-      return '無';
-    }
-
-    const selected = Object.entries(this.demand.serviceTargets || {})
-      .filter(([_, value]) => value)
-      .map(([key]) => key);
-
-    return selected.length > 0 ? selected.join('、') : '無';
+  ngAfterViewInit() {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant',
+      });
+    }, 100);
   }
-  // 檢查是否有有效填寫的其他服務對象
-  hasCustomServiceTargets(): boolean {
-    return (
-      Array.isArray(this.demand?.customServiceTargets) &&
-      this.demand.customServiceTargets.some((target: string) => target && target.trim() !== '')
-    );
+
+  // 開啟刪除視窗
+  openDeleteModal() {
+    this.showDeleteModal = true;
+  }
+
+  // 關閉刪除視窗
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+  }
+
+  // 刪除完成後返回列表
+  onDeleted() {
+    this.showDeleteModal = false;
+    this.router.navigate(['/agency/disaster']);
+  }
+
+  goBack() {
+    this.router.navigate(['/agency/disaster']);
+  }
+  getDeleteIds(): number[] {
+    return this.demand?.id != null ? [this.demand.id] : [];
   }
 
   // 檢查是否有有效填寫的其他物品狀態
@@ -90,30 +104,6 @@ export class SupplyDetailComponent implements OnInit {
     }
 
     return '';
-  }
-
-  // 開啟刪除 Modal
-  openDeleteModal() {
-    this.showDeleteModal = true;
-  }
-
-  // 關閉刪除 Modal
-  closeDeleteModal() {
-    this.showDeleteModal = false;
-  }
-
-  // 確認刪除執行動作
-  confirmDelete() {
-    if (this.demand?.id !== undefined) {
-      this.service.deleteDemand(this.demand.id);
-      this.showDeleteModal = false;
-      this.router.navigate(['/agency/disaster']);
-    }
-  }
-
-  // 取得其他自訂服務對象文字
-  getCustomServiceTargets(): string {
-    return this.demand?.customServiceTargets?.filter((target) => target && target.trim()).join('、') || '無';
   }
 
   // 取得接受物資狀態文字

@@ -1,6 +1,14 @@
 <div class="container">
   <h1>{{ isEditMode ? '編輯緊急需求內容' : '新增急難需求' }}</h1>
 
+  <!-- 編輯模式才顯示需求編號 -->
+  <div class="edit-header-info" *ngIf="isEditMode && demand">
+    <div class="info-tag">
+      <span class="info-label">需求編號</span>
+      <span class="info-value">#{{ demand.id }}</span>
+    </div>
+  </div>
+
   <div class="form-box">
     <!-- 需求物 -->
     <label class="label-row">
@@ -146,7 +154,7 @@
     <!-- 特殊品牌需求 -->
     <label class="label-row">
       特殊品牌需求
-      <span class="word-count"> {{ demand.brand?.length || 0 }}/100 </span>
+      <span class="word-count" *ngIf="demand.brand"> {{ demand.brand.length }}/100 </span>
     </label>
 
     <textarea
@@ -154,66 +162,6 @@
       placeholder="{{ isEditMode ? '請編輯特殊品牌需求，例如：不限品牌、指定品牌、不可接受哪些品牌' : '請輸入特殊品牌需求，例如：不限品牌、指定品牌、不可接受哪些品牌' }}"
       [(ngModel)]="demand.brand"
     ></textarea>
-
-    <!-- 服務對象區塊 -->
-    <div class="service-target-area" [class.error-area]="submitted && !hasServiceTarget">
-      <!-- 左側 固定服務對象 -->
-      <div class="service-target-section">
-        <label class="label-row align-title">
-          服務對象
-          <span class="required">*</span>
-        </label>
-
-        <div class="service-target-box">
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['老人']" /> 老人</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['嬰幼兒']" /> 嬰幼兒</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['孩童']" /> 孩童</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['青少年']" /> 青少年</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['身障']" /> 身障</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['貧困']" /> 貧困</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['重症照護']" /> 重症照護</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['寵物']" /> 寵物</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['流浪']" /> 流浪</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['野生']" /> 野生</label>
-        </div>
-      </div>
-
-      <!-- 右側 自訂服務對象 -->
-      <div class="custom-service-target-section">
-        <label class="label-row align-title"> 其他服務對象 </label>
-
-        <div class="custom-service-list">
-          <div class="custom-service-row" *ngFor="let target of demand.customServiceTargets; let i = index; trackBy: trackByIndex">
-            <input
-              class="custom-service-input"
-              maxlength="50"
-              placeholder="{{ isEditMode ? '請編輯其他服務對象(可自行輸入)' : '請輸入其他服務對象(可自行輸入)' }}"
-              [(ngModel)]="demand.customServiceTargets[i]"
-            />
-
-            <span class="word-count" *ngIf="target"> {{ target.length }}/50 </span>
-
-            <button
-              type="button"
-              class="add-condition-btn"
-              *ngIf="target && demand.customServiceTargets.length < 5"
-              (click)="addCustomServiceTarget()"
-            >
-              ＋
-            </button>
-
-            <button
-              type="button"
-              class="delete-condition-btn"
-              *ngIf="demand.customServiceTargets.length > 1"
-              (click)="removeCustomServiceTarget(i)"
-            >
-              －
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- 物資狀態區（完美鏡射上方對齊架構） -->
     <div class="condition-area">

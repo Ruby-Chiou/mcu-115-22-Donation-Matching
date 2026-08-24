@@ -21,12 +21,12 @@
   <div class="detail-image">
     <img
       src='https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-      alt="志工需求">
+      [alt]="volunteer.title">
   </div>
 <!-- 右邊：志工資訊 -->
   <div class="detail-info">
     <h2>
-      物資搬運
+      {{ volunteer.title }}
     </h2>
     <!-- 緊急程度 -->
     <div class="urgency urgent">
@@ -42,7 +42,7 @@
         需求人數
       </span>
       <strong>
-        10 人
+        {{ volunteer.required }} 人
       </strong>
     </div>
     <div class="info-item">
@@ -50,7 +50,7 @@
         已報名
       </span>
       <strong>
-        6 人
+        {{ volunteer.registered }} 人
       </strong>
     </div>
     <div class="info-item">
@@ -58,7 +58,7 @@
         剩餘需求
       </span>
       <strong>
-        4 人
+        {{ getRemaining() }} 人
       </strong>
     </div>
   </div>
@@ -69,13 +69,13 @@
         報名進度
       </span>
       <strong>
-        60%
+        {{ getProgress() | number:'1.0-0' }}%
       </strong>
     </div>
     <div class="progress-bar">
       <div
         class="progress"
-        style="width: 60%;">
+        [style.width.%]="getProgress()">
       </div>
     </div>
   </div>
@@ -85,7 +85,7 @@
         需求單位
       </span>
       <strong>
-        🏢 花蓮縣救災中心
+        🏢 {{ volunteer.organization }}
       </strong>
     </div>
     <div class="join-section">
@@ -113,7 +113,7 @@
       📍 服務地點
     </span>
     <strong>
-      花蓮縣光復鄉
+      {{ volunteer.location }}
     </strong>
   </div>
   <div class="service-item">
@@ -121,7 +121,7 @@
       🏠 詳細地址
     </span>
     <strong>
-      花蓮縣光復鄉大馬村中學街158號
+      {{ volunteer.address }}
     </strong>
   </div>
   <div class="service-item">
@@ -129,7 +129,7 @@
       📅 服務日期
     </span>
     <strong>
-      2026/08/20
+      {{ volunteer.date }}
     </strong>
   </div>
   <div class="service-item">
@@ -137,7 +137,7 @@
       🕐 服務時間
     </span>
     <strong>
-      08:00 ～ 17:00
+      {{ volunteer.serviceTime }}
     </strong>
   </div>
   </div>
@@ -151,11 +151,10 @@
       工作內容
     </h2>
     <p>
-      協助災區物資搬運、分類及整理。
+      {{ volunteer.description }}
     </p>
     <p>
-      志工將協助救災中心處理每日收到的救援物資，
-      並將物資分類後分送至有需要的災區。
+      {{ volunteer.organization }} 將依照現場需求安排志工工作。
     </p>
   </div>
 
@@ -168,19 +167,9 @@
     </h2>
     <ul>
       <li>
-        年滿 18 歲
-      </li>
-      <li>
-        能配合物資搬運工作
-      </li>
-      <li>
-        請穿著方便活動的服裝
-      </li>
-      <li>
-        工作期間請遵守現場工作人員指示
-      </li>
-      <li>
-        如有身體不適，請立即告知現場工作人員
+        @for (requirement of volunteer.requirements; track requirement) {
+          <li>{{ requirement }}</li>
+        }
       </li>
     </ul>
   </div>
@@ -198,7 +187,7 @@
         單位名稱
       </span>
       <strong>
-        花蓮縣救災中心
+        {{ volunteer.organization }}
       </strong>
     </div>
   <div class="organization-item">
@@ -206,7 +195,7 @@
       聯絡人
     </span>
     <strong>
-      王先生
+      {{ volunteer.contactPerson }}
     </strong>
   </div>
   <div class="organization-item">
@@ -214,7 +203,7 @@
       聯絡電話
     </span>
     <strong>
-      03-1234567
+      {{ volunteer.phone }}
     </strong>
   </div>
   <div class="organization-item">
@@ -222,7 +211,7 @@
       聯絡地址
     </span>
     <strong>
-      花蓮縣花蓮市中山路 100 號
+      {{ volunteer.contactAddress }}
     </strong>
   </div>
   </div>

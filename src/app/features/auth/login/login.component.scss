@@ -1,0 +1,40 @@
+/* filepath: c:\mcu-115-22-Donation-Matching\src\app\features\auth\login\login.component.scss */
+:host {
+  display: block;
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+.role-page {
+  width: min(820px, 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 48px;
+}
+
+.form-card {
+  width: min(820px, 100%);
+  padding: 40px 44px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--color-white) 0%, var(--bg-form) 100%);
+  box-shadow: var(--shadow-xl);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 700px) {
+  .form-card {
+    padding: 24px;
+  }
+}

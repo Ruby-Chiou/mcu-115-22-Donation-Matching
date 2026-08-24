@@ -1,0 +1,56 @@
+<form class="login-form" (ngSubmit)="onSubmit()">
+  <div class="form-header">
+    <div>
+      <h2>捐助者登入</h2>
+      <p>歡迎登入，請輸入帳號與密碼。</p>
+    </div>
+    <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
+  </div>
+
+  <div class="social-login">
+    <div class="social-row">
+      <p>或使用其它應用登入帳號</p>
+      <div class="social-buttons">
+        <button type="button" class="social-btn google" (click)="socialRegister('google')">
+          Google<i class="fa-brands fa-google" style="color: #4285f4"></i>
+        </button>
+        <button type="button" class="social-btn line" (click)="socialRegister('line')">
+          LINE<i class="fa-brands fa-line" style="color: #06c755"></i>
+        </button>
+        <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')">
+          Facebook<i class="fa-brands fa-facebook" style="color: #1877f2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-grid">
+    <label class="field full">
+      <span>電子信箱</span>
+      <input type="email" [(ngModel)]="loginForm.email" name="email" required />
+    </label>
+
+    <label class="field full">
+      <span>密碼</span>
+      <input type="password" [(ngModel)]="loginForm.password" name="password" required />
+    </label>
+  </div>
+
+  <div class="actions">
+    <label class="remember">
+      <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
+      <span>記住我</span>
+    </label>
+
+    <div class="action-links">
+      <a routerLink="/register" class="link-btn">尚未註冊帳號？</a>
+      <button type="button" class="link-btn" (click)="onForgotPassword()">忘記密碼？</button>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button type="submit" class="primary-btn">登入</button>
+  </div>
+
+  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+</form>

@@ -1,0 +1,287 @@
+<div class="container">
+  <h1>急難需求列表</h1>
+
+  <!-- 頂部按鈕區 -->
+  <div class="top-action-bar">
+    <button class="add-btn" (click)="goToAddDemand()">新增需求</button>
+  </div>
+
+  <!-- 表格上方工具列：左側全選/批次 + 右側搜尋、排序與篩選 -->
+  <div class="toolbar-row">
+    <div class="select-area">
+      <div class="select-all">
+        <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
+        <span>全選</span>
+      </div>
+
+      <div class="batch-buttons" *ngIf="hasSelected()">
+        <button (click)="editSelected()">編輯</button>
+        <button class="batch-delete-btn" (click)="openBatchDeleteModal()">刪除</button>
+      </div>
+    </div>
+
+    <!-- 右側操作區：搜尋 + 排序 + 篩選 -->
+    <div class="right-toolbar">
+      <!-- 搜尋框區 -->
+      <div class="search-box">
+        <svg
+          class="search-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          (click)="onSearch()"
+          title="搜尋"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" placeholder="搜尋需求物或類別..." [(ngModel)]="searchTerm" (input)="onSearch()" (keyup.enter)="onSearch()" />
+        <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()" title="清除搜尋">✕</button>
+      </div>
+
+      <!-- 排序區 -->
+      <div class="sort-group">
+        <button class="sort-icon-btn" (click)="toggleSortOrder()" title="切換排序方向">
+          <svg
+            class="sort-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M7 4v16M7 4l-4 4M7 4l4 4M17 20V4M17 20l4-4M17 20l-4-4" />
+          </svg>
+        </button>
+
+        <!-- 自訂質感下拉選單 -->
+        <div class="custom-dropdown" (click)="$event.stopPropagation()">
+          <button class="dropdown-trigger" (click)="toggleSortDropdown()" [class.active]="isSortDropdownOpen">
+            <span>{{ getSelectedSortLabel() }}</span>
+            <span class="arrow-icon"></span>
+          </button>
+
+          <!-- 展開選單面板 -->
+          <div class="dropdown-menu" *ngIf="isSortDropdownOpen">
+            <div
+              *ngFor="let opt of sortOptions"
+              class="dropdown-item"
+              [class.selected]="selectedSort === opt.value"
+              (click)="selectSortOption(opt.value)"
+            >
+              {{ opt.label }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 篩選按鈕區 -->
+      <div class="filter-trigger-group">
+        <button class="filter-icon-btn" (click)="openFilterModal()" title="開啟條件篩選">
+          <svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            <line x1="15" y1="11" x2="21" y2="11"></line>
+            <line x1="17" y1="15" x2="21" y2="15"></line>
+            <line x1="19" y1="19" x2="21" y2="19"></line>
+          </svg>
+        </button>
+        <span class="filter-label-text">篩選</span>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <!-- 無資料 -->
+    <tr *ngIf="filteredDemands.length === 0">
+      <td colspan="10" class="empty-message">
+        <div class="empty-title">尚未輸入需求或無符合條件的需求</div>
+        <div class="empty-description">請點選上方「新增需求」建立急難需求，或嘗試重新篩選。</div>
+      </td>
+    </tr>
+
+    <!-- 調整後的欄位寬度配比 -->
+    <thead *ngIf="filteredDemands.length > 0">
+      <tr>
+        <th class="checkbox-column" style="width: 55px">選取</th>
+        <th style="width: 60px">編號</th>
+        <th class="item-column" style="width: auto">需求物</th>
+        <!-- 自動吸收到最大剩餘空間 -->
+        <th class="category-column" style="width: 90px">類別</th>
+        <th style="width: 100px">需求數量</th>
+        <th style="width: 105px">緊急優先度</th>
+        <th style="width: 100px">剩餘需求</th>
+        <th class="created-time-column" style="width: 110px">發布時間</th>
+        <th class="message-column" style="width: 75px">留言區</th>
+        <th class="operation-column" style="width: 380px">操作</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of pagedDemands">
+        <td class="checkbox-column">
+          <input type="checkbox" [(ngModel)]="item.selected" />
+        </td>
+
+        <td class="id-column">{{ item.id }}</td>
+
+        <td class="item-column" [title]="item.item">
+          <div class="item-text">{{item.item}}</div>
+        </td>
+        <td class="category-column">{{item.category}}</td>
+        <td>{{item.amount}}{{item.unit}}</td>
+
+        <!-- 優先度顏色 -->
+        <td
+          [ngClass]="{
+            'normal': item.priority === '普通',
+            'urgent': item.priority === '緊急',
+            'very-urgent': item.priority === '非常緊急'
+          }"
+        >
+          {{item.priority}}
+        </td>
+
+        <td>{{item.remaining}}{{item.unit}}</td>
+
+        <td class="created-time-column">{{item.displayCreatedAt}}</td>
+
+        <td class="message-column">
+          <a [routerLink]="['/agency/disaster-message', item.id]"> {{item.messageCount || 0}} </a>
+        </td>
+
+        <!-- 操作 -->
+        <td class="operation-column">
+          <div class="operation-flex">
+            <button (click)="goToDetail(item.id!)">查看</button>
+            <button (click)="goToEdit(item.id!)">編輯</button>
+            <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
+
+            <label class="status-label"> 狀態： </label>
+            <select
+              [(ngModel)]="item.displayStatus"
+              (change)="changeStatus(item)"
+              [ngClass]="{
+                'status-on': item.displayStatus === '已上架',
+                'status-hide': item.displayStatus === '隱藏中',
+                'status-off': item.displayStatus === '已下架'
+              }"
+            >
+              <option value="已上架">已上架</option>
+              <option value="隱藏中">隱藏中</option>
+              <option value="已下架">已下架</option>
+            </select>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <app-pagination
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [pageNumbers]="pageNumbers"
+    (pageChange)="goToPage($event)"
+  ></app-pagination>
+
+  <!-- 自訂篩選彈出視窗 Modal -->
+  <div class="modal-backdrop" *ngIf="showFilterModal">
+    <div class="modal-box filter-modal-box">
+      <h2>條件篩選</h2>
+
+      <div class="filter-content">
+        <!-- 依上架狀態 -->
+        <div class="filter-group">
+          <h3>依上架狀態</h3>
+          <div class="pill-list">
+            <button
+              *ngFor="let opt of statusOptions"
+              class="pill-btn"
+              [class.active]="selectedFilters.status.includes(opt)"
+              (click)="toggleFilter('status', opt)"
+            >
+              {{opt}}
+            </button>
+          </div>
+        </div>
+
+        <!-- 依優先度 -->
+        <div class="filter-group">
+          <h3>依優先度</h3>
+          <div class="pill-list">
+            <button
+              *ngFor="let opt of priorityOptions"
+              class="pill-btn"
+              [class.active]="selectedFilters.priority.includes(opt)"
+              (click)="toggleFilter('priority', opt)"
+            >
+              {{opt}}
+            </button>
+          </div>
+        </div>
+
+        <!-- 低剩餘項目 -->
+        <div class="filter-group">
+          <h3>剩餘數量</h3>
+          <div class="pill-list">
+            <button
+              class="pill-btn"
+              [class.active]="selectedFilters.lowRemaining"
+              (click)="selectedFilters.lowRemaining = !selectedFilters.lowRemaining"
+            >
+              顯示尚有剩餘項目
+            </button>
+          </div>
+        </div>
+
+        <!-- 依類別 -->
+        <div class="filter-group">
+          <h3>依類別</h3>
+          <div class="pill-list">
+            <button
+              *ngFor="let opt of categoryOptions"
+              class="pill-btn"
+              [class.active]="selectedFilters.category.includes(opt)"
+              (click)="toggleFilter('category', opt)"
+            >
+              {{opt}}
+            </button>
+          </div>
+        </div>
+
+        <!-- 依聯絡狀態 -->
+        <div class="filter-group">
+          <h3>依聯絡/留言狀態</h3>
+          <div class="pill-list">
+            <button
+              *ngFor="let opt of messageOptions"
+              class="pill-btn"
+              [class.active]="selectedFilters.messageStatus.includes(opt)"
+              (click)="toggleFilter('messageStatus', opt)"
+            >
+              {{opt}}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-buttons filter-buttons">
+        <button class="reset-btn" (click)="resetFilters()">重置篩選</button>
+        <button class="cancel-btn" (click)="closeFilterModal()">取消</button>
+        <button class="filter-confirm-btn" (click)="applyFilters()">確定</button>
+      </div>
+    </div>
+  </div>
+
+  <app-supply-delete
+    *ngIf="showDeleteModal"
+    [demandIds]="deleteIds"
+    [deleteType]="deleteType"
+    (closed)="closeDeleteModal()"
+    (deleted)="onDeleted()"
+  ></app-supply-delete>
+</div>

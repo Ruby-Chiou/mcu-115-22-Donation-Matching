@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DisasterDemand, CreateDisasterDemand } from '../../../models/agency/demand';
+import { DisasterDemand, CreateDisasterDemand } from '../../models/agency/demand';
 
 @Injectable({
   providedIn: 'root',
@@ -32,19 +32,6 @@ export class DisasterDemandService {
       address: '花蓮縣花蓮市中央路三段',
       phone: '03-8230000',
       note: '請於每日09:00至17:00送達。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: false,
-        身障: true,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['獨居家庭'],
     },
 
     {
@@ -73,19 +60,6 @@ export class DisasterDemandService {
       address: '台北市萬華區',
       phone: '02-23000000',
       note: '可接受郵寄。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['街友家庭'],
     },
 
     {
@@ -114,19 +88,6 @@ export class DisasterDemandService {
       address: '台南市安南區',
       phone: '06-2550000',
       note: '',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: true,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['災後清潔志工'],
     },
 
     {
@@ -154,19 +115,6 @@ export class DisasterDemandService {
       address: '高雄市鳳山區',
       phone: '07-7000000',
       note: '目前尚未公開募集。',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: true,
-        孩童: true,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['育兒家庭'],
     },
 
     {
@@ -195,19 +143,6 @@ export class DisasterDemandService {
       address: '宜蘭縣羅東鎮',
       phone: '03-9540000',
       note: '需求已暫時補足。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: true,
-        孩童: true,
-        青少年: false,
-        身障: true,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['臨時安置戶'],
     },
     {
       id: 6,
@@ -235,19 +170,6 @@ export class DisasterDemandService {
       address: '嘉義縣阿里山鄉',
       phone: '05-2670000',
       note: '大型物資車可直接進入。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: true,
-        孩童: true,
-        青少年: true,
-        身障: true,
-        貧困: true,
-        重症照護: true,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['災民家庭'],
     },
 
     {
@@ -276,19 +198,6 @@ export class DisasterDemandService {
       address: '屏東縣東港鎮',
       phone: '08-8320000',
       note: '',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: true,
-        野生: false,
-      },
-      customServiceTargets: ['街友'],
     },
 
     {
@@ -317,19 +226,6 @@ export class DisasterDemandService {
       address: '新竹縣尖石鄉',
       phone: '03-5840000',
       note: '',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: true,
-        貧困: false,
-        重症照護: true,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['慢性病患者'],
     },
 
     {
@@ -358,19 +254,6 @@ export class DisasterDemandService {
       address: '台中市和平區',
       phone: '04-2590000',
       note: '',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['弱勢學生'],
     },
 
     {
@@ -398,19 +281,6 @@ export class DisasterDemandService {
       address: '台東縣成功鎮',
       phone: '089-850000',
       note: '',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: false,
-        重症照護: false,
-        寵物: true,
-        流浪: true,
-        野生: false,
-      },
-      customServiceTargets: ['受災飼主'],
     },
     {
       id: 11,
@@ -438,19 +308,6 @@ export class DisasterDemandService {
       address: '嘉義縣阿里山鄉',
       phone: '05-2670000',
       note: '大型物資車可直接進入。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: true,
-        孩童: true,
-        青少年: true,
-        身障: true,
-        貧困: true,
-        重症照護: true,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['災民家庭'],
     },
 
     {
@@ -478,19 +335,6 @@ export class DisasterDemandService {
       address: '屏東縣東港鎮',
       phone: '08-8320000',
       note: '',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: true,
-        野生: false,
-      },
-      customServiceTargets: ['街友'],
     },
 
     {
@@ -519,19 +363,6 @@ export class DisasterDemandService {
       address: '新竹縣尖石鄉',
       phone: '03-5840000',
       note: '',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: true,
-        貧困: false,
-        重症照護: true,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['慢性病患者'],
     },
 
     {
@@ -560,19 +391,6 @@ export class DisasterDemandService {
       address: '台中市和平區',
       phone: '04-2590000',
       note: '',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['弱勢學生'],
     },
 
     {
@@ -600,19 +418,6 @@ export class DisasterDemandService {
       address: '台東縣成功鎮',
       phone: '089-850000',
       note: '',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: false,
-        重症照護: false,
-        寵物: true,
-        流浪: true,
-        野生: false,
-      },
-      customServiceTargets: ['受災飼主'],
     },
     {
       id: 16,
@@ -640,19 +445,6 @@ export class DisasterDemandService {
       address: '高雄市旗山區',
       phone: '07-6600000',
       note: '此需求為災後大型家庭補給專案，若一次提供大量物資請提前聯繫，以方便安排倉儲空間、分類整理以及後續配送流程。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: true,
-        孩童: true,
-        青少年: true,
-        身障: true,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['災後失去住所家庭'],
     },
     {
       id: 17,
@@ -680,19 +472,6 @@ export class DisasterDemandService {
       address: '苗栗縣南庄鄉',
       phone: '037-823000',
       note: '若為二手用品請先清潔消毒。',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: true,
-        孩童: true,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['安置中心兒童'],
     },
 
     {
@@ -720,19 +499,6 @@ export class DisasterDemandService {
       address: '南投縣埔里鎮',
       phone: '049-2900000',
       note: '大型輔具請提前預約搬運。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: true,
-        貧困: true,
-        重症照護: true,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['行動不便居民'],
     },
 
     {
@@ -761,19 +527,6 @@ export class DisasterDemandService {
       address: '新北市瑞芳區',
       phone: '02-24970000',
       note: '需求已完成，因此暫停募集。',
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: true,
-        貧困: true,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: false,
-      },
-      customServiceTargets: ['災後清潔家庭'],
     },
 
     {
@@ -801,19 +554,6 @@ export class DisasterDemandService {
       address: '花蓮縣壽豐鄉',
       phone: '03-8650000',
       note: '目前尚未公開募集，等待救援單位確認。',
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: false,
-        重症照護: false,
-        寵物: false,
-        流浪: false,
-        野生: true,
-      },
-      customServiceTargets: ['野生動物救援中心'],
     },
   ];
 

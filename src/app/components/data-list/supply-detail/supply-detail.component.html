@@ -1,11 +1,22 @@
 <div class="container">
   <h1>急難需求詳細資料</h1>
 
+  <!-- 方案一：資訊膠囊樣式（已加大編號字體） -->
+  <div class="detail-header-info" *ngIf="demand">
+    <div class="info-tag">
+      <span class="info-label">需求編號</span>
+      <span class="info-value">#{{ listNumber }}</span>
+    </div>
+  </div>
+
   <div class="detail-table" *ngIf="demand">
     <!-- 需求物 -->
     <div class="detail-row">
       <div class="detail-title">需求物</div>
-      <div class="detail-content">{{ demand.item }}</div>
+
+      <div class="detail-content item-detail-content">
+        <div class="detail-item-name">{{ demand.item }}</div>
+      </div>
     </div>
 
     <!-- 需求數量 -->
@@ -48,23 +59,6 @@
     <div class="detail-row">
       <div class="detail-title">特殊品牌需求</div>
       <div class="detail-content">{{ demand.brand || '無' }}</div>
-    </div>
-
-    <!-- 服務對象 -->
-    <div class="detail-row">
-      <div class="detail-title">服務對象</div>
-      <div class="detail-content">{{ getSelectedServiceTargets() }}</div>
-    </div>
-
-    <!-- 其他自訂服務對象 -->
-    <div class="detail-row">
-      <div class="detail-title">其他自訂服務對象</div>
-
-      <div class="detail-content">
-        <ng-container *ngIf="hasCustomServiceTargets(); else noServiceTarget"> {{ getCustomServiceTargets() }} </ng-container>
-
-        <ng-template #noServiceTarget>無</ng-template>
-      </div>
     </div>
 
     <!-- 接受物資狀態 -->
@@ -128,21 +122,17 @@
   <!-- detail-table 結束 -->
 
   <div class="button-area">
-    <button class="back-btn" routerLink="/agency/disaster">返回</button>
+    <button class="back-btn" (click)="goBack()">返回</button>
     <button class="edit-btn" [routerLink]="['/agency/supply-edit', demand?.id]" [queryParams]="{ from: 'detail' }">編輯</button>
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>
 
-<!-- 刪除確認 Modal -->
-<div class="modal-backdrop" *ngIf="showDeleteModal">
-  <div class="modal-box">
-    <h2>確認刪除</h2>
-    <p>確定要刪除此筆急難需求嗎？</p>
-
-    <div class="modal-actions">
-      <button class="cancel-btn" (click)="closeDeleteModal()">取消</button>
-      <button class="confirm-btn" (click)="confirmDelete()">確定刪除</button>
-    </div>
-  </div>
-</div>
+<app-supply-delete
+  *ngIf="showDeleteModal"
+  [demandIds]="getDeleteIds()"
+  [deleteType]="'single'"
+  (closed)="closeDeleteModal()"
+  (deleted)="onDeleted()"
+>
+</app-supply-delete>

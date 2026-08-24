@@ -1,23 +1,22 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DisasterDemandService } from '../../core/services/disaster-demand.service';
+import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { DisasterDemand } from '../../../models/agency/demand';
+import { DailyDemand } from '../../../models/agency/daily-demand';
 
 @Component({
-  selector: 'app-supply-create',
+  selector: 'app-daily-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './supply-create.component.html',
-  styleUrl: './supply-create.component.scss',
+  templateUrl: './daily-form.component.html',
+  styleUrls: ['./daily-form-A.component.scss', './daily-form-B.component.scss'],
 })
-export class SupplyCreateComponent implements OnInit {
+export class DailyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
   submitted = false;
-  hasServiceTarget = true;
-
   fromDetail = false;
+  hasServiceTarget = true;
 
   @ViewChild('itemInput') itemInput!: ElementRef;
   @ViewChild('amountInput') amountInput!: ElementRef;
@@ -27,7 +26,7 @@ export class SupplyCreateComponent implements OnInit {
   @ViewChild('reasonInput') reasonInput!: ElementRef;
   @ViewChild('descriptionInput') descriptionInput!: ElementRef;
 
-  demand: DisasterDemand = {
+  demand: DailyDemand = {
     id: 0,
     item: '',
     amount: null,
@@ -36,25 +35,7 @@ export class SupplyCreateComponent implements OnInit {
     reason: '',
     description: '',
 
-    // 接受物資狀態
-    conditions: {
-      全新: '',
-      二手: '',
-      有擦痕: '',
-      過期: '',
-      毀損: '',
-    },
-
-    customConditions: [''],
-
-    priority: '普通',
-    status: '上架',
-    address: '',
-    phone: '',
-    note: '',
-    brand: '',
-    category: '',
-
+    //服務對象
     serviceTargets: {
       老人: false,
       嬰幼兒: false,
@@ -69,10 +50,34 @@ export class SupplyCreateComponent implements OnInit {
     },
 
     customServiceTargets: [''],
+
+    // 接受物資狀態
+    conditions: {
+      全新: '',
+      二手: '',
+      有擦痕: '',
+      過期: '',
+      毀損: '',
+    },
+
+    customConditions: [''],
+
+    priority: '普通',
+    status: '上架',
+
+    // 接收方式
+    receiveMethod: '寄送',
+    recipient: '',
+    address: '',
+    phone: '',
+
+    note: '',
+    brand: '',
+    category: '',
   };
 
   constructor(
-    private disasterDemandService: DisasterDemandService,
+    private dailyDemandService: DailyDemandService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -86,13 +91,30 @@ export class SupplyCreateComponent implements OnInit {
     if (id) {
       this.isEditMode = true;
 
-      const data = this.disasterDemandService.getDemands().find((item) => item.id === id);
+      const data = this.dailyDemandService.getDemands().find((item) => item.id === id);
 
       if (data) {
         this.demand = {
           ...data,
           status: data.status ?? '上架',
           remaining: data.remaining ?? null,
+          receiveMethod: data.receiveMethod ?? '寄送',
+          recipient: data.recipient ?? '',
+
+          serviceTargets: data.serviceTargets ?? {
+            老人: false,
+            嬰幼兒: false,
+            孩童: false,
+            青少年: false,
+            身障: false,
+            貧困: false,
+            重症照護: false,
+            寵物: false,
+            流浪: false,
+            野生: false,
+          },
+
+          customServiceTargets: data.customServiceTargets?.length ? data.customServiceTargets : [''],
 
           conditions: data.conditions ?? {
             全新: '',
@@ -103,11 +125,18 @@ export class SupplyCreateComponent implements OnInit {
           },
 
           customConditions: data.customConditions?.length ? data.customConditions : [''],
-
-          customServiceTargets: data.customServiceTargets?.length ? data.customServiceTargets : [''],
         };
       }
     }
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant',
+      });
+    }, 0);
   }
 
   save() {
@@ -117,6 +146,11 @@ export class SupplyCreateComponent implements OnInit {
       Object.values(this.demand.serviceTargets).some((value: boolean) => value) ||
       this.demand.customServiceTargets.some((target) => target.trim());
 
+    const invalidReceiveInfo =
+      !this.demand.receiveMethod ||
+      (this.demand.receiveMethod === '寄送' && (!this.demand.recipient || !this.demand.address)) ||
+      (this.demand.receiveMethod === '面交' && !this.demand.address);
+
     if (
       !this.demand.item ||
       !this.demand.amount ||
@@ -124,7 +158,7 @@ export class SupplyCreateComponent implements OnInit {
       !this.demand.category ||
       !this.demand.reason ||
       !this.demand.description ||
-      !this.demand.address ||
+      invalidReceiveInfo ||
       !this.demand.phone ||
       (this.isEditMode && (this.demand.remaining === null || this.demand.remaining === undefined))
     ) {
@@ -163,6 +197,26 @@ export class SupplyCreateComponent implements OnInit {
           behavior: 'smooth',
           block: 'center',
         });
+      } else if (!this.demand.receiveMethod) {
+        document.querySelector('.receive-method-box')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      } else if (this.demand.receiveMethod === '寄送' && !this.demand.recipient) {
+        document.querySelector('.receive-info-box')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      } else if (this.demand.receiveMethod === '寄送' && !this.demand.address) {
+        document.querySelector('.receive-info-box')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      } else if (this.demand.receiveMethod === '面交' && !this.demand.address) {
+        document.querySelector('.receive-info-box')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
       }
 
       return;
@@ -175,14 +229,11 @@ export class SupplyCreateComponent implements OnInit {
 
     // 清除空白的自訂欄位
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
-
     this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
-
     // 保留至少一個輸入框
     if (this.demand.customConditions.length === 0) {
       this.demand.customConditions.push('');
     }
-
     if (this.demand.customServiceTargets.length === 0) {
       this.demand.customServiceTargets.push('');
     }
@@ -198,12 +249,12 @@ export class SupplyCreateComponent implements OnInit {
         this.demand.createdAt = undefined;
       }
 
-      this.disasterDemandService.updateDemand(this.demand);
+      this.dailyDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
-        this.router.navigate(['/agency/supply-detail', this.demand.id]);
+        this.router.navigate(['/agency/daily-detail', this.demand.id]);
       } else {
-        this.router.navigate(['/agency/disaster']);
+        this.router.navigate(['/agency/daily']);
       }
     } else {
       // 新增時只有上架才有發布時間
@@ -213,9 +264,9 @@ export class SupplyCreateComponent implements OnInit {
         this.demand.createdAt = undefined;
       }
 
-      this.disasterDemandService.addDemand(this.demand);
+      this.dailyDemandService.addDemand(this.demand);
 
-      this.router.navigate(['/agency/disaster']);
+      this.router.navigate(['/agency/daily']);
     }
   }
 
@@ -232,8 +283,31 @@ export class SupplyCreateComponent implements OnInit {
       this.demand.customConditions.push('');
     }
   }
+  addCustomServiceTarget() {
+    if (this.demand.customServiceTargets.length < 5) {
+      this.demand.customServiceTargets.push('');
+    }
+  }
 
-  toggleCondition(key: keyof DisasterDemand['conditions']) {
+  removeCustomServiceTarget(index: number) {
+    this.demand.customServiceTargets.splice(index, 1);
+
+    if (this.demand.customServiceTargets.length === 0) {
+      this.demand.customServiceTargets.push('');
+    }
+  }
+  scrollToServiceTarget() {
+    const element = document.querySelector('.service-target-area');
+
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }
+
+  toggleCondition(key: keyof DailyDemand['conditions']) {
     const current = this.demand.conditions[key];
 
     if (current === '') {
@@ -301,32 +375,18 @@ export class SupplyCreateComponent implements OnInit {
     }
   }
 
-  addCustomServiceTarget() {
-    if (this.demand.customServiceTargets.length < 5) {
-      this.demand.customServiceTargets.push('');
+  onReceiveMethodChange(method: '寄送' | '面交') {
+    if (method === '寄送') {
+      this.demand.address = '';
     }
-  }
 
-  removeCustomServiceTarget(index: number) {
-    this.demand.customServiceTargets.splice(index, 1);
-
-    if (this.demand.customServiceTargets.length === 0) {
-      this.demand.customServiceTargets.push('');
+    if (method === '面交') {
+      this.demand.recipient = '';
+      this.demand.address = '';
     }
   }
 
   trackByIndex(index: number): number {
     return index;
-  }
-
-  scrollToServiceTarget() {
-    const element = document.querySelector('.service-target-area');
-
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }
   }
 }

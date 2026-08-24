@@ -1,0 +1,523 @@
+<div class="container">
+  <h1>批次編輯日常需求內容</h1>
+
+  <div class="form-box" [ngClass]="i % 2 === 0 ? 'light-box' : 'dark-box'" *ngFor="let demand of editDemands; let i = index">
+    <div class="batch-edit-header">
+      <div class="info-tag" *ngIf="demand.id">
+        <span class="info-label">需求編號</span>
+        <span class="info-value">#{{ demand.id }}</span>
+      </div>
+    </div>
+
+    <!-- 需求物 -->
+    <label class="label-row">
+      需求物
+      <span class="required">*</span>
+      <span class="word-count" *ngIf="demand.item"> {{ demand.item.length }}/150 </span>
+    </label>
+
+    <textarea
+      class="item-input"
+      maxlength="150"
+      [class.invalid]="demand.itemError"
+      placeholder="請編輯需求物"
+      [(ngModel)]="demand.item"
+    ></textarea>
+
+    <!-- 需求數量與單位 -->
+    <label class="label-row">
+      需求數量
+      <span class="required">*</span>
+      <span class="word-count" *ngIf="demand.amount"> {{ demand.amount.toString().length }}/10 </span>
+    </label>
+
+    <div class="amount-box">
+      <input
+        class="short-input"
+        maxlength="10"
+        [class.invalid]="demand.amountError"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        placeholder="請編輯數量"
+        [(ngModel)]="demand.amount"
+        (input)="limitNumberLength($event, demand, 'amount')"
+      />
+
+      <input
+        class="unit-input"
+        maxlength="10"
+        [class.invalid]="demand.unitError"
+        type="text"
+        placeholder="請編輯單位，例如：箱、袋、包"
+        [(ngModel)]="demand.unit"
+      />
+    </div>
+
+    <!-- 剩餘需求 -->
+    <label class="label-row">
+      剩餘需求
+      <span class="required">*</span>
+      <span class="word-count" *ngIf="demand.remaining"> {{ demand.remaining.toString().length }}/10 </span>
+    </label>
+
+    <div class="amount-box">
+      <input
+        class="short-input"
+        maxlength="10"
+        [class.invalid]="demand.remainingError"
+        type="text"
+        inputmode="numeric"
+        placeholder="請輸入目前剩餘需求"
+        [(ngModel)]="demand.remaining"
+        (input)="limitNumberLength($event, demand, 'remaining')"
+      />
+
+      <input class="unit-input" type="text" [value]="demand.unit" disabled />
+    </div>
+
+    <!-- 數量描述 -->
+    <label class="label-row">
+      數量描述
+      <span class="word-count" *ngIf="demand.amountDescription"> {{ demand.amountDescription.length }}/100 </span>
+    </label>
+
+    <div class="short-field">
+      <textarea
+        maxlength="100"
+        placeholder="請編輯數量描述，例如：1箱內含10包，每包5公斤"
+        [(ngModel)]="demand.amountDescription"
+      ></textarea>
+    </div>
+
+    <label class="label-row">
+      類別
+      <span class="required">*</span>
+    </label>
+
+    <div class="short-field">
+      <select [class.invalid]="demand.categoryError" [(ngModel)]="demand.category">
+        <option value="">請選擇類別</option>
+        <option value="食物">食物</option>
+        <option value="衣物">衣物</option>
+        <option value="醫療">醫療</option>
+        <option value="嬰幼兒">嬰幼兒</option>
+        <option value="生活用品">生活用品</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+
+    <!-- 需求原因 -->
+    <label class="label-row">
+      需求原因
+      <span class="required">*</span>
+      <span class="word-count" *ngIf="demand.reason"> {{ demand.reason.length }}/300 </span>
+    </label>
+
+    <textarea maxlength="300" [class.invalid]="demand.reasonError" placeholder="請編輯需求原因" [(ngModel)]="demand.reason"></textarea>
+
+    <!-- 需求描述 -->
+    <label class="label-row">
+      需求描述
+      <span class="required">*</span>
+      <span class="word-count" *ngIf="demand.description"> {{ demand.description.length }}/500 </span>
+    </label>
+
+    <textarea
+      maxlength="500"
+      [class.invalid]="demand.descriptionError"
+      placeholder="請編輯需求描述，例如可接受誤差程度、特定型號、款式等"
+      [(ngModel)]="demand.description"
+    ></textarea>
+
+    <!-- 特殊品牌需求 -->
+    <label class="label-row">
+      特殊品牌需求
+      <span class="word-count"> {{ demand.brand?.length || 0 }}/100 </span>
+    </label>
+
+    <textarea
+      maxlength="100"
+      placeholder="請編輯特殊品牌需求，例如：不限品牌、指定品牌、不可接受哪些品牌"
+      [(ngModel)]="demand.brand"
+    ></textarea>
+    <!-- 服務對象區 (整體套用 invalid-box) -->
+    <div class="service-target-area" [class.invalid-box]="demand.serviceTargetError">
+      <!-- 左側 固定服務對象 -->
+      <div class="service-target-section">
+        <label class="label-row">
+          服務對象
+          <span class="required">*</span>
+        </label>
+
+        <div class="service-target-box">
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['老人']" />
+            老人
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['嬰幼兒']" />
+            嬰幼兒
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['孩童']" />
+            孩童
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['青少年']" />
+            青少年
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['身障']" />
+            身障
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['貧困']" />
+            貧困
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['重症照護']" />
+            重症照護
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['寵物']" />
+            寵物
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['流浪']" />
+            流浪
+          </label>
+
+          <label>
+            <input type="checkbox" [(ngModel)]="demand.serviceTargets['野生']" />
+            野生
+          </label>
+        </div>
+      </div>
+
+      <!-- 右側 自訂服務對象 -->
+      <div class="custom-service-target-section">
+        <label class="label-row"> 其他服務對象 </label>
+
+        <div class="custom-service-target-box">
+          <div class="custom-service-list">
+            <div class="custom-service-row" *ngFor="let target of demand.customServiceTargets; let j = index; trackBy: trackByIndex">
+              <input
+                class="custom-service-input"
+                maxlength="50"
+                placeholder="請編輯其他服務對象(可自行輸入)"
+                [(ngModel)]="demand.customServiceTargets[j]"
+              />
+
+              <span class="word-count" *ngIf="target"> {{ target.length }}/50 </span>
+
+              <button
+                type="button"
+                class="add-condition-btn"
+                *ngIf="target && demand.customServiceTargets.length < 5"
+                (click)="addCustomServiceTarget(demand)"
+              >
+                ＋
+              </button>
+
+              <button
+                type="button"
+                class="delete-condition-btn"
+                *ngIf="demand.customServiceTargets.length > 1"
+                (click)="removeCustomServiceTarget(demand, j)"
+              >
+                －
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 物資狀態區 -->
+    <div class="condition-area">
+      <!-- 左側 接受物資狀態 -->
+      <div class="condition-section">
+        <label class="label-row"> 接受物資狀態 </label>
+
+        <div class="condition-left">
+          <div class="condition-row">
+            <span class="condition-name">全新</span>
+            <button
+              type="button"
+              class="condition-toggle"
+              [class.accept]="demand.conditions['全新'] === '接受'"
+              [class.reject]="demand.conditions['全新'] === '不接受'"
+              (click)="toggleCondition(demand, '全新')"
+            >
+              {{ getConditionIcon(demand.conditions['全新']) }}
+            </button>
+          </div>
+
+          <div class="condition-row">
+            <span class="condition-name">二手</span>
+            <button
+              type="button"
+              class="condition-toggle"
+              [class.accept]="demand.conditions['二手'] === '接受'"
+              [class.reject]="demand.conditions['二手'] === '不接受'"
+              (click)="toggleCondition(demand, '二手')"
+            >
+              {{ getConditionIcon(demand.conditions['二手']) }}
+            </button>
+          </div>
+
+          <div class="condition-row">
+            <span class="condition-name">有擦痕</span>
+            <button
+              type="button"
+              class="condition-toggle"
+              [class.accept]="demand.conditions['有擦痕'] === '接受'"
+              [class.reject]="demand.conditions['有擦痕'] === '不接受'"
+              (click)="toggleCondition(demand, '有擦痕')"
+            >
+              {{ getConditionIcon(demand.conditions['有擦痕']) }}
+            </button>
+          </div>
+
+          <div class="condition-row">
+            <span class="condition-name">過期</span>
+            <button
+              type="button"
+              class="condition-toggle"
+              [class.accept]="demand.conditions['過期'] === '接受'"
+              [class.reject]="demand.conditions['過期'] === '不接受'"
+              (click)="toggleCondition(demand, '過期')"
+            >
+              {{ getConditionIcon(demand.conditions['過期']) }}
+            </button>
+          </div>
+
+          <div class="condition-row">
+            <span class="condition-name">毀損</span>
+            <button
+              type="button"
+              class="condition-toggle"
+              [class.accept]="demand.conditions['毀損'] === '接受'"
+              [class.reject]="demand.conditions['毀損'] === '不接受'"
+              (click)="toggleCondition(demand, '毀損')"
+            >
+              {{ getConditionIcon(demand.conditions['毀損']) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側 自訂狀態 -->
+      <div class="custom-condition-section">
+        <label class="label-row"> 其他物品狀態</label>
+
+        <div class="custom-condition-list">
+          <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let j = index; trackBy: trackByIndex">
+            <input
+              class="custom-condition-input"
+              maxlength="100"
+              type="text"
+              placeholder="請編輯其他狀態(可自行輸入)"
+              [(ngModel)]="demand.customConditions[j]"
+            />
+
+            <span class="word-count" *ngIf="condition"> {{ condition.length }}/100 </span>
+
+            <!-- 新增按鈕 -->
+            <button
+              type="button"
+              class="add-condition-btn"
+              *ngIf="condition && demand.customConditions.length < 5"
+              (click)="addCustomCondition(demand)"
+            >
+              ＋
+            </button>
+
+            <!-- 刪除按鈕 -->
+            <button
+              type="button"
+              class="delete-condition-btn"
+              *ngIf="demand.customConditions.length > 1"
+              (click)="removeCustomCondition(demand, j)"
+            >
+              －
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 緊急優先度 -->
+    <label class="label-row align-title">
+      緊急優先度
+      <span class="required">*</span>
+    </label>
+
+    <div class="priority-box">
+      <label class="normal">
+        <input type="radio" [name]="'priority' + i" value="普通" [(ngModel)]="demand.priority" />
+        普通
+      </label>
+
+      <label class="urgent">
+        <input type="radio" [name]="'priority' + i" value="緊急" [(ngModel)]="demand.priority" />
+        緊急
+      </label>
+
+      <label class="very-urgent">
+        <input type="radio" [name]="'priority' + i" value="非常緊急" [(ngModel)]="demand.priority" />
+        非常緊急
+      </label>
+    </div>
+
+    <!-- 公開狀態 -->
+    <label>
+      公開狀態
+      <span class="required">*</span>
+    </label>
+
+    <div class="status-box">
+      <label>
+        <input type="radio" [name]="'status' + i" value="上架" [(ngModel)]="demand.status" />
+        上架
+      </label>
+
+      <label>
+        <input type="radio" [name]="'status' + i" value="隱藏" [(ngModel)]="demand.status" />
+        隱藏
+      </label>
+
+      <label>
+        <input type="radio" [name]="'status' + i" value="下架" [(ngModel)]="demand.status" />
+        下架
+      </label>
+    </div>
+
+    <!-- 接收方式 -->
+    <div class="receive-method-area" [class.invalid-box]="demand.invalidReceiveInfo">
+      <label class="label-row">
+        接收方式
+        <span class="required">*</span>
+      </label>
+
+      <div class="receive-method-box">
+        <label>
+          <input
+            type="radio"
+            [name]="'receiveMethod' + i"
+            value="寄送"
+            [(ngModel)]="demand.receiveMethod"
+            (ngModelChange)="onReceiveMethodChange(demand, $event)"
+          />
+          寄送
+        </label>
+
+        <label>
+          <input
+            type="radio"
+            [name]="'receiveMethod' + i"
+            value="面交"
+            [(ngModel)]="demand.receiveMethod"
+            (ngModelChange)="onReceiveMethodChange(demand, $event)"
+          />
+          面交
+        </label>
+      </div>
+
+      <!-- 郵寄 -->
+      <div *ngIf="demand.receiveMethod === '寄送'">
+        <!-- 收件人 -->
+        <label class="label-row">
+          收件人
+          <span class="required">*</span>
+          <span class="word-count" *ngIf="demand.recipient"> {{ demand.recipient.length }}/50 </span>
+        </label>
+
+        <input
+          class="medium-input"
+          maxlength="50"
+          [class.invalid]="demand.invalidReceiveInfo && !demand.recipient"
+          type="text"
+          placeholder="請編輯收件人姓名"
+          [(ngModel)]="demand.recipient"
+        />
+
+        <!-- 郵寄地址 -->
+        <label class="label-row">
+          郵寄地址
+          <span class="required">*</span>
+          <span class="word-count" *ngIf="demand.address"> {{ demand.address.length }}/35 </span>
+        </label>
+
+        <input
+          class="medium-input"
+          maxlength="35"
+          [class.invalid]="demand.invalidReceiveInfo && !demand.address"
+          type="text"
+          placeholder="請編輯郵寄地址"
+          [(ngModel)]="demand.address"
+        />
+      </div>
+
+      <!-- 面交 -->
+      <div *ngIf="demand.receiveMethod === '面交'">
+        <label class="label-row">
+          面交地點
+          <span class="required">*</span>
+          <span class="word-count" *ngIf="demand.address"> {{ demand.address.length }}/35 </span>
+        </label>
+
+        <input
+          class="medium-input"
+          maxlength="35"
+          [class.invalid]="demand.invalidReceiveInfo && !demand.address"
+          type="text"
+          placeholder="請編輯面交地點"
+          [(ngModel)]="demand.address"
+        />
+      </div>
+    </div>
+
+    <!-- 聯絡電話 -->
+    <label class="label-row">
+      聯絡電話
+      <span class="required">*</span>
+      <span class="word-count" *ngIf="demand.phone"> {{ demand.phone.length }}/30 </span>
+    </label>
+
+    <input
+      class="phone-input"
+      maxlength="30"
+      type="tel"
+      [class.invalid]="demand.phoneError"
+      placeholder="請編輯可保持暢通的號碼（方便聯絡時間可註明）"
+      [(ngModel)]="demand.phone"
+    />
+
+    <!-- 其他說明 -->
+    <label class="label-row">
+      其他說明（備註）
+      <span class="word-count" *ngIf="demand.note"> {{ demand.note.length }}/300 </span>
+    </label>
+
+    <textarea maxlength="300" placeholder="請編輯其他說明" [(ngModel)]="demand.note"></textarea>
+
+    <hr />
+  </div>
+
+  <!-- 按鈕 -->
+  <div class="button-area">
+    <button type="button" class="back-btn" (click)="cancel()">取消</button>
+
+    <button type="button" class="save-btn" (click)="saveAll()">儲存全部修改</button>
+  </div>
+</div>

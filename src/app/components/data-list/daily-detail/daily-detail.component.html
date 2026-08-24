@@ -1,0 +1,172 @@
+<div class="container">
+  <h1>日常需求詳細資料</h1>
+
+  <div class="detail-header-info" *ngIf="demand">
+    <div class="info-tag">
+      <span class="info-label">需求編號</span>
+      <span class="info-value">#{{ listNumber }}</span>
+    </div>
+  </div>
+
+  <div class="detail-table" *ngIf="demand">
+    <!-- 需求物 -->
+    <div class="detail-row">
+      <div class="detail-title">需求物</div>
+      <div class="detail-content item-detail-content">
+        <div class="detail-item-name">{{ demand.item }}</div>
+      </div>
+    </div>
+
+    <!-- 需求數量 -->
+    <div class="detail-row">
+      <div class="detail-title">需求數量</div>
+      <div class="detail-content">{{ demand.amount }} {{ demand.unit }}</div>
+    </div>
+
+    <!-- 剩餘需求 -->
+    <div class="detail-row">
+      <div class="detail-title">剩餘需求</div>
+      <div class="detail-content">{{ demand.remaining }} {{ demand.unit }}</div>
+    </div>
+
+    <!-- 數量描述 -->
+    <div class="detail-row">
+      <div class="detail-title">數量描述</div>
+      <div class="detail-content">{{ demand.amountDescription || '無' }}</div>
+    </div>
+
+    <!-- 類別 -->
+    <div class="detail-row">
+      <div class="detail-title">類別</div>
+      <div class="detail-content">{{ demand.category }}</div>
+    </div>
+
+    <!-- 需求原因 -->
+    <div class="detail-row">
+      <div class="detail-title">需求原因</div>
+      <div class="detail-content">{{ demand.reason }}</div>
+    </div>
+
+    <!-- 需求描述 -->
+    <div class="detail-row">
+      <div class="detail-title">需求描述</div>
+      <div class="detail-content">{{ demand.description }}</div>
+    </div>
+
+    <!-- 特殊品牌需求 -->
+    <div class="detail-row">
+      <div class="detail-title">特殊品牌需求</div>
+      <div class="detail-content">{{ demand.brand || '無' }}</div>
+    </div>
+
+    <!-- 服務對象 -->
+    <div class="detail-row">
+      <div class="detail-title">服務對象</div>
+      <div class="detail-content">{{ getSelectedServiceTargets() }}</div>
+    </div>
+
+    <!-- 其他自訂服務對象 -->
+    <div class="detail-row">
+      <div class="detail-title">其他自訂服務對象</div>
+      <div class="detail-content">
+        <ng-container *ngIf="hasCustomServiceTargets(); else noServiceTarget">{{ getCustomServiceTargets() }}</ng-container>
+        <ng-template #noServiceTarget>無</ng-template>
+      </div>
+    </div>
+
+    <!-- 接受物資狀態 -->
+    <div class="detail-row">
+      <div class="detail-title">接受物資狀態</div>
+      <div class="detail-content condition-detail" [innerHTML]="getConditionsText()"></div>
+    </div>
+
+    <!-- 其他物品狀態 -->
+    <div class="detail-row">
+      <div class="detail-title">其他物品狀態</div>
+      <div class="detail-content">
+        <ng-container *ngIf="hasCustomConditions(); else noCondition">{{ getCustomConditions() }}</ng-container>
+        <ng-template #noCondition>無</ng-template>
+      </div>
+    </div>
+
+    <!-- 緊急優先度 -->
+    <div class="detail-row">
+      <div class="detail-title">緊急優先度</div>
+      <div
+        class="detail-content priority-detail"
+        [ngClass]="{
+          'normal': demand.priority === '普通',
+          'urgent': demand.priority === '緊急',
+          'very-urgent': demand.priority === '非常緊急'
+        }"
+      >
+        {{ demand.priority }}
+      </div>
+    </div>
+
+    <!-- 狀態 -->
+    <div class="detail-row">
+      <div class="detail-title">狀態</div>
+      <div class="detail-content">{{ demand.status }}</div>
+    </div>
+
+    <!-- 接收方式 -->
+    <div class="detail-row">
+      <div class="detail-title">接收方式</div>
+      <div class="detail-content">{{ demand.receiveMethod }}</div>
+    </div>
+
+    <!-- 收件資訊 -->
+    <ng-container *ngIf="demand.receiveMethod === '寄送'">
+      <!-- 收件人 -->
+      <div class="detail-row">
+        <div class="detail-title">收件人</div>
+        <div class="detail-content">{{ demand.recipient }}</div>
+      </div>
+
+      <!-- 寄送地址 -->
+      <div class="detail-row">
+        <div class="detail-title">寄送地址</div>
+        <div class="detail-content">{{ demand.address }}</div>
+      </div>
+    </ng-container>
+
+    <!-- 面交資訊 -->
+    <ng-container *ngIf="demand.receiveMethod === '面交'">
+      <!-- 面交地點 -->
+      <div class="detail-row">
+        <div class="detail-title">面交地點</div>
+        <div class="detail-content">{{ demand.address }}</div>
+      </div>
+    </ng-container>
+
+    <!-- 聯絡電話 -->
+    <div class="detail-row">
+      <div class="detail-title">聯絡電話</div>
+      <div class="detail-content">{{ demand.phone }}</div>
+    </div>
+
+    <!-- 其他說明 -->
+    <div class="detail-row">
+      <div class="detail-title">其他說明（備註）</div>
+      <div class="detail-content">{{ demand.note || '無' }}</div>
+    </div>
+  </div>
+  <!-- detail-table 結束 -->
+
+  <div class="button-area">
+    <button class="back-btn" (click)="goBack()">返回</button>
+    <button class="edit-btn" [routerLink]="['/agency/daily-edit', demand?.id]" [queryParams]="{ from: 'detail' }">編輯</button>
+    <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
+  </div>
+</div>
+
+<app-supply-delete
+  *ngIf="showDeleteModal"
+  [demandIds]="getDeleteIds()"
+  [deleteType]="'single'"
+  [demandType]="'daily'"
+  (closed)="closeDeleteModal()"
+  (deleted)="onDeleted()"
+>
+</app-supply-delete>

@@ -1,0 +1,16 @@
+<div class="role-selector-card">
+  <h2>{{ title }}</h2>
+  <p>{{ description }}</p>
+
+  <div class="role-options">
+    <button type="button" class="role-card donor" (click)="selectRole('donor')">
+      <span class="role-title">捐助者</span>
+      <span class="role-subtitle">個人或企業捐助者</span>
+    </button>
+
+    <button type="button" class="role-card agency" (click)="selectRole('agency')">
+      <span class="role-title">受助者</span>
+      <span class="role-subtitle">社福團體 / 機構</span>
+    </button>
+  </div>
+</div>

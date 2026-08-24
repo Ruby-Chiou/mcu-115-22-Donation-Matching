@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
+import { VolunteerDemand } from '../../../models/volunteer/volunteer-demand';
 
 interface Comment {
   user: string;
@@ -10,17 +13,42 @@ interface Comment {
 
 @Component({
   selector: 'app-disaster-open-volunteer-detail-page',
-  imports: [FormsModule],
+  imports: [FormsModule, DecimalPipe],
   templateUrl: './disaster-open-volunteer-detail-page.component.html',
   styleUrl: './disaster-open-volunteer-detail-page.component.scss',
 })
-export class DisasterOpenVolunteerDetailPageComponent {
+export class DisasterOpenVolunteerDetailPageComponent implements OnInit {
+  volunteer!: VolunteerDemand;
 
   constructor(
-  private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private volunteerDemandService: VolunteerDemandService
   ) {}
+
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const volunteer = this.volunteerDemandService.getVolunteerById(id);
+
+    if (!volunteer) {
+      this.router.navigate(['/disaster/open']);
+      return;
+    }
+
+    this.volunteer = volunteer;
+  }
+
+  getRemaining(): number {
+    return Math.max(this.volunteer.required - this.volunteer.registered, 0);
+  }
+
+  getProgress(): number {
+    return this.volunteer.required > 0
+      ? Math.min((this.volunteer.registered / this.volunteer.required) * 100, 100)
+      : 0;
+  }
   goToVolunteerForm() {
-    this.router.navigate(['/disaster/open/volunteer/form']);
+    this.router.navigate(['/disaster/open/volunteer/form', this.volunteer.id]);
   }
 // 返回志工需求清單
   goBackToList() {

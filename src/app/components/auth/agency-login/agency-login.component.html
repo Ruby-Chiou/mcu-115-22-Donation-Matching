@@ -1,0 +1,28 @@
+<form class="login-form" (ngSubmit)="onSubmit()">
+  <div class="form-header">
+    <div>
+      <h2>受助者登入</h2>
+      <p>請輸入您的憑證碼以進行驗證。</p>
+    </div>
+    <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
+  </div>
+
+  <div class="input-grid">
+    <label class="field full">
+      <span>自然人憑證 PIN 碼</span>
+      <input type="password" [(ngModel)]="loginForm.credentialPin" name="credentialPin" placeholder="輸入您的 PIN 碼" required />
+    </label>
+  </div>
+
+  <div class="actions">
+    <div class="action-links">
+      <a routerLink="/register" class="link-btn">尚未註冊帳號？</a>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button type="submit" class="primary-btn">驗證登入</button>
+  </div>
+
+  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+</form>

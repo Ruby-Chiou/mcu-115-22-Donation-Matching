@@ -1,6 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { DailyDemandService } from '../../../core/services/daily-demand.service';
+import { DailyDemand } from '../../../models/agency/daily-demand';
+
 interface Comment {
   user: string;
   date: string;
@@ -9,24 +14,113 @@ interface Comment {
 
 @Component({
   selector: 'app-disaster-open-detail-page',
-  imports: [FormsModule],
+  imports: [
+    FormsModule,
+    NgClass
+  ],
   templateUrl: './disaster-open-detail-page.component.html',
   styleUrl: './disaster-open-detail-page.component.scss',
 })
-export class DisasterOpenDetailPageComponent {
+export class DisasterOpenDetailPageComponent implements OnInit {
+
+  // =========================
+  // 目前查看的需求
+  // =========================
+
+  demand!: DailyDemand;
+
   constructor(
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private dailyDemandService: DailyDemandService
   ) {}
-  goToSupplyForm() {
-    this.router.navigate(['/disaster/open/supply/form']);
+
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const demand = this.dailyDemandService.getDemandById(id);
+
+    if (!demand) {
+      this.router.navigate(['/disaster/open']);
+      return;
+    }
+
+    this.demand = demand;
   }
+
+
+  // =========================
+  // 返回需求清單
+  // =========================
+
   goBackToList() {
-    this.router.navigate(['/disaster/open']);
+
+    this.router.navigate([
+      '/disaster/open'
+    ]);
+
   }
-  // 目前輸入框的內容
+
+
+  // =========================
+  // 前往物資捐助表單
+  // =========================
+
+  goToSupplyForm() {
+
+    this.router.navigate([
+      '/disaster/open/supply/form'
+    ]);
+
+  }
+
+
+  // =========================
+  // 接受狀態文字
+  // =========================
+
+  getConditionText(
+    condition: '接受' | '不接受' | ''
+  ): string {
+
+    if (condition === '接受') {
+      return '✔ 接受';
+    }
+
+    if (condition === '不接受') {
+      return '✘ 不接受';
+    }
+
+    return '未設定';
+  }
+
+
+  // =========================
+  // 緊急程度樣式
+  // =========================
+
+  getPriorityClass(): string {
+
+    switch (this.demand.priority) {
+
+      case '非常緊急':
+        return 'very-urgent';
+
+      case '緊急':
+        return 'urgent';
+
+      default:
+        return 'normal';
+    }
+
+  }
+
+
+  // =========================
+  // 留言
+  // =========================
+
   newComment = '';
 
-  // 留言列表
   comments: Comment[] = [
     {
       user: '王小明',
@@ -39,33 +133,24 @@ export class DisasterOpenDetailPageComponent {
       content: '已經準備好物資，希望可以幫助到災區。'
     }
   ];
-  openDonate() {
-    // 目前先做按鈕功能
-    // 之後連接資料庫時，再改成真正的捐助流程
-    alert('感謝您的捐助！');
-  }
 
-  // 發布留言
+
   addComment() {
 
-    // 如果沒有輸入內容，就不發布
     if (!this.newComment.trim()) {
       return;
     }
 
-    // 新增留言
     this.comments.unshift({
       user: '目前使用者',
       date: this.getToday(),
       content: this.newComment.trim()
     });
 
-    // 清空輸入框
     this.newComment = '';
   }
 
 
-  // 取得今天日期
   getToday(): string {
 
     const today = new Date();

@@ -1,14 +1,16 @@
 <div class="detail-page">
   <!-- 返回需求清單 -->
   <button
-  type="button"
-  class="back-button"
-  (click)="goBackToList()">
-  ← 返回需求清單
+    type="button"
+    class="back-button"
+    (click)="goBackToList()">
+    ← 返回需求清單
   </button>
   <!-- 頁面標題 -->
   <div class="detail-header">
-    <h1>災害物資需求詳情</h1>
+    <h1>
+      急難救助需求詳情
+    </h1>
   </div>
   <!-- =========================
        物資主要資訊
@@ -17,146 +19,570 @@
     <!-- 左邊：物資圖片 -->
     <div class="detail-image">
       <img
-        src='https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-        alt="礦泉水">
+        src="assets/images/water.jpg"
+        [alt]="demand.item">
     </div>
     <!-- 右邊：物資資訊 -->
     <div class="detail-info">
+
+
       <!-- 物資名稱 -->
-      <h2>礦泉水</h2>
-      <!-- 物資緊急程度 -->
-    <div class="urgency urgent">
-      <span class="urgency-icon">●</span>
-      緊急物資
-    </div>
-      <!-- 數量資訊 -->
-      <div class="quantity-info">
-        <div class="info-item">
-          <span>需求數量</span>
-          <strong>100 箱</strong>
+
+      <h2>
+        {{ demand.item }}
+      </h2>
+
+
+      <!-- 類別 -->
+
+      @if (demand.category) {
+
+        <div class="category">
+          {{ demand.category }}
         </div>
-        <div class="info-item">
-          <span>已募集</span>
-          <strong>65 箱</strong>
-        </div>
-        <div class="info-item">
-          <span>剩餘需求</span>
-          <strong>35 箱</strong>
-        </div>
+
+      }
+
+
+      <!-- 緊急程度 -->
+
+      <div
+        class="urgency"
+        [ngClass]="getPriorityClass()">
+
+        <span class="urgency-icon">
+          ●
+        </span>
+
+        {{ demand.priority }}
+
       </div>
-      <!-- 募集進度 -->
+
+
+      <!-- 數量 -->
+
+      <div class="quantity-info">
+
+
+        <div class="info-item">
+
+          <span>
+            需求數量
+          </span>
+
+          <strong>
+
+            {{ demand.amount ?? 0 }}
+            {{ demand.unit }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span>
+            已募集
+          </span>
+
+          <strong>
+
+            {{
+              (demand.amount ?? 0)
+              -
+              (demand.remaining ?? 0)
+            }}
+
+            {{ demand.unit }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span>
+            剩餘需求
+          </span>
+
+          <strong>
+
+            {{ demand.remaining ?? 0 }}
+            {{ demand.unit }}
+
+          </strong>
+
+        </div>
+
+
+      </div>
+
+
+      <!-- 數量補充 -->
+
+      @if (demand.amountDescription) {
+
+        <div class="amount-description">
+
+          {{ demand.amountDescription }}
+
+        </div>
+
+      }
+
 
       <!-- 受助機構 -->
+
       <div class="organization-box">
+
         <span class="organization-label">
           受助機構
         </span>
+
         <strong>
-          🏢 花蓮縣救災中心
+          🏢 {{ demand.recipient }}
         </strong>
+
+
+        <!-- 我要捐助 -->
+
         <div class="donate-action">
-        <button
-          type="button"
-          class="donate-button"
-          (click)="goToSupplyForm()">
-          我要捐助
-        </button>
+
+          <button
+            type="button"
+            class="donate-button"
+            (click)="goToSupplyForm()">
+
+            我要捐助
+
+          </button>
+
         </div>
+
       </div>
+
+
     </div>
+
   </div>
+
+
+
   <!-- =========================
        相關社福機構
   ========================== -->
+
   <div class="organization-detail">
-    <h2>相關社福機構</h2>
+
+    <h2>
+      相關社福機構
+    </h2>
+
+
     <div class="organization-info">
+
+
       <div class="organization-item">
-        <span>機構名稱</span>
+
+        <span>
+          機構名稱
+        </span>
+
         <strong>
-          花蓮縣救災中心
+          {{ demand.recipient }}
         </strong>
+
       </div>
+
+
       <div class="organization-item">
-        <span>機構簡介</span>
-        <p>
-          協助災區物資募集、分配及救災工作，
-          提供受災民眾生活所需物資。
-        </p>
-      </div>
-      <div class="organization-item">
-        <span>接受物資狀態</span>
-        <p>
-          全新：✔ 接受 ｜ 二手：✘ 不接受 ｜ 過期：✘ 不接受 ｜ 毀損：✘ 不接受
-        </p>
-      </div>
-      <div class="organization-item">
-        <span>聯絡電話</span>
+
+        <span>
+          聯絡電話
+        </span>
+
         <strong>
-          03-1234567
+          {{ demand.phone }}
         </strong>
+
       </div>
+
+
       <div class="organization-item">
-        <span>聯絡地址</span>
+
+        <span>
+          聯絡地址
+        </span>
+
         <strong>
-          花蓮縣花蓮市中山路 100 號
+          {{ demand.address }}
         </strong>
+
       </div>
+
+
       <div class="organization-item">
-        <span>聯絡人</span>
+
+        <span>
+          接收方式
+        </span>
+
         <strong>
-          王先生
+          {{ demand.receiveMethod }}
         </strong>
+
       </div>
+
+
+      <!-- 接受物資狀態 -->
+
+      <div class="organization-item">
+
+        <span>
+          接受物資狀態
+        </span>
+
+
+        <div class="condition-list">
+
+
+          <div>
+
+            全新：
+
+            <strong
+              [class.accept]="
+                demand.conditions['全新'] === '接受'
+              "
+              [class.reject]="
+                demand.conditions['全新'] === '不接受'
+              ">
+
+              {{ getConditionText(
+                demand.conditions['全新']
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            二手：
+
+            <strong
+              [class.accept]="
+                demand.conditions['二手'] === '接受'
+              "
+              [class.reject]="
+                demand.conditions['二手'] === '不接受'
+              ">
+
+              {{ getConditionText(
+                demand.conditions['二手']
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            有擦痕：
+
+            <strong
+              [class.accept]="
+                demand.conditions['有擦痕'] === '接受'
+              "
+              [class.reject]="
+                demand.conditions['有擦痕'] === '不接受'
+              ">
+
+              {{ getConditionText(
+                demand.conditions['有擦痕']
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            過期：
+
+            <strong
+              [class.accept]="
+                demand.conditions['過期'] === '接受'
+              "
+              [class.reject]="
+                demand.conditions['過期'] === '不接受'
+              ">
+
+              {{ getConditionText(
+                demand.conditions['過期']
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            毀損：
+
+            <strong
+              [class.accept]="
+                demand.conditions['毀損'] === '接受'
+              "
+              [class.reject]="
+                demand.conditions['毀損'] === '不接受'
+              ">
+
+              {{ getConditionText(
+                demand.conditions['毀損']
+              ) }}
+
+            </strong>
+
+          </div>
+
+
+        </div>
+
+
+        <!-- 自訂狀態 -->
+
+        @if (
+          demand.customConditions.length > 0
+        ) {
+
+          <div class="custom-condition">
+
+            <span>
+              其他：
+            </span>
+
+            @for (
+              condition of demand.customConditions;
+              track condition
+            ) {
+
+              <span>
+                {{ condition }}
+              </span>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- 備註 -->
+
+      @if (demand.note) {
+
+        <div class="organization-item">
+
+          <span>
+            備註
+          </span>
+
+          <p>
+            {{ demand.note }}
+          </p>
+
+        </div>
+
+      }
+
+
     </div>
+
   </div>
+
+
+
+  <!-- =========================
+       服務對象
+  ========================== -->
+
+  <div class="service-target-detail">
+
+    <h2>
+      服務對象
+    </h2>
+
+
+    <div class="service-target-list">
+
+
+      @if (demand.serviceTargets['老人']) {
+        <span>老人</span>
+      }
+
+      @if (demand.serviceTargets['嬰幼兒']) {
+        <span>嬰幼兒</span>
+      }
+
+      @if (demand.serviceTargets['孩童']) {
+        <span>孩童</span>
+      }
+
+      @if (demand.serviceTargets['青少年']) {
+        <span>青少年</span>
+      }
+
+      @if (demand.serviceTargets['身障']) {
+        <span>身障</span>
+      }
+
+      @if (demand.serviceTargets['貧困']) {
+        <span>貧困</span>
+      }
+
+      @if (demand.serviceTargets['重症照護']) {
+        <span>重症照護</span>
+      }
+
+      @if (demand.serviceTargets['寵物']) {
+        <span>寵物</span>
+      }
+
+      @if (demand.serviceTargets['流浪']) {
+        <span>流浪</span>
+      }
+
+      @if (demand.serviceTargets['野生']) {
+        <span>野生</span>
+      }
+
+
+      @for (
+        target of demand.customServiceTargets;
+        track target
+      ) {
+
+        <span>
+          {{ target }}
+        </span>
+
+      }
+
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================
+       需求原因
+  ========================== -->
+
+  <div class="description">
+
+    <h2>
+      需求原因
+    </h2>
+
+    <p>
+      {{ demand.reason }}
+    </p>
+
+  </div>
+
+
+
   <!-- =========================
        需求說明
   ========================== -->
+
   <div class="description">
-    <h2>需求說明</h2>
-    <p>災害造成部分地區道路中斷，多戶家庭暫時無法取得飲用水。</p>
+
+    <h2>
+      需求說明
+    </h2>
+
     <p>
-      目前災區需要礦泉水供災民及救災人員使用，
-      歡迎民眾依照需求進行捐助。
+      {{ demand.description }}
     </p>
+
   </div>
+
+
+
   <!-- =========================
        留言區
   ========================== -->
-<div class="comment-section">
-  <h2>留言區</h2>
-  <!-- 留言輸入 -->
-  <div class="comment-form">
-    <textarea
-      [(ngModel)]="newComment"
-      rows="4"
-      placeholder="輸入你想說的話...">
-    </textarea>
-    <button
-      type="button"
-      class="comment-button"
-      (click)="addComment()">
-      發布留言
-    </button>
-  </div>
-  <!-- 留言列表 -->
-  <div class="comment-list">
-    @for (comment of comments; track $index) {
-      <div class="comment">
-        <div class="comment-header">
-          <strong>
-            {{ comment.user }}
-          </strong>
-          <span>
-            {{ comment.date }}
-          </span>
-        </div>
-        <p>
-          {{ comment.content }}
-        </p>
-      </div>
-    }
-  </div>
-</div>
 
+  <div class="comment-section">
+
+    <h2>
+      留言區
+    </h2>
+
+
+    <div class="comment-form">
+
+      <textarea
+        [(ngModel)]="newComment"
+        rows="4"
+        placeholder="輸入你想說的話...">
+      </textarea>
+
+
+      <button
+        type="button"
+        class="comment-button"
+        (click)="addComment()">
+
+        發布留言
+
+      </button>
+
+    </div>
+
+
+    <div class="comment-list">
+
+      @for (
+        comment of comments;
+        track $index
+      ) {
+
+        <div class="comment">
+
+          <div class="comment-header">
+
+            <strong>
+              {{ comment.user }}
+            </strong>
+
+            <span>
+              {{ comment.date }}
+            </span>
+
+          </div>
+
+          <p>
+            {{ comment.content }}
+          </p>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
+
+</div>

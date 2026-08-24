@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SupplyCreateComponent } from './supply-create.component';
+import { RoleSelectorComponent } from './role-selector.component';
 
-describe('SupplyCreateComponent', () => {
-  let component: SupplyCreateComponent;
-  let fixture: ComponentFixture<SupplyCreateComponent>;
+describe('RoleSelectorComponent', () => {
+  let component: RoleSelectorComponent;
+  let fixture: ComponentFixture<RoleSelectorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SupplyCreateComponent],
+      imports: [RoleSelectorComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SupplyCreateComponent);
+    fixture = TestBed.createComponent(RoleSelectorComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

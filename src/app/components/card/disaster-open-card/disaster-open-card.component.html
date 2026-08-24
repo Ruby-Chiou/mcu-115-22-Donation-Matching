@@ -6,58 +6,67 @@
   @if (type === 'material') {
     <img
       src='https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-      alt="礦泉水">
+      [alt]="demand?.item ?? '物資需求'">
   }
   @else {
     <img
       src='https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-      alt="志工需求">
+      [alt]="volunteer?.title ?? '志工需求'">
   }
   </div>
   <!-- 卡片內容 -->
   <div class="card-content">
 @if (type === 'material') {
   <h2 class="material-name">
-    礦泉水
+    {{ demand?.item }}
   </h2>
-  <div class="urgency urgent">
-    ● 緊急物資
+  <div class="urgency" [class]="getPriorityClass()">
+    ● {{ demand?.priority }}物資
   </div>
   <p class="organization">
     受助機構：
-    <strong>花蓮縣救災中心</strong>
+    <strong>{{ demand?.recipient || '尚未填寫' }}</strong>
   </p>
   <div class="quantity">
     <span>剩餘數量</span>
-    <strong>100 箱</strong>
+    <strong>{{ demand?.remaining ?? 0 }} {{ demand?.unit }}</strong>
+  </div>
+  <div class="progress-section">
+    <div class="progress-info">
+      <span>募集進度</span>
+      <strong>{{ getProgress() | number:'1.0-0' }}%</strong>
+    </div>
+    <div class="progress-bar">
+      <div class="progress" [style.width.%]="getProgress()"></div>
+    </div>
   </div>
   }
   @else {
   <h2 class="material-name">
-    物資搬運
+    {{ volunteer?.title }}
   </h2>
   <div class="urgency urgent">
     ● 緊急需求
   </div>
   <p class="organization">
     需求單位：
-    <strong>花蓮縣救災中心</strong>
+    <strong>{{ volunteer?.organization }}</strong>
   </p>
   <div class="quantity">
     <span>需求人數</span>
-    <strong>10 人</strong>
+    <strong>{{ volunteer?.required ?? 0 }} 人</strong>
   </div>
   <div class="quantity">
     <span>已報名</span>
-    <strong>6 人</strong>
+    <strong>{{ volunteer?.registered ?? 0 }} 人</strong>
   </div>
   <div class="quantity">
     <span>剩餘需求</span>
-    <strong>4 人</strong>
+    <strong>{{ (volunteer?.required ?? 0) - (volunteer?.registered ?? 0) }} 人</strong>
   </div>
   <div class="quantity">
     <span>服務地點</span>
-    <strong>花蓮縣光復鄉</strong>
+    <strong>{{ volunteer?.location }}</strong>
   </div>
   }
 <!-- 按鈕 -->
@@ -114,21 +123,21 @@
     <div class="modal-content">
       <img
         src='https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-        alt="礦泉水"
+        [alt]="demand?.item ?? '物資需求'"
         class="modal-image">
       <div class="modal-info">
         <h3>
-          礦泉水
+          {{ demand?.item }}
         </h3>
-        <div class="urgency urgent">
-          ● 緊急物資
+        <div class="urgency" [class]="getPriorityClass()">
+          ● {{ demand?.priority }}物資
         </div>
         <div class="modal-item">
           <span>
             受助機構
           </span>
           <strong>
-            花蓮縣救災中心
+            {{ demand?.recipient || '尚未填寫' }}
           </strong>
         </div>
         <div class="modal-item">
@@ -136,7 +145,7 @@
             需求數量
           </span>
           <strong>
-            150 箱
+            {{ demand?.amount ?? 0 }} {{ demand?.unit }}
           </strong>
         </div>
         <div class="modal-item">
@@ -144,7 +153,7 @@
             已募集
           </span>
           <strong>
-            50 箱
+            {{ getCollectedAmount() }} {{ demand?.unit }}
           </strong>
         </div>
         <div class="modal-item">
@@ -152,7 +161,7 @@
             剩餘需求
           </span>
           <strong>
-            100 箱
+            {{ demand?.remaining ?? 0 }} {{ demand?.unit }}
           </strong>
         </div>
       </div>
@@ -167,11 +176,11 @@
     <div class="modal-content">
       <img
         src='https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-        alt="志工需求"
+        [alt]="volunteer?.title ?? '志工需求'"
         class="modal-image">
       <div class="modal-info">
         <h3>
-          物資搬運
+          {{ volunteer?.title }}
         </h3>
         <div class="urgency urgent">
           ● 緊急需求
@@ -181,7 +190,7 @@
             需求單位
           </span>
           <strong>
-            花蓮縣救災中心
+            {{ volunteer?.organization }}
           </strong>
         </div>
         <div class="modal-item">
@@ -189,7 +198,7 @@
             需求人數
           </span>
           <strong>
-            10 人
+            {{ volunteer?.required ?? 0 }} 人
           </strong>
         </div>
         <div class="modal-item">
@@ -197,7 +206,7 @@
             已報名
           </span>
           <strong>
-            6 人
+            {{ volunteer?.registered ?? 0 }} 人
           </strong>
         </div>
         <div class="modal-item">
@@ -205,7 +214,7 @@
             剩餘需求
           </span>
           <strong>
-            4 人
+            {{ (volunteer?.required ?? 0) - (volunteer?.registered ?? 0) }} 人
           </strong>
         </div>
         <div class="modal-item">
@@ -213,7 +222,7 @@
             服務地點
           </span>
           <strong>
-            花蓮縣光復鄉
+            {{ volunteer?.location }}
           </strong>
         </div>
         <div class="modal-item">
@@ -221,7 +230,7 @@
             服務時間
           </span>
           <strong>
-            08:00 ～ 17:00
+            {{ volunteer?.serviceTime }}
           </strong>
         </div>
         <div class="modal-item">
@@ -229,7 +238,7 @@
             工作內容
           </span>
           <strong>
-            協助物資搬運、分類及整理。
+            {{ volunteer?.description }}
           </strong>
         </div>
       </div>

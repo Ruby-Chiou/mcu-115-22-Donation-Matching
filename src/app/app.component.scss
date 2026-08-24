@@ -37,4 +37,47 @@
 	color: #fff;
 	cursor: pointer;
 	font: inherit;
+  }
+.dev-switcher {
+  position: fixed; /* 固定位置，不隨頁面捲動而跑掉 */
+  bottom: 20px; /* 距離底部 20px */
+  right: 20px; /* 距離右側 20px */
+  background: #222; /* 深色背景 */
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px; /* 圓角 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 陰影讓它有浮起來的感覺 */
+  z-index: 9999; /* 確保層級最高 */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    font-size: 12px;
+    color: #aaa;
+    border-bottom: 1px solid #444;
+    padding-bottom: 4px;
+  }
+
+  .material-symbols-outlined {
+    font-size: 15px;
+  }
+
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+      background: #0056b3;
+    }
+  }
 }

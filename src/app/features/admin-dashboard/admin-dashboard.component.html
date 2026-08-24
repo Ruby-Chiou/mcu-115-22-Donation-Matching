@@ -1,0 +1,19 @@
+<div class="admin-dashboard-container">
+  <h1>管理者總覽中心</h1>
+  <p class="subtitle">歡迎回來！這裡整合了系統內所有身份別的功能頁面，點擊下方卡片即可直接跳轉。</p>
+
+  <div *ngFor="let section of menuSections" class="section-group">
+    <h2>
+      <span class="material-symbols-outlined section-icon">{{ section.icon }}</span>
+      {{ section.title }}
+    </h2>
+
+    <div class="card-grid">
+      <div *ngFor="let item of section.items" class="nav-card" (click)="goTo(item.path)">
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.desc }}</p>
+        <span class="path-tag">{{ item.path }}</span>
+      </div>
+    </div>
+  </div>
+</div>

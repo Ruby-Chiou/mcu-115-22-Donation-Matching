@@ -1,1 +1,135 @@
-<p>register works!</p>
+<section class="register-shell">
+  <div class="selection-view" *ngIf="showRoleModal">
+    <app-role-selector title="請選擇註冊身份" description="捐助者可進行捐贈；受助者為社福團體與機構。" (roleSelected)="selectRole($event)">
+    </app-role-selector>
+  </div>
+
+  <div class="form-view" *ngIf="!showRoleModal && selectedRole">
+    <form class="register-form" (ngSubmit)="onSubmit()">
+      <div class="form-header">
+        <div>
+          <h2>{{ isAgency ? '受助者註冊' : '捐助者註冊' }}</h2>
+          <p>{{ isAgency ? '請填寫機構資料與帳號資訊。' : '歡迎成為捐助者，填寫帳號與聯絡資訊。' }}</p>
+        </div>
+        <button type="button" class="ghost-btn" (click)="backToRoleSelection()">重新選擇身份</button>
+      </div>
+
+      <!-- 捐助者：第三方註冊提示 -->
+      <div class="input-grid" *ngIf="!isAgency">
+        <div class="social-login">
+          <div class="social-row">
+            <p>或使用其他應用註冊</p>
+            <div class="social-buttons">
+              <button type="button" class="social-btn google" (click)="socialRegister('google')">
+                Google<i class="fa-brands fa-google"></i>
+              </button>
+              <button type="button" class="social-btn line" (click)="socialRegister('line')">LINE<i class="fa-brands fa-line"></i></button>
+              <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')">
+                Facebook<i class="fa-brands fa-facebook"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 共用基本欄位 -->
+      <div class="input-grid">
+        <label class="field full" *ngIf="isAgency">
+          <span>電子信箱</span>
+          <input type="email" [(ngModel)]="agencyForm.email" name="agencyEmail" required />
+        </label>
+
+        <label class="field full" *ngIf="!isAgency">
+          <span>電子信箱</span>
+          <input type="email" [(ngModel)]="donorForm.email" name="donorEmail" required />
+        </label>
+
+        <label class="field full" *ngIf="isAgency">
+          <span>機構名稱</span>
+          <input type="text" [(ngModel)]="agencyForm.agencyName" name="agencyAgencyName" required />
+        </label>
+
+        <label class="field full" *ngIf="!isAgency">
+          <span>帳號名稱</span>
+          <input type="text" [(ngModel)]="donorForm.accountName" name="donorAccountName" required />
+        </label>
+
+        <label class="field full" *ngIf="isAgency">
+          <span>機構統一編號</span>
+          <input type="text" [(ngModel)]="agencyForm.registrationNumber" name="agencyRegistrationNumber" />
+        </label>
+
+        <label class="field full" *ngIf="isAgency">
+          <span>負責人姓名</span>
+          <input type="text" [(ngModel)]="agencyForm.representative" name="agencyRepresentative" />
+        </label>
+
+        <label class="field full" *ngIf="isAgency">
+          <span>聯絡電話</span>
+          <input type="tel" [(ngModel)]="agencyForm.contactPhone" name="agencyContactPhone" />
+        </label>
+
+        <label class="field full" *ngIf="isAgency">
+          <span>機構預設地址</span>
+          <input type="text" [(ngModel)]="agencyForm.defaultAddress" name="agencyDefaultAddress" />
+        </label>
+
+        <!-- 聯絡人（自然人）區塊：選填，用於後續驗證 -->
+        <div *ngIf="isAgency" class="field-group">
+          <h3>聯絡人資訊（選填，供後續確認使用）</h3>
+
+          <label class="field full">
+            <span>聯絡人姓名</span>
+            <input type="text" [(ngModel)]="agencyForm.contactPersonName" name="contactPersonName" />
+          </label>
+
+          <label class="field full">
+            <span>聯絡人電話</span>
+            <input type="tel" [(ngModel)]="agencyForm.contactPersonPhone" name="contactPersonPhone" />
+          </label>
+
+          <label class="field full">
+            <span>聯絡人電子信箱</span>
+            <input type="email" [(ngModel)]="agencyForm.contactPersonEmail" name="contactPersonEmail" />
+          </label>
+
+          <!-- 國民身分證號等高敏感欄位建議先不強制填寫 -->
+          <label class="field full">
+            <span>是否同意我們後續聯絡以確認身分？</span>
+            <label class="checkbox-inline">
+              <input type="checkbox" [(ngModel)]="agencyForm.consentToContact" name="consentToContact" />
+              <span>同意被聯絡</span>
+            </label>
+          </label>
+
+          <label class="field full">
+            <span>驗證文件（選填，上傳後會由後端審核）</span>
+            <input type="file" (change)="onVerificationFile($event)" />
+          </label>
+        </div>
+
+        <label class="field full" *ngIf="isAgency">
+          <span>密碼</span>
+          <input type="password" [(ngModel)]="agencyForm.password" name="agencyPassword" required />
+        </label>
+
+        <label class="field full" *ngIf="!isAgency">
+          <span>密碼</span>
+          <input type="password" [(ngModel)]="donorForm.password" name="donorPassword" required />
+        </label>
+      </div>
+
+      <div class="actions">
+        <div class="action-links">
+          <a routerLink="/login">已有帳號？直接登入</a>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button type="submit" class="primary-btn">送出註冊</button>
+      </div>
+
+      <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+    </form>
+  </div>
+</section>

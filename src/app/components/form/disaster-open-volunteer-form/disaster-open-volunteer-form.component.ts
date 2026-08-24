@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
+import { VolunteerDemand } from '../../../models/volunteer/volunteer-demand';
 
 @Component({
   selector: 'app-disaster-open-volunteer-form',
@@ -8,7 +10,10 @@ import { Router } from '@angular/router';
   templateUrl: './disaster-open-volunteer-form.component.html',
   styleUrl: './disaster-open-volunteer-form.component.scss',
 })
-export class DisasterOpenVolunteerFormComponent {
+export class DisasterOpenVolunteerFormComponent implements OnInit {
+
+  volunteer!: VolunteerDemand;
+  serviceItems: string[] = [];
 
   volunteerName = '';
   phone = '';
@@ -18,9 +23,31 @@ export class DisasterOpenVolunteerFormComponent {
   serviceDate = '';
   startTime = '';
   endTime = '';
-  people = 1;
   note = '';
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private volunteerDemandService: VolunteerDemandService
+  ) {}
+
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const volunteer = this.volunteerDemandService.getVolunteerById(id);
+
+    if (!volunteer) {
+      this.router.navigate(['/disaster/open']);
+      return;
+    }
+
+    this.volunteer = volunteer;
+    this.serviceItems = volunteer.serviceItems;
+    this.location = volunteer.location;
+    this.serviceDate = volunteer.date.replace(/\//g, '-');
+
+    const [startTime, endTime] = volunteer.serviceTime.split(' - ');
+    this.startTime = startTime ?? '';
+    this.endTime = endTime ?? '';
+  }
   cancel() {
     this.router.navigate(['/disaster/open']);
   }
@@ -35,7 +62,6 @@ export class DisasterOpenVolunteerFormComponent {
       !this.serviceDate ||
       !this.startTime ||
       !this.endTime ||
-      !this.people ||
       !this.note.trim()
     ) {
       alert('請完整填寫所有欄位！');
@@ -61,7 +87,6 @@ export class DisasterOpenVolunteerFormComponent {
       serviceDate: this.serviceDate,
       startTime: this.startTime,
       endTime: this.endTime,
-      people: this.people,
       note: this.note,
     });
 

@@ -33,6 +33,10 @@ export const routes: Routes = [
     path: 'donor/history',
     loadComponent: () => import('./features/donor-history/donor-history.component').then((m) => m.DonorHistoryComponent), // 歷史紀錄與進度追蹤
   },
+  {
+    path: 'tracking',
+    loadComponent: () => import('./features/logistics/tracking/tracking.component').then((m) => m.TrackingComponent),
+  },
 
   {
     path: 'donor/disaster/needs',
@@ -44,12 +48,12 @@ export const routes: Routes = [
   loadComponent: () =>import('./features/disaster/disaster-open/disaster-open.component').then((m) => m.DisasterOpenComponent),
   },
   {
-  path: 'disaster/open/detail',
+  path: 'disaster/open/detail/:id',
   canActivate: [disasterOpenGuard],
   loadComponent: () => import('./components/page/disaster-open-detail-page/disaster-open-detail-page.component').then((m) => m.DisasterOpenDetailPageComponent),
   },
   {
-  path: 'disaster/open/volunteer/detail',
+  path: 'disaster/open/volunteer/detail/:id',
   canActivate: [disasterOpenGuard],
   loadComponent: () => import('./components/page/disaster-open-volunteer-detail-page/disaster-open-volunteer-detail-page.component').then((m) => m.DisasterOpenVolunteerDetailPageComponent),
   },
@@ -59,7 +63,7 @@ export const routes: Routes = [
   loadComponent: () => import('./components/form/disaster-open-supply-form/disaster-open-supply-form.component').then((m) => m.DisasterOpenSupplyFormComponent),
   },
   {
-  path: 'disaster/open/volunteer/form',
+  path: 'disaster/open/volunteer/form/:id',
   canActivate: [disasterOpenGuard],
   loadComponent: () => import('./components/form/disaster-open-volunteer-form/disaster-open-volunteer-form.component').then((m) => m.DisasterOpenVolunteerFormComponent),
   },
@@ -71,17 +75,33 @@ export const routes: Routes = [
       import('./features/daily/agency-daily-workspace/agency-daily-workspace.component').then((m) => m.AgencyDailyWorkspaceComponent), // 日常需求發布管理區
   },
   {
+    path: 'agency/daily-form',
+    loadComponent: () => import('./components/form/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
+  },
+  {
+    path: 'agency/daily-edit/:id',
+    loadComponent: () => import('./components/form/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
+  },
+  {
+    path: 'agency/daily-detail/:id',
+    loadComponent: () => import('./components/data-list/daily-detail/daily-detail.component').then((m) => m.DailyDetailComponent),
+  },
+  {
+    path: 'agency/daily-batch-edit',
+    loadComponent: () => import('./components/form/daily-batch-edit/daily-batch-edit.component').then((m) => m.DailyBatchEditComponent),
+  },
+  {
     path: 'agency/disaster',
     loadComponent: () =>
       import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then((m) => m.AgencyDisasterWorkspaceComponent), // 急難救助需求管理區
   },
   {
-    path: 'agency/supply-create',
-    loadComponent: () => import('./components/form/supply-create/supply-create.component').then((m) => m.SupplyCreateComponent),
+    path: 'agency/supply-form',
+    loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
     path: 'agency/supply-edit/:id',
-    loadComponent: () => import('./components/form/supply-create/supply-create.component').then((m) => m.SupplyCreateComponent),
+    loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
     path: 'agency/supply-detail/:id',
@@ -106,6 +126,11 @@ export const routes: Routes = [
     path: 'admin/disaster-control',
     loadComponent: () =>
       import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
+  },
+
+  {
+    path: 'admin/dashboard',
+    loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
   },
 
   // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回大廳

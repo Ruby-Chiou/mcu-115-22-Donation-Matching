@@ -19,3 +19,11 @@
     </section>
   </div>
 }
+<!-- 懸浮切換面板 -->
+<div class="dev-switcher">
+  <span class="title"><span class="material-symbols-outlined"> construction </span> 開發者身份切換</span>
+  <button (click)="switchRole('guest')">訪客</button>
+  <button (click)="switchRole('admin')">管理者</button>
+  <button (click)="switchRole('donor')">捐助者</button>
+  <button (click)="switchRole('agency')">受助者</button>
+</div>

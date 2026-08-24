@@ -2,39 +2,22 @@
 
   @if (type === 'material') {
 
-    <app-disaster-open-card
-      type="material">
-    </app-disaster-open-card>
-
-    <app-disaster-open-card
-      type="material">
-    </app-disaster-open-card>
-
-    <app-disaster-open-card
-      type="material">
-    </app-disaster-open-card>
-
-    <app-disaster-open-card
-      type="material">
-    </app-disaster-open-card>
+    @for (demand of demands; track demand.id) {
+      <app-disaster-open-card
+        type="material"
+        [demand]="demand"
+        [demandId]="demand.id">
+      </app-disaster-open-card>
+    }
 
   } @else {
 
-    <app-disaster-open-card
-      type="volunteer">
-    </app-disaster-open-card>
-
-    <app-disaster-open-card
-      type="volunteer">
-    </app-disaster-open-card>
-
-    <app-disaster-open-card
-      type="volunteer">
-    </app-disaster-open-card>
-
-    <app-disaster-open-card
-      type="volunteer">
-    </app-disaster-open-card>
+    @for (volunteer of volunteers; track volunteer.id) {
+      <app-disaster-open-card
+        type="volunteer"
+        [volunteer]="volunteer">
+      </app-disaster-open-card>
+    }
 
   }
 
