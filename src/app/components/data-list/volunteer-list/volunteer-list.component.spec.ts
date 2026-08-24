@@ -41,4 +41,12 @@ describe('VolunteerListComponent', () => {
     expect(component.filteredDemands.slice(0, 4).map((demand) => demand.id)).toEqual([3, 5, 9, 10]);
     expect(component.filteredDemands.at(-1)?.id).toBe(1);
   });
+
+  it('should infer unpublish dates from priority', () => {
+    component.loadDemands();
+
+    expect(component.demands.find((demand) => demand.id === 1)?.displayUnpublishAt).toBe('2026/8/4');
+    expect(component.demands.find((demand) => demand.id === 3)?.displayUnpublishAt).toBe('尚未發布');
+    expect(component.demands.find((demand) => demand.id === 6)?.displayUnpublishAt).toBe('2026/8/15');
+  });
 });

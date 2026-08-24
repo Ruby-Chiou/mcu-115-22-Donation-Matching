@@ -48,27 +48,12 @@
     </div>
 
 
-    <!-- 服務日期 -->
-    <div class="form-group">
-      <label>
-        服務日期 <span>*</span>
-      </label>
-
-      <input
-        type="date"
-        [(ngModel)]="demand.date"
-        [class.invalid-field]="isInvalid('date')"
-      />
-    </div>
-
-
-
     <!-- 服務地點 -->
     <div class="form-group">
       <label>
         服務地點 <span>*</span>
         <span class="word-count">
-          {{ demand.location?.length || 0 }}/50
+          {{ demand.location.length || 0 }}/50
         </span>
       </label>
 
@@ -127,7 +112,7 @@
         需求原因 <span>*</span>
 
         <span class="word-count">
-          {{ demand.reason ?.length || 0 }}/300
+          {{ demand.reason.length || 0 }}/300
         </span>
       </label>
       <textarea
@@ -141,10 +126,10 @@
 <div class="form-group">
     <label>
       緊急優先度 <span>*</span>
+      <span class="priority-hint">
+        (普通：於14天後下架&nbsp;&nbsp;&nbsp;緊急：於7天後下架&nbsp;&nbsp;&nbsp;非常緊急：於3天後下架)
+      </span>
     </label>
-<span>
-  (普通:14天內&nbsp;&nbsp;&nbsp;緊急:7天內&nbsp;&nbsp;&nbsp;非常緊急:3天內)
-</span>
 <div class="priority-box">
       <label class="normal">
         <input type="radio" name="priority" value="普通" [(ngModel)]="demand.priority" />

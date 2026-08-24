@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
 import { VolunteerDemand } from '../../../models/agency/vdemand';
@@ -8,7 +8,7 @@ import { VolunteerDemand } from '../../../models/agency/vdemand';
 @Component({
   selector: 'app-volunteer-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './volunteer-form.component.html',
   styleUrls: ['./volunteer-form.component.scss']
 })
@@ -36,7 +36,6 @@ export class VolunteerFormComponent implements OnInit {
     id: 0,
     type: '',
     people: null,
-    date: '',
     location: '',
     condition: '',
     workContent: '',
@@ -112,9 +111,6 @@ export class VolunteerFormComponent implements OnInit {
         return !this.demand.people ||
                this.demand.people < 1;
 
-      case 'date':
-        return !this.demand.date;
-
       case 'location':
         return !this.demand.location.trim();
 
@@ -160,10 +156,6 @@ export class VolunteerFormComponent implements OnInit {
       this.demand.people < 1
     ) {
       this.invalidFields.push('people');
-    }
-
-    if (!this.demand.date) {
-      this.invalidFields.push('date');
     }
 
     if (!this.demand.location.trim()) {

@@ -20,18 +20,21 @@ demands: (VolunteerDemand & {
     selected: boolean;
     displayStatus: DisplayVolunteerStatus;
     displayCreatedAt: string;
+    displayUnpublishAt: string;
   })[] = [];
 
   filteredDemands: (VolunteerDemand & {
     selected: boolean;
     displayStatus: DisplayVolunteerStatus;
     displayCreatedAt: string;
+    displayUnpublishAt: string;
   })[] = [];
 
   pagedDemands: (VolunteerDemand & {
     selected: boolean;
     displayStatus: DisplayVolunteerStatus;
     displayCreatedAt: string;
+    displayUnpublishAt: string;
   })[] = [];
 
   selectAll = false;
@@ -275,6 +278,8 @@ demands: (VolunteerDemand & {
         displayCreatedAt:
           item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
 
+        displayUnpublishAt: this.getUnpublishAt(item),
+
         category: item.type ?? '其他',
       };
     });
@@ -429,6 +434,27 @@ demands: (VolunteerDemand & {
   // 排序
   // =========================
 
+  private getUnpublishAt(demand: VolunteerDemand): string {
+    if (demand.status === '隱藏' || !demand.createdAt) {
+      return '尚未發布';
+    }
+
+    const unpublishAt = new Date(demand.createdAt);
+    const daysToAdd = {
+      普通: 14,
+      緊急: 7,
+      非常緊急: 3,
+    }[demand.priority];
+
+    if (Number.isNaN(unpublishAt.getTime())) {
+      return '尚未發布';
+    }
+
+    unpublishAt.setDate(unpublishAt.getDate() + daysToAdd);
+
+    return unpublishAt.toLocaleDateString('zh-TW');
+  }
+
   private getCreatedAtTime(demand: VolunteerDemand): number {
     if (demand.status === '隱藏' || !demand.createdAt) {
       return Number.POSITIVE_INFINITY;
@@ -538,6 +564,7 @@ demands: (VolunteerDemand & {
       selected: boolean;
       displayStatus: DisplayVolunteerStatus;
       displayCreatedAt: string;
+      displayUnpublishAt: string;
     }
   ) {
     let status: VolunteerStatus;
@@ -568,6 +595,8 @@ demands: (VolunteerDemand & {
     if (status === '上架' || status === '下架') {
       item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布';
     }
+
+    item.displayUnpublishAt = this.getUnpublishAt(item);
 
     this.disasterDemandService.updateDemand(item);
   }

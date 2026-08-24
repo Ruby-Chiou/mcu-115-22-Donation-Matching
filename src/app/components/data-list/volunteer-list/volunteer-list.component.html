@@ -207,13 +207,6 @@
         </th>
 
         <th
-          class="created-time-column"
-          style="width: 90px"
-        >
-          服務日期
-        </th>
-
-        <th
           class="item-column"
           style="width: auto"
         >
@@ -231,6 +224,12 @@
           發布時間
         </th>
 
+        <th
+          class="created-time-column"
+          style="width: 110px"
+        >
+          下架時間
+        </th>
         <th
           class="message-column"
           style="width: 75px"
@@ -284,13 +283,6 @@
           {{ item.people ?? 0 }} 人
         </td>
 
-
-        <!-- 服務日期 -->
-        <td>
-          {{ item.date }}
-        </td>
-
-
         <!-- 服務地點 -->
         <td
           class="item-column"
@@ -313,10 +305,14 @@
           {{ item.priority }}
         </td>
 
-
         <!-- 發布時間 -->
         <td class="created-time-column">
           {{ item.displayCreatedAt || '尚未發布' }}
+        </td>
+
+        <!-- 下架時間 -->
+        <td class="created-time-column">
+          {{ item.displayUnpublishAt || '尚未發布' }}
         </td>
 
 
