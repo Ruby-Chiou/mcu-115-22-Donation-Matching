@@ -1,9 +1,10 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { HeaderComponent } from './components/layout/header/header.component'; // 引入導覽列
 import { FooterComponent } from './components/layout/footer/footer.component';
 import { DisasterClosedModalService } from './core/services/disaster-closed-modal.service';
+import { DisasterControlService } from './core/services/disaster-control.service';
 
 @Component({
   selector: 'app-root',
@@ -17,20 +18,46 @@ export class App {
 
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly disasterControl = inject(DisasterControlService);
+  private hasReloadedAfterClose = false;
 
   constructor() {
+    let previousClosedAt = this.disasterControl.data().closedAt;
+    effect(() => {
+      const closedAt = this.disasterControl.data().closedAt;
+      const wasJustClosed = closedAt !== null && closedAt !== previousClosedAt;
+      previousClosedAt = closedAt;
+
+      if (
+        wasJustClosed &&
+        !this.hasReloadedAfterClose &&
+        (this.router.url === '/donor/disaster' || this.router.url.startsWith('/disaster/open'))
+      ) {
+        this.hasReloadedAfterClose = true;
+        this.closedModal.show();
+        window.setTimeout(() => window.location.reload(), 2500);
+      }
+    });
+
     const blockClosedDisasterClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       const isClosed = localStorage.getItem('disasterOpen') !== 'true';
-      const isDisasterOpenPage = this.router.url.startsWith('/disaster/open');
+      const isDisasterOpenPage =
+        this.router.url.startsWith('/disaster/open') ||
+        this.router.url === '/donor/disaster';
       const isInteractiveControl = target?.closest(
         'button, a, input, textarea, select, [role="button"]'
       );
+      const isDisasterControl =
+        (target?.closest('.donor-disaster-page') ||
+        this.router.url.startsWith('/disaster/open')) &&
+        !target?.closest('.map-button');
 
       if (
         isClosed &&
         isDisasterOpenPage &&
         isInteractiveControl &&
+        isDisasterControl &&
         !target?.closest('.disaster-closed-modal')
       ) {
         event.preventDefault();

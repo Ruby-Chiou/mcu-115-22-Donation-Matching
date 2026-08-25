@@ -18,10 +18,10 @@ interface Comment {
     FormsModule,
     NgClass
   ],
-  templateUrl: './disaster-open-detail-page.component.html',
-  styleUrl: './disaster-open-detail-page.component.scss',
+  templateUrl: './donor-disaster-supply-detail-page.component.html',
+  styleUrl: './donor-disaster-supply-detail-page.component.scss',
 })
-export class DisasterOpenDetailPageComponent implements OnInit {
+export class DonorDisasterSupplyDetailPageComponent implements OnInit {
 
   // =========================
   // 目前查看的需求

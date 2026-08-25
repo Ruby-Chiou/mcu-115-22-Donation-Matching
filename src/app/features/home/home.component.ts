@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   const disasterOpen =
     localStorage.getItem('disasterOpen') === 'true';
     if (disasterOpen) {
-      this.router.navigate(['/disaster/open']);
+      this.router.navigate(['/donor/disaster']);
     }
     else {
       this.router.navigate(['/donor/disaster']);

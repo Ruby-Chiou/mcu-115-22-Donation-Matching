@@ -38,6 +38,47 @@
   </div>
 
 </section>
+
+<section class="schedule-card">
+  <h2>預約關閉災害捐助</h2>
+  @if (disasterData().scheduledCloseAt) {
+    <p class="scheduled-close-summary">
+      災害捐助將於
+      <strong>{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }}</strong>
+      關閉
+    </p>
+  } @else {
+    <p class="scheduled-close-summary empty">
+      尚未設定關閉時間
+    </p>
+  }
+  <div class="form-group">
+    <label for="scheduledCloseAt">
+      預計關閉時間
+    </label>
+    <input
+      id="scheduledCloseAt"
+      type="datetime-local"
+      [(ngModel)]="scheduledCloseAt">
+  </div>
+  <div class="form-group">
+    <label for="announcement">
+      災害救助公告
+    </label>
+    <textarea
+      id="announcement"
+      [(ngModel)]="announcement"
+      placeholder="例如：本次物資募集將於指定時間結束。">
+    </textarea>
+  </div>
+  <button
+    type="button"
+    class="save-btn"
+    (click)="saveSchedule()">
+    儲存預約設定
+  </button>
+</section>
+
 <section class="disaster-card">
   <h2>目前災害資訊</h2>
   @if (!isEditing) {

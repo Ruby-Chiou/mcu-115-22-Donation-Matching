@@ -1,19 +1,17 @@
 import { Component, Input } from '@angular/core';
-import {
-  DisasterOpenCardComponent,
-} from '../../../components/card/disaster-open-card/disaster-open-card.component';
+import { DonorDisasterCardComponent } from '../../card/donor-disaster-card/donor-disaster-card.component';
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { DailyDemand } from '../../../models/agency/daily-demand';
 import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
 import { VolunteerDemand } from '../../../models/volunteer/volunteer-demand';
 
 @Component({
-  selector: 'app-disaster-open-card-list',
-  imports: [DisasterOpenCardComponent],
-  templateUrl: './disaster-open-card-list.component.html',
-  styleUrl: './disaster-open-card-list.component.scss',
+  selector: 'app-donor-disaster-card-list',
+  imports: [DonorDisasterCardComponent],
+  templateUrl: './donor-disaster-card-list.component.html',
+  styleUrl: './donor-disaster-card-list.component.scss',
 })
-export class DisasterOpenCardListComponent {
+export class DonorDisasterCardListComponent {
   @Input() type: 'material' | 'volunteer' = 'material';
   demands: DailyDemand[];
   volunteers: VolunteerDemand[];

@@ -1,0 +1,41 @@
+<div class="donor-disaster-page">
+  <nav class="request-switcher" aria-label="災害救助類型">
+    <button
+      type="button"
+      class="switch-button"
+      [class.active]="activeType() === 'material'"
+      [attr.aria-selected]="activeType() === 'material'"
+      (click)="selectType('material')">
+      物資捐助
+    </button>
+    <span class="switch-divider" aria-hidden="true">|</span>
+    <button
+      type="button"
+      class="switch-button"
+      [class.active]="activeType() === 'volunteer'"
+      [attr.aria-selected]="activeType() === 'volunteer'"
+      (click)="selectType('volunteer')">
+      志工需求
+    </button>
+    <button
+      type="button"
+      class="switch-button map-button"
+      aria-label="前往災害救助地圖"
+      (click)="goToMap()">
+      <span aria-hidden="true">🗺️</span>
+      地圖
+    </button>
+  </nav>
+
+  @if (activeType() === 'material') {
+    <section class="needs-section" aria-labelledby="material-heading">
+      <h1 id="material-heading">物資捐助</h1>
+      <app-donor-disaster-card-list type="material"></app-donor-disaster-card-list>
+    </section>
+  } @else {
+    <section class="needs-section" aria-labelledby="volunteer-heading">
+      <h1 id="volunteer-heading">志工需求</h1>
+      <app-donor-disaster-card-list type="volunteer"></app-donor-disaster-card-list>
+    </section>
+  }
+</div>

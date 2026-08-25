@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { CanActivateFn } from '@angular/router';
 
-import { disasterOpenGuard } from './disaster-open.guard';
+import { donorDisasterGuard } from './donor-disaster.guard';
 
-describe('disasterOpenGuard', () => {
-  const executeGuard: CanActivateFn = (...guardParameters) => TestBed.runInInjectionContext(() => disasterOpenGuard(...guardParameters));
+describe('donorDisasterGuard', () => {
+  const executeGuard: CanActivateFn = (...guardParameters) => TestBed.runInInjectionContext(() => donorDisasterGuard(...guardParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({});

@@ -3,20 +3,20 @@
   @if (type === 'material') {
 
     @for (demand of demands; track demand.id) {
-      <app-disaster-open-card
+      <app-donor-disaster-card
         type="material"
         [demand]="demand"
         [demandId]="demand.id">
-      </app-disaster-open-card>
+      </app-donor-disaster-card>
     }
 
   } @else {
 
     @for (volunteer of volunteers; track volunteer.id) {
-      <app-disaster-open-card
+      <app-donor-disaster-card
         type="volunteer"
         [volunteer]="volunteer">
-      </app-disaster-open-card>
+      </app-donor-disaster-card>
     }
 
   }

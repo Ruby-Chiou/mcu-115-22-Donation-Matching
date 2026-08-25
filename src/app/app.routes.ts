@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
-import { disasterOpenGuard} from './components/card/disaster-open.guard';
+import { donorDisasterGuard } from './components/card/donor-disaster.guard';
 
 export const routes: Routes = [
   // 1. 預設首頁
@@ -25,7 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'donor/disaster',
-    canActivate: [disasterOpenGuard],
+    canActivate: [donorDisasterGuard],
     loadComponent: () =>
       import('./features/disaster/donor-disaster-lobby/donor-disaster-lobby.component').then((m) => m.DonorDisasterLobbyComponent), // 災害救助大廳
   },
@@ -44,27 +44,27 @@ export const routes: Routes = [
   },
   {
   path: 'disaster/open',
-  canActivate: [disasterOpenGuard],
-  loadComponent: () =>import('./features/disaster/disaster-open/disaster-open.component').then((m) => m.DisasterOpenComponent),
+  redirectTo: '/donor/disaster',
+  pathMatch: 'full',
   },
   {
   path: 'disaster/open/detail/:id',
-  canActivate: [disasterOpenGuard],
-  loadComponent: () => import('./components/page/disaster-open-detail-page/disaster-open-detail-page.component').then((m) => m.DisasterOpenDetailPageComponent),
+  canActivate: [donorDisasterGuard],
+  loadComponent: () => import('./components/page/donor-disaster-supply-detail-page/donor-disaster-supply-detail-page.component').then((m) => m.DonorDisasterSupplyDetailPageComponent),
   },
   {
   path: 'disaster/open/volunteer/detail/:id',
-  canActivate: [disasterOpenGuard],
-  loadComponent: () => import('./components/page/disaster-open-volunteer-detail-page/disaster-open-volunteer-detail-page.component').then((m) => m.DisasterOpenVolunteerDetailPageComponent),
+  canActivate: [donorDisasterGuard],
+  loadComponent: () => import('./components/page/donor-disaster-volunteer-detail-page/donor-disaster-volunteer-detail-page.component').then((m) => m.DonorDisasterVolunteerDetailPageComponent),
   },
   {
   path: 'disaster/open/supply/form',
-  canActivate: [disasterOpenGuard],
+  canActivate: [donorDisasterGuard],
   loadComponent: () => import('./components/form/disaster-open-supply-form/disaster-open-supply-form.component').then((m) => m.DisasterOpenSupplyFormComponent),
   },
   {
   path: 'disaster/open/volunteer/form/:id',
-  canActivate: [disasterOpenGuard],
+  canActivate: [donorDisasterGuard],
   loadComponent: () => import('./components/form/disaster-open-volunteer-form/disaster-open-volunteer-form.component').then((m) => m.DisasterOpenVolunteerFormComponent),
   },
 
@@ -124,8 +124,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/disaster-control',
-    loadComponent: () =>
-      import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
+    loadComponent: () => import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
   },
 
   {

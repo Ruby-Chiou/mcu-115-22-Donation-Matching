@@ -166,11 +166,9 @@
       志工需求條件
     </h2>
     <ul>
-      <li>
-        @for (requirement of volunteer.requirements; track requirement) {
-          <li>{{ requirement }}</li>
-        }
-      </li>
+      @for (requirement of volunteer.requirements; track requirement) {
+        <li>{{ requirement }}</li>
+      }
     </ul>
   </div>
 

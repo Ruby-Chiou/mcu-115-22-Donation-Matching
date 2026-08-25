@@ -12,12 +12,12 @@ interface Comment {
 }
 
 @Component({
-  selector: 'app-disaster-open-volunteer-detail-page',
+  selector: 'app-donor-disaster-volunteer-detail-page',
   imports: [FormsModule, DecimalPipe],
-  templateUrl: './disaster-open-volunteer-detail-page.component.html',
-  styleUrl: './disaster-open-volunteer-detail-page.component.scss',
+  templateUrl: './donor-disaster-volunteer-detail-page.component.html',
+  styleUrl: './donor-disaster-volunteer-detail-page.component.scss',
 })
-export class DisasterOpenVolunteerDetailPageComponent implements OnInit {
+export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
   volunteer!: VolunteerDemand;
 
   constructor(

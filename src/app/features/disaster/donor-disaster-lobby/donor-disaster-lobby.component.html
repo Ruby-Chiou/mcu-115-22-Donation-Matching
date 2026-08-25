@@ -1,8 +1,20 @@
 <h1 class="title">災害救助大廳</h1>
+@if (disasterData().announcement) {
+  <section class="disaster-announcement" aria-labelledby="announcement-title">
+    <h2 id="announcement-title">災害救助公告</h2>
+    <p>{{ disasterData().announcement }}</p>
+    @if (disasterData().scheduledCloseAt) {
+      <p class="scheduled-close">
+        預計結束時間：{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }}
+      </p>
+    }
+  </section>
+}
 <div class="title-row">
   <div class="title-box">政府最新消息</div>
   <div class="title-box">歷史紀錄</div>
 </div>
+
 <div class="menu-container">
   <aside class="left-menu">
     <div class="news-card">
@@ -39,23 +51,19 @@
   <a [routerLink]="['/donor/disaster/needs']">查看歷史紀錄</a>
   </aside>
 </div>
-<div class="world">世界災害新聞</div>
 
-<div class="card-container">
-  @for(item of worldList; track $index) {
-    <div class="card">
-      <!-- 1. 最上方大標題 -->
-      <h3 class="card-title">{{item.text}}</h3>
+<app-donor-disaster-page></app-donor-disaster-page>
 
-      <!-- 2. 下方內容區（圖左、文右） -->
-      <div class="card-body">
-        <div class="item-image">
-          <img [src]="item.image" alt="">
-        </div>
-        <div class="item-text">
-          <p>{{item.highlight}}</p>
-        </div>
-      </div>
-    </div>
-  }
-</div>
+<section id="disaster-map-section" class="map-section" aria-labelledby="map-title">
+  <div class="map-sidebar">
+    <h2 id="map-title">災害救助地圖</h2>
+    <label for="location-select">查看救助地點</label>
+    <select id="location-select" class="location-select" (change)="selectType($event)">
+      <option value="">請選擇</option>
+      <option value="volunteer">志工</option>
+      <option value="donation">物資</option>
+    </select>
+  </div>
+  <div id="disaster-map"></div>
+</section>
+
