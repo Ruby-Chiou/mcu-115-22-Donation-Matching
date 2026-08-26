@@ -1,0 +1,202 @@
+.detail-info{
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  box-sizing: border-box;
+
+  margin: 40px auto;
+  padding: 70px 30px 30px;
+
+  background: #fff;
+}
+.detail-page {
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px;
+
+}
+
+/* 左邊圖片 */
+.detail-image {
+  width: 100%;
+  height: 240px;
+  max-width: 100%;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+  overflow: hidden;
+
+  background: #f3f3f3;
+}
+
+.detail-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* 右邊內容 */
+.detail-content {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 返回 */
+.back-btn {
+  position: absolute;
+  top: 25px;
+  left: 30px;
+
+  border: none;
+  background: none;
+
+  padding: 0;
+
+  color: #666;
+  font-size: 15px;
+
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  color: #333;
+}
+
+/* 標題 */
+.detail-content h2 {
+  margin: 0 0 25px;
+
+  font-size: 28px;
+  color: #333;
+}
+
+.quantity-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.quantity-row h3,
+.quantity-row h4,
+.quantity-row p {
+  margin: 0;
+}
+
+.contact-row h4 {
+  padding-left: 1em;
+}
+
+/* 小標題 */
+.detail-content h4 {
+  margin: 22px 0 8px;
+
+  font-size: 16px;
+  color: #555;
+}
+
+/* 需求資訊 */
+.info {
+  display: flex;
+  gap: 15px;
+}
+
+.info > div {
+  flex: 1;
+  min-width: 0;
+
+  padding: 12px;
+
+  background: #f7f7f7;
+  border-radius: 8px;
+
+  text-align: center;
+}
+
+.info span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 18px;
+  color: #888;
+}
+
+.info strong {
+  font-size: 18px;
+  color: #333;
+}
+
+/* 文字 */
+.detail-content p {
+  margin: 5px 0;
+
+  line-height: 1.7;
+  color: #555;
+}
+
+.description {
+  max-width: 660px;
+  color: #555;
+}
+
+
+/* 我要捐助 */
+.contact-btn {
+  display: block;
+  margin-top: 25px;
+  margin-left: auto;
+
+  width: 180px;
+  padding: 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #e68a3a;
+  color: white;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+@media (max-width: 700px) {
+  .detail-page {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 70px 20px 25px;
+  }
+
+  .detail-content {
+    text-align: center;
+  }
+
+  .info {
+    justify-content: center;
+  }
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 12px;
+
+  border-radius: 20px;
+
+  background: #f3e8dc;
+  color: #b86b2c;
+
+  font-size: 14px;
+}

@@ -23,6 +23,20 @@ export const routes: Routes = [
     loadComponent: () => import('./features/daily/donor-daily-lobby/donor-daily-lobby.component').then((m) => m.DonorDailyLobbyComponent), // 日常捐助大廳
   },
   {
+    path: 'donor/daily/detail/:id',
+    loadComponent: () =>
+      import('./components/data-list/donor-daily-card-list/donor-daily-card-list.component').then(
+        (m) => m.DonorDailyCardListComponent
+      ),
+  },
+  {
+    path: 'donor/daily/form',
+    loadComponent: () =>
+      import('./components/form/donor-daily-form/donor-daily-form.component').then(
+        (m) => m.DonorDailyFormComponent
+      ),
+  },
+  {
     path: 'donor/disaster',
     loadComponent: () =>
       import('./features/disaster/donor-disaster-lobby/donor-disaster-lobby.component').then((m) => m.DonorDisasterLobbyComponent), // 災害救助大廳
@@ -40,8 +54,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/daily/daily-locations/daily-locations.component').then(m => m.DailyLocationsComponent)
   },
-
-
   // 4. 社福機構模組 (機構端)
   {
     path: 'agency/daily',

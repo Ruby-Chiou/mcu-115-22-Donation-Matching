@@ -1,0 +1,82 @@
+<section class="featured-section">
+
+  <div class="featured-grid">
+
+    <div
+      class="featured-card"
+      *ngFor="let item of paginatedDonations"
+    >
+
+      <div class="featured-image">
+        <img
+          *ngIf="item.image"
+          [src]="item.image"
+          [alt]="item.title"
+        >
+      </div>
+
+      <div class="featured-content">
+
+        <h3>{{ item.title }}</h3>
+
+        <div class="tags">
+          <span class="tag">{{ item.category }}</span>
+          <span class="tag">{{ item.target }}</span>
+        </div>
+
+        <div class="info">
+          <p>需求數量: {{ item.quantity }}</p>
+          <p>{{ item.organization }}</p>
+          <p>{{ item.address }}</p>
+        </div>
+
+        <button
+          class="detail-btn"
+          [routerLink]="[
+            '/donor/daily/detail',
+            item.id
+          ]"
+        >
+          查看更多
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 分頁 -->
+  <div
+    class="pagination"
+    *ngIf="totalPages > 1"
+  >
+
+    <button
+      class="page-btn"
+      [disabled]="currentPage === 1"
+      (click)="goToPage(currentPage - 1)"
+    >
+      ‹
+    </button>
+
+    <button
+      class="page-btn"
+      *ngFor="let page of [].constructor(totalPages); let i = index"
+      [class.active]="currentPage === i + 1"
+      (click)="goToPage(i + 1)"
+    >
+      {{ i + 1 }}
+    </button>
+
+    <button
+      class="page-btn"
+      [disabled]="currentPage === totalPages"
+      (click)="goToPage(currentPage + 1)"
+    >
+      ›
+    </button>
+
+  </div>
+
+</section>

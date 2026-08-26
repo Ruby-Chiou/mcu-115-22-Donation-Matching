@@ -1,0 +1,110 @@
+<div class="filter-section">
+
+  <!-- 類別 -->
+  <div class="filter-row">
+
+    <div class="filter-title">
+      類別
+    </div>
+
+    <div class="filter-options">
+
+      <button
+        *ngFor="let option of categoryOptions"
+        class="filter-option"
+        [class.active]="selectedCategories.includes(option)"
+        (click)="toggleCategory(option)"
+      >
+        {{ option }}
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 服務對象 -->
+  <div class="filter-row">
+
+    <div class="filter-title">
+      服務對象
+    </div>
+
+    <div class="filter-options">
+
+      <button
+        *ngFor="let option of targetOptions"
+        class="filter-option"
+        [class.active]="selectedTargets.includes(option)"
+        (click)="toggleTarget(option)"
+      >
+        {{ option }}
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 地區 -->
+  <div class="filter-row">
+
+    <div class="filter-title">
+      地區
+    </div>
+
+    <div class="filter-options">
+
+      <button
+        *ngFor="let option of regionOptions"
+        class="filter-option"
+        [class.active]="selectedRegions.includes(option)"
+        (click)="toggleRegion(option)"
+      >
+        {{ option }}
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 接收方式 -->
+  <div class="filter-row">
+
+    <div class="filter-title">
+      接收方式
+    </div>
+
+    <div class="filter-options">
+
+      <button
+        *ngFor="let option of receiveMethodOptions"
+        class="filter-option"
+        [class.active]="selectedReceiveMethods.includes(option)"
+        (click)="toggleReceiveMethod(option)"
+      >
+        {{ option }}
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 清除篩選 -->
+  <div
+    class="filter-footer"
+    *ngIf="hasFilter()"
+  >
+
+    <button
+      class="clear-filter-btn"
+      (click)="clearFilters()"
+    >
+      <i class="fa-solid fa-trash"></i> 清除篩選
+    </button>
+
+  </div>
+
+</div>
