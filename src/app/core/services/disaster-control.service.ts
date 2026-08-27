@@ -98,11 +98,22 @@ export class DisasterControlService {
 
     const delay = new Date(scheduledCloseAt).getTime() - Date.now();
     if (delay <= 0) {
-      this.setOpen(false);
+      this.closeScheduledDisaster();
       return;
     }
 
-    this.closeTimer = setTimeout(() => this.setOpen(false), delay);
+    this.closeTimer = setTimeout(() => this.closeScheduledDisaster(), delay);
+  }
+
+  private closeScheduledDisaster(): void {
+    this.updateData({
+      isOpen: false,
+      closedAt: Date.now(),
+      scheduledCloseAt: null,
+      announcement: '',
+    });
+    localStorage.setItem('disasterOpen', 'false');
+    this.closeTimer = undefined;
   }
 
   private loadData(): DisasterControlData {

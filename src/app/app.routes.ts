@@ -37,35 +37,29 @@ export const routes: Routes = [
     path: 'tracking',
     loadComponent: () => import('./features/logistics/tracking/tracking.component').then((m) => m.TrackingComponent),
   },
-
   {
     path: 'donor/disaster/needs',
     loadComponent: () =>import('./features/disaster/needs/needs.component').then((m) => m.NeedsComponent),  //災害歷史紀錄
   },
   {
-  path: 'disaster/open',
-  redirectTo: '/donor/disaster',
-  pathMatch: 'full',
-  },
-  {
-  path: 'disaster/open/detail/:id',
+  path: 'donor/disaster/supply/detail/:id',
   canActivate: [donorDisasterGuard],
   loadComponent: () => import('./components/page/donor-disaster-supply-detail-page/donor-disaster-supply-detail-page.component').then((m) => m.DonorDisasterSupplyDetailPageComponent),
   },
   {
-  path: 'disaster/open/volunteer/detail/:id',
+  path: 'donor/disaster/volunteer/detail/:id',
   canActivate: [donorDisasterGuard],
   loadComponent: () => import('./components/page/donor-disaster-volunteer-detail-page/donor-disaster-volunteer-detail-page.component').then((m) => m.DonorDisasterVolunteerDetailPageComponent),
   },
   {
-  path: 'disaster/open/supply/form',
+  path: 'donor/disaster/supply/form/:id',
   canActivate: [donorDisasterGuard],
-  loadComponent: () => import('./components/form/disaster-open-supply-form/disaster-open-supply-form.component').then((m) => m.DisasterOpenSupplyFormComponent),
+  loadComponent: () => import('./components/form/donor-disaster-supply-form/donor-disaster-supply-form.component').then((m) => m.DonorDisasterSupplyFormComponent),
   },
   {
-  path: 'disaster/open/volunteer/form/:id',
+  path: 'donor/disaster/volunteer/form/:id',
   canActivate: [donorDisasterGuard],
-  loadComponent: () => import('./components/form/disaster-open-volunteer-form/disaster-open-volunteer-form.component').then((m) => m.DisasterOpenVolunteerFormComponent),
+  loadComponent: () => import('./components/form/donor-disaster-volunteer-form/donor-disaster-volunteer-form.component').then((m) => m.DisasterOpenVolunteerFormComponent),
   },
 
   // 4. 社福機構模組 (機構端)

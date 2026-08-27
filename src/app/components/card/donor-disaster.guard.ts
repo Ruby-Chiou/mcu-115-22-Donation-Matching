@@ -13,7 +13,7 @@ export const donorDisasterGuard : CanActivateFn = (route, state) => {
   // 如果目前災害是「關閉」
   // 不允許進入 disaster-open
   if (
-    state.url.startsWith('/disaster/open') &&
+    state.url.startsWith('donor/disaster') &&
     !disasterOpen
   ) {
 

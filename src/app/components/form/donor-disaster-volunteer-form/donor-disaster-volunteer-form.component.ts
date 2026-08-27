@@ -5,10 +5,10 @@ import { VolunteerDemandService } from '../../../core/services/volunteer-demand.
 import { VolunteerDemand } from '../../../models/volunteer/volunteer-demand';
 
 @Component({
-  selector: 'app-disaster-open-volunteer-form',
+  selector: 'app-donor-disaster-volunteer-form',
   imports: [FormsModule],
-  templateUrl: './disaster-open-volunteer-form.component.html',
-  styleUrl: './disaster-open-volunteer-form.component.scss',
+  templateUrl: './donor-disaster-volunteer-form.component.html',
+  styleUrl: './donor-disaster-volunteer-form.component.scss',
 })
 export class DisasterOpenVolunteerFormComponent implements OnInit {
 
@@ -35,7 +35,7 @@ export class DisasterOpenVolunteerFormComponent implements OnInit {
     const volunteer = this.volunteerDemandService.getVolunteerById(id);
 
     if (!volunteer) {
-      this.router.navigate(['/disaster/open']);
+      this.router.navigate(['/donor/disaster']);
       return;
     }
 
@@ -49,7 +49,7 @@ export class DisasterOpenVolunteerFormComponent implements OnInit {
     this.endTime = endTime ?? '';
   }
   cancel() {
-    this.router.navigate(['/disaster/open']);
+    this.router.navigate(['/donor/disaster']);
   }
   submitForm() {
 
@@ -92,6 +92,6 @@ export class DisasterOpenVolunteerFormComponent implements OnInit {
 
     alert('志工報名完成！');
 
-    this.router.navigate(['/disaster/open']);
+    this.router.navigate(['/donor/disaster']);
   }
 }

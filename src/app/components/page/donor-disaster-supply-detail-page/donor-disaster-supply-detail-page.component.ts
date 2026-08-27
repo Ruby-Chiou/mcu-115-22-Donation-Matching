@@ -13,11 +13,8 @@ interface Comment {
 }
 
 @Component({
-  selector: 'app-disaster-open-detail-page',
-  imports: [
-    FormsModule,
-    NgClass
-  ],
+  selector: 'app-disaster-supply-detail-page',
+  imports: [FormsModule,NgClass],
   templateUrl: './donor-disaster-supply-detail-page.component.html',
   styleUrl: './donor-disaster-supply-detail-page.component.scss',
 })
@@ -40,40 +37,28 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
     const demand = this.dailyDemandService.getDemandById(id);
 
     if (!demand) {
-      this.router.navigate(['/disaster/open']);
+      this.router.navigate(['/donor/disaster']);
       return;
     }
-
     this.demand = demand;
   }
-
-
   // =========================
   // 返回需求清單
   // =========================
-
   goBackToList() {
-
     this.router.navigate([
-      '/disaster/open'
+      '/donor/disaster'
     ]);
-
   }
-
-
   // =========================
   // 前往物資捐助表單
   // =========================
-
   goToSupplyForm() {
-
     this.router.navigate([
-      '/disaster/open/supply/form'
+      '/donor/disaster/supply/form',
+      this.demand.id
     ]);
-
   }
-
-
   // =========================
   // 接受狀態文字
   // =========================

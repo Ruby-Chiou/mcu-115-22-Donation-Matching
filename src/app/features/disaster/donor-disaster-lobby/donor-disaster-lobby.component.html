@@ -1,11 +1,15 @@
 <h1 class="title">災害救助大廳</h1>
-@if (disasterData().announcement) {
+@if (disasterData().announcement || disasterData().scheduledCloseAt) {
   <section class="disaster-announcement" aria-labelledby="announcement-title">
     <h2 id="announcement-title">災害救助公告</h2>
-    <p>{{ disasterData().announcement }}</p>
+    @if (disasterData().announcement) {
+      <p>{{ disasterData().announcement }}</p>
+    }
     @if (disasterData().scheduledCloseAt) {
-      <p class="scheduled-close">
-        預計結束時間：{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }}
+      <p class="scheduled-close marquee" role="status">
+        <span>
+          預計關閉災害捐助時間：{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }}
+        </span>
       </p>
     }
   </section>

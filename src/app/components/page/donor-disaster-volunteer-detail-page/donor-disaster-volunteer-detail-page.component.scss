@@ -79,10 +79,17 @@
 緊急程度
 ========================= */
 .urgency {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
   margin-bottom: 20px;
+  padding: 6px 12px;
+  border-radius: 6px;
   font-weight: 600;
 }
 .urgent {
+  background: #ffe5e5;
   color: #e53935;
 }
 .urgency-icon {

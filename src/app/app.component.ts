@@ -41,6 +41,10 @@ export class App {
 
     const blockClosedDisasterClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
+      if (target?.closest('#disaster-map-section')) {
+        return;
+      }
+
       const isClosed = localStorage.getItem('disasterOpen') !== 'true';
       const isDisasterOpenPage =
         this.router.url.startsWith('/disaster/open') ||

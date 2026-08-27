@@ -2,17 +2,17 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 @Component({
-  selector: 'app-disaster-open-supply-form',
+  selector: 'app-donor-disaster-supply-form',
   imports: [FormsModule],
-  templateUrl: './disaster-open-supply-form.component.html',
-  styleUrl: './disaster-open-supply-form.component.scss',
+  templateUrl: './donor-disaster-supply-form.component.html',
+  styleUrl: './donor-disaster-supply-form.component.scss',
 })
-export class DisasterOpenSupplyFormComponent {
+export class DonorDisasterSupplyFormComponent {
   constructor(
     private router: Router
   ) {}
   cancelForm() {
-    this.router.navigate(['/disaster/open']);
+    this.router.navigate(['/donor/disaster']);
   }
   donorName = '';
   phone = '';
@@ -117,6 +117,6 @@ export class DisasterOpenSupplyFormComponent {
 
   }
   goToDisasterOpen() {
-    this.router.navigate(['/disaster/open']);
+    this.router.navigate(['/donor/disaster']);
   }
 }

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DisasterOpenVolunteerFormComponent } from './disaster-open-volunteer-form.component';
+import { DisasterOpenVolunteerFormComponent } from './donor-disaster-volunteer-form.component';
 
 describe('DisasterOpenVolunteerFormComponent', () => {
   let component: DisasterOpenVolunteerFormComponent;

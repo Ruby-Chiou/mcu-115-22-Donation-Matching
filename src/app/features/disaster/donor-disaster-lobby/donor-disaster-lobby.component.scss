@@ -26,12 +26,45 @@
 .disaster-announcement p {
   margin: 0;
   line-height: 1.7;
+
 }
 
 .disaster-announcement .scheduled-close {
   margin-top: 8px;
   color: var(--color-text-muted);
-  font-size: 14px;
+  font-size: 24px;
+}
+
+.disaster-announcement .marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.disaster-announcement .marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: announcement-marquee 14s linear infinite;
+}
+
+@keyframes announcement-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disaster-announcement .marquee {
+    white-space: normal;
+  }
+
+  .disaster-announcement .marquee span {
+    padding-left: 0;
+    animation: none;
+  }
 }
 
 /* 1. 調整按鈕容器，寬度設為 1250px 並居中，間距設為 30px（與下方 menu-container 一致） */

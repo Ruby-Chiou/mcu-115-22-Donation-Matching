@@ -31,7 +31,7 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
     const volunteer = this.volunteerDemandService.getVolunteerById(id);
 
     if (!volunteer) {
-      this.router.navigate(['/disaster/open']);
+      this.router.navigate(['/donor/disaster']);
       return;
     }
 
@@ -48,11 +48,11 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
       : 0;
   }
   goToVolunteerForm() {
-    this.router.navigate(['/disaster/open/volunteer/form', this.volunteer.id]);
+    this.router.navigate(['/donor/disaster/volunteer/form', this.volunteer.id]);
   }
 // 返回志工需求清單
   goBackToList() {
-    this.router.navigate(['/disaster/open']);
+    this.router.navigate(['/donor/disaster']);
   }
 
 // =========================
