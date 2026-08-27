@@ -25,12 +25,12 @@ export const routes: Routes = [
   {
     path: 'donor/daily/detail/:id',
     loadComponent: () =>
-      import('./components/data-list/donor-daily-card-list/donor-daily-card-list.component').then(
-        (m) => m.DonorDailyCardListComponent
+      import('./components/data-list/donor-daily-detail/donor-daily-detail.component').then(
+        (m) => m.DonorDailyDetailComponent
       ),
   },
   {
-    path: 'donor/daily/form',
+    path: 'donor/daily/form/:id',
     loadComponent: () =>
       import('./components/form/donor-daily-form/donor-daily-form.component').then(
         (m) => m.DonorDailyFormComponent

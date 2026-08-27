@@ -1,0 +1,96 @@
+<div class="detail-info">
+
+  <div class="detail-page">
+
+    <button
+      class="back-btn"
+      routerLink="/donor/daily"
+    >
+      ← 返回
+    </button>
+
+    <!-- 左邊圖片 -->
+    <div class="detail-image">
+
+      <img
+        [src]="donation?.image || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
+        [alt]="donation?.title || '物資圖片'"
+      >
+
+    </div>
+
+    <!-- 右邊內容 -->
+    <div class="detail-content">
+
+      <h2>{{ donation?.title }}</h2>
+
+      <div class="tags">
+
+        <span class="tag">{{ donation?.category }}</span>
+        <span class="tag">{{ donation?.target }}</span>
+
+      </div>
+
+      <div class="quantity-row">
+        <h3>需求數量</h3>
+        <p>{{ donation?.quantity }}</p>
+      </div>
+
+      <div class="quantity-row">
+        <h3>機構名稱</h3>
+        <p>{{ donation?.organization }}</p>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="quantity-row">
+  <h4>物資狀態</h4>
+  <p class="description">{{ donation?.status }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>接收方式</h4>
+  <p class="description">{{ donation?.receiveMethod }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>需求說明</h4>
+  <p class="description">{{ donation?.requestSummary }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>需求描述</h4>
+  <p class="description">{{ donation?.requestDescription }}</p>
+</div>
+
+<div class="quantity-row contact-row">
+  <h4>聯絡人</h4>
+  <p class="description">{{ donation?.contactPerson }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>聯絡電話</h4>
+  <p class="description">{{ donation?.contactPhone }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>接收地點</h4>
+  <p class="description">{{ donation?.receiveLocation }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>其他說明</h4>
+  <p class="description">{{ donation?.otherDescription }}</p>
+</div>
+
+  <button
+    class="contact-btn"
+    [routerLink]="['/donor/daily/form', donation?.id]"
+  >
+    我要捐助
+  </button>
+
+</div>

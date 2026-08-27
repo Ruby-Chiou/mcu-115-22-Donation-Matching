@@ -16,9 +16,9 @@
         </div>
         <div class="material-text">
           <span class="label">捐助物資</span>
-          <h2>白米</h2>
+          <h2>{{ donation?.title }}</h2>
           <p>受助機構：
-            <strong>社團法人臺東縣弱勢者關懷協會</strong>
+            <strong>{{ donation?.organization }}</strong>
           </p>
         </div>
       </div>
@@ -36,7 +36,7 @@
       <!-- =================================================
            表單
       ================================================= -->
-      <form (ngSubmit)="submitForm()" #supplyForm="ngForm">
+      <form (ngSubmit)="submitForm(supplyForm)" #supplyForm="ngForm" [class.form-submitted]="formSubmitted">
         <!-- 姓名 -->
         <div class="form-group">
           <label>捐助人姓名<span>*</span></label>
@@ -61,11 +61,40 @@
             實際捐贈物資
             <span>*</span>
           </label>
-          <input type="text" name="actualMaterial" [(ngModel)]="actualMaterial" placeholder="例如：統一純水 600ml" required>
+          <input type="text" name="actualMaterial" [(ngModel)]="actualMaterial" placeholder="例如：統一純水 600ml" required >
           <small class="input-hint">
             請填寫實際準備捐贈的品牌及物資名稱
           </small>
+          <!-- 上傳物資照片 -->
+        <div class="form-group">
+          <label>
+            物資照片
+            <span>*</span>
+          </label>
+
+          <div class="file-upload">
+            <button type="button" (click)="materialFileInput.click()">選擇檔案</button>
+            <input
+              #materialFileInput
+              type="file"
+              name="materialFile"
+              accept="image/*,.pdf"
+              (change)="onMaterialFileSelected($event)"
+              required >
+          </div>
+
+          @if (materialFileName) {
+            <div class="selected-file">
+              已選擇：{{ materialFileName }}
+            </div>
+          }
+          <div>
+          <small class="input-hint">
+            請上傳實際捐贈物資照片，可上傳 JPG、PNG 或 PDF
+          </small>
         </div>
+          </div>
+                </div>
         <!-- =================================================
              收據
         ================================================ -->
@@ -84,7 +113,9 @@
                 type="radio"
                 name="needReceipt"
                 value="yes"
-                [(ngModel)]="needReceipt">
+                [(ngModel)]="needReceipt"
+                required
+                class="no-error-border">
               <span>
                 需要
               </span>
@@ -94,7 +125,8 @@
                 type="radio"
                 name="needReceipt"
                 value="no"
-                [(ngModel)]="needReceipt">
+                [(ngModel)]="needReceipt"
+                class="no-error-border">
               <span>
                 不需要
               </span>
@@ -109,7 +141,7 @@
                 收據抬頭
                 <span>*</span>
               </label>
-              <input type="text" name="receiptTitle" [(ngModel)]="receiptTitle" placeholder="請輸入收據抬頭">
+              <input type="text" name="receiptTitle" [(ngModel)]="receiptTitle" placeholder="請輸入收據抬頭" [required]="needReceipt === 'yes'" class="no-error-border">
             </div>
             <div class="form-group">
               <label>
@@ -140,13 +172,13 @@
           </label>
           <div class="radio-group">
             <label class="radio-option">
-              <input type="radio" name="needThankYou" value="yes" [(ngModel)]="needThankYou">
+              <input type="radio" name="needThankYou" value="yes" [(ngModel)]="needThankYou" required class="no-error-border">
               <span>
                 需要
               </span>
             </label>
             <label class="radio-option">
-              <input type="radio" name="needThankYou" value="no" [(ngModel)]="needThankYou">
+              <input type="radio" name="needThankYou" value="no" [(ngModel)]="needThankYou" class="no-error-border">
               <span>
                 不需要
               </span>
@@ -223,16 +255,16 @@
               接收單位
             </span>
             <strong>
-              社團法人臺東縣弱勢者關懷協會
+              {{donation?.organization }}
             </strong>
           </div>
           <div class="address-item">
             <span>接收地址</span>
-            <strong>950 臺東縣臺東市 正氣北路266號</strong>
+            <strong>{{ donation?.receiveLocation }}</strong>
           </div>
           <div class="address-item">
             <span>聯絡電話</span>
-            <strong>03-1234567</strong>
+            <strong>{{ donation?.contactPhone }}</strong>
           </div>
         </div>
         <!-- 寄送注意事項 -->
