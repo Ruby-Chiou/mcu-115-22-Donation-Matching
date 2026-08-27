@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -93,7 +93,8 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private dailyDemandService: DailyDemandService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef // 👈 注入這行
   ) {
     history.scrollRestoration = 'manual';
   }
@@ -214,41 +215,49 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   // 讀取需求
-  loadDemands() {
-    this.demands = this.dailyDemandService.getDemands().map((item) => {
+  // 新增一個載入中的旗標（可以宣告在類別屬性區塊，例如：isLoading = false;）
+  isLoading = true;
+
+  async loadDemands() {
+    this.isLoading = true;
+    const rawDemands = await this.dailyDemandService.getDemands();
+
+    this.demands = rawDemands.map((item) => {
       let currentStatus: DailyDisplayStatus = '已上架';
 
       if (item.status === '上架') {
         currentStatus = '已上架';
       }
-
       if (item.status === '隱藏') {
         currentStatus = '隱藏中';
       }
-
       if (item.status === '下架') {
         currentStatus = '已下架';
       }
 
       return {
         ...item,
-
         selected: false,
-
         status: item.status,
-
         displayStatus: currentStatus,
-
         displayCreatedAt:
           item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
-
         remaining: item.remaining ?? item.amount ?? 0,
-
         category: item.category ?? '其他',
+        receiveMethod: item.receiveMethod ?? '寄送', // 👈 補回接收方式，避免欄位消失
       };
     });
 
-    this.applyFilters(false);
+    this.filteredDemands = [...this.demands];
+
+    if (this.userHasSorted) {
+      this.applySort();
+    } else {
+      this.updatePagination();
+    }
+
+    this.isLoading = false; // 👈 載入完成，關閉轉圈/空白
+    this.cdr.detectChanges();
   }
 
   // 搜尋

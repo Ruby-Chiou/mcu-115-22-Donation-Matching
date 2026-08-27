@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DailyDemand } from '../../../models/agency/daily-demand';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-daily-form',
@@ -79,54 +80,103 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   constructor(
     private dailyDemandService: DailyDemandService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef // 👈 注入這行
   ) {}
 
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    // 1. 嘗試從路徑參數抓（例如 /agency/daily-edit/5）
+    let id = Number(this.route.snapshot.paramMap.get('id'));
+
+    // 2. 如果路徑抓不到，嘗試從 Query Parameters 抓（例如 /agency/daily-edit?id=5）
+    if (!id || isNaN(id)) {
+      const queryId = this.route.snapshot.queryParamMap.get('id');
+      if (queryId) id = Number(queryId);
+    }
+
+    // 3. 如果還是抓不到，嘗試從歷史記錄 state 抓
+    if (!id || isNaN(id)) {
+      const navigation = this.router.getCurrentNavigation();
+      if (navigation?.extras?.state) {
+        id = Number((navigation.extras.state as any)['id']);
+      }
+    }
+
+    console.log('🔗 最終抓到的編輯 ID 是：', id);
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
 
     // 編輯模式
-    if (id) {
+    if (id && !isNaN(id) && id > 0) {
       this.isEditMode = true;
 
-      const data = this.dailyDemandService.getDemands().find((item) => item.id === id);
+      this.dailyDemandService.getDemandByIdAsync(id).then((data) => {
+        console.log('📦 成功從 Service 撈到要編輯的單筆資料：', data);
 
-      if (data) {
-        this.demand = {
-          ...data,
-          status: data.status ?? '上架',
-          remaining: data.remaining ?? null,
-          receiveMethod: data.receiveMethod ?? '寄送',
-          recipient: data.recipient ?? '',
+        if (data) {
+          this.demand = {
+            ...data,
+            status: data.status ?? '上架',
+            remaining: data.remaining ?? null,
 
-          serviceTargets: data.serviceTargets ?? {
-            老人: false,
-            嬰幼兒: false,
-            孩童: false,
-            青少年: false,
-            身障: false,
-            貧困: false,
-            重症照護: false,
-            寵物: false,
-            流浪: false,
-            野生: false,
-          },
+            // 修正 1：確保 receiveMethod 是字串而非陣列
+            receiveMethod: Array.isArray(data.receiveMethod) ? (data.receiveMethod[0] ?? '寄送') : (data.receiveMethod ?? '寄送'),
 
-          customServiceTargets: data.customServiceTargets?.length ? data.customServiceTargets : [''],
+            recipient: data.recipient ?? '',
 
-          conditions: data.conditions ?? {
-            全新: '',
-            二手: '',
-            有擦痕: '',
-            過期: '',
-            毀損: '',
-          },
+            // 修正 2：把陣列轉成前端 Checkbox 要的物件格式
+            serviceTargets: Array.isArray(data.serviceTargets)
+              ? {
+                  老人: data.serviceTargets.includes('老人'),
+                  嬰幼兒: data.serviceTargets.includes('嬰幼兒'),
+                  孩童: data.serviceTargets.includes('孩童'),
+                  青少年: data.serviceTargets.includes('青少年'),
+                  身障: data.serviceTargets.includes('身障'),
+                  貧困: data.serviceTargets.includes('貧困'),
+                  重症照護: data.serviceTargets.includes('重症照護'),
+                  寵物: data.serviceTargets.includes('寵物'),
+                  流浪: data.serviceTargets.includes('流浪'),
+                  野生: data.serviceTargets.includes('野生'),
+                }
+              : (data.serviceTargets ?? {
+                  老人: false,
+                  嬰幼兒: false,
+                  孩童: false,
+                  青少年: false,
+                  身障: false,
+                  貧困: false,
+                  重症照護: false,
+                  寵物: false,
+                  流浪: false,
+                  野生: false,
+                }),
 
-          customConditions: data.customConditions?.length ? data.customConditions : [''],
-        };
-      }
+            customServiceTargets: data.customServiceTargets?.length ? data.customServiceTargets : [''],
+
+            // 修正 3：確保 conditions 是物件
+            conditions: (Array.isArray(data.conditions)
+              ? {
+                  全新: data.conditions.includes('全新') ? '全新' : '',
+                  二手: data.conditions.includes('二手') ? '二手' : '',
+                  有擦痕: data.conditions.includes('有擦痕') ? '有擦痕' : '',
+                  過期: data.conditions.includes('過期') ? '過期' : '',
+                  毀損: data.conditions.includes('毀損') ? '毀損' : '',
+                }
+              : (data.conditions ?? { 全新: '', 二手: '', 有擦痕: '', 過期: '', 毀損: '' })) as any,
+
+            customConditions: data.customConditions?.length ? data.customConditions : [''],
+
+            // 修正 4：category 統一對應
+            category: data.category ?? '其他',
+          };
+
+          this.cdr.detectChanges();
+        } else {
+          console.warn('⚠️ 找不到對應 ID 的資料！');
+        }
+      });
+    } else {
+      console.log('✨ 目前為【新增模式】，沒有偵測到有效 ID');
     }
   }
 

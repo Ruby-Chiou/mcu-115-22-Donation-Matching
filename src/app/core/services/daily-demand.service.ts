@@ -1,5 +1,21 @@
 import { Injectable } from '@angular/core';
 import { DailyDemand, CreateDailyDemand } from '../../models/agency/daily-demand';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://wxryryyiakzkeeoorlrq.supabase.co';
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cnlyeXlpYWt6a2Vlb29ybHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2NzY0MTIsImV4cCI6MjEwMzI1MjQxMn0.B8Q_B3diy-hDK37HttpNscXfLcDbSOYpP7A14DlQF8A';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export async function fetchSupplyItems() {
+  const { data, error } = await supabase.from('agency-daily-supply_items').select('*');
+
+  if (error) {
+    console.error('抓取物資失敗：', error);
+    return [];
+  }
+  return data;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -844,14 +860,37 @@ export class DailyDemandService {
     },
   ];
 
+  // 🚀 改良版的 getDemands：優先從 Supabase 抓，抓不到或失敗就退回使用假資料
+  async getDemands(): Promise<DailyDemand[]> {
+    const { data, error } = await supabase.from('agency-daily-supply_items').select('*');
+
+    // 🔍 加上這兩行來抓戰犯
+    console.log('Supabase 回傳的 error:', error);
+    console.log('Supabase 回傳的 data:', data);
+
+    if (error || !data || data.length === 0) {
+      console.warn('⚠️ 無法從 Supabase 取得資料，改用本地假資料：', error);
+      return this.demands;
+    }
+
+    // 如果 Supabase 有資料，您可以把資料對應成您需要的格式回傳
+    return data as DailyDemand[];
+  }
+
   addDemand(demand: CreateDailyDemand) {
     this.demands.push({
       ...demand,
       id: this.demands.length + 1,
     });
   }
-  getDemands() {
-    return this.demands;
+  //getDemands() {
+  //  return this.demands;
+  //}
+
+  // 新增：根據 ID 從 Supabase（或本地陣列）抓取單筆資料
+  async getDemandByIdAsync(id: number): Promise<DailyDemand | undefined> {
+    const demands = await this.getDemands();
+    return demands.find((demand) => demand.id === id);
   }
 
   getDemandById(id: number): DailyDemand | undefined {
