@@ -1,20 +1,45 @@
-import { Component, ElementRef, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
 import { DisasterDemand } from '../../../models/agency/demand';
 
 @Component({
   selector: 'app-supply-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ImagePreviewComponent],
   templateUrl: './supply-form.component.html',
-  styleUrls: ['./supply-form-A.component.scss', './supply-form-B.component.scss'],
+  styleUrls: ['./supply-form-A.component.scss', './supply-form-B.component.scss', './supply-form-C.component.scss'],
 })
 export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
   submitted = false;
+  imageFiles: File[] = [];
+  // 圖片預覽
+  showImagePreview = false;
+  previewImage = '';
+  previewImageName = '';
+
+  // 類別下拉選單
+  categoryDropdownOpen = false;
+
+  categoryOptions: NonNullable<DisasterDemand['category']>[] = [
+    '食品與飲用水',
+    '衣物與保暖用品',
+    '醫療與照護用品',
+    '清潔與衛生用品',
+    '嬰幼兒用品',
+    '長者與身心障礙用品',
+    '女性生理用品',
+    '寵物與動物用品',
+    '防災與照明用品',
+    '通訊與求救用品',
+    '生活與炊事用品',
+    '居住安置與修繕用品',
+    '其他',
+  ];
 
   fromDetail = false;
 
@@ -35,7 +60,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     reason: '',
     description: '',
 
-    // 接受物資狀態
     conditions: {
       全新: '',
       二手: '',
@@ -52,13 +76,21 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     phone: '',
     note: '',
     brand: '',
+    image: [],
+    imageFileNames: [],
     category: '',
+    contactTimeWeekday: false,
+    contactTimeWeekend: false,
+    contactTimeMorning: false,
+    contactTimeAfternoon: false,
+    contactTimeEvening: false,
   };
 
   constructor(
     private disasterDemandService: DisasterDemandService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -77,6 +109,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
           ...data,
           status: data.status ?? '上架',
           remaining: data.remaining ?? null,
+          image: data.image ?? [],
+          imageFileNames: data.imageFileNames ?? [],
+
+          contactTimeWeekday: data.contactTimeWeekday ?? false,
+          contactTimeWeekend: data.contactTimeWeekend ?? false,
+          contactTimeMorning: data.contactTimeMorning ?? false,
+          contactTimeAfternoon: data.contactTimeAfternoon ?? false,
+          contactTimeEvening: data.contactTimeEvening ?? false,
 
           conditions: data.conditions ?? {
             全新: '',
@@ -88,6 +128,19 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
           customConditions: data.customConditions?.length ? data.customConditions : [''],
         };
+
+        // 載入原本已儲存的圖片
+        this.imageFiles = [];
+
+        Promise.all(
+          (data.image ?? []).map((image, index) => {
+            const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+            return this.base64ToFile(image, fileName);
+          })
+        ).then((files) => {
+          this.imageFiles = files;
+          this.cdr.detectChanges();
+        });
       }
     }
   }
@@ -99,6 +152,31 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         behavior: 'instant',
       });
     }, 0);
+  }
+
+  async base64ToFile(base64: string, fileName: string): Promise<File> {
+    const response = await fetch(base64);
+    const blob = await response.blob();
+
+    return new File([blob], fileName, { type: blob.type });
+  }
+
+  // 點擊類別下拉選單以外的地方時關閉
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+
+    if (!target.closest('.custom-select')) {
+      this.categoryDropdownOpen = false;
+    }
+  }
+
+  toggleCategoryDropdown() {
+    this.categoryDropdownOpen = !this.categoryDropdownOpen;
+  }
+  selectCategory(category: NonNullable<DisasterDemand['category']>) {
+    this.demand.category = category;
+    this.categoryDropdownOpen = false;
   }
 
   save() {
@@ -164,16 +242,29 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
 
     if (this.isEditMode) {
-      // 上架 / 下架 都需要發布時間
-      if ((this.demand.status === '上架' || this.demand.status === '下架') && !this.demand.createdAt) {
-        this.demand.createdAt = new Date().toISOString();
-      }
+      const originalStatus = this.disasterDemandService.getDemands().find((item) => item.id === this.demand.id)?.status;
 
-      // 隱藏代表尚未發布，清除時間
-      if (this.demand.status === '隱藏') {
-        this.demand.createdAt = undefined;
-      }
+      const originalPublishedAt = this.demand.publishedAt;
+      const now = new Date();
 
+      if (this.demand.status === '上架') {
+        if (originalStatus !== '上架') {
+          this.demand.publishedAt = now.toISOString();
+          if (!this.demand.createdAt) {
+            this.demand.createdAt = now.toISOString();
+          }
+        } else if (originalPublishedAt) {
+          this.demand.publishedAt = originalPublishedAt;
+        }
+        if (this.demand.publishedAt) {
+          this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(this.demand.publishedAt), this.demand.priority);
+        }
+      } else if (this.demand.status === '隱藏') {
+        this.demand.publishedAt = undefined;
+        this.demand.expectedOffShelfAt = undefined;
+      } else if (this.demand.status === '下架') {
+        this.demand.expectedOffShelfAt = now.toISOString();
+      }
       this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
@@ -182,11 +273,23 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/agency/disaster']);
       }
     } else {
-      // 新增時只有上架才有發布時間
+      // 按下「發布需求」的時間
+      const createdDate = new Date();
+
+      // 創建日期：記錄按下發布的日期
+      this.demand.createdAt = createdDate.toISOString();
+
+      // 如果新增時選擇「上架」
       if (this.demand.status === '上架') {
-        this.demand.createdAt = new Date().toISOString();
+        // 上架日期 = 發布日期
+        this.demand.publishedAt = createdDate.toISOString();
+
+        // 計算預計下架日期
+        this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, this.demand.priority);
       } else {
-        this.demand.createdAt = undefined;
+        // 隱藏：尚未上架
+        this.demand.publishedAt = undefined;
+        this.demand.expectedOffShelfAt = undefined;
       }
 
       this.disasterDemandService.addDemand(this.demand);
@@ -207,6 +310,29 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     if (this.demand.customConditions.length === 0) {
       this.demand.customConditions.push('');
     }
+  }
+  calculateExpectedOffShelfDate(publishedDate: Date, priority: DisasterDemand['priority']): string {
+    const offShelfDate = new Date(publishedDate);
+
+    switch (priority) {
+      case '普通':
+        offShelfDate.setDate(offShelfDate.getDate() + 30);
+        break;
+
+      case '緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 14);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 7);
+        break;
+    }
+
+    return offShelfDate.toISOString();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   toggleCondition(key: keyof DisasterDemand['conditions']) {
@@ -277,7 +403,84 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  trackByIndex(index: number): number {
-    return index;
+  limitTextLength(event: Event, field: 'description', maxLength: number) {
+    const input = event.target as HTMLTextAreaElement;
+
+    if (input.value.length > maxLength) {
+      input.value = input.value.slice(0, maxLength);
+    }
+
+    this.demand[field] = input.value;
+  }
+
+  onImageSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+
+    // 最多 5 張
+    if (this.imageFiles.length >= 5) {
+      alert('最多只能上傳 5 張圖片');
+      input.value = '';
+      return;
+    }
+
+    // 限制 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      alert('圖片大小不可超過 5MB');
+      input.value = '';
+      return;
+    }
+
+    // 加入圖片清單
+    this.imageFiles.push(file);
+
+    // 讀取圖片
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (!this.demand.image) {
+        this.demand.image = [];
+      }
+
+      if (!this.demand.imageFileNames) {
+        this.demand.imageFileNames = [];
+      }
+
+      this.demand.image.push(reader.result as string);
+      this.demand.imageFileNames.push(file.name);
+    };
+
+    reader.readAsDataURL(file);
+
+    // 清空 input
+    input.value = '';
+  }
+
+  removeImage(index: number) {
+    this.imageFiles.splice(index, 1);
+
+    if (this.demand.image) {
+      this.demand.image.splice(index, 1);
+    }
+
+    if (this.demand.imageFileNames) {
+      this.demand.imageFileNames.splice(index, 1);
+    }
+  }
+
+  openImagePreview(image: string, imageName: string): void {
+    this.previewImage = image;
+    this.previewImageName = imageName;
+    this.showImagePreview = true;
+  }
+  closeImagePreview(): void {
+    this.showImagePreview = false;
+    this.previewImage = '';
+    this.previewImageName = '';
   }
 }

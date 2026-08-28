@@ -1,11 +1,68 @@
-/* =========================
-   優先度
-========================= */
+/*接受物資狀態*/
+.condition-left {
+  width: 180px;
+}
 
+.condition-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  margin-bottom: 2px;
+  border-bottom: 1px dashed #1e88e5;
+  transition: background-color 0.2s ease;
+  border-radius: 6px;
+}
+
+.condition-row:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.condition-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.condition-name {
+  color: var(--color-text-main, #333333);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.condition-toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background-color: #90a4ae;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.condition-toggle.accept {
+  background-color: #66a96b;
+}
+
+.condition-toggle.reject {
+  background-color: #c75b5b;
+}
+
+.condition-toggle:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+/* 優先度*/
 .priority-box {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 16px;
   margin-bottom: 35px;
 }
 
@@ -17,7 +74,7 @@
   margin-bottom: 0;
   cursor: pointer;
   white-space: nowrap;
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .priority-box input[type='radio'] {
@@ -37,14 +94,11 @@
   color: #d32f2f;
 }
 
-/* =========================
-   公開狀態
-========================= */
-
+/*公開狀態*/
 .status-box {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 16px;
   margin-bottom: 35px;
 }
 
@@ -55,7 +109,7 @@
   gap: 6px;
   margin-bottom: 0;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .status-box input[type='radio'] {
@@ -63,10 +117,7 @@
   margin: 0;
 }
 
-/* =========================
-   按鈕
-========================= */
-
+/*按鈕*/
 .button-area {
   width: 100%;
   display: flex;
@@ -85,10 +136,7 @@
   font-weight: 500;
 }
 
-/* =========================
-   按鈕顏色
-========================= */
-
+/*按鈕顏色*/
 .save-btn {
   background-color: var(--color-brand-primary);
   color: white;
@@ -107,16 +155,24 @@
   opacity: 0.85;
 }
 
-/* =========================
-   必填標記與提示
-========================= */
-
+/*必填標記與提示*/
 .required {
   color: #d32f2f;
   font-weight: bold;
 }
 
 .error-input {
+  border: 2px solid #d32f2f !important;
+  background-color: #fff5f5;
+}
+
+/* 類別下拉選單必填錯誤 */
+.custom-select.error-input {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.custom-select.error-input .custom-select-trigger {
   border: 2px solid #d32f2f !important;
   background-color: #fff5f5;
 }
@@ -145,10 +201,16 @@
   white-space: nowrap;
 }
 
-/* =========================
-   按鈕通用元件設定
-========================= */
+/*緊急優先度限制說明*/
+.priority-limit-info {
+  font-size: 13px;
+  color: #555;
+  font-weight: 400;
+  margin-left: 8px;
+  white-space: nowrap;
+}
 
+/*按鈕通用元件設定*/
 .add-condition-btn,
 .delete-condition-btn {
   width: 30px;
@@ -171,14 +233,12 @@
   background-color: #f5f5f5;
 }
 
-/* =========================
-   物資狀態區（與服務對象區完全對稱）
-========================= */
-
+/* 物資狀態區（與服務對象區完全對稱）*/
 .condition-area {
   display: flex;
   align-items: flex-start;
-  gap: 100px;
+  gap: 130px;
+  margin-top: 35px;
   margin-bottom: 35px;
 }
 
@@ -214,4 +274,40 @@
   width: 320px !important;
   flex-shrink: 0;
   margin-bottom: 0 !important;
+}
+
+/*自訂類別下拉選單*/
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+/* 下拉選單按鈕 */
+.custom-select-trigger {
+  width: 100%;
+  height: 46px;
+  padding: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #333333;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* 下拉選單文字 */
+.custom-select-trigger span:first-child {
+  color: #333333;
+}
+
+/* 箭頭 */
+.dropdown-arrow {
+  font-size: 13px;
+  color: #555;
+  margin-left: 10px;
 }

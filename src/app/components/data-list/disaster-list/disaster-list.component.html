@@ -97,23 +97,25 @@
     <tr *ngIf="filteredDemands.length === 0">
       <td colspan="10" class="empty-message">
         <div class="empty-title">尚未輸入需求或無符合條件的需求</div>
-        <div class="empty-description">請點選上方「新增需求」建立急難需求，或嘗試重新篩選。</div>
+        <div class="empty-description">請點選上方「新增需求」建立災害需求，或嘗試重新篩選。</div>
       </td>
     </tr>
 
     <!-- 調整後的欄位寬度配比 -->
     <thead *ngIf="filteredDemands.length > 0">
       <tr>
-        <th class="checkbox-column" style="width: 55px">選取</th>
-        <th style="width: 60px">編號</th>
+        <th class="checkbox-column" style="width: 50px">選取</th>
+        <th style="width: 55px">編號</th>
         <th class="item-column" style="width: auto">需求物</th>
-        <th class="category-column" style="width: 90px">類別</th>
-        <th style="width: 100px">需求數量</th>
-        <th style="width: 105px">緊急優先度</th>
-        <th style="width: 100px">剩餘需求</th>
-        <th class="created-time-column" style="width: 110px">發布時間</th>
-        <th class="message-column" style="width: 75px">留言區</th>
-        <th class="operation-column" style="width: 340px">操作</th>
+        <th class="category-column" style="width: 93px">類別</th>
+        <th style="width: 90px">需求數量</th>
+        <th style="width: 95px">緊急優先度</th>
+        <th style="width: 90px">剩餘需求</th>
+        <th class="created-time-column" style="width: 95px">建立日期</th>
+        <th class="published-time-column" style="width: 95px">上架日期</th>
+        <th class="off-shelf-time-column" style="width: 100px">預計下架日期</th>
+        <th class="message-column" style="width: 52px">留言區</th>
+        <th class="operation-column" style="width: 300px">操作</th>
       </tr>
     </thead>
 
@@ -123,13 +125,13 @@
           <input type="checkbox" [(ngModel)]="item.selected" />
         </td>
 
-        <td class="id-column">{{ item.id }}</td>
+        <td class="id-column">B{{ item.id }}</td>
 
         <td class="item-column" [title]="item.item">
           <div class="item-text">{{item.item}}</div>
         </td>
         <td class="category-column">{{item.category}}</td>
-        <td>{{item.amount}}{{item.unit}}</td>
+        <td>{{item.amount}} {{item.unit}}</td>
 
         <!-- 優先度顏色 -->
         <td
@@ -142,9 +144,13 @@
           {{item.priority}}
         </td>
 
-        <td>{{item.remaining}}{{item.unit}}</td>
+        <td>{{item.remaining}} {{item.unit}}</td>
 
-        <td class="created-time-column">{{item.displayCreatedAt}}</td>
+        <td class="created-time-column">{{ item.displayCreatedAt }}</td>
+
+        <td class="published-time-column">{{ item.displayPublishedAt }}</td>
+
+        <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
 
         <td class="message-column">
           <a [routerLink]="['/agency/disaster-message', item.id]"> {{item.messageCount || 0}} </a>
@@ -168,7 +174,7 @@
             >
               <option value="已上架">已上架</option>
               <option value="隱藏中">隱藏中</option>
-              <option value="">已下架</option>
+              <option value="已下架">已下架</option>
             </select>
           </div>
         </td>
@@ -280,4 +286,4 @@
     (closed)="closeDeleteModal()"
     (deleted)="onDeleted()"
   ></app-supply-delete>
-
+</div>

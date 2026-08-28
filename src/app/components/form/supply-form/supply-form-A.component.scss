@@ -9,10 +9,7 @@ h1 {
   color: var(--color-brand-primary);
 }
 
-/* =========================
-編輯頁需求編號
-========================= */
-
+/*編輯頁需求編號*/
 .edit-header-info {
   display: flex;
   align-items: center;
@@ -26,16 +23,16 @@ h1 {
   background-color: #f0f4f9;
   border: 1px solid #d0e1f9;
   border-radius: 8px;
-  padding: 8px 16px; /* 👈 稍微加大上下 padding，讓空間均勻 */
+  padding: 8px 16px;
   gap: 8px;
-  line-height: 1; /* 👈 新增：重置行高，防止文字向上偏移 */
+  line-height: 1;
 }
 
 .info-label {
   font-size: 15px;
   color: #5f6368;
   font-weight: 500;
-  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+  line-height: 1;
 }
 
 .info-value {
@@ -44,13 +41,10 @@ h1 {
   font-weight: 700;
   font-family: monospace, sans-serif;
   letter-spacing: 0.5px;
-  line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
+  line-height: 1;
 }
 
-/* =========================
-   表單外框
-========================= */
-
+/*表單外框*/
 .form-box {
   background-color: #e3f2fd;
   border: 1px solid #ddd;
@@ -58,10 +52,7 @@ h1 {
   padding: 30px;
 }
 
-/* =========================
-   標籤
-========================= */
-
+/*標籤*/
 label {
   display: block;
   margin-bottom: 8px;
@@ -74,10 +65,7 @@ label {
   margin-top: 15px;
 }
 
-/* =========================
-   輸入框
-========================= */
-
+/*輸入框*/
 input,
 select,
 textarea {
@@ -112,10 +100,7 @@ textarea {
   resize: vertical;
 }
 
-/* =========================
-   數量 + 單位
-========================= */
-
+/*數量 + 單位*/
 .quantity-box {
   display: flex;
   align-items: center;
@@ -128,6 +113,11 @@ textarea {
 
 .phone-input {
   width: 420px;
+  margin-bottom: 35px;
+}
+
+.contact-time-title {
+  margin-top: 15px;
 }
 
 .unit-input {
@@ -135,13 +125,10 @@ textarea {
 }
 
 .medium-input {
-  width: 450px;
+  width: 600px;
 }
 
-/* =========================
-   短欄位（數量描述、可選類別）
-========================= */
-
+/*短欄位（數量描述、可選類別）*/
 .short-field {
   width: 515px;
 }
@@ -157,66 +144,162 @@ textarea {
   left: 0px;
 }
 
-/* =========================
-   接受物資狀態（緊湊排列）
-========================= */
-
-.condition-left {
-  width: 180px; /* 收窄欄位寬度，把按鈕拉近 */
+/*物資示意圖片*/
+.image-upload-box {
+  width: 550px;
+  max-width: 100%;
+  margin-bottom: 40px;
 }
 
-/* 修改重點：縮小 Padding 與 Margin，微調極窄垂直間隔 */
-.condition-row {
+.image-upload-area {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border: 2px dashed #b0bec5;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 選擇圖片按鈕 */
+.image-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border: 1px solid #1565c0;
+  border-radius: 8px;
+  color: #1565c0;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.image-upload-btn:hover {
+  background-color: #f0f7ff;
+}
+
+/* 隱藏原生檔案選擇 */
+.image-upload-btn input[type='file'] {
+  display: none;
+}
+
+/* 上傳提示 (按鈕右側) */
+.image-upload-hint {
+  font-size: 14px;
+  color: #666666;
+  white-space: nowrap;
+}
+
+/* 圖片清單 */
+.selected-image-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 單張圖片 */
+.selected-image {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 8px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 8px; /* 縮小上下內邊距 (原為 10px) */
-  margin-bottom: 2px; /* 縮小底部外邊距 (原為 6px) */
-  border-bottom: 1px dashed #1e88e5;
-  transition: background-color 0.2s ease;
-  border-radius: 6px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
-.condition-row:hover {
-  background-color: rgba(255, 255, 255, 0.4); /* 滑鼠懸停微亮 */
-}
-
-.condition-row:last-child {
-  border-bottom: none; /* 最後一行不加上劃線 */
-  margin-bottom: 0;
-}
-
-.condition-name {
-  color: var(--color-text-main, #333333);
-  font-weight: 500;
-  font-size: 16px;
-}
-
-.condition-toggle {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: none;
-  background-color: #90a4ae;
-  color: white;
+/* 圖片名稱 */
+.selected-image-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin: 0;
+  background-color: #e8f3ff;
+  border: 1px solid #a6cffd;
+  border-radius: 8px;
+  color: #1565c0;
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 500;
+  text-align: left;
   cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 滑鼠懸停樣式（移除底線，改為加深背景） */
+.selected-image-name:hover {
+  background-color: #d0e5ff;
+  border-color: #1565c0;
+  color: #0d47a1;
+  text-decoration: none;
+}
+
+/* 單張圖片條狀列：直接作為膠囊載體 */
+.selected-image {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 6px 14px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  background-color: #e8f3ff;
+  border: 1px solid #a6cffd;
+  border-radius: 8px;
+}
+
+/* 內部的檔名取消所有背景與邊框 */
+.selected-image-name {
+  background: transparent;
+  border: none;
+  color: #1565c0;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 移除圖片按鈕 */
+.remove-image-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.condition-toggle.accept {
-  background-color: #66a96b;
-}
-
-.condition-toggle.reject {
-  background-color: #c75b5b;
-}
-
-.condition-toggle:hover {
-  opacity: 0.85;
-  transform: scale(1.05); /* 輕微放大效果，增加手感 */
+.remove-image-btn:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
 }
