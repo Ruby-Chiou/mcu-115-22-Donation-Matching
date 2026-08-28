@@ -134,7 +134,7 @@
             <div class="item-text">{{item.item}}</div>
           </td>
           <td class="category-column">{{item.category}}</td>
-          <td>{{item.amount}}{{item.unit}}</td>
+          <td>{{item.amount}} {{item.unit}}</td>
 
           <!-- 優先度顏色 -->
           <td
@@ -147,7 +147,7 @@
             {{item.priority}}
           </td>
 
-          <td>{{item.remaining}}{{item.unit}}</td>
+          <td>{{item.remaining}} {{item.unit}}</td>
 
           <td class="receive-method-column">
             <div class="receive-method-list" [class.has-both]="item.receiveMethod['寄送'] && item.receiveMethod['面交']">
