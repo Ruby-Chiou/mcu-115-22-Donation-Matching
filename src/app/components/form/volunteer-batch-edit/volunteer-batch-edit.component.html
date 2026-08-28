@@ -46,20 +46,6 @@
       />
     </div>
 
-    <!-- 服務日期 -->
-    <label class="label-row">
-      服務日期
-      <span class="required">*</span>
-    </label>
-    <div class="input-row">
-      <input
-        type="date"
-        class="medium-input"
-        [class.invalid]="demand.dateError"
-        [(ngModel)]="demand.date"
-      />
-    </div>
-
     <!-- 服務地點 -->
     <label class="label-row">
       服務地點
@@ -124,6 +110,9 @@
     <label class="label-row">
       緊急優先度
       <span class="required">*</span>
+      <span class="priority-hint">
+        (普通：於14天後下架&nbsp;&nbsp;&nbsp;緊急：於7天後下架&nbsp;&nbsp;&nbsp;非常緊急：於3天後下架)
+      </span>
     </label>
     <div class="priority-box">
       <label class="normal">
