@@ -97,26 +97,28 @@
     <table>
       <!-- 無資料 -->
       <tr *ngIf="filteredDemands.length === 0">
-        <td colspan="11" class="empty-message">
+        <td colspan="13" class="empty-message">
           <div class="empty-title">尚未輸入需求或無符合條件的需求</div>
-          <div class="empty-description">請點選上方「新增需求」建立急難需求，或嘗試重新篩選。</div>
+          <div class="empty-description">請點選上方「新增需求」建立日常需求，或嘗試重新篩選。</div>
         </td>
       </tr>
 
       <!-- 調整欄位寬度比例：需求物(22%) 與 操作(28%) 為全表最寬 -->
       <thead *ngIf="filteredDemands.length > 0">
         <tr>
-          <th class="checkbox-column" style="width: 5%">選取</th>
+          <th class="checkbox-column" style="width: 4%">選取</th>
           <th style="width: 5%">編號</th>
-          <th class="item-column" style="width: 24%">需求物</th>
-          <th class="category-column" style="width: 6%">類別</th>
-          <th style="width: 7%">需求數量</th>
-          <th style="width: 8%">緊急優先度</th>
-          <th style="width: 7%">剩餘需求</th>
+          <th class="item-column" style="width: 15%">需求物</th>
+          <th class="category-column" style="width: 7%">類別</th>
+          <th style="width: 6%">需求數量</th>
+          <th style="width: 7%">緊急優先度</th>
+          <th style="width: 6%">剩餘需求</th>
           <th style="width: 7%">接收方式</th>
-          <th class="created-time-column" style="width: 8%">發布時間</th>
+          <th class="created-time-column" style="width: 6.25%">建立日期</th>
+          <th class="published-time-column" style="width: 6.25%">上架日期</th>
+          <th class="off-shelf-time-column" style="width: 8%">預計下架日期</th>
           <th class="message-column" style="width: 5%">留言區</th>
-          <th class="operation-column" style="width: 28%">操作</th>
+          <th class="operation-column" style="width: 21%">操作</th>
         </tr>
       </thead>
 
@@ -126,13 +128,13 @@
             <input type="checkbox" [(ngModel)]="item.selected" />
           </td>
 
-          <td class="id-column">{{ item.id }}</td>
+          <td class="id-column">A{{ item.id }}</td>
 
           <td class="item-column" [title]="item.item">
             <div class="item-text">{{item.item}}</div>
           </td>
           <td class="category-column">{{item.category}}</td>
-          <td>{{item.amount}}{{item.unit}}</td>
+          <td>{{item.amount}} {{item.unit}}</td>
 
           <!-- 優先度顏色 -->
           <td
@@ -145,30 +147,40 @@
             {{item.priority}}
           </td>
 
-          <td>{{item.remaining}}{{item.unit}}</td>
+          <td>{{item.remaining}} {{item.unit}}</td>
 
-          <!-- 接收方式欄位 -->
           <td class="receive-method-column">
-            <span *ngIf="item.receiveMethod === '寄送'" class="receive-method">
-              <!-- 車子 + 左側速度線 -->
-              <span class="custom-truck-wrapper">
-                <span class="speed-lines"></span>
-                <i class="fa-solid fa-truck"></i>
+            <div class="receive-method-list" [class.has-both]="item.receiveMethod['寄送'] && item.receiveMethod['面交']">
+              <!-- 寄送 -->
+              <span *ngIf="item.receiveMethod['寄送']" class="receive-method">
+                <span class="custom-truck-wrapper">
+                  <span class="speed-lines"></span>
+                  <i class="fa-solid fa-truck"></i>
+                </span>
+                寄送
               </span>
-              寄送
-            </span>
-            <span *ngIf="item.receiveMethod === '面交'" class="receive-method">
-              <!-- 組合圖示：手 + 箱子 -->
-              <span class="custom-hand-box">
-                <i class="fa-solid fa-box box-icon"></i>
-                <i class="fa-solid fa-hand-holding hand-icon"></i>
+
+              <!-- 分隔線 -->
+              <div *ngIf="item.receiveMethod['寄送'] && item.receiveMethod['面交']" class="receive-divider"></div>
+
+              <!-- 面交 -->
+              <span *ngIf="item.receiveMethod['面交']" class="receive-method">
+                <span class="custom-hand-box">
+                  <i class="fa-solid fa-box box-icon"></i>
+                  <i class="fa-solid fa-hand-holding hand-icon"></i>
+                </span>
+                面交
               </span>
-              面交
-            </span>
-            <span *ngIf="!item.receiveMethod">-</span>
+
+              <!-- 都沒有 -->
+              <span *ngIf="!item.receiveMethod['寄送'] && !item.receiveMethod['面交']" class="receive-none"> - </span>
+            </div>
           </td>
 
           <td class="created-time-column">{{item.displayCreatedAt}}</td>
+          <td class="published-time-column">{{ item.displayPublishedAt }}</td>
+
+          <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
 
           <td class="message-column">
             <a [routerLink]="['/agency/disaster-message', item.id]"> {{item.messageCount || 0}} </a>

@@ -53,12 +53,28 @@
   justify-content: flex-end;
 }
 
-.receive-method {
-  display: inline-flex;
+.receive-method-column {
+  white-space: normal;
+  vertical-align: middle;
+}
+
+.receive-method-list {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  width: 100%;
+}
+
+.receive-method {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 32px;
   color: #333;
+  white-space: nowrap;
+  line-height: 22px;
 
   i {
     color: #1565c0;
@@ -66,37 +82,58 @@
   }
 }
 
+/* 寄送＋面交時的分隔線 */
+.receive-divider {
+  width: 85%;
+  height: 1px;
+  margin: 3px 0;
+  background: #cfcfcf;
+}
+
+.receive-none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  color: #333;
+}
+
 .custom-hand-box {
   position: relative;
   display: inline-block;
   width: 18px;
-  height: 18px;
+  height: 24px;
   margin-right: 1px;
   vertical-align: middle;
 
   .hand-icon {
     position: absolute;
     bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     color: #1565c0;
-    font-size: 17px;
+    font-size: 19px; // 手縮小
   }
 
   .box-icon {
     position: absolute;
-    top: -2px;
-    left: 5px;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     color: #1565c0;
-    font-size: 11px;
+    font-size: 15px; // 箱子縮小
   }
 }
 
 .custom-truck-wrapper {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
 
   i {
-    font-size: 15px;
+    font-size: 17px; // 車子縮小
   }
 }
 
