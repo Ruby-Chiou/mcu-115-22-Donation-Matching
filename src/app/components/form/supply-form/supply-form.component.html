@@ -1,11 +1,11 @@
 <div class="container">
-  <h1>{{ isEditMode ? '編輯緊急需求內容' : '新增急難需求' }}</h1>
+  <h1>{{ isEditMode ? '編輯災害需求內容' : '新增災害需求' }}</h1>
 
   <!-- 編輯模式才顯示需求編號 -->
   <div class="edit-header-info" *ngIf="isEditMode && demand">
     <div class="info-tag">
       <span class="info-label">需求編號</span>
-      <span class="info-value">#{{ demand.id }}</span>
+      <span class="info-value">B{{ demand.id }}</span>
     </div>
   </div>
 
@@ -98,7 +98,7 @@
     <div class="short-field">
       <textarea
         maxlength="100"
-        [placeholder]="isEditMode ? '請編輯數量描述，例如：1箱內含10包，每包5公斤' : '例如：1箱內含10包，每包5公斤'"
+        [placeholder]="isEditMode ? '請編輯數量描述，例如：1箱內含10包，每包5公斤' : '請輸入數量描述，例如：1箱內含10包，每包5公斤'"
         [(ngModel)]="demand.amountDescription"
       ></textarea>
     </div>
@@ -109,16 +109,22 @@
       <span class="required">*</span>
     </label>
 
-    <div class="short-field">
-      <select #categoryInput [class.error-input]="submitted && !demand.category" [(ngModel)]="demand.category">
-        <option value="">請選擇類別</option>
-        <option value="食物">食物</option>
-        <option value="衣物">衣物</option>
-        <option value="醫療">醫療</option>
-        <option value="嬰幼兒">嬰幼兒</option>
-        <option value="生活用品">生活用品</option>
-        <option value="其他">其他</option>
-      </select>
+    <div class="short-field category-field">
+      <div class="custom-select" [class.error-input]="submitted && !demand.category">
+        <!-- 顯示目前選擇 -->
+        <button #categoryInput type="button" class="custom-select-trigger" (click)="toggleCategoryDropdown()">
+          <span> {{ demand.category || '請選擇類別' }} </span>
+
+          <span class="dropdown-arrow">▼</span>
+        </button>
+
+        <!-- 下拉選項 -->
+        <div class="custom-select-options" *ngIf="categoryDropdownOpen">
+          <button type="button" class="custom-option" *ngFor="let category of categoryOptions" (click)="selectCategory(category)">
+            {{ category }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- 需求原因 -->
@@ -149,6 +155,7 @@
       [class.error-input]="submitted && !demand.description"
       placeholder="{{ isEditMode ? '請編輯需求描述，例如可接受誤差程度、特定型號、款式等' : '請輸入需求描述，例如可接受誤差程度、特定型號、款式等' }}"
       [(ngModel)]="demand.description"
+      (input)="limitTextLength($event, 'description', 500)"
     ></textarea>
 
     <!-- 特殊品牌需求 -->
@@ -163,11 +170,62 @@
       [(ngModel)]="demand.brand"
     ></textarea>
 
+    <!-- 物資示意圖片 -->
+    <label class="label-row">物資示意圖片</label>
+
+    <div class="image-upload-box">
+      <div class="image-upload-area">
+        <!-- 未滿 5 張才顯示選擇圖片 -->
+        <ng-container *ngIf="imageFiles.length < 5">
+          <div class="upload-controls">
+            <label class="image-upload-btn">
+              <i class="fa-solid fa-image"></i>
+              選擇圖片
+              <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+            </label>
+
+            <span class="image-upload-hint"> 可上傳 JPG、PNG 等圖片，大小上限 5MB </span>
+          </div>
+        </ng-container>
+
+        <div class="selected-image-list" *ngIf="imageFiles.length > 0">
+          <div class="selected-image" *ngFor="let image of imageFiles; let i = index">
+            <!-- 圖片名稱：點擊可預覽 -->
+            <button type="button" class="selected-image-name" (click)="openImagePreview(demand.image![i], image.name)">
+              {{ image.name }}
+            </button>
+
+            <button type="button" class="remove-image-btn" (click)="removeImage(i)">移除圖片</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 物資狀態區（完美鏡射上方對齊架構） -->
     <div class="condition-area">
       <!-- 左側 接受物資狀態 -->
       <div class="condition-section">
-        <label class="label-row align-title"> 接受物資狀態 </label>
+        <label class="label-row align-title condition-title"> 接受物資需求狀態 </label>
+
+        <div class="condition-hint">
+          <span class="hint-item">
+            初始：
+            <span class="hint-icon unset">―</span>
+            未設定
+          </span>
+
+          <span class="hint-item">
+            點一下：
+            <span class="hint-icon accept">✔</span>
+            接受
+          </span>
+
+          <span class="hint-item">
+            點兩下：
+            <span class="hint-icon reject">✘</span>
+            不接受
+          </span>
+        </div>
 
         <div class="condition-left">
           <div class="condition-row">
@@ -235,7 +293,7 @@
 
       <!-- 右側 自訂物品狀態（位置與增減方式完全同步） -->
       <div class="custom-condition-section">
-        <label class="label-row align-title"> 其他物品狀態 </label>
+        <label class="label-row align-title"> 其它物資需求狀態 </label>
 
         <div class="custom-condition-list">
           <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let i = index; trackBy: trackByIndex">
@@ -243,7 +301,7 @@
               class="custom-condition-input"
               maxlength="100"
               type="text"
-              placeholder="{{ isEditMode ? '請編輯其他狀態(可自行輸入)' : '請輸入其他狀態(可自行輸入)' }}"
+              placeholder="{{ isEditMode ? '請編輯其它物資需求狀態(可自行輸入)' : '請輸入其它物資需求狀態(可自行輸入)' }}"
               [(ngModel)]="demand.customConditions[i]"
             />
 
@@ -272,7 +330,12 @@
     </div>
 
     <!-- 緊急優先度 -->
-    <label class="label-row align-title"> 緊急優先度 <span class="required">*</span> </label>
+    <label class="label-row align-title">
+      緊急優先度
+      <span class="required">*</span>
+
+      <span class="priority-limit-info"> 普通：上架30天｜緊急：上架14天｜非常緊急：上架7天 </span>
+    </label>
 
     <div class="priority-box">
       <label class="normal">
@@ -312,9 +375,9 @@
       </label>
     </div>
 
-    <!-- 面交地點 -->
+    <!-- 接收物資地址 -->
     <label class="label-row">
-      面交地點
+      接收物資地址
       <span class="required">*</span>
       <span class="word-count" *ngIf="demand.address"> {{ demand.address.length }}/35 </span>
     </label>
@@ -324,7 +387,7 @@
       maxlength="35"
       [class.error-input]="submitted && !demand.address"
       type="text"
-      placeholder="{{ isEditMode ? '請編輯能夠接收物資的地點' : '請輸入能夠接收物資的地點' }}"
+      placeholder="{{ isEditMode ? '請編輯能夠接收物資的地址' : '請輸入能夠接收物資的地址' }}"
       [(ngModel)]="demand.address"
     />
 
@@ -340,9 +403,56 @@
       maxlength="30"
       [class.error-input]="submitted && !demand.phone"
       type="tel"
-      placeholder="{{ isEditMode ? '請編輯可保持暢通的號碼(方便聯絡時間可註明)' : '請輸入可保持暢通的號碼(方便聯絡時間可註明)' }}"
+      placeholder="{{ isEditMode ? '請編輯可保持暢通的號碼' : '請輸入可保持暢通的號碼' }}"
       [(ngModel)]="demand.phone"
     />
+
+    <!-- 聯絡時間 -->
+    <label class="label-row contact-time-title"> 聯絡時間 </label>
+
+    <div class="contact-time-box">
+      <!-- 星期 -->
+      <div class="contact-time-section">
+        <span class="contact-time-label">日期</span>
+
+        <div class="contact-time-options">
+          <label class="time-option">
+            <input type="checkbox" value="平日" [(ngModel)]="demand.contactTimeWeekday" />
+            平日
+          </label>
+
+          <label class="time-option">
+            <input type="checkbox" value="假日" [(ngModel)]="demand.contactTimeWeekend" />
+            假日
+          </label>
+        </div>
+      </div>
+
+      <!-- 時段 -->
+      <div class="contact-time-section">
+        <span class="contact-time-label">時段</span>
+
+        <div class="contact-time-options">
+          <label class="time-option">
+            <input type="checkbox" value="上午" [(ngModel)]="demand.contactTimeMorning" />
+            上午
+            <span class="time-range">08:00～12:00</span>
+          </label>
+
+          <label class="time-option">
+            <input type="checkbox" value="下午" [(ngModel)]="demand.contactTimeAfternoon" />
+            下午
+            <span class="time-range">12:00～18:00</span>
+          </label>
+
+          <label class="time-option">
+            <input type="checkbox" value="晚上" [(ngModel)]="demand.contactTimeEvening" />
+            晚上
+            <span class="time-range">18:00～22:00</span>
+          </label>
+        </div>
+      </div>
+    </div>
 
     <!-- 備註 -->
     <label class="label-row">
@@ -362,3 +472,11 @@
     <button class="save-btn" (click)="save()">{{ isEditMode ? '儲存' : '發布需求' }}</button>
   </div>
 </div>
+
+<!-- 圖片預覽視窗 -->
+<app-image-preview
+  *ngIf="showImagePreview"
+  [image]="previewImage"
+  [imageName]="previewImageName"
+  (closed)="closeImagePreview()"
+></app-image-preview>

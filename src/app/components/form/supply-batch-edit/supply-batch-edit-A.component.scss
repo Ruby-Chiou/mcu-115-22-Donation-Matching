@@ -1,6 +1,12 @@
+:host {
+  --color-brand-primary: #1565c0;
+  --color-white: #ffffff;
+  --color-text-main: #333333;
+}
+
 .container {
   padding: 30px;
-  padding-bottom: 50px; /* 確保最外層底部有足夠空間 */
+  padding-bottom: 120px;
 }
 
 h1 {
@@ -10,6 +16,7 @@ h1 {
   color: var(--color-brand-primary);
 }
 
+/*批次編輯標題*/
 .batch-edit-header {
   display: flex;
   flex-direction: column;
@@ -17,41 +24,35 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* 修改 .info-tag 及其子元素 */
 .info-tag {
   display: inline-flex;
-  align-items: center; /* 確保內部元件垂直置中 */
+  align-items: center;
   justify-content: center;
   background-color: #f0f4f9;
   border: 1px solid #d0e1f9;
   border-radius: 8px;
   padding: 8px 16px;
   gap: 8px;
+  line-height: 1;
 }
 
 .info-label {
-  font-size: 19px;
+  font-size: 15px; /* 原為 18px，調小讓文字「需求編號」變小 */
   color: #5f6368;
   font-weight: 500;
-  line-height: 1; /* 保留 line-height: 1 */
+  line-height: 1;
 }
 
 .info-value {
-  font-size: 19px;
+  font-size: 18px; /* 原為 17px，可維持或微調放大編號 */
   color: var(--color-brand-primary);
   font-weight: 700;
   font-family: monospace, sans-serif;
   letter-spacing: 0.5px;
   line-height: 1;
-
-  /* 💡 新增這行：微調數字向上提升 1 px，達到視覺完美對齊 */
-  transform: translateY(-1px);
 }
 
-/* =========================
-   表單外框
-========================= */
-
+/*表單外框*/
 .form-box {
   border: 1px solid #ddd;
   border-radius: 15px;
@@ -59,26 +60,24 @@ h1 {
   margin-bottom: 30px;
 }
 
-/* 第1、3、5筆 */
 .light-box {
   background-color: #d7ebf9;
 }
 
-/* 第2、4、6筆 */
 .dark-box {
   background-color: #e3f2fd;
 }
 
-/* 標題 */
+/*表單標題*/
 h2 {
+  margin-top: 0;
   margin-bottom: 20px;
   font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-main);
 }
 
-/* =========================
-   標籤
-========================= */
-
+/*標籤*/
 label {
   display: block;
   margin-bottom: 8px;
@@ -91,12 +90,27 @@ label {
   margin-top: 15px;
 }
 
-/* =========================
-   輸入框
-========================= */
+.label-row {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
 
+.word-count {
+  font-size: 13px;
+  color: #555;
+  font-weight: 400;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+/*輸入框*/
 input,
-select {
+select,
+textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 12px;
@@ -107,53 +121,25 @@ select {
 }
 
 textarea {
-  width: 100%;
-  box-sizing: border-box;
   min-height: 100px;
-  padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 16px;
   resize: vertical;
 }
 
-/* =========================
-   數量 + 單位
-========================= */
-
-.amount-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.amount-box input:first-child {
-  width: 250px;
-  margin-bottom: 0;
-}
-
-.amount-box input:nth-child(2) {
-  width: 250px;
-  margin-bottom: 0;
-}
-
-/* =========================
-   一般輸入寬度
-========================= */
-
+/*一般輸入寬度*/
 .short-input {
   width: 250px;
 }
 
 .medium-input {
-  width: 450px;
+  width: 600px;
 }
 
 .item-input {
   width: 450px;
   min-height: 100px;
+  padding: 12px;
+  box-sizing: border-box;
+  resize: vertical;
 }
 
 .unit-input {
@@ -162,4 +148,143 @@ textarea {
 
 .phone-input {
   width: 420px;
+  margin-bottom: 35px;
+}
+
+.contact-time-title {
+  margin-top: 15px;
+}
+
+.short-field {
+  width: 515px;
+}
+
+.short-field select,
+.short-field textarea {
+  width: 100%;
+}
+
+.amount-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.amount-box input {
+  margin-bottom: 20px;
+}
+
+.amount-box input:first-child {
+  width: 250px;
+}
+
+.amount-box input:nth-child(2) {
+  width: 250px;
+}
+
+/*自訂類別下拉選單*/
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  height: 46px;
+  padding: 12px;
+  margin-bottom: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  font-size: 16px;
+  color: #333333;
+
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.custom-select-trigger span:first-child {
+  color: #333333;
+}
+
+.dropdown-arrow {
+  font-size: 13px;
+  color: #555;
+  margin-left: 10px;
+}
+
+.custom-select-options {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  width: 100%;
+
+  max-height: 230px;
+  overflow-y: auto;
+
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+
+  z-index: 1000;
+}
+
+.custom-option {
+  width: 100%;
+  height: 46px;
+  padding: 12px;
+
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  border: none;
+
+  text-align: left;
+  font-size: 16px;
+  color: #333333;
+
+  cursor: pointer;
+}
+
+.custom-option:hover {
+  background-color: #f0f7ff;
+  color: #1565c0;
+}
+
+/*物資示意圖片*/
+.image-upload-box {
+  width: 550px;
+  max-width: 100%;
+  margin-bottom: 40px;
+}
+
+.image-upload-area {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  border: 2px dashed #b0bec5;
+  border-radius: 10px;
+
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* 按鈕與提示文字的水平容器 */
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }

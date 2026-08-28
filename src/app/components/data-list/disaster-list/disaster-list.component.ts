@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
-import { DisasterDemand,  DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
+import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
 
 import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
 import { PaginationComponent } from '../../pagination/pagination.component';
 
-type SortType = 'createdAt' | 'amount' | 'remaining';
+type SortType = 'createdAt' | 'publishedAt' | 'expectedOffShelfAt' | 'amount' | 'remaining';
 
 @Component({
   selector: 'app-disaster-list',
@@ -23,48 +23,44 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     selected: boolean;
     displayStatus: DisplayStatus;
     displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
   })[] = [];
 
   filteredDemands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
     displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
   })[] = [];
 
   pagedDemands: (DisasterDemand & {
     selected: boolean;
     displayStatus: DisplayStatus;
     displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
   })[] = [];
 
   selectAll = false;
+  isRestoringScroll = false;
 
-  // =========================
-  // 搜尋
-  // =========================
-
+  //搜尋//
   searchTerm = '';
 
-  // =========================
-  // 分頁
-  // =========================
-
+  // 分頁//
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
   pageNumbers: number[] = [];
 
-  // =========================
-  // 保留列表位置
-  // =========================
-
+  //保留列表位置//
   private readonly scrollPositionKey = 'agency-disaster-workspace-scroll';
 
   private readonly pagePositionKey = 'agency-disaster-workspace-page';
 
-  // =========================
-  // 排序
-  // =========================
+  //排序//
 
   selectedSort: SortType = 'createdAt';
   sortAscending = true;
@@ -73,7 +69,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
   private userHasSorted = false;
 
   sortOptions: { label: string; value: SortType }[] = [
-    { label: '發布時間', value: 'createdAt' },
+    { label: '建立日期', value: 'createdAt' },
+    { label: '上架日期', value: 'publishedAt' },
+    { label: '預計下架日期', value: 'expectedOffShelfAt' },
     { label: '需求數量', value: 'amount' },
     { label: '剩餘需求', value: 'remaining' },
   ];
@@ -95,7 +93,21 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
   priorityOptions: DisasterDemand['priority'][] = ['普通', '緊急', '非常緊急'];
 
-  categoryOptions: NonNullable<DisasterDemand['category']>[] = ['食物', '衣物', '醫療', '嬰幼兒', '生活用品', '其他'];
+  categoryOptions: NonNullable<DisasterDemand['category']>[] = [
+    '食品與飲用水',
+    '衣物與保暖用品',
+    '醫療與照護用品',
+    '清潔與衛生用品',
+    '嬰幼兒用品',
+    '長者與身心障礙用品',
+    '女性生理用品',
+    '寵物與動物用品',
+    '防災與照明用品',
+    '通訊與求救用品',
+    '生活與炊事用品',
+    '居住安置與修繕用品',
+    '其他',
+  ];
 
   messageOptions = ['已回覆', '未回覆'];
 
@@ -135,14 +147,27 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
 
-    if (savedScroll) {
-      const scrollY = Number(savedScroll);
-
-      window.scrollTo({
-        top: scrollY,
-        behavior: 'instant',
-      });
+    if (!savedScroll) {
+      return;
     }
+
+    const scrollY = Number(savedScroll);
+
+    window.scrollTo({
+      top: scrollY,
+      left: 0,
+      behavior: 'instant',
+    });
+
+    requestAnimationFrame(() => {
+      if (window.scrollY !== scrollY) {
+        window.scrollTo({
+          top: scrollY,
+          left: 0,
+          behavior: 'instant',
+        });
+      }
+    });
   }
 
   // =========================
@@ -208,7 +233,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
   getSelectedSortLabel(): string {
     const found = this.sortOptions.find((opt) => opt.value === this.selectedSort);
 
-    return found ? found.label : '發布時間';
+    return found ? found.label : '建立日期';
   }
 
   selectSortOption(value: SortType) {
@@ -276,8 +301,14 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
         displayStatus: currentStatus,
 
-        displayCreatedAt:
-          item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
+        // 建立日期
+        displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+
+        // 上架日期
+        displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+
+        // 預計下架日期 / 已下架日期
+        displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
 
         remaining: item.remaining ?? item.amount ?? 0,
 
@@ -315,10 +346,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     return this.filteredDemands.some((item) => item.selected);
   }
 
-  // =========================
   // 批次編輯
-  // =========================
-
   editSelected() {
     const selectedItems = this.filteredDemands.filter((item) => item.selected);
 
@@ -334,10 +362,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/agency/supply-batch-edit']);
   }
 
-  // =========================
   // 篩選 Modal
-  // =========================
-
   openFilterModal() {
     this.showFilterModal = true;
   }
@@ -366,10 +391,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     };
   }
 
-  // =========================
   // 套用篩選
-  // =========================
-
   applyFilters(resetPage: boolean = true) {
     this.filteredDemands = this.demands.filter((item) => {
       // 關鍵字
@@ -438,26 +460,44 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     this.closeFilterModal();
   }
 
-  // =========================
   // 排序
-  // =========================
-
   applySort() {
     this.filteredDemands.sort((a, b) => {
       let result = 0;
 
+      // 建立日期
       if (this.selectedSort === 'createdAt') {
-        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : Date.now();
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
 
-        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : Date.now();
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
 
         result = aTime - bTime;
       }
 
+      // 上架日期
+      if (this.selectedSort === 'publishedAt') {
+        const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+
+        const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+
+        result = aTime - bTime;
+      }
+
+      // 預計下架日期
+      if (this.selectedSort === 'expectedOffShelfAt') {
+        const aTime = a.expectedOffShelfAt ? new Date(a.expectedOffShelfAt).getTime() : 0;
+
+        const bTime = b.expectedOffShelfAt ? new Date(b.expectedOffShelfAt).getTime() : 0;
+
+        result = aTime - bTime;
+      }
+
+      // 需求數量
       if (this.selectedSort === 'amount') {
         result = Number(a.amount ?? 0) - Number(b.amount ?? 0);
       }
 
+      // 剩餘需求
       if (this.selectedSort === 'remaining') {
         result = Number(a.remaining ?? 0) - Number(b.remaining ?? 0);
       }
@@ -468,10 +508,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     this.updatePagination();
   }
 
-  // =========================
   // 分頁
-  // =========================
-
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredDemands.length / this.pageSize) || 1;
 
@@ -546,8 +583,15 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
       selected: boolean;
       displayStatus: DisplayStatus;
       displayCreatedAt: string;
+      displayPublishedAt: string;
+      displayOffShelfAt: string;
     }
   ) {
+    // 先取得原本儲存的資料
+    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
+
+    const originalStatus = originalItem?.status;
+
     let status: DisasterStatus;
 
     switch (item.displayStatus) {
@@ -567,16 +611,94 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
         status = '上架';
     }
 
-    item.status = status;
+    const now = new Date();
 
-    if (status === '隱藏') {
-      item.displayCreatedAt = '尚未發布';
+    // =========================
+    // 上架
+    // =========================
+    if (status === '上架') {
+      // 原本不是上架 → 現在重新上架
+      if (originalStatus !== '上架') {
+        item.publishedAt = now.toISOString();
+
+        // 建立日期只在建立時記錄，不重新建立
+        if (!item.createdAt) {
+          item.createdAt = now.toISOString();
+        }
+      }
+
+      // 原本就是上架 → 保留原本上架日期
+      else if (originalItem?.publishedAt) {
+        item.publishedAt = originalItem.publishedAt;
+      }
+
+      // 重新計算預計下架日期
+      if (item.publishedAt) {
+        item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+      }
+
+      item.status = '上架';
+      item.displayStatus = '已上架';
+
+      // 更新畫面日期
+      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+
+      item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
     }
 
-    if (status === '上架' || status === '下架') {
-      item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布';
+    // =========================
+    // 隱藏
+    // =========================
+    else if (status === '隱藏') {
+      item.status = '隱藏';
+
+      // 隱藏後視為尚未上架
+      item.publishedAt = undefined;
+      item.expectedOffShelfAt = undefined;
+
+      item.displayStatus = '隱藏中';
+
+      item.displayPublishedAt = '尚未上架';
+      item.displayOffShelfAt = '—';
     }
 
+    // =========================
+    // 下架
+    // =========================
+    else if (status === '下架') {
+      item.status = '下架';
+
+      // 已下架時間 = 現在
+      item.expectedOffShelfAt = now.toISOString();
+
+      item.displayStatus = '已下架';
+
+      item.displayOffShelfAt = new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW');
+    }
+
+    // 建立日期永遠保留
+    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+
+    // 儲存
     this.disasterDemandService.updateDemand(item);
+  }
+  calculateExpectedOffShelfDate(publishedDate: Date, priority: DisasterDemand['priority']): string {
+    const offShelfDate = new Date(publishedDate);
+
+    switch (priority) {
+      case '普通':
+        offShelfDate.setDate(offShelfDate.getDate() + 30);
+        break;
+
+      case '緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 14);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 7);
+        break;
+    }
+
+    return offShelfDate.toISOString();
   }
 }

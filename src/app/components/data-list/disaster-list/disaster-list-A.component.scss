@@ -130,7 +130,6 @@ th {
 
 .item-column {
   padding: 12px 6px;
-
   .item-text {
     height: 44.8px;
     overflow: hidden;
@@ -138,8 +137,23 @@ th {
     line-height: 1.4;
     text-align: center;
     word-break: break-all;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
     align-content: center;
   }
+}
+
+/* 類別欄位固定為兩行高度 */
+.category-column {
+  height: 44.8px;
+  padding: 12px 6px;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+  vertical-align: middle;
+  word-break: break-all;
 }
 
 /* 操作 */
