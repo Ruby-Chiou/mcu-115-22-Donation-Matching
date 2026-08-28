@@ -4,10 +4,11 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { DailyDemand } from '../../../models/agency/daily-demand';
 import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
+import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
 
 @Component({
   selector: 'app-daily-detail',
-  imports: [CommonModule, RouterLink, SupplyDeleteComponent],
+  imports: [CommonModule, RouterLink, SupplyDeleteComponent, ImagePreviewComponent],
   templateUrl: './daily-detail.component.html',
   styleUrl: './daily-detail.component.scss',
 })
@@ -15,6 +16,9 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   demand?: DailyDemand;
   showDeleteModal: boolean = false;
   listNumber?: number;
+  showImagePreview = false;
+  previewImage = '';
+  previewImageName = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -33,7 +37,23 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
       this.demand.remaining ??= this.demand.amount ?? 0;
       this.demand.customConditions ??= [];
       this.demand.customServiceTargets ??= [];
-      this.demand.serviceTargets ??= {};
+      if (this.demand) {
+        this.demand.remaining ??= this.demand.amount ?? 0;
+        this.demand.customConditions ??= [];
+        this.demand.customServiceTargets ??= [];
+
+        this.demand.serviceTargets ??= {
+          老人: false,
+          嬰幼兒: false,
+          孩童: false,
+          青少年: false,
+          身障: false,
+          貧困: false,
+          重症照護: false,
+          動物: false,
+          無家者: false,
+        };
+      }
     }
   }
 
@@ -65,6 +85,21 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   goBack() {
     this.router.navigate(['/agency/daily']);
   }
+
+  // 開啟圖片預覽
+  openImagePreview(image: string, imageName: string) {
+    this.previewImage = image;
+    this.previewImageName = imageName;
+    this.showImagePreview = true;
+  }
+
+  // 關閉圖片預覽
+  closeImagePreview() {
+    this.showImagePreview = false;
+    this.previewImage = '';
+    this.previewImageName = '';
+  }
+
   getDeleteIds(): number[] {
     return this.demand?.id != null ? [this.demand.id] : [];
   }
@@ -130,6 +165,65 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
     }
 
     return '';
+  }
+
+  // 檢查是否有設定聯絡時間
+  hasContactTime(): boolean {
+    if (!this.demand) {
+      return false;
+    }
+
+    return !!(
+      this.demand.contactTimeWeekday ||
+      this.demand.contactTimeWeekend ||
+      this.demand.contactTimeMorning ||
+      this.demand.contactTimeAfternoon ||
+      this.demand.contactTimeEvening
+    );
+  }
+
+  // 取得聯絡時間文字
+  getContactTimeText(): string {
+    if (!this.demand) {
+      return '無';
+    }
+
+    const dates: string[] = [];
+    const times: string[] = [];
+
+    // 日期
+    if (this.demand.contactTimeWeekday) {
+      dates.push('平日');
+    }
+
+    if (this.demand.contactTimeWeekend) {
+      dates.push('假日');
+    }
+
+    // 時段
+    if (this.demand.contactTimeMorning) {
+      times.push('上午 08:00～12:00');
+    }
+
+    if (this.demand.contactTimeAfternoon) {
+      times.push('下午 12:00～18:00');
+    }
+
+    if (this.demand.contactTimeEvening) {
+      times.push('晚上 18:00～22:00');
+    }
+
+    const result: string[] = [];
+
+    if (dates.length > 0) {
+      result.push(`日期：${dates.join('、')}`);
+    }
+
+    if (times.length > 0) {
+      result.push(`時段：${times.join('、')}`);
+    }
+
+    return result.join(' ｜ ');
   }
 
   // 取得接受物資狀態文字

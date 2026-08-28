@@ -1,23 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { EditableDailyDemand } from '../../../models/agency/daily-demand';
+import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
 
 @Component({
   selector: 'app-daily-batch-edit',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImagePreviewComponent],
   templateUrl: './daily-batch-edit.component.html',
-  styleUrls: ['./daily-batch-edit-A.component.scss', './daily-batch-edit-B.component.scss'],
+  styleUrls: ['./daily-batch-edit-A.component.scss', './daily-batch-edit-B.component.scss', './daily-batch-edit-C.component.scss'],
 })
 export class DailyBatchEditComponent implements OnInit {
   editDemands: EditableDailyDemand[] = [];
 
+  // 圖片
+  imageFiles: { [id: number]: File[] } = {};
+  imagePreviewUrls: { [id: number]: string[] } = {};
+
+  showImagePreview = false;
+  previewImage = '';
+  previewImageName = '';
+
   constructor(
     private service: DailyDemandService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  categoryDropdownIndex: number | null = null;
+
+  categoryOptions: NonNullable<EditableDailyDemand['category']>[] = [
+    '食品與飲用水',
+    '衣物與保暖用品',
+    '醫療與照護用品',
+    '清潔與衛生用品',
+    '嬰幼兒用品',
+    '長者與身心障礙用品',
+    '女性生理用品',
+    '寵物與動物用品',
+    '防災與照明用品',
+    '通訊與求救用品',
+    '生活與炊事用品',
+    '居住安置與修繕用品',
+    '其他',
+  ];
 
   ngOnInit() {
     const data = localStorage.getItem('editDemands');
@@ -35,9 +63,8 @@ export class DailyBatchEditComponent implements OnInit {
           身障: false,
           貧困: false,
           重症照護: false,
-          寵物: false,
-          流浪: false,
-          野生: false,
+          動物: false,
+          無家者: false,
         },
 
         customServiceTargets: item.customServiceTargets?.length ? item.customServiceTargets : [''],
@@ -59,11 +86,120 @@ export class DailyBatchEditComponent implements OnInit {
         createdAt: item.createdAt,
         brand: item.brand || '',
         category: item.category || '',
-        receiveMethod: item.receiveMethod ?? '寄送',
+        receiveMethod: item.receiveMethod || {
+          寄送: true,
+          面交: false,
+        },
         recipient: item.recipient ?? '',
       }));
+      this.editDemands.forEach((item) => {
+        this.imageFiles[item.id] = [];
+
+        Promise.all(
+          (item.image ?? []).map((image: string, index: number) => {
+            const fileName = item.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+
+            return this.base64ToFile(image, fileName);
+          })
+        ).then((files) => {
+          this.imageFiles[item.id] = files;
+
+          // 預先建立圖片預覽 URL
+          this.imagePreviewUrls[item.id] = files.map((file) => URL.createObjectURL(file));
+
+          this.cdr.detectChanges();
+        });
+      });
     }
     console.log('批次修改資料:', this.editDemands);
+  }
+
+  async base64ToFile(base64: string, fileName: string): Promise<File> {
+    const response = await fetch(base64);
+    const blob = await response.blob();
+
+    return new File([blob], fileName, {
+      type: blob.type,
+    });
+  }
+
+  onImageSelected(event: Event, demand: EditableDailyDemand) {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    if (!this.imageFiles[demand.id]) {
+      this.imageFiles[demand.id] = [];
+    }
+
+    const file = input.files[0];
+
+    // 最多 5 張
+    if (this.imageFiles[demand.id].length >= 5) {
+      alert('最多只能上傳 5 張圖片');
+      input.value = '';
+      return;
+    }
+
+    // 限制 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      alert('圖片大小不可超過 5MB');
+      input.value = '';
+      return;
+    }
+
+    // 加入圖片清單
+    this.imageFiles[demand.id].push(file);
+
+    if (!this.imagePreviewUrls[demand.id]) {
+      this.imagePreviewUrls[demand.id] = [];
+    }
+
+    this.imagePreviewUrls[demand.id].push(URL.createObjectURL(file));
+
+    // 讀取圖片
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (!demand.image) {
+        demand.image = [];
+      }
+
+      if (!demand.imageFileNames) {
+        demand.imageFileNames = [];
+      }
+
+      demand.image.push(reader.result as string);
+      demand.imageFileNames.push(file.name);
+    };
+
+    reader.readAsDataURL(file);
+
+    // 清空 input
+    input.value = '';
+  }
+
+  removeImage(demand: EditableDailyDemand, index: number) {
+    const urls = this.imagePreviewUrls[demand.id];
+
+    if (urls?.[index]) {
+      URL.revokeObjectURL(urls[index]);
+      urls.splice(index, 1);
+    }
+
+    if (this.imageFiles[demand.id]) {
+      this.imageFiles[demand.id].splice(index, 1);
+    }
+
+    if (demand.image) {
+      demand.image.splice(index, 1);
+    }
+
+    if (demand.imageFileNames) {
+      demand.imageFileNames.splice(index, 1);
+    }
   }
 
   // 限制剩餘需求最高只能填到需求數量
@@ -106,6 +242,28 @@ export class DailyBatchEditComponent implements OnInit {
         demand.remaining = value;
       }
     }
+  }
+
+  openImagePreview(demand: EditableDailyDemand, index: number): void {
+    const files = this.imageFiles[demand.id] || [];
+    const previewUrls = this.imagePreviewUrls[demand.id] || [];
+
+    const file = files[index];
+    const previewUrl = previewUrls[index];
+
+    if (!file || !previewUrl) {
+      return;
+    }
+
+    this.previewImage = previewUrl;
+    this.previewImageName = file.name;
+    this.showImagePreview = true;
+  }
+
+  closeImagePreview(): void {
+    this.showImagePreview = false;
+    this.previewImage = '';
+    this.previewImageName = '';
   }
 
   saveAll() {
@@ -154,11 +312,9 @@ export class DailyBatchEditComponent implements OnInit {
       }
 
       // 接收方式檢查
-      if (
-        !item.receiveMethod ||
-        (item.receiveMethod === '寄送' && (!item.recipient || !item.address)) ||
-        (item.receiveMethod === '面交' && !item.address)
-      ) {
+      const hasReceiveMethod = item.receiveMethod?.寄送 || item.receiveMethod?.面交;
+
+      if (!hasReceiveMethod || !item.recipient || !item.address) {
         item.invalidReceiveInfo = true;
       }
 
@@ -306,17 +462,18 @@ export class DailyBatchEditComponent implements OnInit {
     demand.customConditions.splice(index, 1);
   }
 
-  trackByIndex(index: number): number {
-    return index;
+  toggleCategoryDropdown(index: number): void {
+    this.categoryDropdownIndex = this.categoryDropdownIndex === index ? null : index;
   }
 
-  onReceiveMethodChange(demand: EditableDailyDemand, method: '寄送' | '面交') {
-    if (method === '寄送') {
-      demand.address = '';
-    } else if (method === '面交') {
-      demand.recipient = '';
-      demand.address = '';
-    }
+  selectCategory(demand: EditableDailyDemand, category: NonNullable<EditableDailyDemand['category']>): void {
+    demand.category = category;
+    demand.categoryError = false;
+    this.categoryDropdownIndex = null;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   cancel() {

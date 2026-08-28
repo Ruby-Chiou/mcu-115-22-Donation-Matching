@@ -4,7 +4,7 @@
   <div class="detail-header-info" *ngIf="demand">
     <div class="info-tag">
       <span class="info-label">需求編號</span>
-      <span class="info-value">#{{ listNumber }}</span>
+      <span class="info-value">#A{{ listNumber }}</span>
     </div>
   </div>
 
@@ -59,15 +59,41 @@
       <div class="detail-content">{{ demand.brand || '無' }}</div>
     </div>
 
-    <!-- 服務對象 -->
+    <!-- 物資示意圖片 -->
     <div class="detail-row">
-      <div class="detail-title">服務對象</div>
+      <div class="detail-title">物資示意圖片</div>
+
+      <div class="detail-content image-detail-content">
+        <ng-container *ngIf="demand.image && demand.image.length > 0; else noImages">
+          <div class="image-name-list">
+            <button
+              type="button"
+              class="image-name-btn"
+              *ngFor="let image of demand.image; let i = index"
+              (click)="openImagePreview(image, demand.imageFileNames?.[i] || '物資圖片' + (i + 1))"
+            >
+              <i class="fa-solid fa-image"></i>
+
+              {{ demand.imageFileNames?.[i] || '物資圖片' + (i + 1) }}
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-template #noImages>
+          <span>無</span>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- 需求對象 -->
+    <div class="detail-row">
+      <div class="detail-title">需求對象</div>
       <div class="detail-content">{{ getSelectedServiceTargets() }}</div>
     </div>
 
-    <!-- 其他自訂服務對象 -->
+    <!-- 其他自訂需求對象 -->
     <div class="detail-row">
-      <div class="detail-title">其他自訂服務對象</div>
+      <div class="detail-title">其他自訂需求對象</div>
       <div class="detail-content">
         <ng-container *ngIf="hasCustomServiceTargets(); else noServiceTarget">{{ getCustomServiceTargets() }}</ng-container>
         <ng-template #noServiceTarget>無</ng-template>
@@ -110,40 +136,73 @@
       <div class="detail-content">{{ demand.status }}</div>
     </div>
 
+    <!-- 創建日期 -->
+    <div class="detail-row">
+      <div class="detail-title">創建日期</div>
+      <div class="detail-content">{{ demand.createdAt ? (demand.createdAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
+
+    <!-- 上架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">上架日期</div>
+      <div class="detail-content">{{ demand.publishedAt ? (demand.publishedAt | date:'yyyy/MM/dd HH:mm') : '尚未上架' }}</div>
+    </div>
+
+    <!-- 預計下架日期 / 下架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">{{ demand.status === '下架' ? '下架日期' : '預計下架日期' }}</div>
+
+      <div class="detail-content">{{ demand.expectedOffShelfAt ? (demand.expectedOffShelfAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
+
     <!-- 接收方式 -->
     <div class="detail-row">
       <div class="detail-title">接收方式</div>
-      <div class="detail-content">{{ demand.receiveMethod }}</div>
+      <div class="detail-content">
+        <span *ngIf="demand.receiveMethod['寄送']"> 寄送 </span>
+
+        <span *ngIf="demand.receiveMethod['寄送'] && demand.receiveMethod['面交']"> 、 </span>
+
+        <span *ngIf="demand.receiveMethod['面交']"> 面交 </span>
+
+        <span
+          *ngIf="
+        !demand.receiveMethod['寄送'] &&
+        !demand.receiveMethod['面交']
+      "
+        >
+          無
+        </span>
+      </div>
     </div>
 
     <!-- 收件資訊 -->
-    <ng-container *ngIf="demand.receiveMethod === '寄送'">
-      <!-- 收件人 -->
-      <div class="detail-row">
-        <div class="detail-title">收件人</div>
-        <div class="detail-content">{{ demand.recipient }}</div>
-      </div>
+    <div class="detail-row">
+      <div class="detail-title">收件人</div>
+      <div class="detail-content">{{ demand.recipient || '無' }}</div>
+    </div>
 
-      <!-- 寄送地址 -->
-      <div class="detail-row">
-        <div class="detail-title">寄送地址</div>
-        <div class="detail-content">{{ demand.address }}</div>
-      </div>
-    </ng-container>
-
-    <!-- 面交資訊 -->
-    <ng-container *ngIf="demand.receiveMethod === '面交'">
-      <!-- 面交地點 -->
-      <div class="detail-row">
-        <div class="detail-title">面交地點</div>
-        <div class="detail-content">{{ demand.address }}</div>
-      </div>
-    </ng-container>
+    <!-- 接收物資地址 -->
+    <div class="detail-row">
+      <div class="detail-title">接收物資地址</div>
+      <div class="detail-content">{{ demand.address || '無' }}</div>
+    </div>
 
     <!-- 聯絡電話 -->
     <div class="detail-row">
       <div class="detail-title">聯絡電話</div>
       <div class="detail-content">{{ demand.phone }}</div>
+    </div>
+
+    <!-- 聯絡時間 -->
+    <div class="detail-row">
+      <div class="detail-title">聯絡時間</div>
+
+      <div class="detail-content contact-time-detail">
+        <ng-container *ngIf="hasContactTime(); else noContactTime"> {{ getContactTimeText() }} </ng-container>
+
+        <ng-template #noContactTime> 無 </ng-template>
+      </div>
     </div>
 
     <!-- 其他說明 -->
@@ -170,3 +229,6 @@
   (deleted)="onDeleted()"
 >
 </app-supply-delete>
+
+<app-image-preview *ngIf="showImagePreview" [image]="previewImage" [imageName]="previewImageName" (closed)="closeImagePreview()">
+</app-image-preview>

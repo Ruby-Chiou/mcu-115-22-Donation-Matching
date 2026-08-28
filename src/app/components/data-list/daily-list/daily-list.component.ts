@@ -9,7 +9,8 @@ import { DailyDemand, DailyStatus, DailyDisplayStatus } from '../../../models/ag
 import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
 import { PaginationComponent } from '../../pagination/pagination.component';
 
-type SortType = 'createdAt' | 'amount' | 'remaining';
+type SortType = 'createdAt' | 'publishedAt' | 'expectedOffShelfAt' | 'amount' | 'remaining';
+type ReceiveMethod = '寄送' | '面交';
 
 @Component({
   selector: 'app-daily-list',
@@ -23,18 +24,24 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     selected: boolean;
     displayStatus: DailyDisplayStatus;
     displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
   })[] = [];
 
   filteredDemands: (DailyDemand & {
     selected: boolean;
     displayStatus: DailyDisplayStatus;
     displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
   })[] = [];
 
   pagedDemands: (DailyDemand & {
     selected: boolean;
     displayStatus: DailyDisplayStatus;
     displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
   })[] = [];
 
   selectAll = false;
@@ -60,7 +67,9 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   private userHasSorted = false;
 
   sortOptions: { label: string; value: SortType }[] = [
-    { label: '發布時間', value: 'createdAt' },
+    { label: '建立日期', value: 'createdAt' },
+    { label: '上架日期', value: 'publishedAt' },
+    { label: '預計下架日期', value: 'expectedOffShelfAt' },
     { label: '需求數量', value: 'amount' },
     { label: '剩餘需求', value: 'remaining' },
   ];
@@ -77,15 +86,29 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
   priorityOptions: DailyDemand['priority'][] = ['普通', '緊急', '非常緊急'];
 
-  categoryOptions: NonNullable<DailyDemand['category']>[] = ['食物', '衣物', '醫療', '嬰幼兒', '生活用品', '其他'];
+  categoryOptions: NonNullable<DailyDemand['category']>[] = [
+    '食品與飲用水',
+    '衣物與保暖用品',
+    '醫療與照護用品',
+    '清潔與衛生用品',
+    '嬰幼兒用品',
+    '長者與身心障礙用品',
+    '女性生理用品',
+    '寵物與動物用品',
+    '防災與照明用品',
+    '通訊與求救用品',
+    '生活與炊事用品',
+    '居住安置與修繕用品',
+    '其他',
+  ];
 
   messageOptions = ['已回覆', '未回覆'];
-  receiveMethodOptions: DailyDemand['receiveMethod'][] = ['寄送', '面交'];
+  receiveMethodOptions: ReceiveMethod[] = ['寄送', '面交'];
 
   selectedFilters = {
     status: [] as string[],
     priority: [] as string[],
-    receiveMethod: [] as string[],
+    receiveMethod: [] as ReceiveMethod[],
     lowRemaining: false,
     category: [] as string[],
     messageStatus: [] as string[],
@@ -116,14 +139,27 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
 
-    if (savedScroll) {
-      const scrollY = Number(savedScroll);
-
-      window.scrollTo({
-        top: scrollY,
-        behavior: 'instant',
-      });
+    if (!savedScroll) {
+      return;
     }
+
+    const scrollY = Number(savedScroll);
+
+    window.scrollTo({
+      top: scrollY,
+      left: 0,
+      behavior: 'instant',
+    });
+
+    requestAnimationFrame(() => {
+      if (window.scrollY !== scrollY) {
+        window.scrollTo({
+          top: scrollY,
+          left: 0,
+          behavior: 'instant',
+        });
+      }
+    });
   }
 
   // 新增
@@ -239,8 +275,14 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
         displayStatus: currentStatus,
 
-        displayCreatedAt:
-          item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
+        // 建立日期
+        displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+
+        // 上架日期
+        displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+
+        // 預計下架日期
+        displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
 
         remaining: item.remaining ?? item.amount ?? 0,
 
@@ -298,12 +340,14 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   toggleFilter(key: 'status' | 'priority' | 'receiveMethod' | 'category' | 'messageStatus', value: string) {
-    const index = this.selectedFilters[key].indexOf(value);
+    const filters = this.selectedFilters[key] as string[];
+
+    const index = filters.indexOf(value);
 
     if (index > -1) {
-      this.selectedFilters[key].splice(index, 1);
+      filters.splice(index, 1);
     } else {
-      this.selectedFilters[key].push(value);
+      filters.push(value);
     }
   }
 
@@ -345,10 +389,17 @@ export class DailyListComponent implements OnInit, AfterViewInit {
       }
 
       // 接收方式
-      if (this.selectedFilters.receiveMethod.length > 0 && !this.selectedFilters.receiveMethod.includes(item.receiveMethod)) {
-        return false;
-      }
+      if (this.selectedFilters.receiveMethod.length > 0) {
+        const selectedMethods = this.selectedFilters.receiveMethod;
 
+        const matchReceiveMethod = selectedMethods.some((method) => {
+          return item.receiveMethod?.[method] === true;
+        });
+
+        if (!matchReceiveMethod) {
+          return false;
+        }
+      }
       // 剩餘數量
       if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) <= 0) {
         return false;
@@ -411,6 +462,21 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
       if (this.selectedSort === 'remaining') {
         result = Number(a.remaining ?? 0) - Number(b.remaining ?? 0);
+      }
+      if (this.selectedSort === 'publishedAt') {
+        const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+
+        const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+
+        result = aTime - bTime;
+      }
+
+      if (this.selectedSort === 'expectedOffShelfAt') {
+        const aTime = a.expectedOffShelfAt ? new Date(a.expectedOffShelfAt).getTime() : 0;
+
+        const bTime = b.expectedOffShelfAt ? new Date(b.expectedOffShelfAt).getTime() : 0;
+
+        result = aTime - bTime;
       }
 
       return this.sortAscending ? result : -result;
@@ -487,8 +553,15 @@ export class DailyListComponent implements OnInit, AfterViewInit {
       selected: boolean;
       displayStatus: DailyDisplayStatus;
       displayCreatedAt: string;
+      displayPublishedAt: string;
+      displayOffShelfAt: string;
     }
   ) {
+    // 先取得原本儲存的資料
+    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.id === item.id);
+
+    const originalStatus = originalItem?.status;
+
     let status: DailyStatus;
 
     switch (item.displayStatus) {
@@ -508,16 +581,94 @@ export class DailyListComponent implements OnInit, AfterViewInit {
         status = '上架';
     }
 
-    item.status = status;
+    const now = new Date();
 
-    if (status === '隱藏') {
-      item.displayCreatedAt = '尚未發布';
+    // =========================
+    // 上架
+    // =========================
+    if (status === '上架') {
+      // 原本不是上架 → 現在重新上架
+      if (originalStatus !== '上架') {
+        item.publishedAt = now.toISOString();
+
+        // 建立日期只在建立時記錄
+        if (!item.createdAt) {
+          item.createdAt = now.toISOString();
+        }
+      }
+
+      // 原本就是上架 → 保留原本上架日期
+      else if (originalItem?.publishedAt) {
+        item.publishedAt = originalItem.publishedAt;
+      }
+
+      // 重新計算預計下架日期
+      if (item.publishedAt) {
+        item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+      }
+
+      item.status = '上架';
+      item.displayStatus = '已上架';
+
+      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+
+      item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
     }
 
-    if (status === '上架' || status === '下架') {
-      item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布';
+    // =========================
+    // 隱藏
+    // =========================
+    else if (status === '隱藏') {
+      item.status = '隱藏';
+
+      // 隱藏後視為尚未上架
+      item.publishedAt = undefined;
+      item.expectedOffShelfAt = undefined;
+
+      item.displayStatus = '隱藏中';
+
+      item.displayPublishedAt = '尚未上架';
+      item.displayOffShelfAt = '—';
     }
 
+    // =========================
+    // 下架
+    // =========================
+    else if (status === '下架') {
+      item.status = '下架';
+
+      // 已下架時間
+      item.expectedOffShelfAt = now.toISOString();
+
+      item.displayStatus = '已下架';
+
+      item.displayOffShelfAt = new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW');
+    }
+
+    // 建立日期永遠保留
+    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+
+    // 儲存
     this.dailyDemandService.updateDemand(item);
+  }
+
+  calculateExpectedOffShelfDate(publishedDate: Date, priority: DailyDemand['priority']): string {
+    const offShelfDate = new Date(publishedDate);
+
+    switch (priority) {
+      case '普通':
+        offShelfDate.setDate(offShelfDate.getDate() + 60);
+        break;
+
+      case '緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 30);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 14);
+        break;
+    }
+
+    return offShelfDate.toISOString();
   }
 }

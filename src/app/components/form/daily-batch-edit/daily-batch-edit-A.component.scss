@@ -1,6 +1,6 @@
 .container {
   padding: 30px;
-  padding-bottom: 50px; /* 確保最外層底部有足夠空間 */
+  padding-bottom: 50px;
 }
 
 h1 {
@@ -17,23 +17,22 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* 修改 .info-tag 及其子元素 */
 .info-tag {
   display: inline-flex;
-  align-items: center; /* 確保內部元件垂直置中 */
+  align-items: center;
   justify-content: center;
   background-color: #f0f4f9;
   border: 1px solid #d0e1f9;
   border-radius: 8px;
   padding: 8px 16px;
   gap: 8px;
+  line-height: 1;
 }
 
 .info-label {
-  font-size: 19px;
+  font-size: 15px;
   color: #5f6368;
   font-weight: 500;
-  line-height: 1; /* 保留 line-height: 1 */
 }
 
 .info-value {
@@ -42,15 +41,7 @@ h1 {
   font-weight: 700;
   font-family: monospace, sans-serif;
   letter-spacing: 0.5px;
-  line-height: 1;
-
-  /* 💡 新增這行：微調數字向上提升 1 px，達到視覺完美對齊 */
-  transform: translateY(-1px);
 }
-
-/* =========================
-   表單外框
-========================= */
 
 .form-box {
   border: 1px solid #ddd;
@@ -59,25 +50,18 @@ h1 {
   margin-bottom: 30px;
 }
 
-/* 第1、3、5筆 */
 .light-box {
   background-color: #d7ebf9;
 }
 
-/* 第2、4、6筆 */
 .dark-box {
   background-color: #e3f2fd;
 }
 
-/* 標題 */
 h2 {
   margin-bottom: 20px;
   font-size: 20px;
 }
-
-/* =========================
-   標籤
-========================= */
 
 label {
   display: block;
@@ -91,12 +75,9 @@ label {
   margin-top: 15px;
 }
 
-/* =========================
-   輸入框
-========================= */
-
 input,
-select {
+select,
+textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 12px;
@@ -107,21 +88,11 @@ select {
 }
 
 textarea {
-  width: 100%;
-  box-sizing: border-box;
   min-height: 100px;
-  padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 16px;
   resize: vertical;
 }
 
-/* =========================
-   數量 + 單位
-========================= */
-
+/* 數量 + 單位 */
 .amount-box {
   display: flex;
   align-items: center;
@@ -129,20 +100,12 @@ textarea {
   margin-bottom: 20px;
 }
 
-.amount-box input:first-child {
+.amount-box input {
   width: 250px;
   margin-bottom: 0;
 }
 
-.amount-box input:nth-child(2) {
-  width: 250px;
-  margin-bottom: 0;
-}
-
-/* =========================
-   一般輸入寬度
-========================= */
-
+/* 一般輸入寬度 */
 .short-input {
   width: 250px;
 }
@@ -164,10 +127,7 @@ textarea {
   width: 420px;
 }
 
-/* =========================
-   物品完好度
-========================= */
-
+/* 物品完好度 */
 .condition-row {
   display: flex;
   align-items: center;
@@ -175,8 +135,8 @@ textarea {
   padding: 5px 8px;
   margin-bottom: 2px;
   border-bottom: 1px dashed #1e88e5;
-  transition: background-color 0.2s ease;
   border-radius: 6px;
+  transition: background-color 0.2s ease;
 }
 
 .condition-name {
@@ -190,30 +150,28 @@ textarea {
   margin: 0;
 }
 
-/* =========================
-   優先度 (加大下邊距)
-========================= */
-
-.priority-box {
+/* 優先度 */
+.priority-box,
+.status-box {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 30px;
+  gap: 16px;
   margin-bottom: 35px;
 }
 
-.priority-box label {
+.priority-box label,
+.status-box label {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 6px;
   margin-bottom: 0;
   cursor: pointer;
+  font-size: 17px;
   white-space: nowrap;
-  font-size: 16px;
 }
 
-.priority-box input[type='radio'] {
+.priority-box input[type='radio'],
+.status-box input[type='radio'] {
   width: auto;
   margin: 0;
 }
@@ -230,42 +188,13 @@ textarea {
   color: #d32f2f;
 }
 
-/* =========================
-   公開狀態 (加大下邊距)
-========================= */
-
-.status-box {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  margin-bottom: 35px;
-}
-
-.status-box label {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 0;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.status-box input[type='radio'] {
-  width: auto;
-  margin: 0;
-}
-
-/* =========================
-   標題 + 字數提示
-========================= */
-
+/* 標題 + 字數提示 */
 .label-row {
   display: flex !important;
   align-items: center;
   gap: 6px;
   margin-top: 20px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
   font-weight: 600;
 }
 
@@ -276,25 +205,24 @@ textarea {
   margin-left: 4px;
   white-space: nowrap;
 }
-/* =========================
-   服務對象左右排列
-========================= */
 
+/* 服務對象左右排列 */
 .service-target-area {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 100px;
-  margin-bottom: 35px;
+  gap: 130px;
+  margin-top: 0 !important;
+  margin-bottom: 20px !important;
 }
 
 .service-target-area.invalid-box::before {
   content: '';
   position: absolute;
-  top: 10px;
+  top: -5px;
   left: -12px;
   width: 850px;
-  height: calc(100% + 2px);
+  height: calc(100% + 10px);
   border: 2px solid #d32f2f;
   background-color: #fff5f5;
   border-radius: 12px;
@@ -306,25 +234,25 @@ textarea {
 .custom-service-target-section {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .service-target-section {
   width: 280px;
-  flex-shrink: 0;
 }
 
 .custom-service-target-section {
-  flex: 1;
+  width: calc(100% - 380px);
 }
 
 .custom-service-target-section .label-row {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .service-target-box {
   display: grid;
-  grid-template-columns: repeat(2, 120px);
-  column-gap: 30px;
+  grid-template-columns: repeat(2, 140px);
+  column-gap: 50px !important;
   row-gap: 10px;
 }
 
@@ -354,5 +282,27 @@ textarea {
   align-items: center;
   gap: 8px;
   width: 440px;
+  flex-shrink: 0;
+}
+/* 物資狀態左右排列 */
+.condition-area {
+  display: flex;
+  align-items: flex-start;
+  gap: 130px;
+  margin-top: 10px !important;
+  margin-bottom: 35px !important;
+}
+
+.condition-section {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.condition-left {
+  width: 180px;
+}
+
+.custom-condition-section {
+  width: calc(100% - 380px);
   flex-shrink: 0;
 }

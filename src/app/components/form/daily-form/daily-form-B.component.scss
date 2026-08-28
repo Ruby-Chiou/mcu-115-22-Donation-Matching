@@ -1,19 +1,163 @@
-/* =========================
-   按鈕顏色
-========================= */
+.receive-method-box label {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 500;
+}
 
-.save-btn {
-  background-color: var(--color-brand-primary);
+.receive-method-box input[type='checkbox'] {
+  width: auto !important;
+  height: auto;
+  padding: 0 !important;
+  margin: 2px 0 0 0 !important;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+}
+
+/*短欄位*/
+.short-field {
+  width: 515px;
+}
+
+.short-field textarea,
+.short-field select {
+  width: 100%;
+}
+
+.note-textarea {
+  width: 100%;
+  position: relative;
+  left: 0px;
+}
+
+/*接受物資狀態*/
+.condition-left {
+  width: 180px;
+}
+
+.condition-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  margin-bottom: 2px;
+  border-bottom: 1px dashed #1e88e5;
+  transition: background-color 0.2s ease;
+  border-radius: 6px;
+}
+
+.condition-row:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.condition-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.condition-name {
+  color: var(--color-text-main, #333333);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.condition-toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background-color: #90a4ae;
   color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.condition-toggle.accept {
+  background-color: #66a96b;
+}
+
+.condition-toggle.reject {
+  background-color: #c75b5b;
+}
+
+.condition-toggle:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+/*優先度*/
+.priority-box,
+.status-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 35px;
+}
+
+.priority-box label,
+.status-box label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 17px;
+}
+
+.priority-box input[type='radio'],
+.status-box input[type='radio'] {
+  width: auto;
+  margin: 0;
+}
+
+.priority-box .normal {
+  color: #333333;
+}
+
+.priority-box .urgent {
+  color: #f57c00;
+}
+
+.priority-box .very-urgent {
+  color: #d32f2f;
+}
+
+/*按鈕*/
+.button-area {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.button-area button {
+  padding: 8px 18px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .back-btn {
   background-color: #64b5f6;
   color: #0d47a1;
-}
-
-.save-btn:hover {
-  opacity: 0.85;
 }
 
 .back-btn:hover {
@@ -24,10 +168,7 @@
   opacity: 0.85;
 }
 
-/* =========================
-   必填標記與提示
-========================= */
-
+/*必填標記與提示*/
 .required {
   color: #d32f2f;
   font-weight: bold;
@@ -38,15 +179,30 @@
   background-color: #fff5f5;
 }
 
+.custom-select.error-input {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.custom-select.error-input .custom-select-trigger {
+  border: 2px solid #d32f2f !important;
+  background-color: #fff5f5;
+}
+
+/*接收方式必填錯誤*/
+.receive-method-box.error-area {
+  border: 2px solid #d32f2f !important;
+  background-color: #fff5f5;
+}
+
 .label-row {
   display: flex !important;
   align-items: center;
   gap: 6px;
   margin-top: 20px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
   font-weight: 600;
 }
-
 /* 統一標題間距，確保上下對齊 */
 .align-title {
   margin-top: 0 !important;
@@ -62,10 +218,16 @@
   white-space: nowrap;
 }
 
-/* =========================
-   按鈕通用元件設定
-========================= */
+/* 緊急優先度限制說明 */
+.priority-limit-info {
+  font-size: 13px;
+  color: #555;
+  font-weight: 400;
+  margin-left: 8px;
+  white-space: nowrap;
+}
 
+/*按鈕通用元件設定*/
 .add-condition-btn,
 .delete-condition-btn {
   width: 30px;
@@ -88,18 +250,14 @@
   background-color: #f5f5f5;
 }
 
-/* =========================
-   服務對象區與精準紅框範圍
-========================= */
-
+/*服務對象區與精準紅框範圍*/
 .service-target-area {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 100px;
+  gap: 130px;
   margin-bottom: 35px;
 }
-
 .service-target-area.error-area::before {
   content: '';
   position: absolute;
@@ -125,102 +283,19 @@
   background-color: transparent !important;
 }
 
-.service-target-section {
-  width: 280px;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-/* 修改重點：將服務對象列間距 row-gap 從 20px 縮小為 10px */
-.service-target-box {
-  display: grid;
-  grid-template-columns: repeat(2, 120px);
-  column-gap: 30px;
-  row-gap: 10px; /* 縮小垂直間距 */
-}
-
-.service-target-box label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-}
-
-.service-target-box input[type='checkbox'] {
-  width: auto;
-  margin: 0;
-}
-
-.custom-service-target-section {
-  width: calc(100% - 380px);
-  flex-shrink: 0;
-}
-
-.custom-service-list {
-  display: grid;
-  grid-template-columns: repeat(2, 440px);
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column;
-  column-gap: 30px;
-  row-gap: 28px;
-}
-
-.custom-service-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 440px;
-  height: 42px;
-  flex-shrink: 0;
-}
-
-.custom-service-input {
-  width: 320px !important;
-  flex-shrink: 0;
-  margin-bottom: 0 !important;
-}
-
-/* =========================
-   物資狀態區（與服務對象區完全對稱）
-========================= */
-
-.condition-area {
-  display: flex;
-  align-items: flex-start;
-  gap: 100px;
-  margin-bottom: 35px;
-}
-
+.service-target-section,
 .condition-section {
   width: 280px;
   flex-shrink: 0;
 }
 
-.custom-condition-section {
-  width: calc(100% - 380px);
-  flex-shrink: 0;
+.service-target-section {
+  padding: 0;
 }
 
-.custom-condition-list {
+.service-target-box {
   display: grid;
-  grid-template-columns: repeat(2, 440px);
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column;
-  column-gap: 30px;
-  row-gap: 28px;
-}
-
-.custom-condition-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 440px;
-  height: 42px;
-  flex-shrink: 0;
-}
-
-.custom-condition-input {
-  width: 320px !important;
-  flex-shrink: 0;
-  margin-bottom: 0 !important;
+  grid-template-columns: repeat(2, 140px);
+  column-gap: 50px !important;
+  row-gap: 10px;
 }
