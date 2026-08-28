@@ -20,7 +20,6 @@
   box-sizing: border-box;
 }
 
-/*短欄位*/
 .short-field {
   width: 515px;
 }
@@ -36,7 +35,6 @@
   left: 0px;
 }
 
-/*接受物資狀態*/
 .condition-left {
   width: 180px;
 }
@@ -96,7 +94,6 @@
   transform: scale(1.05);
 }
 
-/*優先度*/
 .priority-box,
 .status-box {
   display: flex;
@@ -135,7 +132,6 @@
   color: #d32f2f;
 }
 
-/*按鈕*/
 .button-area {
   width: 100%;
   display: flex;
@@ -160,6 +156,15 @@
   color: #0d47a1;
 }
 
+.save-btn {
+  background-color: var(--color-brand-primary);
+}
+
+.save-btn:hover {
+  background-color: var(--color-brand-primary);
+  opacity: 0.85;
+}
+
 .back-btn:hover {
   background-color: #42a5f5;
 }
@@ -168,7 +173,6 @@
   opacity: 0.85;
 }
 
-/*必填標記與提示*/
 .required {
   color: #d32f2f;
   font-weight: bold;
@@ -189,7 +193,6 @@
   background-color: #fff5f5;
 }
 
-/*接收方式必填錯誤*/
 .receive-method-box.error-area {
   border: 2px solid #d32f2f !important;
   background-color: #fff5f5;
@@ -203,7 +206,7 @@
   margin-bottom: 16px;
   font-weight: 600;
 }
-/* 統一標題間距，確保上下對齊 */
+
 .align-title {
   margin-top: 0 !important;
   margin-bottom: 15px !important;
@@ -218,7 +221,6 @@
   white-space: nowrap;
 }
 
-/* 緊急優先度限制說明 */
 .priority-limit-info {
   font-size: 13px;
   color: #555;
@@ -227,7 +229,6 @@
   white-space: nowrap;
 }
 
-/*按鈕通用元件設定*/
 .add-condition-btn,
 .delete-condition-btn {
   width: 30px;
@@ -250,7 +251,6 @@
   background-color: #f5f5f5;
 }
 
-/*服務對象區與精準紅框範圍*/
 .service-target-area {
   position: relative;
   display: flex;
