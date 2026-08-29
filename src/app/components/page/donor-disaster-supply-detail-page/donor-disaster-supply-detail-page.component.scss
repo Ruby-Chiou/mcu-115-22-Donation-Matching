@@ -160,6 +160,7 @@
 .organization-box strong {
   color: #333;
   font-size: 16px;
+
 }
 .donate-action {
   margin-top: 30px;
@@ -211,6 +212,7 @@
   gap: 20px;
   padding: 15px 0;
   border-bottom: 1px solid #eeeeee;
+  text-align: right;
 }
 
 .organization-item:last-child {
@@ -220,16 +222,19 @@
 .organization-item > span {
   color: #666;
   font-weight: 500;
+
 }
 
 .organization-item strong {
   color: #333;
+  text-align: right;
 }
 
 .organization-item p {
   margin: 0;
   line-height: 1.7;
   color: #555;
+  text-align: right;
 }
 
 /* =========================

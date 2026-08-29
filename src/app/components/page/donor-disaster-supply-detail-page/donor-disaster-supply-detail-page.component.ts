@@ -45,10 +45,10 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   // =========================
   // 返回需求清單
   // =========================
-  goBackToList() {
-    this.router.navigate([
-      '/donor/disaster'
-    ]);
+  goBackToList(): void {
+    this.router.navigate( ['/donor/disaster'],
+      { queryParams: { section: 'material' } }
+    );
   }
   // =========================
   // 前往物資捐助表單

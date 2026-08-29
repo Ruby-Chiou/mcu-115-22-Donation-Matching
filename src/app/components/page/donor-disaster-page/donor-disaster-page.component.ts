@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal,OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { DonorDisasterCardListComponent } from '../../data-list/donor-disaster-card-list/donor-disaster-card-list.component';
 import { DisasterControlService } from '../../../core/services/disaster-control.service';
 
@@ -9,7 +10,7 @@ import { DisasterControlService } from '../../../core/services/disaster-control.
   styleUrl: './donor-disaster-page.component.scss',
 })
 
-export class DonorDisasterPageComponent {
+export class DonorDisasterPageComponent implements OnInit {
 
   showFilterModal = false;
   categoryOptions = [
@@ -125,6 +126,16 @@ export class DonorDisasterPageComponent {
     signal<'material' | 'volunteer'>('material');
   protected readonly disasterData =
     inject(DisasterControlService).data;
+  private route = inject(ActivatedRoute);
+  ngOnInit(): void {
+    const section = this.route.snapshot.queryParamMap.get('section');
+    if (section === 'volunteer') {
+      this.activeType.set('volunteer');
+    }
+    else {
+      this.activeType.set('material');
+    }
+  }
   protected selectType(
     type: 'material' | 'volunteer'
   ): void {

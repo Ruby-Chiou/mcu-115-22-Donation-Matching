@@ -19,19 +19,20 @@
       ================================================= -->
       <div class="material-info">
         <div class="material-image">
-          <img src="https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img" alt="礦泉水">
+          <img src="https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img" [alt]="demand?.item">
         </div>
         <div class="material-text">
           <span class="label">
             捐助物資
           </span>
           <h2>
-            礦泉水
+            {{ demand?.item }}
+
           </h2>
           <p>
-            受助機構：
+            接收地址：
             <strong>
-              花蓮縣救災中心
+               {{ demand?.address }}
             </strong>
           </p>
         </div>
@@ -51,9 +52,9 @@
           </span>
         </label>
       </div>
-      <!-- =================================================
+      <!-- ============
            表單
-      ================================================= -->
+       =============== -->
       <form (ngSubmit)="submitForm()" #supplyForm="ngForm">
         <!-- 姓名 -->
         <div class="form-group">
@@ -78,8 +79,18 @@
             <span>*</span>
           </label>
           <div class="quantity-input">
-            <input type="number" name="quantity" [(ngModel)]="quantity" min="1" placeholder="請輸入數量" max="100" required>
-
+            <input
+              type="number"
+              name="quantity"
+              [(ngModel)]="quantity"
+              min="1"
+              [max]="maxDonationQuantity"
+              placeholder="請輸入數量"
+              (input)="limitQuantityInput($event)"
+              required>
+              <span>
+              {{ demand?.unit }}
+            </span>
           </div>
         </div>
         <!-- 實際捐贈物資 -->
@@ -199,7 +210,8 @@
         ================================================= -->
         <div class="notice">
           <strong>
-            📦 物資寄送提醒
+            <i class="fa-solid fa-box"></i>
+            物資捐助提醒
           </strong>
           <p>
             為避免物資誤送或與目前需求不符，
@@ -243,14 +255,14 @@
         ================================================= -->
         <div class="address-box">
           <h2>
-            📦 物資接收資訊
+            <i class="fa-solid fa-box"></i> 物資接收資訊
           </h2>
           <div class="address-item">
             <span>
               接收單位
             </span>
             <strong>
-              花蓮縣救災中心
+              <!--{{ demand?.recipient }}-->
             </strong>
           </div>
           <div class="address-item">
@@ -258,7 +270,7 @@
               接收地址
             </span>
             <strong>
-              花蓮縣花蓮市○○路○○號
+             {{ demand?.address }}
             </strong>
           </div>
           <div class="address-item">
@@ -266,7 +278,7 @@
               聯絡電話
             </span>
             <strong>
-              03-1234567
+               {{ demand?.phone }}
             </strong>
           </div>
         </div>
@@ -275,7 +287,7 @@
         ================================================= -->
         <div class="address-notice">
           <strong>
-            ⚠️ 寄送注意事項
+            <i class="fa-solid fa-exclamation"></i> 寄送注意事項
           </strong>
           <p>
             請依照以上指定地址寄送物資，
@@ -302,7 +314,7 @@
           <p>
             捐贈數量：
             <strong>
-              {{ quantity }} 箱
+              {{ quantity }} {{ demand?.unit }}
             </strong>
           </p>
           <p>
@@ -314,7 +326,6 @@
         </div>
         <!-- =================================================
              捐贈完成證明
-
              ⭐ 只有「需要收據」或「需要感謝狀」
                 才會顯示
         ================================================= -->

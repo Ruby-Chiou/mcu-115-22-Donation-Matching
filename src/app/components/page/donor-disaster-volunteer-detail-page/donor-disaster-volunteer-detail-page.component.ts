@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
 import { VolunteerDemand } from '../../../models/volunteer/volunteer-demand';
+import { Location } from '@angular/common';
 
 interface Comment {
   user: string;
@@ -23,7 +24,8 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private volunteerDemandService: VolunteerDemandService
+    private volunteerDemandService: VolunteerDemandService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -51,10 +53,12 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
     this.router.navigate(['/donor/disaster/volunteer/form', this.volunteer.id]);
   }
 // 返回志工需求清單
-  goBackToList() {
-    this.router.navigate(['/donor/disaster']);
-  }
 
+  goBackToList(): void {
+    this.router.navigate( ['/donor/disaster'],
+      { queryParams: { section: 'volunteer' } }
+    );
+  }
 // =========================
 // 留言
 // =========================
