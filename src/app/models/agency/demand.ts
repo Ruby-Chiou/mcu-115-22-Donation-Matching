@@ -11,36 +11,18 @@ export interface DisasterConditions {
 
 // 急難救助需求資料
 export interface DisasterDemand {
-  id: number; // 編號
+  // 基本資料
+  serialNo: number; // 編號
   createdAt?: string; // 建立時間
-  publishedAt?: string; // 發布時間
+  publishedAt?: string; // 上架時間
   expectedOffShelfAt?: string; // 預計下架時間
+
+  // 需求物資
   item: string; // 物資名稱
   amount: number | null; // 需求數量
   remaining?: number | null; // 剩餘需求數量
   unit: string; // 單位
-  amountDescription?: string; // 數量說明
-  reason: string; // 需求原因
-  description: string; // 需求描述
-  conditions: DisasterConditions; // 接受物資狀態
-  customConditions: string[]; // 其他物資狀態
-  priority: '普通' | '緊急' | '非常緊急'; // 緊急程度
-  status: '上架' | '隱藏' | '下架'; // 需求狀態
-  address: string; // 地址
-  phone: string; // 聯絡電話
-  contactTimeWeekday?: boolean; // 平日聯絡
-  contactTimeWeekend?: boolean; // 假日聯絡
-  contactTimeMorning?: boolean; // 上午聯絡
-  contactTimeAfternoon?: boolean; // 下午聯絡
-  contactTimeEvening?: boolean; // 晚上聯絡
-  note?: string; // 備註
-  brand?: string; // 品牌
-  image?: string[]; // 物資圖片
-  imageFileNames?: string[]; // 物資圖片檔名
-
-  // TODO: 留言功能完成後，由 Message 資料計算，不存資料庫
-  messageCount?: number; // 留言數量
-
+  amountDescription?: string; // 數量描述
   category:
     | '食品與飲用水'
     | '衣物與保暖用品'
@@ -56,10 +38,60 @@ export interface DisasterDemand {
     | '居住安置與修繕用品'
     | '其他'
     | '';
+
+  // 需求內容
+  reason: string; // 需求原因
+  description: string; // 需求描述
+  brand?: string; // 特殊品牌需求
+
+  // 物資圖片
+  image?: string[]; // 物資圖片
+  imageFileNames?: string[]; // 物資圖片檔名
+
+  // 物資接受條件
+
+  conditions: DisasterConditions; // 前端使用：接受物資狀態
+
+  customConditions: string[]; // 前端使用：其它物資需求狀態
+
+  conditionDescription?: string; // 資料庫使用：合併後的物資狀態內容
+
+  // 優先度與需求狀態
+  priority: '普通' | '緊急' | '非常緊急'; // 緊急優先度
+  status: '上架' | '隱藏' | '下架'; // 需求狀態
+
+  // 聯絡資訊
+  address: string; // 接收物資地址
+  phone: string; // 聯絡電話
+
+  // 是否區分平日、假日的聯絡時段
+  contactTimeDifferent?: boolean;
+
+  // 一般聯絡時段
+  contactTimeMorning?: boolean; // 上午
+  contactTimeAfternoon?: boolean; // 下午
+  contactTimeEvening?: boolean; // 晚上
+
+  // 平日聯絡時段
+  weekdayMorning?: boolean; // 平日上午
+  weekdayAfternoon?: boolean; // 平日下午
+  weekdayEvening?: boolean; // 平日晚上
+
+  // 假日聯絡時段
+  weekendMorning?: boolean; // 假日上午
+  weekendAfternoon?: boolean; // 假日下午
+  weekendEvening?: boolean; // 假日晚上
+
+  // 其他資訊
+  note?: string; // 其他說明（備註）
+
+  // TODO: 留言功能完成後，由 Message 資料計算，不存資料庫
+  messageCount?: number; // 留言數量
 }
 
-// 編輯用錯誤提示欄位
+// 編輯用資料
 export interface EditableDisasterDemand extends DisasterDemand {
+  // 編輯錯誤提示
   itemError?: boolean; // 物資名稱錯誤
   amountError?: boolean; // 需求數量錯誤
   unitError?: boolean; // 單位錯誤
@@ -76,10 +108,10 @@ export interface EditableDisasterDemand extends DisasterDemand {
 }
 
 // 新增需求用
-export type CreateDisasterDemand = Omit<DisasterDemand, 'id'>;
+export type CreateDisasterDemand = Omit<DisasterDemand, 'serialNo'>;
 
-// 狀態
+// 需求狀態
 export type DisasterStatus = '上架' | '隱藏' | '下架';
 
-// 顯示狀態
+// 列表顯示狀態
 export type DisplayStatus = '已上架' | '隱藏中' | '已下架';

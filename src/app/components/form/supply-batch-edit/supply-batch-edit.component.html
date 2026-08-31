@@ -3,10 +3,16 @@
 
   <ng-container *ngFor="let demand of editDemands; let i = index">
     <!-- 需求編號：移到藍色大框框外面 -->
-    <div class="batch-edit-header" *ngIf="demand.id">
+    <div class="batch-edit-header" *ngIf="demand.serialNo">
       <div class="info-tag">
         <span class="info-label">需求編號</span>
-        <span class="info-value">B{{ demand.id }}</span>
+        <span class="info-value">B{{ demand.serialNo }}</span>
+      </div>
+
+      <!-- 上方操作按鈕 -->
+      <div class="edit-top-button-area">
+        <button type="button" class="back-btn" (click)="cancel()">取消</button>
+        <button type="button" class="save-btn" (click)="saveAll()">儲存全部修改</button>
       </div>
     </div>
 
@@ -25,6 +31,7 @@
         [class.invalid]="demand.itemError"
         placeholder="請編輯需求物"
         [(ngModel)]="demand.item"
+        (keydown)="preventMaxLength($event, 150)"
       ></textarea>
 
       <!-- 需求數量與單位 -->
@@ -46,6 +53,7 @@
           pattern="[0-9]*"
           placeholder="請編輯數量"
           [(ngModel)]="demand.amount"
+          (keydown)="preventMaxLength($event, 10)"
           (input)="limitNumberLength($event, demand, 'amount')"
         />
 
@@ -56,6 +64,7 @@
           type="text"
           placeholder="請編輯單位，例如：箱、袋、包"
           [(ngModel)]="demand.unit"
+          (keydown)="preventMaxLength($event, 10)"
         />
       </div>
 
@@ -77,6 +86,7 @@
           inputmode="numeric"
           placeholder="請輸入目前剩餘需求"
           [(ngModel)]="demand.remaining"
+          (keydown)="preventMaxLength($event, 10)"
           (input)="limitNumberLength($event, demand, 'remaining')"
         />
 
@@ -94,6 +104,7 @@
           maxlength="100"
           placeholder="請編輯數量描述，例如：1箱內含10包，每包5公斤"
           [(ngModel)]="demand.amountDescription"
+          (keydown)="preventMaxLength($event, 100)"
         ></textarea>
       </div>
 
@@ -124,7 +135,13 @@
         <span class="word-count" *ngIf="demand.reason"> {{ demand.reason.length }}/300 </span>
       </label>
 
-      <textarea maxlength="300" [class.invalid]="demand.reasonError" placeholder="請編輯需求原因" [(ngModel)]="demand.reason"></textarea>
+      <textarea
+        maxlength="300"
+        [class.invalid]="demand.reasonError"
+        placeholder="請編輯需求原因"
+        [(ngModel)]="demand.reason"
+        (keydown)="preventMaxLength($event, 300)"
+      ></textarea>
 
       <!-- 需求描述 -->
       <label class="label-row">
@@ -138,6 +155,7 @@
         [class.invalid]="demand.descriptionError"
         placeholder="請編輯需求描述，例如可接受誤差程度、特定型號、款式等"
         [(ngModel)]="demand.description"
+        (keydown)="preventMaxLength($event, 500)"
       ></textarea>
 
       <!-- 特殊品牌需求 -->
@@ -150,7 +168,9 @@
         maxlength="100"
         placeholder="請編輯特殊品牌需求，例如：不限品牌、指定品牌、不可接受哪些品牌"
         [(ngModel)]="demand.brand"
+        (keydown)="preventMaxLength($event, 100)"
       ></textarea>
+
       <!-- 物資示意圖片 -->
       <label class="label-row">物資示意圖片</label>
 
@@ -291,6 +311,7 @@
                 type="text"
                 placeholder="請編輯其它物資需求狀態(可自行輸入)"
                 [(ngModel)]="demand.customConditions[j]"
+                (keydown)="preventMaxLength($event, 100)"
               />
 
               <span class="word-count" *ngIf="condition"> {{ condition.length }}/100 </span>
@@ -381,6 +402,7 @@
         type="text"
         placeholder="請編輯能夠接收物資的地址"
         [(ngModel)]="demand.address"
+        (keydown)="preventMaxLength($event, 35)"
       />
 
       <!-- 聯絡電話 -->
@@ -397,51 +419,113 @@
         type="tel"
         placeholder="請編輯可保持暢通的號碼"
         [(ngModel)]="demand.phone"
+        (keydown)="preventMaxLength($event, 30)"
       />
 
       <!-- 聯絡時間 -->
       <label class="label-row contact-time-title"> 聯絡時間 </label>
 
       <div class="contact-time-box">
-        <!-- 星期 -->
-        <div class="contact-time-section">
-          <span class="contact-time-label">日期</span>
+        <!-- 是否區分平日、假日 -->
+        <div class="contact-time-different-row">
+          <span class="contact-time-question"> 平日、假日聯絡時段是否不同？ </span>
 
-          <div class="contact-time-options">
-            <label class="time-option">
-              <input type="checkbox" value="平日" [(ngModel)]="demand.contactTimeWeekday" />
-              平日
-            </label>
+          <div class="different-toggle">
+            <button
+              type="button"
+              class="different-btn"
+              [ngClass]="{ active: demand.contactTimeDifferent === false }"
+              (click)="setContactTimeDifferent(demand, false)"
+            >
+              否
+            </button>
 
-            <label class="time-option">
-              <input type="checkbox" value="假日" [(ngModel)]="demand.contactTimeWeekend" />
-              假日
-            </label>
+            <button
+              type="button"
+              class="different-btn"
+              [ngClass]="{ active: demand.contactTimeDifferent === true }"
+              (click)="setContactTimeDifferent(demand, true)"
+            >
+              是
+            </button>
           </div>
         </div>
 
-        <!-- 時段 -->
-        <div class="contact-time-section">
-          <span class="contact-time-label">時段</span>
+        <!-- 不區分平日、假日 -->
+        <div class="contact-time-group" *ngIf="!demand.contactTimeDifferent">
+          <div class="contact-time-group-title">聯絡時段</div>
 
           <div class="contact-time-options">
             <label class="time-option">
-              <input type="checkbox" value="上午" [(ngModel)]="demand.contactTimeMorning" />
+              <input type="checkbox" [(ngModel)]="demand.contactTimeMorning" />
               上午
               <span class="time-range">08:00～12:00</span>
             </label>
 
             <label class="time-option">
-              <input type="checkbox" value="下午" [(ngModel)]="demand.contactTimeAfternoon" />
+              <input type="checkbox" [(ngModel)]="demand.contactTimeAfternoon" />
               下午
               <span class="time-range">12:00～18:00</span>
             </label>
 
             <label class="time-option">
-              <input type="checkbox" value="晚上" [(ngModel)]="demand.contactTimeEvening" />
+              <input type="checkbox" [(ngModel)]="demand.contactTimeEvening" />
               晚上
               <span class="time-range">18:00～22:00</span>
             </label>
+          </div>
+        </div>
+
+        <!-- 區分平日、假日 -->
+        <div class="contact-time-separated" *ngIf="demand.contactTimeDifferent">
+          <!-- 平日 -->
+          <div class="contact-time-group">
+            <div class="contact-time-group-title">平日</div>
+
+            <div class="contact-time-options">
+              <label class="time-option">
+                <input type="checkbox" [(ngModel)]="demand.weekdayMorning" />
+                上午
+                <span class="time-range">08:00～12:00</span>
+              </label>
+
+              <label class="time-option">
+                <input type="checkbox" [(ngModel)]="demand.weekdayAfternoon" />
+                下午
+                <span class="time-range">12:00～18:00</span>
+              </label>
+
+              <label class="time-option">
+                <input type="checkbox" [(ngModel)]="demand.weekdayEvening" />
+                晚上
+                <span class="time-range">18:00～22:00</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 假日 -->
+          <div class="contact-time-group">
+            <div class="contact-time-group-title">假日</div>
+
+            <div class="contact-time-options">
+              <label class="time-option">
+                <input type="checkbox" [(ngModel)]="demand.weekendMorning" />
+                上午
+                <span class="time-range">08:00～12:00</span>
+              </label>
+
+              <label class="time-option">
+                <input type="checkbox" [(ngModel)]="demand.weekendAfternoon" />
+                下午
+                <span class="time-range">12:00～18:00</span>
+              </label>
+
+              <label class="time-option">
+                <input type="checkbox" [(ngModel)]="demand.weekendEvening" />
+                晚上
+                <span class="time-range">18:00～22:00</span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -452,7 +536,7 @@
         <span class="word-count" *ngIf="demand.note"> {{ demand.note.length }}/300 </span>
       </label>
 
-      <textarea maxlength="300" placeholder="請編輯其他說明" [(ngModel)]="demand.note"></textarea>
+      <textarea maxlength="300" placeholder="請編輯其他說明" [(ngModel)]="demand.note" (keydown)="preventMaxLength($event, 300)"></textarea>
 
       <hr />
     </div>
@@ -467,9 +551,9 @@
 </div>
 
 <!-- 圖片預覽視窗 -->
-<app-image-preview
+<app-supply-image-preview
   *ngIf="showImagePreview"
   [image]="previewImage"
   [imageName]="previewImageName"
   (closed)="closeImagePreview()"
-></app-image-preview>
+></app-supply-image-preview>

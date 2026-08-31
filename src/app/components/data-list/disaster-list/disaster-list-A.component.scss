@@ -23,7 +23,6 @@
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-
   &:hover {
     opacity: 0.85;
   }
@@ -192,22 +191,23 @@ td button {
 }
 
 /* 狀態 */
-.status-on {
+.operation-flex select.status-on {
   background: #e8f5e9;
   color: #2e7d32;
 }
 
-.status-hide {
+.operation-flex select.status-hide {
   background: #fff8e1;
   color: #8d6e00;
 }
 
-.status-off {
+.operation-flex select.status-off {
   background: #ffebee;
   color: #c62828;
 }
 
 /* 優先度 */
+
 .normal,
 .urgent,
 .very-urgent {

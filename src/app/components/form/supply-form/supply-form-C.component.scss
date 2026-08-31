@@ -91,18 +91,12 @@
   margin-bottom: 40px;
 }
 
-/*聯絡時間*/
+/* 聯絡時間 */
 .contact-time-title {
   margin-top: 5px !important;
   font-size: 17px;
   font-weight: 600;
   color: #1a202c;
-}
-
-.optional {
-  color: #718096;
-  font-size: 14px;
-  font-weight: 400;
 }
 
 .contact-time-box {
@@ -117,19 +111,67 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.contact-time-section {
+/* 是否區分平日假日 */
+.contact-time-different-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.contact-time-question {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.different-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.different-btn {
+  min-width: 55px;
+  padding: 7px 16px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #333333;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.different-btn:hover {
+  background-color: #f0f7ff;
+  border-color: #93c5fd;
+}
+
+.different-btn.active {
+  background-color: #e0f2fe;
+  border-color: #0284c7;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+/* 聯絡時間區塊 */
+.contact-time-separated {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-time-group {
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-bottom: 16px;
 }
 
-.contact-time-section:last-child {
-  margin-bottom: 0;
-}
-
-.contact-time-label {
-  width: 45px;
+.contact-time-group-title {
+  width: 65px;
   flex-shrink: 0;
   font-size: 16px;
   font-weight: 600;
@@ -142,7 +184,7 @@
   gap: 10px;
 }
 
-/* 膠囊切換按鈕 */
+/* 時段按鈕 */
 .time-option {
   position: relative;
   display: inline-flex;
@@ -170,14 +212,13 @@
   pointer-events: none;
 }
 
-/* 滑鼠靠近 (Hover) - 淡藍色背景 */
 .time-option:hover {
   background-color: #f0f7ff;
   border-color: #93c5fd;
   color: #1e40af;
 }
 
-/* 選取狀態 (Checked) */
+/* 選取狀態 */
 .time-option:has(input[type='checkbox']:checked) {
   background-color: #e0f2fe;
   border-color: #0284c7;
@@ -185,7 +226,7 @@
   font-weight: 600;
 }
 
-/* 時間範圍文字 */
+/* 時間範圍 */
 .time-range {
   color: #555555;
   font-size: 14px;

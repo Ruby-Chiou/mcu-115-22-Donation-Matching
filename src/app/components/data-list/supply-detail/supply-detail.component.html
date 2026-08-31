@@ -1,15 +1,40 @@
 <div class="container">
   <h1>災害需求詳細資料</h1>
 
-  <!-- 方案一：資訊膠囊樣式（已加大編號字體） -->
   <div class="detail-header-info" *ngIf="demand">
     <div class="info-tag">
       <span class="info-label">需求編號</span>
       <span class="info-value">B{{ listNumber }}</span>
     </div>
+
+    <!-- 上方操作按鈕 -->
+    <div class="button-area">
+      <button class="back-btn" (click)="goBack()">返回</button>
+      <button class="edit-btn" [routerLink]="['/agency/supply-edit', demand.serialNo]" [queryParams]="{ from: 'detail' }">編輯</button>
+      <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
+    </div>
   </div>
 
   <div class="detail-table" *ngIf="demand">
+    <!-- 創建日期 -->
+    <div class="detail-row">
+      <div class="detail-title">創建日期</div>
+      <div class="detail-content">{{ demand.createdAt ? (demand.createdAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
+
+    <!-- 上架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">上架日期</div>
+      <div class="detail-content">{{ demand.publishedAt ? (demand.publishedAt | date:'yyyy/MM/dd HH:mm') : '尚未上架' }}</div>
+    </div>
+
+    <!-- 預計下架日期 / 下架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">{{ demand.status === '下架' ? '下架日期' : '預計下架日期' }}</div>
+
+      <div class="detail-content">{{ demand.expectedOffShelfAt ? (demand.expectedOffShelfAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
+
     <!-- 需求物 -->
     <div class="detail-row">
       <div class="detail-title">需求物</div>
@@ -99,7 +124,7 @@
       <div class="detail-title">其他物品狀態</div>
 
       <div class="detail-content">
-        <ng-container *ngIf="hasCustomConditions(); else noCondition"> {{ getCustomConditions() }} </ng-container>
+        <ng-container *ngIf="hasCustomConditions(); else noCondition">{{ getCustomConditions() }}</ng-container>
 
         <ng-template #noCondition>無</ng-template>
       </div>
@@ -127,25 +152,6 @@
       <div class="detail-content">{{ demand.status }}</div>
     </div>
 
-    <!-- 創建日期 -->
-    <div class="detail-row">
-      <div class="detail-title">創建日期</div>
-      <div class="detail-content">{{ demand.createdAt ? (demand.createdAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
-    </div>
-
-    <!-- 上架日期 -->
-    <div class="detail-row">
-      <div class="detail-title">上架日期</div>
-      <div class="detail-content">{{ demand.publishedAt ? (demand.publishedAt | date:'yyyy/MM/dd HH:mm') : '尚未上架' }}</div>
-    </div>
-
-    <!-- 預計下架日期 / 下架日期 -->
-    <div class="detail-row">
-      <div class="detail-title">{{ demand.status === '下架' ? '下架日期' : '預計下架日期' }}</div>
-
-      <div class="detail-content">{{ demand.expectedOffShelfAt ? (demand.expectedOffShelfAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
-    </div>
-
     <!-- 接收物資地址 -->
     <div class="detail-row">
       <div class="detail-title">接收物資地址</div>
@@ -163,9 +169,9 @@
       <div class="detail-title">聯絡時間</div>
 
       <div class="detail-content contact-time-detail">
-        <ng-container *ngIf="hasContactTime(); else noContactTime"> {{ getContactTimeText() }} </ng-container>
+        <ng-container *ngIf="hasContactTime(); else noContactTime">{{ getContactTimeText() }}</ng-container>
 
-        <ng-template #noContactTime> 無 </ng-template>
+        <ng-template #noContactTime>無</ng-template>
       </div>
     </div>
 
@@ -179,7 +185,7 @@
 
   <div class="button-area">
     <button class="back-btn" (click)="goBack()">返回</button>
-    <button class="edit-btn" [routerLink]="['/agency/supply-edit', demand?.id]" [queryParams]="{ from: 'detail' }">編輯</button>
+    <button class="edit-btn" [routerLink]="['/agency/supply-edit', demand?.serialNo]" [queryParams]="{ from: 'detail' }">編輯</button>
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>
@@ -193,5 +199,5 @@
 >
 </app-supply-delete>
 
-<app-image-preview *ngIf="showImagePreview" [image]="previewImage" [imageName]="previewImageName" (closed)="closeImagePreview()">
-</app-image-preview>
+<app-supply-image-preview *ngIf="showImagePreview" [image]="previewImage" [imageName]="previewImageName" (closed)="closeImagePreview()">
+</app-supply-image-preview>

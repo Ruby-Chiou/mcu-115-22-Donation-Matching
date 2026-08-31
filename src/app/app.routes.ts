@@ -96,11 +96,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
-    path: 'agency/supply-edit/:id',
+    path: 'agency/supply-edit/:serialNo',
     loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
-    path: 'agency/supply-detail/:id',
+    path: 'agency/supply-detail/:serialNo',
     loadComponent: () => import('./components/data-list/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
   },
   {

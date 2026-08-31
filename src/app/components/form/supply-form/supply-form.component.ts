@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
-import { DisasterDemand } from '../../../models/agency/demand';
+import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
+import { DisasterDemand, ConditionStatus } from '../../../models/agency/demand';
 
 @Component({
   selector: 'app-supply-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ImagePreviewComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent],
   templateUrl: './supply-form.component.html',
   styleUrls: ['./supply-form-A.component.scss', './supply-form-B.component.scss', './supply-form-C.component.scss'],
 })
@@ -52,7 +52,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   @ViewChild('descriptionInput') descriptionInput!: ElementRef;
 
   demand: DisasterDemand = {
-    id: 0,
+    serialNo: 0,
     item: '',
     amount: null,
     unit: '',
@@ -69,9 +69,10 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     },
 
     customConditions: [''],
+    conditionDescription: '',
 
     priority: '普通',
-    status: '上架',
+    status: '隱藏',
     address: '',
     phone: '',
     note: '',
@@ -79,11 +80,19 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     image: [],
     imageFileNames: [],
     category: '',
-    contactTimeWeekday: false,
-    contactTimeWeekend: false,
+    contactTimeDifferent: false,
+
     contactTimeMorning: false,
     contactTimeAfternoon: false,
     contactTimeEvening: false,
+
+    weekdayMorning: false,
+    weekdayAfternoon: false,
+    weekdayEvening: false,
+
+    weekendMorning: false,
+    weekendAfternoon: false,
+    weekendEvening: false,
   };
 
   constructor(
@@ -94,29 +103,37 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
 
     // 編輯模式
-    if (id) {
+    if (serialNo) {
       this.isEditMode = true;
 
-      const data = this.disasterDemandService.getDemands().find((item) => item.id === id);
+      const data = this.disasterDemandService.getDemands().find((item) => item.serialNo === serialNo);
 
       if (data) {
         this.demand = {
           ...data,
           status: data.status ?? '上架',
           remaining: data.remaining ?? null,
-          image: data.image ?? [],
-          imageFileNames: data.imageFileNames ?? [],
+          image: [...(data.image ?? [])],
+          imageFileNames: [...(data.imageFileNames ?? [])],
 
-          contactTimeWeekday: data.contactTimeWeekday ?? false,
-          contactTimeWeekend: data.contactTimeWeekend ?? false,
+          contactTimeDifferent: data.contactTimeDifferent ?? false,
+
           contactTimeMorning: data.contactTimeMorning ?? false,
           contactTimeAfternoon: data.contactTimeAfternoon ?? false,
           contactTimeEvening: data.contactTimeEvening ?? false,
+
+          weekdayMorning: data.weekdayMorning ?? false,
+          weekdayAfternoon: data.weekdayAfternoon ?? false,
+          weekdayEvening: data.weekdayEvening ?? false,
+
+          weekendMorning: data.weekendMorning ?? false,
+          weekendAfternoon: data.weekendAfternoon ?? false,
+          weekendEvening: data.weekendEvening ?? false,
 
           conditions: data.conditions ?? {
             全新: '',
@@ -174,9 +191,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   toggleCategoryDropdown() {
     this.categoryDropdownOpen = !this.categoryDropdownOpen;
   }
+
   selectCategory(category: NonNullable<DisasterDemand['category']>) {
     this.demand.category = category;
     this.categoryDropdownOpen = false;
+  }
+
+  setContactTimeDifferent(different: boolean) {
+    this.demand.contactTimeDifferent = different;
   }
 
   save() {
@@ -241,8 +263,38 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       this.demand.customConditions.push('');
     }
 
+    // 整理成資料庫使用的單一物資狀態欄位
+    const conditionParts: string[] = [];
+
+    const conditionLabels: (keyof DisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
+
+    // 接受物資需求狀態
+    // 只有有設定 ✔ / ✘ 才加入
+    conditionLabels.forEach((key) => {
+      const status = this.demand.conditions[key];
+
+      if (status === '接受') {
+        conditionParts.push(`${key}✔`);
+      } else if (status === '不接受') {
+        conditionParts.push(`${key}✘`);
+      }
+    });
+
+    // 其它物資需求狀態
+    // 只加入有填寫的內容
+    this.demand.customConditions.forEach((condition) => {
+      const value = condition.trim();
+
+      if (value) {
+        conditionParts.push(value);
+      }
+    });
+
+    // 最後全部合併成資料庫的單一欄位
+    this.demand.conditionDescription = conditionParts.join('、');
+
     if (this.isEditMode) {
-      const originalStatus = this.disasterDemandService.getDemands().find((item) => item.id === this.demand.id)?.status;
+      const originalStatus = this.disasterDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo)?.status;
 
       const originalPublishedAt = this.demand.publishedAt;
       const now = new Date();
@@ -268,7 +320,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
-        this.router.navigate(['/agency/supply-detail', this.demand.id]);
+        this.router.navigate(['/agency/supply-detail', this.demand.serialNo]);
       } else {
         this.router.navigate(['/agency/disaster']);
       }
@@ -373,10 +425,8 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   limitNumberLength(event: Event, field: 'amount' | 'remaining') {
     const input = event.target as HTMLInputElement;
 
-    // 只允許數字
     input.value = input.value.replace(/[^0-9]/g, '');
 
-    // 最多10位
     if (input.value.length > 10) {
       input.value = input.value.slice(0, 10);
     }
@@ -386,14 +436,12 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     if (field === 'amount') {
       this.demand.amount = value;
 
-      // 新增時，剩餘需求預設等於需求數量
       if (!this.isEditMode) {
         this.demand.remaining = value;
       }
     }
 
     if (field === 'remaining') {
-      // 不能超過需求數量
       if (value !== null && this.demand.amount !== null && value > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
         input.value = this.demand.amount.toString();
@@ -403,14 +451,28 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  limitTextLength(event: Event, field: 'description', maxLength: number) {
-    const input = event.target as HTMLTextAreaElement;
+  limitTextLength(
+    event: Event,
+    field: 'item' | 'unit' | 'amountDescription' | 'reason' | 'description' | 'brand' | 'address' | 'phone' | 'note',
+    maxLength: number
+  ) {
+    const input = event.target as HTMLInputElement | HTMLTextAreaElement;
 
     if (input.value.length > maxLength) {
       input.value = input.value.slice(0, maxLength);
     }
 
     this.demand[field] = input.value;
+  }
+
+  limitCustomConditionLength(event: Event, index: number) {
+    const input = event.target as HTMLInputElement;
+
+    if (input.value.length > 100) {
+      input.value = input.value.slice(0, 100);
+    }
+
+    this.demand.customConditions[index] = input.value;
   }
 
   onImageSelected(event: Event) {

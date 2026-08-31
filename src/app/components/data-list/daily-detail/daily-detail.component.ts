@@ -4,11 +4,11 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { DailyDemand } from '../../../models/agency/daily-demand';
 import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
-import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
+import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({
   selector: 'app-daily-detail',
-  imports: [CommonModule, RouterLink, SupplyDeleteComponent, ImagePreviewComponent],
+  imports: [CommonModule, RouterLink, SupplyDeleteComponent, SupplyImagePreviewComponent],
   templateUrl: './daily-detail.component.html',
   styleUrl: './daily-detail.component.scss',
 })
