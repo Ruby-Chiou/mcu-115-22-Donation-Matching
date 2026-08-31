@@ -1,0 +1,100 @@
+<div class="filter-trigger-group">
+  <button class="filter-icon-btn" (click)="openFilterModal()" title="開啟條件篩選">
+    <svg class="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+      <line x1="15" y1="11" x2="21" y2="11"></line>
+      <line x1="17" y1="15" x2="21" y2="15"></line>
+      <line x1="19" y1="19" x2="21" y2="19"></line>
+    </svg>
+  </button>
+  <span class="filter-label-text">篩選</span>
+</div>
+
+<!-- 自訂篩選彈出視窗 Modal -->
+<div class="modal-backdrop" *ngIf="showFilterModal">
+  <div class="modal-box filter-modal-box">
+    <h2>條件篩選</h2>
+
+    <div class="filter-content">
+      <!-- 依上架狀態 -->
+      <div class="filter-group">
+        <h3>依上架狀態</h3>
+        <div class="pill-list">
+          <button
+            *ngFor="let opt of statusOptions"
+            class="pill-btn"
+            [class.active]="selectedFilters.status.includes(opt)"
+            (click)="toggleFilter('status', opt)"
+          >
+            {{opt}}
+          </button>
+        </div>
+      </div>
+
+      <!-- 依優先度 -->
+      <div class="filter-group">
+        <h3>依優先度</h3>
+        <div class="pill-list">
+          <button
+            *ngFor="let opt of priorityOptions"
+            class="pill-btn"
+            [class.active]="selectedFilters.priority.includes(opt)"
+            (click)="toggleFilter('priority', opt)"
+          >
+            {{opt}}
+          </button>
+        </div>
+      </div>
+
+      <!-- 低剩餘項目 -->
+      <div class="filter-group">
+        <h3>剩餘數量</h3>
+        <div class="pill-list">
+          <button
+            class="pill-btn"
+            [class.active]="selectedFilters.lowRemaining"
+            (click)="selectedFilters.lowRemaining = !selectedFilters.lowRemaining"
+          >
+            顯示尚有剩餘項目
+          </button>
+        </div>
+      </div>
+
+      <!-- 依類別 -->
+      <div class="filter-group">
+        <h3>依類別</h3>
+        <div class="pill-list">
+          <button
+            *ngFor="let opt of categoryOptions"
+            class="pill-btn"
+            [class.active]="selectedFilters.category.includes(opt)"
+            (click)="toggleFilter('category', opt)"
+          >
+            {{opt}}
+          </button>
+        </div>
+      </div>
+
+      <!-- 依聯絡狀態 -->
+      <div class="filter-group">
+        <h3>依聯絡/留言狀態</h3>
+        <div class="pill-list">
+          <button
+            *ngFor="let opt of messageOptions"
+            class="pill-btn"
+            [class.active]="selectedFilters.messageStatus.includes(opt)"
+            (click)="toggleFilter('messageStatus', opt)"
+          >
+            {{opt}}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-buttons filter-buttons">
+      <button class="reset-btn" (click)="resetFilters()">重置篩選</button>
+      <button class="cancel-btn" (click)="closeFilterModal()">取消</button>
+      <button class="filter-confirm-btn" (click)="applyFilters()">確定</button>
+    </div>
+  </div>
+</div>

@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DailyDemand } from '../../../models/agency/daily-demand';
-import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
+import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({
   selector: 'app-daily-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ImagePreviewComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent],
   templateUrl: './daily-form.component.html',
   styleUrls: ['./daily-form-A.component.scss', './daily-form-B.component.scss', './daily-form-C.component.scss'],
 })

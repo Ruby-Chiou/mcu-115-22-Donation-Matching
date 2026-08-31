@@ -33,11 +33,11 @@ export class SupplyDeleteComponent {
 
   // 確定刪除
   confirmDelete() {
-    this.demandIds.forEach((id) => {
+    this.demandIds.forEach((serialNo) => {
       if (this.demandType === 'daily') {
-        this.dailyService.deleteDemand(id);
+        this.dailyService.deleteDemand(serialNo);
       } else {
-        this.disasterService.deleteDemand(id);
+        this.disasterService.deleteDemand(serialNo);
       }
     });
 

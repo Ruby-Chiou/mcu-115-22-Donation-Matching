@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../models/agency/demand';
-import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
+import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({
   selector: 'app-supply-batch-edit',
-  imports: [CommonModule, FormsModule, ImagePreviewComponent],
+  imports: [CommonModule, FormsModule, SupplyImagePreviewComponent],
   templateUrl: './supply-batch-edit.component.html',
   styleUrls: ['./supply-batch-edit-A.component.scss', './supply-batch-edit-B.component.scss', './supply-batch-edit-C.component.scss'],
 })
@@ -68,7 +68,7 @@ export class SupplyBatchEditComponent implements OnInit {
       this.editDemands = JSON.parse(data).map((item: any) => ({
         ...item,
 
-        conditions: item.conditions || {
+        conditions: item.conditions ?? {
           全新: '',
           二手: '',
           有擦痕: '',
@@ -76,27 +76,36 @@ export class SupplyBatchEditComponent implements OnInit {
           毀損: '',
         },
 
-        customConditions: item.customConditions?.length ? item.customConditions : [''],
+        customConditions: item.customConditions?.length ? [...item.customConditions] : [''],
+
+        conditionDescription: item.conditionDescription ?? '',
 
         unit: item.unit || '',
         amountDescription: item.amountDescription || '',
-        status: item.status ?? '上架',
+        status: item.status ?? '隱藏',
         remaining: item.remaining ?? item.amount,
         createdAt: item.createdAt,
         publishedAt: item.publishedAt,
         expectedOffShelfAt: item.expectedOffShelfAt,
         brand: item.brand || '',
         category: item.category || '',
-
-        imageFileNames: item.imageFileNames ?? [],
+        image: [...(item.image ?? [])],
+        imageFileNames: [...(item.imageFileNames ?? [])],
 
         // 聯絡時間
-        contactTimeWeekday: item.contactTimeWeekday ?? false,
-        contactTimeWeekend: item.contactTimeWeekend ?? false,
-        contactTimeDawn: item.contactTimeDawn ?? false,
+        contactTimeDifferent: item.contactTimeDifferent ?? false,
+
         contactTimeMorning: item.contactTimeMorning ?? false,
         contactTimeAfternoon: item.contactTimeAfternoon ?? false,
         contactTimeEvening: item.contactTimeEvening ?? false,
+
+        weekdayMorning: item.weekdayMorning ?? false,
+        weekdayAfternoon: item.weekdayAfternoon ?? false,
+        weekdayEvening: item.weekdayEvening ?? false,
+
+        weekendMorning: item.weekendMorning ?? false,
+        weekendAfternoon: item.weekendAfternoon ?? false,
+        weekendEvening: item.weekendEvening ?? false,
 
         // 批次編輯專用
         categoryDropdownOpen: false,
@@ -123,6 +132,10 @@ export class SupplyBatchEditComponent implements OnInit {
     });
 
     console.log('批次修改資料:', this.editDemands);
+  }
+
+  setContactTimeDifferent(demand: EditableDisasterDemand, different: boolean): void {
+    demand.contactTimeDifferent = different;
   }
 
   toggleCategoryDropdown(demand: EditableDisasterDemand) {
@@ -173,6 +186,31 @@ export class SupplyBatchEditComponent implements OnInit {
       } else {
         demand.remaining = value;
       }
+    }
+  }
+
+  // 達到最高字數後禁止繼續輸入
+  preventMaxLength(event: KeyboardEvent, maxLength: number): void {
+    const input = event.target as HTMLInputElement | HTMLTextAreaElement;
+
+    // Ctrl / Command / Alt 等快捷鍵允許使用
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+      return;
+    }
+
+    // Backspace、Delete、方向鍵、Tab 等功能鍵允許使用
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Home', 'End'];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    // 有選取文字時允許輸入，因為會取代選取內容
+    const selectionLength = input.selectionEnd! - input.selectionStart!;
+
+    // 已達最高字數，而且沒有選取任何文字 → 禁止輸入
+    if (input.value.length >= maxLength && selectionLength === 0) {
+      event.preventDefault();
     }
   }
 
@@ -318,6 +356,33 @@ export class SupplyBatchEditComponent implements OnInit {
           毀損: '',
         };
       }
+
+      const conditionParts: string[] = [];
+
+      const conditionLabels: (keyof EditableDisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
+
+      // 接受物資需求狀態
+      conditionLabels.forEach((key) => {
+        const status = item.conditions[key];
+
+        if (status === '接受') {
+          conditionParts.push(`${key}✔`);
+        } else if (status === '不接受') {
+          conditionParts.push(`${key}✘`);
+        }
+      });
+
+      // 其它物資需求狀態
+      item.customConditions.forEach((condition) => {
+        const value = condition.trim();
+
+        if (value) {
+          conditionParts.push(value);
+        }
+      });
+
+      // 合併成資料庫使用的單一欄位
+      item.conditionDescription = conditionParts.join('、');
     });
 
     // 清除空白自訂欄位
@@ -329,7 +394,7 @@ export class SupplyBatchEditComponent implements OnInit {
         item.customConditions.push('');
       }
 
-      const originalItem = this.service.getDemands().find((demand) => demand.id === item.id);
+      const originalItem = this.service.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
       const originalStatus = originalItem?.status;
       const originalPublishedAt = originalItem?.publishedAt;
@@ -415,8 +480,12 @@ export class SupplyBatchEditComponent implements OnInit {
     }
   }
 
-  removeCustomCondition(demand: any, index: number) {
+  removeCustomCondition(demand: EditableDisasterDemand, index: number) {
     demand.customConditions.splice(index, 1);
+
+    if (demand.customConditions.length === 0) {
+      demand.customConditions.push('');
+    }
   }
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: EditableDisasterDemand['priority']): string {

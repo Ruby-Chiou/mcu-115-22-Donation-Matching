@@ -2,10 +2,8 @@ import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { DailyDemand, DailyStatus, DailyDisplayStatus } from '../../../models/agency/daily-demand';
-
 import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
 import { PaginationComponent } from '../../pagination/pagination.component';
 

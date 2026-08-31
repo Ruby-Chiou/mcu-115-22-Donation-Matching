@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DailyDemandService } from '../../../core/services/daily-demand.service';
 import { EditableDailyDemand } from '../../../models/agency/daily-demand';
-import { ImagePreviewComponent } from '../../modal/image-preview/image-preview.component';
+import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({
   selector: 'app-daily-batch-edit',
-  imports: [CommonModule, FormsModule, ImagePreviewComponent],
+  imports: [CommonModule, FormsModule, SupplyImagePreviewComponent],
   templateUrl: './daily-batch-edit.component.html',
   styleUrls: ['./daily-batch-edit-A.component.scss', './daily-batch-edit-B.component.scss', './daily-batch-edit-C.component.scss'],
 })

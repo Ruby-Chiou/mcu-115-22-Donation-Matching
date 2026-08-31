@@ -10,10 +10,10 @@ h1 {
   color: var(--color-brand-primary);
 }
 
-/* 需求編號資訊區塊 (修正垂直居中與偏上問題) */
 .detail-header-info {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
@@ -97,13 +97,17 @@ h1 {
   overflow-wrap: break-word;
 }
 
-/* 按鈕區 */
 .button-area {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 25px;
-  margin-bottom: 30px; /* 將按鈕向上推開，避免被 Footer 遮擋 */
+  margin-bottom: 30px;
+}
+
+.detail-header-info .button-area {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .back-btn,
@@ -169,6 +173,10 @@ h1 {
 }
 
 /* 緊急優先度顏色 */
+.priority-detail {
+  white-space: normal;
+}
+
 .priority-detail.normal {
   color: #333333;
 }

@@ -35,12 +35,10 @@ export const routes: Routes = [
     path: 'tracking',
     loadComponent: () => import('./features/logistics/tracking/tracking.component').then((m) => m.TrackingComponent),
   },
-    {
+  {
     path: 'daily/locations',
-    loadComponent: () =>
-      import('./features/daily/daily-locations/daily-locations.component').then(m => m.DailyLocationsComponent)
+    loadComponent: () => import('./features/daily/daily-locations/daily-locations.component').then((m) => m.DailyLocationsComponent),
   },
-
 
   // 4. 社福機構模組 (機構端)
   {
@@ -76,11 +74,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
-    path: 'agency/supply-edit/:id',
+    path: 'agency/supply-edit/:serialNo',
     loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
-    path: 'agency/supply-detail/:id',
+    path: 'agency/supply-detail/:serialNo',
     loadComponent: () => import('./components/data-list/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
   },
   {
@@ -97,11 +95,13 @@ export const routes: Routes = [
   },
   {
     path: 'agency/volunteer-detail/:id',
-    loadComponent: () => import('./components/data-list/volunteer-detail/volunteer-detail.component').then((m) => m.VolunteerDetailComponent),
+    loadComponent: () =>
+      import('./components/data-list/volunteer-detail/volunteer-detail.component').then((m) => m.VolunteerDetailComponent),
   },
   {
     path: 'agency/volunteer-batch-edit',
-    loadComponent: () => import('./components/form/volunteer-batch-edit/volunteer-batch-edit.component').then((m) => m.VolunteerBatchEditComponent),
+    loadComponent: () =>
+      import('./components/form/volunteer-batch-edit/volunteer-batch-edit.component').then((m) => m.VolunteerBatchEditComponent),
   },
 
   // 5. 系統後台模組 (管理員端)

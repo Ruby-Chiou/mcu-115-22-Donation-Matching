@@ -1,0 +1,19 @@
+<!-- 搜尋框區 -->
+<div class="search-box">
+  <svg
+    class="search-icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    (click)="onSearch()"
+    title="搜尋"
+  >
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+  <input type="text" placeholder="搜尋需求物或類別..." [(ngModel)]="searchTerm" (input)="onSearch()" (keyup.enter)="onSearch()" />
+  <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()" title="清除搜尋">✕</button>
+</div>

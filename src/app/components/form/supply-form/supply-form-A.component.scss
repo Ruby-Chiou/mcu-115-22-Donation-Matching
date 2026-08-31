@@ -13,7 +13,30 @@ h1 {
 .edit-header-info {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
+}
+
+/* 編輯頁上方操作按鈕 */
+.edit-top-button-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-top-button-area button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.edit-top-button-area button:hover {
+  opacity: 0.85;
 }
 
 .info-tag {

@@ -1,14 +1,13 @@
-
 import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { VolunteerDeleteComponent } from '../../modal/volunteer-delete/volunteer-delete.component';
-import { VolunteerDemandService  } from '../../../core/services/volunteer-demand.service';
-import {  VolunteerDemand,VolunteerStatus,DisplayVolunteerStatus } from '../../../models/agency/vdemand';
+import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
+import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../models/agency/vdemand';
 import { PaginationComponent } from '../../pagination/pagination.component';
 
-type SortType = 'createdAt' | 'amount' ;
+type SortType = 'createdAt' | 'amount';
 type VolunteerListItem = VolunteerDemand & {
   selected: boolean;
   displayStatus: DisplayVolunteerStatus;
@@ -18,7 +17,7 @@ type VolunteerListItem = VolunteerDemand & {
 
 @Component({
   selector: 'app-volunteer-list',
-  imports: [CommonModule,FormsModule,RouterLink,PaginationComponent,VolunteerDeleteComponent ],
+  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent, VolunteerDeleteComponent],
   templateUrl: './volunteer-list.component.html',
   styleUrl: './volunteer-list.component.scss',
 })
@@ -58,7 +57,7 @@ export class VolunteerListComponent {
   showFilterModal = false;
   statusOptions: DisplayVolunteerStatus[] = ['已上架', '隱藏中', '已下架'];
   priorityOptions: VolunteerDemand['priority'][] = ['普通', '緊急', '非常緊急'];
-  categoryOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運','物資整理','環境清潔','醫療照護','其他'];
+  categoryOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資整理', '環境清潔', '醫療照護', '其他'];
   messageOptions = ['已回覆', '未回覆'];
 
   selectedFilters = {
@@ -381,7 +380,6 @@ export class VolunteerListComponent {
     this.selectAll = false;
     this.loadDemands();
   }
-
 
   // 修改狀態
 
