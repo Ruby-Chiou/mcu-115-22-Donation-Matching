@@ -35,10 +35,11 @@ export class AdminDashboardComponent {
       title: '社福機構模組 (Agency)',
       icon: 'business',
       items: [
+        { name: '社福機構總控制台', path: '/agency/dashboard', desc: '機構可概覽各式資訊與連結' },
+        { name: '捐助發票管理區', path: '/agency/receipt-review', desc: '機構審核捐助收據與感謝狀寄出' },
         { name: '日常需求管理區', path: '/agency/daily', desc: '機構發布與管理日常需求' },
         { name: '急難救助需求區', path: '/agency/disaster', desc: '急難救助需求管理' },
-        //{ name: '發布物資表單', path: '/agency/supply-create', desc: '建立新物資需求' },
-        //{ name: '批次編輯物資', path: '/agency/supply-batch-edit', desc: '批次處理物資項目' },
+        { name: '日常物資 AI+人工審核', path: '/agency/item-review', desc: '審核民眾提交的物資' },
       ],
     },
     {
@@ -46,7 +47,6 @@ export class AdminDashboardComponent {
       icon: 'settings',
       items: [
         { name: '機構字號審核', path: '/admin/agency-verify', desc: '審核社福機構註冊資格' },
-        { name: '日常物資 AI+人工審核', path: '/admin/item-review', desc: '審核民眾或機構提交的物資' },
         { name: '災害模式控制台', path: '/admin/disaster-control', desc: '切換災害模式與發布公告' },
       ],
     },
