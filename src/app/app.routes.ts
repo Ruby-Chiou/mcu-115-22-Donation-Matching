@@ -41,6 +41,19 @@ export const routes: Routes = [
   },
 
   // 4. 社福機構模組 (機構端)
+  // 4.1 社福團體儀錶板
+  {
+    path: 'agency/dashboard',
+    loadComponent: () => import('./features/agency-dashboard/agency-dashboard.component').then((m) => m.AgencyDashboardComponent),
+  },
+  // 4.2 捐助發票與感謝狀送出處
+  {
+    path: 'agency/receipt-review',
+    loadComponent: () =>
+      import('./features/agency-receipt-review/agency-receipt-review.component').then((m) => m.AgencyReceiptReviewComponent),
+  },
+
+  // 4.3 日常需求管理區
   {
     path: 'agency/daily',
     loadComponent: () =>
@@ -62,6 +75,15 @@ export const routes: Routes = [
     path: 'agency/daily-batch-edit',
     loadComponent: () => import('./components/form/daily-batch-edit/daily-batch-edit.component').then((m) => m.DailyBatchEditComponent),
   },
+
+  // 4.4 日常物資審核管理區
+  {
+    path: 'agency/item-review',
+    loadComponent: () =>
+      import('./features/daily/agency-item-review/agency-item-review.component').then((m) => m.AgencyItemReviewComponent), // 日常物資 AI+人工審核工作流
+  },
+
+  //4.5 急難救助需求管理區
   {
     path: 'agency/disaster',
     loadComponent: () =>
@@ -85,6 +107,8 @@ export const routes: Routes = [
     path: 'agency/supply-batch-edit',
     loadComponent: () => import('./components/form/supply-batch-edit/supply-batch-edit.component').then((m) => m.SupplyBatchEditComponent),
   },
+
+  // 4.6 災害需求志工管理區
   {
     path: 'agency/volunteer-form',
     loadComponent: () => import('./components/form/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
@@ -111,15 +135,10 @@ export const routes: Routes = [
       import('./features/auth/admin-agency-verify/admin-agency-verify.component').then((m) => m.AdminAgencyVerifyComponent), // 社福機構註冊字號審核
   },
   {
-    path: 'admin/item-review',
-    loadComponent: () => import('./features/daily/admin-item-review/admin-item-review.component').then((m) => m.AdminItemReviewComponent), // 日常物資 AI+人工審核工作流
-  },
-  {
     path: 'admin/disaster-control',
     loadComponent: () =>
       import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
   },
-
   {
     path: 'admin/dashboard',
     loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
