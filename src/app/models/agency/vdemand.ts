@@ -10,9 +10,6 @@ export interface VolunteerDemand {
   // 需求人數
   people: number | null;
 
-  // 需求日期
-  date: string;
-
   // 需求地點
   location: string;
 

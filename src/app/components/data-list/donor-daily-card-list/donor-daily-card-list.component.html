@@ -1,0 +1,26 @@
+<section class="featured-section">
+  <div class="featured-grid">
+    @for (item of pagedDailyDemands; track item.id) {
+
+      <app-donor-daily-card
+        [demand]="item"
+        (view)="openDetail(item)"
+      ></app-donor-daily-card>
+
+    } @empty {
+
+      <div class="data-empty">
+        無捐助資料
+      </div>
+
+    }
+  </div>
+</section>
+
+<app-pagination
+  [pageSize]="pageSize"
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
+  [pageNumbers]="pageNumbers"
+  (pageChange)="goToPage($event)"
+></app-pagination>

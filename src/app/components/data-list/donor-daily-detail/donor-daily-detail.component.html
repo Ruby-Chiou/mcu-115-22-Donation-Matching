@@ -1,0 +1,138 @@
+<div class="detail-info">
+  <div class="detail-page">
+    <button
+      class="back-btn"
+      routerLink="/donor/daily"
+    >
+      ← 返回
+    </button>
+
+    <!-- 左邊圖片 -->
+    <div class="detail-image">
+      <span
+        class="tag"
+        [ngClass]="getPriorityClass(demand?.priority)"
+      >
+        {{ demand?.priority }}
+      </span>
+      <img
+        [src]="demand?.image?.[0] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
+        [alt]="demand?.item || '物資圖片'"
+      >
+    </div>
+
+    <!-- 右邊內容 -->
+    <div class="detail-content">
+      <h2>{{ demand?.item }}</h2>
+      <div class="tags">
+        <span class="tag">{{ demand?.category }}</span>
+      </div>
+
+      <div class="quantity-row">
+        <h3>需求數量</h3>
+        <p>{{ demand?.amount }} {{ demand?.unit }}</p>
+      </div>
+
+      <div class="quantity-row">
+        <h3>接收方</h3>
+        <p>{{ demand?.recipient }}</p>
+      </div>
+    </div>
+  </div>
+<div class="quantity-row">
+  <h4>數量描述</h4>
+    <p class="description">{{ demand?.amountDescription || '無'}}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>接收方式</h4>
+  <p class="description">{{ getReceiveMethod() }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>需求原因</h4>
+  <p class="description">{{ demand?.reason }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>需求描述</h4>
+  <p class="description">{{ demand?.description }}</p>
+</div>
+<div class="quantity-row">
+  <h4>特殊品牌需求</h4>
+    <p class="description">{{ demand?.brand || '無' }}</p>
+</div>
+<div class="quantity-row">
+  <h4>需求對象</h4>
+  <p class="description">{{ getServiceTargets() }}</p>
+</div>
+<div class="quantity-row">
+  <h4>物資狀態要求</h4>
+  <p class="description">{{ demand?.conditions }}</p>
+</div>
+<div class="quantity-row">
+  <h4>其他物品狀態</h4>
+  @if (hasCustomConditions()) {
+    <p class="description">{{ demand?.customConditions }}</p> }
+     @else {<p class="description"> 無</p>
+  }
+</div>
+<div class="quantity-row contact-row">
+  <h4>聯絡人</h4>
+  <p class="description">{{ demand?.recipient }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>聯絡電話</h4>
+  <p class="description">{{ demand?.phone }}</p>
+</div>
+<div class="quantity-row">
+  <h4>聯絡時間</h4>
+  <p class="description">
+    @if (demand?.contactTimeWeekday) {
+      平日
+    }
+    @if (demand?.contactTimeWeekend) {
+      假日
+    }
+    @if (demand?.contactTimeWeekday &&
+         (demand?.contactTimeMorning ||
+          demand?.contactTimeAfternoon ||
+          demand?.contactTimeEvening)) {
+      ｜
+    }
+    @if (demand?.contactTimeMorning) {
+      上午
+    }
+    @if (demand?.contactTimeMorning && demand?.contactTimeAfternoon) {
+      、
+    }
+    @if (demand?.contactTimeAfternoon) {
+      下午
+    }
+    @if (demand?.contactTimeAfternoon && demand?.contactTimeEvening) {
+      、
+    }
+    @if (demand?.contactTimeEvening) {
+      晚上
+    }
+  </p>
+</div>
+<div class="quantity-row">
+  <h4>地址</h4>
+  <p class="description">{{ getRegion(demand?.address) }}</p>
+</div>
+
+<div class="quantity-row">
+  <h4>其他說明</h4>
+  <p class="description">{{ demand?.note }}</p>
+</div>
+
+  <button
+    class="contact-btn"
+    [routerLink]="['/donor/daily/form', demand?.id]"
+  >
+    我要捐助
+  </button>
+
+</div>

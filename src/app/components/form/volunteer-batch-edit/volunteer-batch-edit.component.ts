@@ -10,7 +10,6 @@ export type VolunteerDemandItem = VolunteerDemand & {
   selected?: boolean;
   typeError?: boolean;
   peopleError?: boolean;
-  dateError?: boolean;
   locationError?: boolean;
   conditionError?: boolean;
   workContentError?: boolean;
@@ -89,8 +88,6 @@ export class VolunteerBatchEditComponent implements OnInit {
       demand.people === undefined ||
       demand.people <= 0;
 
-    demand.dateError = !demand.date;
-
     demand.locationError =
       !demand.location?.trim();
 
@@ -113,7 +110,6 @@ export class VolunteerBatchEditComponent implements OnInit {
     if (
       demand.typeError ||
       demand.peopleError ||
-      demand.dateError ||
       demand.locationError ||
       demand.conditionError ||
       demand.workContentError ||
@@ -137,7 +133,6 @@ export class VolunteerBatchEditComponent implements OnInit {
       selected,
       typeError,
       peopleError,
-      dateError,
       locationError,
       conditionError,
       workContentError,
