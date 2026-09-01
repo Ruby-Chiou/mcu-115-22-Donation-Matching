@@ -1,29 +1,99 @@
-.filter-trigger-group {
-  gap: 8px;
-  padding-right: 4px;
+:host {
+  --color-brand-primary: #1565c0;
+  --color-white: #fff;
+  --color-text-main: #333;
 }
 
-.filter-icon-btn {
+.container {
+  padding: 20px 30px 120px;
+}
+
+/* 頂部按鈕區（獨立在右上方） */
+.top-action-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.add-btn {
+  padding: 8px 22px;
+  border: 0;
+  border-radius: 20px;
+  cursor: pointer;
+  background: var(--color-brand-primary);
+  color: var(--color-white);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.toolbar-row,
+.select-area,
+.right-toolbar,
+.sort-group {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-row {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.select-all {
+  width: 104px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #90caf9;
-  background: #bbdefb;
-  color: #1565c0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  gap: 8px;
+
+  span {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
 }
 
-.filter-icon {
-  width: 19px;
-  height: 19px;
+.batch-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 15px;
+
+  button {
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 15px;
+    background: var(--color-brand-primary);
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .batch-delete-btn {
+    background: #d32f2f;
+
+    &:hover {
+      background: #b71c1c;
+    }
+  }
 }
 
-.filter-label-text {
-  color: #333;
-  font-size: 16px;
-  font-weight: 600;
-  user-select: none;
+.right-toolbar {
+  gap: 16px;
 }
+
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -32,7 +102,7 @@
 
 table {
   width: 100%;
-  min-width: 1450px;
+  min-width: 1250px; /* 降低最低寬度門檻，避免嚴重超出視窗 */
   border-collapse: separate;
   border-spacing: 0;
   border-radius: 12px;
@@ -43,10 +113,10 @@ table {
 th,
 td {
   height: 100px;
-  padding: 8px 6px;
+  padding: 8px 4px;
   border: 1px solid #ddd;
   text-align: center;
-  font-size: 16px;
+  font-size: 15px;
   vertical-align: middle;
   box-sizing: border-box;
 }
@@ -57,7 +127,7 @@ tbody tr {
 
 th {
   height: 55px;
-  padding: 8px 6px;
+  padding: 8px 4px;
   background: #e3f2fd;
   white-space: nowrap;
 }
@@ -74,7 +144,7 @@ th {
 }
 
 .item-column {
-  padding: 16px 10px;
+  padding: 16px 8px;
   text-align: center !important;
   vertical-align: middle;
 
@@ -86,7 +156,7 @@ th {
     margin: 0 auto;
     overflow: hidden;
 
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.4;
     text-align: center !important;
     word-break: break-all;
@@ -101,35 +171,35 @@ th {
   }
 }
 
-.item-column {
-  text-align: center !important;
-}
-
-.item-text {
-  text-align: center !important;
-}
-
 .operation-column {
-  padding: 14px 6px;
+  padding: 8px 4px;
 }
 
+/* 操作區彈性排列優化 */
 .operation-flex {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 6px; /* 稍微縮小間距，確保完整顯示 */
+
+  button {
+    flex-shrink: 0;
+    padding: 6px 8px; /* 縮減水平 padding 避免爆開 */
+  }
 
   select {
-    width: 95px;
-    height: 36px;
+    flex-shrink: 0;
+    width: 88px;
+    height: 34px;
     border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
     text-align: center;
     text-align-last: center;
     cursor: pointer;
   }
 }
+
 .status-on {
   background: #e8f5e9;
   color: #2e7d32;
@@ -151,7 +221,7 @@ td button {
   border-radius: 8px;
   background: var(--color-brand-primary);
   color: var(--color-white);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
@@ -224,89 +294,4 @@ tbody tr:last-child td {
 .very-urgent {
   color: #d32f2f;
   font-weight: 700;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-}
-
-.modal-box {
-  width: 460px;
-  padding: 32px;
-  border-radius: 20px;
-  background: #fff;
-  text-align: center;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
-
-  h2 {
-    margin-bottom: 22px;
-    color: var(--color-brand-primary);
-    font-size: 26px;
-    font-weight: 600;
-  }
-
-  p {
-    margin-bottom: 30px;
-    color: var(--color-text-main);
-    font-size: 18px;
-  }
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-
-  button {
-    padding: 9px 22px;
-    border: 0;
-    border-radius: 15px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-}
-
-.confirm-btn {
-  background: #d32f2f;
-  color: #fff;
-
-  &:hover {
-    background: #b71c1c;
-  }
-}
-
-.cancel-btn {
-  background: #90caf9;
-  color: #0d47a1;
-
-  &:hover {
-    background: #64b5f6;
-  }
-}
-
-.filter-confirm-btn {
-  background: var(--color-brand-primary);
-  color: var(--color-white);
-
-  &:hover {
-    opacity: 0.88;
-  }
-}
-
-.reset-btn {
-  margin-right: auto;
-  border: 1px solid #c8d0d8 !important;
-  background: #e1e6eb;
-  color: #4f5b66;
-
-  &:hover {
-    background: #d5dce3;
-  }
 }

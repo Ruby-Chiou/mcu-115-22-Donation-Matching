@@ -1,5 +1,4 @@
 // 接受物資狀態
-
 export type ConditionStatus = '接受' | '不接受' | '';
 
 export interface DailyConditions {
@@ -13,48 +12,24 @@ export interface DailyConditions {
 // 接收方式
 export type ReceiveMethod = '寄送' | '面交';
 
-// 急難救助需求資料
+export interface DailyReceiveMethod {
+  寄送: boolean;
+  面交: boolean;
+}
+
+// 日常需求資料
 export interface DailyDemand {
-  id: number; // 編號
-  createdAt?: string; // 建立時間
-  publishedAt?: string; // 發布時間
-  expectedOffShelfAt?: string; // 預計下架時間
-  item: string; // 物資名稱
+  serialNo: number; // 編號
+  createdAt?: string; // 建立日期
+  publishedAt?: string; // 上架日期
+  expectedOffShelfAt?: string; // 預計下架日期／下架日期
+
+  // 需求物資
+  item: string; // 需求物
   amount: number | null; // 需求數量
-  remaining?: number | null; // 剩餘需求數量
+  remaining?: number | null; // 剩餘需求
   unit: string; // 單位
-  amountDescription?: string; // 數量說明
-  reason: string; // 需求原因
-  description: string; // 需求描述
-
-  // 接受物資狀態
-  conditions: DailyConditions; // 接受物資狀態
-  customConditions: string[]; // 其他物資狀態
-
-  priority: '普通' | '緊急' | '非常緊急'; // 緊急程度
-  status: '上架' | '隱藏' | '下架'; // 需求狀態
-
-  receiveMethod: {
-    寄送: boolean;
-    面交: boolean;
-  };
-
-  recipient: string; // 接收方
-  address: string; // 地址
-  phone: string; // 聯絡電話
-  note?: string; // 備註
-  brand?: string; // 品牌
-  image?: string[]; // 物資圖片
-  imageFileNames?: string[]; // 物資圖片檔名
-
-  contactTimeWeekday?: boolean; // 平日聯絡
-  contactTimeWeekend?: boolean; // 假日聯絡
-  contactTimeMorning?: boolean; // 上午聯絡
-  contactTimeAfternoon?: boolean; // 下午聯絡
-  contactTimeEvening?: boolean; // 晚上聯絡
-
-  // TODO: 留言功能完成後，由 Message 資料計算，不存資料庫
-  messageCount?: number; // 留言數量
+  amountDescription?: string; // 數量描述
 
   category:
     | '食品與飲用水'
@@ -72,7 +47,17 @@ export interface DailyDemand {
     | '其他'
     | '';
 
-  // 服務對象
+  // 需求內容
+  reason: string; // 需求原因
+  description: string; // 需求描述
+  brand?: string; // 特殊品牌需求
+
+  // 物資圖片
+  image?: string[]; // 物資圖片
+  imageFileNames?: string[]; // 物資圖片檔名
+
+  // 需求對象
+  // 前端使用：固定需求對象勾選
   serviceTargets: {
     老人: boolean;
     嬰幼兒: boolean;
@@ -85,11 +70,81 @@ export interface DailyDemand {
     無家者: boolean;
   };
 
-  customServiceTargets: string[]; // 其他服務對象
+  // 前端使用：其他自訂需求對象
+  // 最多 5 個
+  customServiceTargets: string[];
+
+  // 資料庫使用：合併後的需求對象內容
+  // 內容包含「固定需求對象」及「其他自訂需求對象」
+  serviceTargetDescription?: string;
+
+  // 物資接受條件
+  // 前端使用：接受物資狀態
+  conditions: DailyConditions;
+
+  // 前端使用：其他物資需求狀態
+  // 最多 5 個
+  customConditions: string[];
+
+  // 資料庫使用：合併後的物資需求狀態內容
+  // 內容包含「接受物資狀態」及「其他物資需求狀態」
+  conditionDescription?: string;
+
+  // 優先度與需求狀態
+  priority: '普通' | '緊急' | '非常緊急'; // 緊急優先度
+  status: '上架' | '隱藏' | '下架'; // 系統實際狀態
+
+  // 接收方式
+  receiveMethod: DailyReceiveMethod;
+  recipient: string; // 收件人
+  address: string; // 接收物資地址
+  phone: string; // 聯絡電話
+
+  // 聯絡時間：平日
+  contactTimeWeekday: boolean;
+
+  // 聯絡時間：假日
+  contactTimeWeekend: boolean;
+
+  // 聯絡時間：上午
+  contactTimeMorning: boolean;
+
+  // 聯絡時間：下午
+  contactTimeAfternoon: boolean;
+
+  // 聯絡時間：晚上
+  contactTimeEvening: boolean;
+
+  // 是否將平日與假日的聯絡時段分開設定
+  contactTimeSeparate: boolean;
+
+  // 平日：上午
+  contactTimeWeekdayMorning: boolean;
+
+  // 平日：下午
+  contactTimeWeekdayAfternoon: boolean;
+
+  // 平日：晚上
+  contactTimeWeekdayEvening: boolean;
+
+  // 假日：上午
+  contactTimeWeekendMorning: boolean;
+
+  // 假日：下午
+  contactTimeWeekendAfternoon: boolean;
+
+  // 假日：晚上
+  contactTimeWeekendEvening: boolean;
+
+  // 其他說明
+  note?: string;
+
+  // TODO:
+  // 留言功能完成後，由 Message 資料計算，不存資料庫
+  messageCount?: number;
 }
 
-// 編輯用錯誤提示欄位
-
+// 編輯用資料
 export interface EditableDailyDemand extends DailyDemand {
   itemError?: boolean; // 物資名稱錯誤
   amountError?: boolean; // 需求數量錯誤
@@ -103,14 +158,14 @@ export interface EditableDailyDemand extends DailyDemand {
   invalidReceiveInfo?: boolean; // 接收方式資訊錯誤
 
   // 批次編輯圖片
-  imageFiles: File[]; // 圖片檔案
+  imageFiles: File[];
 }
 
 // 新增需求用
-export type CreateDailyDemand = Omit<DailyDemand, 'id'>;
+export type CreateDailyDemand = Omit<DailyDemand, 'serialNo'>;
 
 // 狀態
 export type DailyStatus = '上架' | '隱藏' | '下架';
 
-// 顯示狀態
+// 列表顯示狀態
 export type DailyDisplayStatus = '已上架' | '隱藏中' | '已下架';

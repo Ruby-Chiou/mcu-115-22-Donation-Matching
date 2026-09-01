@@ -4,17 +4,28 @@
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-bottom: 23px;
   font-size: 24px;
   font-weight: 600;
   color: var(--color-brand-primary);
 }
 
+.batch-edit-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
 .batch-edit-header {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 20px;
+  align-items: center;
+}
+
+.top-button-area {
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
 }
 
 .info-tag {
@@ -27,6 +38,15 @@ h1 {
   padding: 8px 16px;
   gap: 8px;
   line-height: 1;
+  box-sizing: border-box;
+}
+
+.top-button-area button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 37px;
+  margin: 0;
 }
 
 .info-label {
@@ -211,7 +231,7 @@ textarea {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 130px;
+  gap: 114px;
   margin-top: 0 !important;
   margin-bottom: 20px !important;
 }
@@ -288,7 +308,7 @@ textarea {
 .condition-area {
   display: flex;
   align-items: flex-start;
-  gap: 130px;
+  gap: 114px;
   margin-top: 10px !important;
   margin-bottom: 35px !important;
 }

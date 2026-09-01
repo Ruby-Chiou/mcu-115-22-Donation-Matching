@@ -61,19 +61,20 @@ export const routes: Routes = [
   },
   {
     path: 'agency/daily-form',
-    loadComponent: () => import('./components/form/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
+    loadComponent: () => import('./components/form/daily/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
   },
   {
-    path: 'agency/daily-edit/:id',
-    loadComponent: () => import('./components/form/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
+    path: 'agency/daily-edit/:serialNo',
+    loadComponent: () => import('./components/form/daily/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
   },
   {
-    path: 'agency/daily-detail/:id',
-    loadComponent: () => import('./components/data-list/daily-detail/daily-detail.component').then((m) => m.DailyDetailComponent),
+    path: 'agency/daily-detail/:serialNo',
+    loadComponent: () => import('./components/data-list/daily/daily-detail/daily-detail.component').then((m) => m.DailyDetailComponent),
   },
   {
     path: 'agency/daily-batch-edit',
-    loadComponent: () => import('./components/form/daily-batch-edit/daily-batch-edit.component').then((m) => m.DailyBatchEditComponent),
+    loadComponent: () =>
+      import('./components/form/daily/daily-batch-edit/daily-batch-edit.component').then((m) => m.DailyBatchEditComponent),
   },
 
   // 4.4 日常物資審核管理區

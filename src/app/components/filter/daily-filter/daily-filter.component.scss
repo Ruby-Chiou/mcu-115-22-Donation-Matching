@@ -1,0 +1,171 @@
+.filter-trigger-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.filter-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #90caf9;
+  border-radius: 50%;
+  background: #bbdefb;
+  color: #1565c0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #90caf9;
+    transform: scale(1.05);
+  }
+}
+
+.filter-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.filter-label-text {
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  user-select: none;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 50px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-box {
+  width: 460px;
+  padding: 32px;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+
+  h2 {
+    margin-bottom: 22px;
+    color: #1565c0;
+    font-size: 26px;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 18px;
+  }
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+
+  button {
+    padding: 9px 22px;
+    border: 0;
+    border-radius: 15px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
+
+.cancel-btn {
+  background: #90caf9;
+  color: #0d47a1;
+
+  &:hover {
+    background: #64b5f6;
+  }
+}
+
+.filter-confirm-btn {
+  background: #1565c0;
+  color: #fff;
+
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+.reset-btn {
+  margin-right: auto;
+  border: 1px solid #c8d0d8 !important;
+  background: #e1e6eb;
+  color: #4f5b66;
+
+  &:hover {
+    background: #d5dce3;
+  }
+}
+
+.filter-modal-box {
+  width: 580px;
+  max-height: 80vh;
+  padding: 30px 35px;
+  overflow-y: auto;
+  text-align: left;
+
+  h2 {
+    margin-bottom: 25px;
+    text-align: center;
+  }
+}
+
+.filter-group {
+  margin-bottom: 20px;
+
+  h3 {
+    margin-bottom: 10px;
+    color: #444;
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pill-btn {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 20px;
+  background: #e3f2fd;
+  color: #1565c0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: #bbdefb;
+  }
+
+  &.active {
+    background: #1565c0;
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.filter-buttons {
+  margin-top: 30px;
+  justify-content: flex-end;
+}

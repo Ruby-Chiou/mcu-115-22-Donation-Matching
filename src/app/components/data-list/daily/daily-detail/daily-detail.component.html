@@ -1,14 +1,39 @@
 <div class="container">
   <h1>日常需求詳細資料</h1>
 
+  <!-- 頂部資訊與操作按鈕 -->
   <div class="detail-header-info" *ngIf="demand">
     <div class="info-tag">
       <span class="info-label">需求編號</span>
-      <span class="info-value">#A{{ listNumber }}</span>
+      <span class="info-value">A{{ listNumber }}</span>
+    </div>
+
+    <div class="button-area">
+      <button class="back-btn" (click)="goBack()">返回</button>
+      <button class="edit-btn" [routerLink]="['/agency/daily-edit', demand.serialNo]" [queryParams]="{ from: 'detail' }">編輯</button>
+      <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
     </div>
   </div>
 
   <div class="detail-table" *ngIf="demand">
+    <!-- 創建日期 -->
+    <div class="detail-row">
+      <div class="detail-title">創建日期</div>
+      <div class="detail-content">{{ demand.createdAt ? (demand.createdAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
+
+    <!-- 上架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">上架日期</div>
+      <div class="detail-content">{{ demand.publishedAt ? (demand.publishedAt | date:'yyyy/MM/dd HH:mm') : '尚未上架' }}</div>
+    </div>
+
+    <!-- 預計下架日期 / 下架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">{{ demand.status === '下架' ? '下架日期' : '預計下架日期' }}</div>
+
+      <div class="detail-content">{{ demand.expectedOffShelfAt ? (demand.expectedOffShelfAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
     <!-- 需求物 -->
     <div class="detail-row">
       <div class="detail-title">需求物</div>
@@ -136,25 +161,6 @@
       <div class="detail-content">{{ demand.status }}</div>
     </div>
 
-    <!-- 創建日期 -->
-    <div class="detail-row">
-      <div class="detail-title">創建日期</div>
-      <div class="detail-content">{{ demand.createdAt ? (demand.createdAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
-    </div>
-
-    <!-- 上架日期 -->
-    <div class="detail-row">
-      <div class="detail-title">上架日期</div>
-      <div class="detail-content">{{ demand.publishedAt ? (demand.publishedAt | date:'yyyy/MM/dd HH:mm') : '尚未上架' }}</div>
-    </div>
-
-    <!-- 預計下架日期 / 下架日期 -->
-    <div class="detail-row">
-      <div class="detail-title">{{ demand.status === '下架' ? '下架日期' : '預計下架日期' }}</div>
-
-      <div class="detail-content">{{ demand.expectedOffShelfAt ? (demand.expectedOffShelfAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
-    </div>
-
     <!-- 接收方式 -->
     <div class="detail-row">
       <div class="detail-title">接收方式</div>
@@ -215,7 +221,7 @@
 
   <div class="button-area">
     <button class="back-btn" (click)="goBack()">返回</button>
-    <button class="edit-btn" [routerLink]="['/agency/daily-edit', demand?.id]" [queryParams]="{ from: 'detail' }">編輯</button>
+    <button class="edit-btn" [routerLink]="['/agency/daily-edit', demand?.serialNo]" [queryParams]="{ from: 'detail' }">編輯</button>
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>

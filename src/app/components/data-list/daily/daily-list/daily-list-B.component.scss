@@ -1,56 +1,66 @@
-.filter-modal-box {
-  width: 580px;
-  max-height: 85vh;
-  padding: 30px 35px;
-  overflow-y: auto;
-  text-align: left;
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modal-box {
+  width: 460px;
+  padding: 32px;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
 
   h2 {
-    margin-bottom: 25px;
-    text-align: center;
-  }
-}
-
-.filter-group {
-  margin-bottom: 20px;
-
-  h3 {
-    margin-bottom: 10px;
-    color: #444;
-    font-size: 16px;
+    margin-bottom: 22px;
+    color: var(--color-brand-primary);
+    font-size: 26px;
     font-weight: 600;
   }
+
+  p {
+    margin-bottom: 30px;
+    color: var(--color-text-main);
+    font-size: 18px;
+  }
 }
 
-.pill-list {
+.modal-buttons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  justify-content: center;
+  gap: 15px;
+
+  button {
+    padding: 9px 22px;
+    border: 0;
+    border-radius: 15px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+  }
 }
 
-.pill-btn {
-  padding: 8px 18px;
-  border: 0;
-  border-radius: 20px;
-  background: #e3f2fd;
-  color: #1565c0;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
+.confirm-btn {
+  background: #d32f2f;
+  color: #fff;
 
   &:hover {
-    background: #bbdefb;
-  }
-
-  &.active {
-    background: var(--color-brand-primary);
-    color: #fff;
-    font-weight: 600;
+    background: #b71c1c;
   }
 }
-.filter-buttons {
-  margin-top: 30px;
-  justify-content: flex-end;
+
+.cancel-btn {
+  background: #90caf9;
+  color: #0d47a1;
+
+  &:hover {
+    background: #64b5f6;
+  }
 }
 
 .receive-method-column {
@@ -112,7 +122,7 @@
     left: 50%;
     transform: translateX(-50%);
     color: #1565c0;
-    font-size: 19px; // 手縮小
+    font-size: 19px;
   }
 
   .box-icon {
@@ -121,7 +131,7 @@
     left: 50%;
     transform: translateX(-50%);
     color: #1565c0;
-    font-size: 15px; // 箱子縮小
+    font-size: 15px;
   }
 }
 
@@ -133,7 +143,7 @@
   height: 18px;
 
   i {
-    font-size: 17px; // 車子縮小
+    font-size: 17px;
   }
 }
 

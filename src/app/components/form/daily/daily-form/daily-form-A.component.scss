@@ -3,7 +3,7 @@
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-bottom: -4px;
   font-size: 24px;
   font-weight: 600;
   color: var(--color-brand-primary);
@@ -13,13 +13,15 @@ h1 {
 .edit-header-info {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  margin-bottom: -5px;
 }
 
 .info-tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   background-color: #f0f4f9;
   border: 1px solid #d0e1f9;
   border-radius: 8px;

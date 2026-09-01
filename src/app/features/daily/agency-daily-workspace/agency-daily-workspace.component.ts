@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DailyListComponent } from '../../../components/data-list/daily-list/daily-list.component';
+import { DailyListComponent } from '../../../components/data-list/daily/daily-list/daily-list.component';
 
 @Component({
   selector: 'app-agency-daily-workspace',

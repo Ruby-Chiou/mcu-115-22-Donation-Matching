@@ -22,8 +22,7 @@
   grid-template-columns: repeat(2, 440px);
   grid-template-rows: repeat(3, auto);
   grid-auto-flow: column;
-  column-gap: 30px;
-  row-gap: 28px;
+  gap: 28px 30px;
 }
 
 .custom-service-row,
@@ -43,6 +42,7 @@
   margin-bottom: 0 !important;
 }
 
+/* 自訂下拉選單 */
 .custom-select {
   position: relative;
   width: 100%;
@@ -51,92 +51,84 @@
 .custom-select-trigger {
   width: 100%;
   height: 46px;
-  padding: 12px;
-  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #ffffff;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
+  color: #333;
   font-size: 16px;
-  color: #333333;
   cursor: pointer;
-  box-sizing: border-box;
 }
 
-/* 下拉選單文字 */
 .custom-select-trigger span:first-child {
-  color: #333333;
+  color: #333;
 }
 
-/* 箭頭 */
 .dropdown-arrow {
-  font-size: 13px;
-  color: #555;
   margin-left: 10px;
+  color: #555;
+  font-size: 13px;
 }
 
-/* 下拉選項 */
 .custom-select-options {
   position: absolute;
   top: 50px;
   left: 0;
+  z-index: 1000;
   width: 100%;
   max-height: 230px;
   overflow-y: auto;
-  background-color: #ffffff;
+  background: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  z-index: 1000;
 }
 
-/* 下拉選項按鈕 */
 .custom-option {
   width: 100%;
   height: 46px;
   padding: 12px;
   box-sizing: border-box;
-  background-color: #ffffff;
-  border: none;
-  text-align: left;
+  background: #fff;
+  border: 0;
+  color: #333;
   font-size: 16px;
-  color: #333333;
+  text-align: left;
   cursor: pointer;
 }
 
-/* 滑鼠移入選項 */
 .custom-option:hover {
-  background-color: #f0f7ff;
+  background: #f0f7ff;
   color: #1565c0;
 }
 
-/*物資狀態區*/
+/* 物資狀態區 */
 .condition-area {
   display: flex;
   align-items: flex-start;
-  gap: 130px;
-  margin-top: 35px;
-  margin-bottom: 35px;
+  gap: 114px;
+  margin: 35px 0;
 }
 
-/* 接受物資狀態操作說明 */
 .condition-title {
   display: block !important;
   margin-bottom: 8px !important;
 }
 
-/* 說明文字 */
 .condition-hint {
   display: flex;
   align-items: center;
   gap: 18px;
   margin-bottom: 12px;
   padding-left: 2px;
+  color: #555;
   font-size: 13px;
   font-weight: 400;
-  color: #555;
   white-space: nowrap;
 }
 
@@ -154,29 +146,26 @@
 .hint-icon {
   width: 20px;
   height: 20px;
-  border-radius: 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  flex-shrink: 0;
+  border-radius: 4px;
+  color: #fff;
   font-size: 12px;
   font-weight: bold;
-  flex-shrink: 0;
 }
 
-/* 未設定 */
 .hint-icon.unset {
-  background-color: #90a4ae;
+  background: #90a4ae;
 }
 
-/* 接受 */
 .hint-icon.accept {
-  background-color: #66a96b;
+  background: #66a96b;
 }
 
-/* 不接受 */
 .hint-icon.reject {
-  background-color: #c75b5b;
+  background: #c75b5b;
 }
 
 .optional {
@@ -185,122 +174,96 @@
   font-weight: 400;
 }
 
+/* =========================
+   聯絡時間
+========================= */
+
+.contact-time-title {
+  margin-top: 5px !important;
+  color: #1a202c;
+  font-size: 17px;
+  font-weight: 600;
+}
+
 .contact-time-box {
   width: fit-content;
   max-width: 100%;
   margin-bottom: 35px;
   padding: 20px 24px;
   box-sizing: border-box;
-  background-color: #ffffff;
+  background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.contact-time-section {
+.contact-time-different-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.contact-time-question {
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.different-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.different-btn {
+  min-width: 55px;
+  padding: 7px 16px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.different-btn:hover {
+  background: #f0f7ff;
+  border-color: #93c5fd;
+}
+
+.different-btn.active {
+  background: #e0f2fe;
+  border-color: #0284c7;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.contact-time-separated {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-time-group {
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-bottom: 16px;
 }
 
-.contact-time-section:last-child {
-  margin-bottom: 0;
-}
-
-.contact-time-label {
-  width: 45px;
+.contact-time-group-title {
+  width: 65px;
   flex-shrink: 0;
+  color: #333;
   font-size: 16px;
   font-weight: 600;
-  color: #333333;
 }
 
 .contact-time-options {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-}
-
-/* 膠囊切換按鈕 */
-.time-option {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  color: #333333;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-
-/* 隱藏原生 checkbox */
-.time-option input[type='checkbox'] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
-/* 滑鼠靠近 (Hover) - 淡藍色背景 */
-.time-option:hover {
-  background-color: #f0f7ff;
-  border-color: #93c5fd;
-  color: #1e40af;
-}
-
-/* 選取狀態 (Checked) */
-.time-option:has(input[type='checkbox']:checked) {
-  background-color: #e0f2fe;
-  border-color: #0284c7;
-  color: #0369a1;
-  font-weight: 600;
-}
-
-/* 時間範圍文字 */
-.time-range {
-  color: #555555;
-  font-size: 14px;
-  font-weight: 400;
-  transition: color 0.2s ease;
-}
-
-.time-option:hover .time-range {
-  color: #3b82f6;
-}
-
-.time-option:has(input[type='checkbox']:checked) .time-range {
-  color: #0284c7;
-}
-
-/* Webkit 核心瀏覽器 (Chrome, Edge, Safari) */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
 }

@@ -1,10 +1,10 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DailyDemandService } from '../../../core/services/daily-demand.service';
-import { DailyDemand } from '../../../models/agency/daily-demand';
-import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
-import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
+import { DailyDemandService } from '../../../../core/services/daily-demand.service';
+import { DailyDemand } from '../../../../models/agency/daily-demand';
+import { SupplyDeleteComponent } from '../../../modal/supply-delete/supply-delete.component';
+import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({
   selector: 'app-daily-detail',
@@ -27,11 +27,9 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-
-    this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
-
-    this.demand = this.service.getDemandById(id);
+    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+    this.demand = this.service.getDemandById(serialNo);
+    this.listNumber = this.demand?.serialNo;
 
     if (this.demand) {
       this.demand.remaining ??= this.demand.amount ?? 0;
@@ -55,6 +53,64 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
         };
       }
     }
+  }
+
+  getServiceTargetDescription(): string {
+    if (!this.demand) {
+      return '無';
+    }
+
+    const result: string[] = [];
+
+    Object.entries(this.demand.serviceTargets || {}).forEach(([key, value]) => {
+      if (value) {
+        result.push(`${key}✓`);
+      }
+    });
+
+    (this.demand.customServiceTargets || []).forEach((target) => {
+      const value = target.trim();
+
+      if (value) {
+        result.push(value);
+      }
+    });
+
+    return result.length > 0 ? result.join('、') : '無';
+  }
+
+  getConditionDescription(): string {
+    if (!this.demand) {
+      return '無';
+    }
+
+    const conditions = [
+      { name: '全新', value: this.demand.conditions?.全新 },
+      { name: '二手', value: this.demand.conditions?.二手 },
+      { name: '有擦痕', value: this.demand.conditions?.有擦痕 },
+      { name: '過期', value: this.demand.conditions?.過期 },
+      { name: '毀損', value: this.demand.conditions?.毀損 },
+    ];
+
+    const result: string[] = [];
+
+    conditions.forEach((condition) => {
+      if (condition.value === '接受') {
+        result.push(`${condition.name}✓`);
+      } else if (condition.value === '不接受') {
+        result.push(`${condition.name}✗`);
+      }
+    });
+
+    (this.demand.customConditions || []).forEach((condition) => {
+      const value = condition.trim();
+
+      if (value) {
+        result.push(value);
+      }
+    });
+
+    return result.length > 0 ? result.join('、') : '無';
   }
 
   ngAfterViewInit() {
@@ -101,7 +157,7 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   }
 
   getDeleteIds(): number[] {
-    return this.demand?.id != null ? [this.demand.id] : [];
+    return this.demand?.serialNo != null ? [this.demand.serialNo] : [];
   }
 
   // 取得勾選的服務對象，以頓號連結；若皆無則回傳 '無'
@@ -173,12 +229,19 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
       return false;
     }
 
+    // 不區分平日、假日
+    if (!this.demand.contactTimeSeparate) {
+      return !!(this.demand.contactTimeMorning || this.demand.contactTimeAfternoon || this.demand.contactTimeEvening);
+    }
+
+    // 區分平日、假日
     return !!(
-      this.demand.contactTimeWeekday ||
-      this.demand.contactTimeWeekend ||
-      this.demand.contactTimeMorning ||
-      this.demand.contactTimeAfternoon ||
-      this.demand.contactTimeEvening
+      this.demand.contactTimeWeekdayMorning ||
+      this.demand.contactTimeWeekdayAfternoon ||
+      this.demand.contactTimeWeekdayEvening ||
+      this.demand.contactTimeWeekendMorning ||
+      this.demand.contactTimeWeekendAfternoon ||
+      this.demand.contactTimeWeekendEvening
     );
   }
 
@@ -188,42 +251,55 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
       return '無';
     }
 
-    const dates: string[] = [];
-    const times: string[] = [];
+    const getTimeText = (morning: boolean, afternoon: boolean, evening: boolean): string => {
+      const times: string[] = [];
 
-    // 日期
-    if (this.demand.contactTimeWeekday) {
-      dates.push('平日');
+      if (morning) {
+        times.push('上午 08:00～12:00');
+      }
+
+      if (afternoon) {
+        times.push('下午 12:00～18:00');
+      }
+
+      if (evening) {
+        times.push('晚上 18:00～22:00');
+      }
+
+      return times.length > 0 ? times.join('、') : '無';
+    };
+
+    // 不區分平日、假日
+    if (!this.demand.contactTimeSeparate) {
+      const timeText = getTimeText(this.demand.contactTimeMorning, this.demand.contactTimeAfternoon, this.demand.contactTimeEvening);
+
+      return timeText === '無' ? '無' : `時段：${timeText}`;
     }
 
-    if (this.demand.contactTimeWeekend) {
-      dates.push('假日');
-    }
+    // 區分平日、假日
+    const weekdayText = getTimeText(
+      this.demand.contactTimeWeekdayMorning,
+      this.demand.contactTimeWeekdayAfternoon,
+      this.demand.contactTimeWeekdayEvening
+    );
 
-    // 時段
-    if (this.demand.contactTimeMorning) {
-      times.push('上午 08:00～12:00');
-    }
-
-    if (this.demand.contactTimeAfternoon) {
-      times.push('下午 12:00～18:00');
-    }
-
-    if (this.demand.contactTimeEvening) {
-      times.push('晚上 18:00～22:00');
-    }
+    const weekendText = getTimeText(
+      this.demand.contactTimeWeekendMorning,
+      this.demand.contactTimeWeekendAfternoon,
+      this.demand.contactTimeWeekendEvening
+    );
 
     const result: string[] = [];
 
-    if (dates.length > 0) {
-      result.push(`日期：${dates.join('、')}`);
+    if (weekdayText !== '無') {
+      result.push(`平日：${weekdayText}`);
     }
 
-    if (times.length > 0) {
-      result.push(`時段：${times.join('、')}`);
+    if (weekendText !== '無') {
+      result.push(`假日：${weekendText}`);
     }
 
-    return result.join(' ｜ ');
+    return result.length > 0 ? result.join(' ｜ ') : '無';
   }
 
   // 取得接受物資狀態文字
