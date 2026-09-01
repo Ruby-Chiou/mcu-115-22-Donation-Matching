@@ -57,6 +57,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   filteredDemands: DailyListItem[] = [];
   pagedDemands: DailyListItem[] = [];
   selectAll = false;
+  isLoading = false;
 
   // 搜尋
   searchTerm = '';
@@ -250,35 +251,57 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
   // 讀取需求
   loadDemands(): void {
-    this.demands = this.dailyDemandService.getDemands().map((item) => {
-      let currentStatus: DailyDisplayStatus = '已上架';
+    this.isLoading = true;
 
-      if (item.status === '上架') {
-        currentStatus = '已上架';
+    // 先讓 Loading 畫面確實顯示
+    setTimeout(() => {
+      try {
+        const data = this.dailyDemandService.getDemands();
+
+        this.demands = data.map((item) => {
+          let currentStatus: DailyDisplayStatus = '已上架';
+
+          if (item.status === '上架') {
+            currentStatus = '已上架';
+          }
+
+          if (item.status === '隱藏') {
+            currentStatus = '隱藏中';
+          }
+
+          if (item.status === '下架') {
+            currentStatus = '已下架';
+          }
+
+          return {
+            ...item,
+            selected: false,
+            status: item.status,
+            displayStatus: currentStatus,
+
+            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+
+            displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+
+            displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+
+            remaining: item.remaining ?? item.amount ?? 0,
+
+            category: item.category ?? '其他',
+          };
+        });
+
+        this.applyFilters(false);
+      } catch (error) {
+        console.error('日常需求資料載入失敗：', error);
+
+        this.demands = [];
+        this.filteredDemands = [];
+        this.pagedDemands = [];
+      } finally {
+        this.isLoading = false;
       }
-
-      if (item.status === '隱藏') {
-        currentStatus = '隱藏中';
-      }
-
-      if (item.status === '下架') {
-        currentStatus = '已下架';
-      }
-
-      return {
-        ...item,
-        selected: false,
-        status: item.status,
-        displayStatus: currentStatus,
-        displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
-        displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
-        displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
-        remaining: item.remaining ?? item.amount ?? 0,
-        category: item.category ?? '其他',
-      };
-    });
-
-    this.applyFilters(false);
+    }, 800);
   }
 
   // 搜尋

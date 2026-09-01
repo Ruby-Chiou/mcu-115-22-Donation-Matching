@@ -1,192 +1,266 @@
 <div class="container">
-  <!-- 頂部按鈕區 -->
-  <div class="top-action-bar">
-    <button class="add-btn" (click)="goToAddDemand()">新增需求</button>
+  <!-- 資料載入中 -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">資料載入中，請稍候...</div>
   </div>
 
-  <!-- 表格上方工具列：左側全選/批次 + 右側搜尋、排序與篩選 -->
-  <div class="toolbar-row">
-    <div class="select-area">
-      <div class="select-all">
-        <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
-        <span>全選</span>
+  <!-- 資料載入完成後才顯示列表 -->
+  <ng-container *ngIf="!isLoading">
+    <!-- 頂部按鈕區 -->
+    <div class="top-action-bar">
+      <button class="add-btn" (click)="goToAddDemand()">新增需求</button>
+    </div>
+
+    <!-- 表格上方工具列：左側全選/批次 + 右側搜尋、排序與篩選 -->
+    <div class="toolbar-row">
+      <div class="select-area">
+        <div class="select-all">
+          <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
+          <span>全選</span>
+        </div>
+
+        <div class="batch-buttons" *ngIf="hasSelected()">
+          <button (click)="editSelected()">編輯</button>
+          <button class="batch-delete-btn" (click)="openBatchDeleteModal()">刪除</button>
+        </div>
       </div>
 
-      <div class="batch-buttons" *ngIf="hasSelected()">
-        <button (click)="editSelected()">編輯</button>
-        <button class="batch-delete-btn" (click)="openBatchDeleteModal()">刪除</button>
+      <!-- 右側操作區：搜尋 + 排序 + 篩選 -->
+      <div class="right-toolbar">
+        <!-- 搜尋 -->
+        <app-daily-search-bar
+          [searchTerm]="searchTerm"
+          (searchTermChange)="searchTerm = $event"
+          (search)="onSearch()"
+          (clear)="clearSearch()"
+        ></app-daily-search-bar>
+
+        <!-- 排序區 -->
+        <app-daily-sort-bar
+          [selectedSort]="selectedSort"
+          [sortAscending]="sortAscending"
+          (selectedSortChange)="onSortChange($event)"
+          (sortAscendingChange)="onSortOrderChange($event)"
+        ></app-daily-sort-bar>
+
+        <!-- 篩選按鈕區 -->
+        <app-daily-filter
+          [showFilterModal]="showFilterModal"
+          [statusOptions]="statusOptions"
+          [priorityOptions]="priorityOptions"
+          [receiveMethodOptions]="receiveMethodOptions"
+          [categoryOptions]="categoryOptions"
+          [messageOptions]="messageOptions"
+          [selectedFilters]="selectedFilters"
+          (open)="showFilterModal = true"
+          (close)="showFilterModal = false"
+          (reset)="resetFilters()"
+          (apply)="applyFilterFromModal()"
+        ></app-daily-filter>
       </div>
     </div>
 
-    <!-- 右側操作區：搜尋 + 排序 + 篩選 -->
-    <div class="right-toolbar">
-      <!-- 搜尋 -->
-      <app-daily-search-bar
-        [searchTerm]="searchTerm"
-        (searchTermChange)="searchTerm = $event"
-        (search)="onSearch()"
-        (clear)="clearSearch()"
-      ></app-daily-search-bar>
+    <!-- 表格 -->
+    <div class="table-wrapper">
+      <table>
+        <!-- 無資料 -->
+        <tr *ngIf="filteredDemands.length === 0">
+          <td colspan="13" class="empty-message">
+            <div class="empty-title">尚未輸入需求或無符合條件的需求</div>
 
-      <!-- 排序區 -->
-      <app-daily-sort-bar
-        [selectedSort]="selectedSort"
-        [sortAscending]="sortAscending"
-        (selectedSortChange)="onSortChange($event)"
-        (sortAscendingChange)="onSortOrderChange($event)"
-      ></app-daily-sort-bar>
-
-      <!-- 篩選按鈕區 -->
-      <app-daily-filter
-        [showFilterModal]="showFilterModal"
-        [statusOptions]="statusOptions"
-        [priorityOptions]="priorityOptions"
-        [receiveMethodOptions]="receiveMethodOptions"
-        [categoryOptions]="categoryOptions"
-        [messageOptions]="messageOptions"
-        [selectedFilters]="selectedFilters"
-        (open)="showFilterModal = true"
-        (close)="showFilterModal = false"
-        (reset)="resetFilters()"
-        (apply)="applyFilterFromModal()"
-      ></app-daily-filter>
-    </div>
-  </div>
-
-  <!-- 表格 -->
-  <div class="table-wrapper">
-    <table>
-      <!-- 無資料 -->
-      <tr *ngIf="filteredDemands.length === 0">
-        <td colspan="13" class="empty-message">
-          <div class="empty-title">尚未輸入需求或無符合條件的需求</div>
-          <div class="empty-description">請點選上方「新增需求」建立日常需求，或嘗試重新篩選。</div>
-        </td>
-      </tr>
-
-      <!-- 表格標題 -->
-      <thead *ngIf="filteredDemands.length > 0">
-        <tr>
-          <th class="checkbox-column" style="width: 3.5%">選取</th>
-          <th style="width: 4%">編號</th>
-          <th class="item-column" style="width: 12%">需求物</th>
-          <th class="category-column" style="width: 8.5%">類別</th>
-          <th style="width: 7%">需求數量</th>
-          <th style="width: 7%">緊急優先度</th>
-          <th style="width: 7%">剩餘需求</th>
-          <th style="width: 7%">接收方式</th>
-          <th class="created-time-column" style="width: 6.5%">建立日期</th>
-          <th class="published-time-column" style="width: 6.5%">上架日期</th>
-          <th class="off-shelf-time-column" style="width: 7.5%">預計下架日期</th>
-          <th class="message-column" style="width: 4.5%">留言區</th>
-          <th class="operation-column" style="width: 19%">操作</th>
+            <div class="empty-description">請點選上方「新增需求」建立日常需求，或嘗試重新篩選。</div>
+          </td>
         </tr>
-      </thead>
 
-      <tbody>
-        <tr *ngFor="let item of pagedDemands">
-          <td class="checkbox-column">
-            <input type="checkbox" [(ngModel)]="item.selected" />
-          </td>
+        <!-- 表格標題 -->
+        <thead *ngIf="filteredDemands.length > 0">
+          <tr>
+            <th class="checkbox-column" style="width: 3.5%">選取</th>
 
-          <td class="serialNo-column">A{{ item.serialNo }}</td>
+            <th style="width: 4%">編號</th>
 
-          <td class="item-column" [title]="item.item">
-            <div class="item-text">{{ item.item }}</div>
-          </td>
+            <th class="item-column" style="width: 12%">需求物</th>
 
-          <td class="category-column">{{ item.category }}</td>
+            <th class="category-column" style="width: 8.5%">類別</th>
 
-          <td>{{ item.amount }} {{ item.unit }}</td>
+            <th style="width: 7%">需求數量</th>
 
-          <!-- 優先度顏色 -->
-          <td
-            [ngClass]="{
-              'normal': item.priority === '普通',
-              'urgent': item.priority === '緊急',
-              'very-urgent': item.priority === '非常緊急'
-            }"
-          >
-            {{ item.priority }}
-          </td>
+            <th style="width: 7%">緊急優先度</th>
 
-          <td>{{ item.remaining }} {{ item.unit }}</td>
+            <th style="width: 7%">剩餘需求</th>
 
-          <td class="receive-method-column">
-            <div class="receive-method-list" [class.has-both]="item.receiveMethod['寄送'] && item.receiveMethod['面交']">
-              <!-- 寄送 -->
-              <span *ngIf="item.receiveMethod['寄送']" class="receive-method">
-                <span class="custom-truck-wrapper">
-                  <span class="speed-lines"></span>
-                  <i class="fa-solid fa-truck"></i>
-                </span>
-                寄送
-              </span>
+            <th style="width: 7%">接收方式</th>
 
-              <!-- 分隔線 -->
-              <div *ngIf="item.receiveMethod['寄送'] && item.receiveMethod['面交']" class="receive-divider"></div>
+            <th class="created-time-column" style="width: 6.5%">建立日期</th>
 
-              <!-- 面交 -->
-              <span *ngIf="item.receiveMethod['面交']" class="receive-method">
-                <span class="custom-hand-box">
-                  <i class="fa-solid fa-box box-icon"></i>
-                  <i class="fa-solid fa-hand-holding hand-icon"></i>
-                </span>
-                面交
-              </span>
+            <th class="published-time-column" style="width: 6.5%">上架日期</th>
 
-              <!-- 都沒有 -->
-              <span *ngIf="!item.receiveMethod['寄送'] && !item.receiveMethod['面交']" class="receive-none"> - </span>
-            </div>
-          </td>
+            <th class="off-shelf-time-column" style="width: 7.5%">預計下架日期</th>
 
-          <td class="created-time-column">{{ item.displayCreatedAt }}</td>
+            <th class="message-column" style="width: 4.5%">留言區</th>
 
-          <td class="published-time-column">{{ item.displayPublishedAt }}</td>
+            <th class="operation-column" style="width: 19%">操作</th>
+          </tr>
+        </thead>
 
-          <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
+        <!-- 表格內容 -->
+        <tbody>
+          <tr *ngFor="let item of pagedDemands">
+            <!-- 選取 -->
+            <td class="checkbox-column">
+              <input type="checkbox" [(ngModel)]="item.selected" />
+            </td>
 
-          <td class="message-column">
-            <a [routerLink]="['/agency/disaster-message', item.serialNo]"> {{ item.messageCount || 0 }} </a>
-          </td>
+            <!-- 編號 -->
+            <td class="serialNo-column">A{{ item.serialNo }}</td>
 
-          <!-- 操作 -->
-          <td class="operation-column">
-            <div class="operation-flex">
-              <button (click)="goToDetail(item.serialNo!)">查看</button>
-              <button (click)="goToEdit(item.serialNo!)">編輯</button>
-              <button class="delete-btn" (click)="openDeleteModal(item.serialNo!)">刪除</button>
+            <!-- 需求物 -->
+            <td class="item-column" [title]="item.item">
+              <div class="item-text">{{ item.item }}</div>
+            </td>
 
-              <!-- 狀態下拉選單 -->
-              <select
-                class="status-select"
-                [ngModel]="item.displayStatus"
-                (ngModelChange)="changeStatus(item, $event)"
-                [ngClass]="{
-    'status-on': item.displayStatus === '已上架',
-    'status-hide': item.displayStatus === '隱藏中',
-    'status-off': item.displayStatus === '已下架'
-  }"
+            <!-- 類別 -->
+            <td class="category-column">{{ item.category }}</td>
+
+            <!-- 需求數量 -->
+            <td>{{ item.amount }} {{ item.unit }}</td>
+
+            <!-- 優先度 -->
+            <td
+              [ngClass]="{
+                'normal': item.priority === '普通',
+                'urgent': item.priority === '緊急',
+                'very-urgent': item.priority === '非常緊急'
+              }"
+            >
+              {{ item.priority }}
+            </td>
+
+            <!-- 剩餘需求 -->
+            <td>{{ item.remaining }} {{ item.unit }}</td>
+
+            <!-- 接收方式 -->
+            <td class="receive-method-column">
+              <div
+                class="receive-method-list"
+                [class.has-both]="
+                  item.receiveMethod['寄送'] &&
+                  item.receiveMethod['面交']
+                "
               >
-                <option value="已上架">已上架</option>
-                <option value="隱藏中">隱藏中</option>
-                <option value="已下架">已下架</option>
-              </select>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+                <!-- 寄送 -->
+                <span *ngIf="item.receiveMethod['寄送']" class="receive-method">
+                  <span class="custom-truck-wrapper">
+                    <span class="speed-lines"></span>
+                    <i class="fa-solid fa-truck"></i>
+                  </span>
 
-  <app-pagination
-    [pageSize]="pageSize"
-    [currentPage]="currentPage"
-    [totalPages]="totalPages"
-    [pageNumbers]="pageNumbers"
-    (pageChange)="goToPage($event)"
-  ></app-pagination>
+                  寄送
+                </span>
 
+                <!-- 分隔線 -->
+                <div
+                  *ngIf="
+                    item.receiveMethod['寄送'] &&
+                    item.receiveMethod['面交']
+                  "
+                  class="receive-divider"
+                ></div>
+
+                <!-- 面交 -->
+                <span *ngIf="item.receiveMethod['面交']" class="receive-method">
+                  <span class="custom-hand-box">
+                    <i class="fa-solid fa-box box-icon"></i>
+                    <i class="fa-solid fa-hand-holding hand-icon"></i>
+                  </span>
+
+                  面交
+                </span>
+
+                <!-- 都沒有 -->
+                <span
+                  *ngIf="
+                    !item.receiveMethod['寄送'] &&
+                    !item.receiveMethod['面交']
+                  "
+                  class="receive-none"
+                >
+                  -
+                </span>
+              </div>
+            </td>
+
+            <!-- 建立日期 -->
+            <td class="created-time-column">{{ item.displayCreatedAt }}</td>
+
+            <!-- 上架日期 -->
+            <td class="published-time-column">{{ item.displayPublishedAt }}</td>
+
+            <!-- 預計下架日期 -->
+            <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
+
+            <!-- 留言區 -->
+            <td class="message-column">
+              <a
+                [routerLink]="[
+                  '/agency/disaster-message',
+                  item.serialNo
+                ]"
+              >
+                {{ item.messageCount || 0 }}
+              </a>
+            </td>
+
+            <!-- 操作 -->
+            <td class="operation-column">
+              <div class="operation-flex">
+                <!-- 查看 -->
+                <button (click)="goToDetail(item.serialNo!)">查看</button>
+
+                <!-- 編輯 -->
+                <button (click)="goToEdit(item.serialNo!)">編輯</button>
+
+                <!-- 刪除 -->
+                <button class="delete-btn" (click)="openDeleteModal(item.serialNo!)">刪除</button>
+
+                <!-- 狀態下拉選單 -->
+                <select
+                  class="status-select"
+                  [ngModel]="item.displayStatus"
+                  (ngModelChange)="changeStatus(item, $event)"
+                  [ngClass]="{
+                    'status-on': item.displayStatus === '已上架',
+                    'status-hide': item.displayStatus === '隱藏中',
+                    'status-off': item.displayStatus === '已下架'
+                  }"
+                >
+                  <option value="已上架">已上架</option>
+
+                  <option value="隱藏中">隱藏中</option>
+
+                  <option value="已下架">已下架</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分頁 -->
+    <app-pagination
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [pageNumbers]="pageNumbers"
+      (pageChange)="goToPage($event)"
+    ></app-pagination>
+  </ng-container>
+
+  <!-- Modal 不放進 Loading 判斷 -->
+
+  <!-- 刪除 Modal -->
   <app-supply-delete
     *ngIf="showDeleteModal"
     [demandIds]="deleteIds"
