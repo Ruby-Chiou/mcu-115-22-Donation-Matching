@@ -1,17 +1,22 @@
 import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
-import { DisasterDemand, ConditionStatus } from '../../../models/agency/demand';
+import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
+import { DisasterDemand, ConditionStatus } from '../../../../models/agency/demand';
 
 @Component({
   selector: 'app-supply-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent],
   templateUrl: './supply-form.component.html',
-  styleUrls: ['./supply-form-A.component.scss', './supply-form-B.component.scss', './supply-form-C.component.scss'],
+  styleUrls: [
+    './supply-form-A.component.scss',
+    './supply-form-B.component.scss',
+    './supply-form-C.component.scss',
+    './supply-form-D.component.scss',
+  ],
 })
 export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
@@ -42,6 +47,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   ];
 
   fromDetail = false;
+  listNumber?: number;
 
   @ViewChild('itemInput') itemInput!: ElementRef;
   @ViewChild('amountInput') amountInput!: ElementRef;
@@ -106,6 +112,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
+    this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
 
     // 編輯模式
     if (serialNo) {
@@ -320,7 +327,11 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
-        this.router.navigate(['/agency/supply-detail', this.demand.serialNo]);
+        this.router.navigate(['/agency/supply-detail', this.demand.serialNo], {
+          queryParams: {
+            number: this.listNumber,
+          },
+        });
       } else {
         this.router.navigate(['/agency/disaster']);
       }

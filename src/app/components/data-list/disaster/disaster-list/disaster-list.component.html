@@ -1,0 +1,175 @@
+<div class="container">
+  <!-- 資料載入中 -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">資料載入中，請稍候...</div>
+  </div>
+
+  <!-- 資料載入完成後才顯示列表 -->
+  <ng-container *ngIf="!isLoading">
+    <!-- 頂部按鈕區 -->
+    <div class="top-action-bar">
+      <button class="add-btn" (click)="goToAddDemand()">新增需求</button>
+    </div>
+
+    <!-- 左側全選/批次 + 右側搜尋、排序與篩選 -->
+    <div class="toolbar-row">
+      <div class="select-area">
+        <div class="select-all">
+          <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
+          <span>全選</span>
+        </div>
+
+        <div class="batch-buttons" *ngIf="hasSelected()">
+          <button (click)="editSelected()">編輯</button>
+          <button class="batch-delete-btn" (click)="openBatchDeleteModal()">刪除</button>
+        </div>
+      </div>
+
+      <!-- 右側操作區 -->
+      <div class="right-toolbar">
+        <!-- 搜尋 -->
+        <app-supply-search-bar [searchTerm]="searchTerm" (searchChange)="onSearchChange($event)"></app-supply-search-bar>
+
+        <!-- 排序 -->
+        <app-supply-sort-bar (sortChange)="onSortChange($event)"></app-supply-sort-bar>
+
+        <!-- 篩選 -->
+        <app-supply-filter
+          [statusOptions]="statusOptions"
+          [priorityOptions]="priorityOptions"
+          [categoryOptions]="categoryOptions"
+          [messageOptions]="messageOptions"
+          [selectedFilters]="selectedFilters"
+          (filterApply)="onFilterApply($event)"
+          (filterReset)="resetFilters()"
+        ></app-supply-filter>
+      </div>
+    </div>
+
+    <!-- 表格 -->
+    <table>
+      <!-- 無資料 -->
+      <tr *ngIf="filteredDemands.length === 0">
+        <td colspan="10" class="empty-message">
+          <div class="empty-title">尚未輸入需求或無符合條件的需求</div>
+
+          <div class="empty-description">請點選上方「新增需求」建立災害需求，或嘗試重新篩選。</div>
+        </td>
+      </tr>
+
+      <!-- 表頭 -->
+      <thead *ngIf="filteredDemands.length > 0">
+        <tr>
+          <th class="checkbox-column" style="width: 50px">選取</th>
+          <th style="width: 55px">編號</th>
+          <th class="item-column" style="width: auto">需求物</th>
+          <th class="category-column" style="width: 93px">類別</th>
+          <th style="width: 90px">需求數量</th>
+          <th style="width: 95px">緊急優先度</th>
+          <th style="width: 90px">剩餘需求</th>
+          <th class="created-time-column" style="width: 95px">建立日期</th>
+          <th class="published-time-column" style="width: 95px">上架日期</th>
+          <th class="off-shelf-time-column" style="width: 100px">預計下架日期</th>
+          <th class="message-column" style="width: 52px">留言區</th>
+          <th class="operation-column" style="width: 300px">操作</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of pagedDemands">
+          <td class="checkbox-column">
+            <input type="checkbox" [(ngModel)]="item.selected" />
+          </td>
+
+          <td class="serialNo-column">B{{ item.serialNo }}</td>
+
+          <td class="item-column" [title]="item.item">
+            <div class="item-text">{{ item.item }}</div>
+          </td>
+
+          <td class="category-column">{{ item.category }}</td>
+
+          <td>{{ item.amount }} {{ item.unit }}</td>
+
+          <td
+            [ngClass]="{
+              'normal': item.priority === '普通',
+              'urgent': item.priority === '緊急',
+              'very-urgent': item.priority === '非常緊急'
+            }"
+          >
+            {{ item.priority }}
+          </td>
+
+          <td>{{ item.remaining }} {{ item.unit }}</td>
+
+          <td class="created-time-column">{{ item.displayCreatedAt }}</td>
+
+          <td class="published-time-column">{{ item.displayPublishedAt }}</td>
+
+          <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
+
+          <td class="message-column">
+            <a [routerLink]="['/agency/disaster-message', item.serialNo]"> {{ item.messageCount || 0 }} </a>
+          </td>
+
+          <td class="operation-column">
+            <div class="operation-flex">
+              <button (click)="goToDetail(item.serialNo!)">查看</button>
+
+              <button (click)="goToEdit(item.serialNo!)">編輯</button>
+
+              <button class="delete-btn" (click)="openDeleteModal(item.serialNo!)">刪除</button>
+
+              <select
+                [value]="item.displayStatus"
+                (change)="changeStatus(item, $event)"
+                [ngClass]="{
+                  'status-on': item.displayStatus === '已上架',
+                  'status-hide': item.displayStatus === '隱藏中',
+                  'status-off': item.displayStatus === '已下架'
+                }"
+              >
+                <option value="已上架">已上架</option>
+                <option value="隱藏中">隱藏中</option>
+                <option value="已下架">已下架</option>
+              </select>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 分頁 -->
+    <app-pagination
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [pageNumbers]="pageNumbers"
+      (pageChange)="goToPage($event)"
+    ></app-pagination>
+  </ng-container>
+
+  <!-- Modal 不要放進 loading 判斷 -->
+  <app-supply-delete
+    *ngIf="showDeleteModal"
+    [demandIds]="deleteIds"
+    [deleteType]="deleteType"
+    (closed)="closeDeleteModal()"
+    (deleted)="onDeleted()"
+  ></app-supply-delete>
+
+  <app-supply-off-shelf
+    *ngIf="showOffShelfWarning"
+    (closed)="cancelManualOffShelf()"
+    (hide)="hideInsteadOfOffShelf()"
+    (confirmed)="confirmManualOffShelf()"
+  ></app-supply-off-shelf>
+
+  <app-supply-on-shelf
+    *ngIf="showOnShelfWarning"
+    (closed)="closeOnShelfWarning()"
+    (confirmed)="closeOnShelfWarning()"
+  ></app-supply-on-shelf>
+</div>

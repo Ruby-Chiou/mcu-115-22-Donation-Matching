@@ -10,7 +10,13 @@
     <!-- 上方操作按鈕 -->
     <div class="button-area">
       <button class="back-btn" (click)="goBack()">返回</button>
-      <button class="edit-btn" [routerLink]="['/agency/supply-edit', demand.serialNo]" [queryParams]="{ from: 'detail' }">編輯</button>
+      <button
+        class="edit-btn"
+        [routerLink]="['/agency/supply-edit', demand.serialNo]"
+        [queryParams]="{ from: 'detail', number: listNumber }"
+      >
+        編輯
+      </button>
       <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
     </div>
   </div>
@@ -185,7 +191,13 @@
 
   <div class="button-area">
     <button class="back-btn" (click)="goBack()">返回</button>
-    <button class="edit-btn" [routerLink]="['/agency/supply-edit', demand?.serialNo]" [queryParams]="{ from: 'detail' }">編輯</button>
+    <button
+      class="edit-btn"
+      [routerLink]="['/agency/supply-edit', demand?.serialNo]"
+      [queryParams]="{ from: 'detail', number: listNumber }"
+    >
+      編輯
+    </button>
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>

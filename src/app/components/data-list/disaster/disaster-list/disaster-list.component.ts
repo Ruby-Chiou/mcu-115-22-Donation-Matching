@@ -2,15 +2,15 @@ import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
-import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
-import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
-import { PaginationComponent } from '../../pagination/pagination.component';
-import { SupplySearchBarComponent } from '../../search-bar/supply-search-bar/supply-search-bar.component';
-import { SupplySortBarComponent, SortType } from '../../sort-bar/supply-sort-bar/supply-sort-bar.component';
-import { SupplyFilterComponent, SupplyFilterState } from '../../filter/supply-filter/supply-filter.component';
-import { SupplyOffShelfComponent } from '../../modal/supply-off-shelf/supply-off-shelf.component';
-import { SupplyOnShelfComponent } from '../../modal/supply-on-shelf/supply-on-shelf.component';
+import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
+import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../models/agency/demand';
+import { SupplyDeleteComponent } from '../../../modal/supply-delete/supply-delete.component';
+import { PaginationComponent } from '../../../pagination/pagination.component';
+import { SupplySearchBarComponent } from '../../../search-bar/supply-search-bar/supply-search-bar.component';
+import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
+import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply-filter/supply-filter.component';
+import { SupplyOffShelfComponent } from '../../../modal/supply-off-shelf/supply-off-shelf.component';
+import { SupplyOnShelfComponent } from '../../../modal/supply-on-shelf/supply-on-shelf.component';
 
 @Component({
   selector: 'app-disaster-list',
@@ -57,6 +57,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
   selectAll = false;
   isRestoringScroll = false;
+  isLoading = false;
 
   // 搜尋
   searchTerm = '';
@@ -222,35 +223,41 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
   // 讀取需求
   loadDemands() {
-    this.demands = this.disasterDemandService.getDemands().map((item) => {
-      let currentStatus: DisplayStatus = '已上架';
+    this.isLoading = true;
 
-      if (item.status === '上架') {
-        currentStatus = '已上架';
-      }
+    // 先讓 Angular 把 Loading 畫面渲染出來
+    requestAnimationFrame(() => {
+      this.demands = this.disasterDemandService.getDemands().map((item) => {
+        let currentStatus: DisplayStatus = '已上架';
 
-      if (item.status === '隱藏') {
-        currentStatus = '隱藏中';
-      }
+        if (item.status === '上架') {
+          currentStatus = '已上架';
+        }
 
-      if (item.status === '下架') {
-        currentStatus = '已下架';
-      }
+        if (item.status === '隱藏') {
+          currentStatus = '隱藏中';
+        }
 
-      return {
-        ...item,
-        selected: false,
-        status: item.status,
-        displayStatus: currentStatus,
-        displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
-        displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
-        displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
-        remaining: item.remaining ?? item.amount ?? 0,
-        category: item.category ?? '其他',
-      };
+        if (item.status === '下架') {
+          currentStatus = '已下架';
+        }
+
+        return {
+          ...item,
+          selected: false,
+          status: item.status,
+          displayStatus: currentStatus,
+          displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+          displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+          displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+          remaining: item.remaining ?? item.amount ?? 0,
+          category: item.category ?? '其他',
+        };
+      });
+
+      this.applyFilters(false);
+      this.isLoading = false;
     });
-
-    this.applyFilters(false);
   }
 
   // 搜尋

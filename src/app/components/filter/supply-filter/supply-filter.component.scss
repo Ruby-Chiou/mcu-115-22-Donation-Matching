@@ -43,27 +43,51 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0.4);
+  padding-top: 60px;
+  box-sizing: border-box;
 }
 
+/* 篩選彈窗主體 */
 .filter-modal-box {
   width: 580px;
-  max-height: 85vh;
-  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
   padding: 30px 35px;
   border-radius: 20px;
   background: #fff;
   text-align: left;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+
   h2 {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     color: var(--primary);
     font-size: 24px;
     text-align: center;
+    flex-shrink: 0;
+  }
+}
+
+/* 中間滾動內容區 */
+.filter-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+  h3 {
+    margin-bottom: 10px;
+    color: #444;
+    font-size: 16px;
   }
 }
 
@@ -101,11 +125,15 @@
   }
 }
 
-/* 篩選視窗按鈕 */
+/* 篩選視窗按鈕*/
 .modal-buttons {
   display: flex;
   justify-content: center;
   gap: 15px;
+  flex-shrink: 0;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+
   button {
     padding: 9px 22px;
     border: 0;

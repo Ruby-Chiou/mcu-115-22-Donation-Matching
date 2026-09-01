@@ -93,19 +93,21 @@ export const routes: Routes = [
   },
   {
     path: 'agency/supply-form',
-    loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
+    loadComponent: () => import('./components/form/disaster/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
     path: 'agency/supply-edit/:serialNo',
-    loadComponent: () => import('./components/form/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
+    loadComponent: () => import('./components/form/disaster/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
     path: 'agency/supply-detail/:serialNo',
-    loadComponent: () => import('./components/data-list/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
+    loadComponent: () =>
+      import('./components/data-list/disaster/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
   },
   {
     path: 'agency/supply-batch-edit',
-    loadComponent: () => import('./components/form/supply-batch-edit/supply-batch-edit.component').then((m) => m.SupplyBatchEditComponent),
+    loadComponent: () =>
+      import('./components/form/disaster/supply-batch-edit/supply-batch-edit.component').then((m) => m.SupplyBatchEditComponent),
   },
 
   // 4.6 災害需求志工管理區
