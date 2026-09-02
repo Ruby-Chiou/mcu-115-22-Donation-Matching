@@ -1,0 +1,349 @@
+<div class="supply-form-page">
+  <div class="form-container">
+    @if (!submitted) {
+      <!-- 標題 -->
+      <div class="form-header">
+        <h1>
+          物資捐贈表
+        </h1>
+        <p>
+          感謝您的愛心，請填寫以下捐贈資料
+        </p>
+      </div>
+      <div class="material-image">
+          @if (demand) {
+            @if (demand.image && demand.image.length > 0) {
+              <img
+                [src]="demand.image[0]"
+                [alt]="demand.item">
+            } @else {
+              <div class="no-image">
+                尚未提供圖片
+              </div>
+            }
+          } @else {
+            <div class="no-image">
+              載入中...
+            </div>
+          }
+        </div>
+                <div class="material-text">
+          <span class="label">
+            捐助物資
+          </span>
+          <h2>
+            {{ demand?.item }}
+          </h2>
+          <p>
+            接收地址：
+            <strong>
+               {{ demand?.address }}
+            </strong>
+          </p>
+        </div>
+      <div class="section-title-row">
+        <div class="section-title">
+          <span>1</span>
+          捐贈人資料
+        </div>
+        <label class="account-fill-option">
+          <input type="checkbox" name="useAccountInfo" [(ngModel)]="useAccountInfo" (change)="fillAccountInfo()">
+          <span>
+            自動填入帳戶資料
+          </span>
+        </label>
+      </div>
+      <form (ngSubmit)="submitForm()" #supplyForm="ngForm">
+        <!-- 姓名 -->
+        <div class="form-group">
+          <label>
+            捐助人姓名
+            <span>*</span>
+          </label>
+          <input type="text" name="donorName" [(ngModel)]="donorName" placeholder="請輸入您的姓名" required>
+        </div>
+        <!-- 電話 -->
+        <div class="form-group">
+          <label>
+            聯絡電話
+            <span>*</span>
+          </label>
+          <input type="tel" name="phone" [(ngModel)]="phone" placeholder="請輸入聯絡電話" required>
+        </div>
+        <!-- 數量 -->
+        <div class="form-group">
+          <label>
+            捐贈數量
+            <span>*</span>
+          </label>
+          <div class="quantity-input">
+            <input
+              type="number"
+              name="quantity"
+              [(ngModel)]="quantity"
+              min="1"
+              [max]="maxDonationQuantity"
+              placeholder="請輸入數量"
+              (input)="limitQuantityInput($event)"
+              required>
+              <span>
+              {{ demand?.unit }}
+            </span>
+          </div>
+        </div>
+        <!-- 實際捐贈物資 -->
+        <div class="form-group">
+          <label>
+            實際捐贈物資
+            <span>*</span>
+          </label>
+          <input type="text" name="actualMaterial" [(ngModel)]="actualMaterial" placeholder="例如：統一純水 600ml" required>
+          <small class="input-hint">
+            請填寫實際準備捐贈的品牌及物資名稱
+          </small>
+        </div>
+        <div class="section-title">
+          <span>2</span>
+          捐贈收據
+        </div>
+        <div class="form-group">
+          <label>
+            是否需要捐助收據？
+            <span>*</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input
+                type="radio"
+                name="needReceipt"
+                value="yes"
+                [(ngModel)]="needReceipt">
+              <span>
+                需要
+              </span>
+            </label>
+            <label class="radio-option">
+              <input
+                type="radio"
+                name="needReceipt"
+                value="no"
+                [(ngModel)]="needReceipt">
+              <span>
+                不需要
+              </span>
+            </label>
+          </div>
+        </div>
+        <!-- 需要收據才顯示 -->
+        @if (needReceipt === 'yes') {
+          <div class="receipt-box">
+            <div class="form-group">
+              <label>
+                收據抬頭
+                <span>*</span>
+              </label>
+              <input type="text" name="receiptTitle" [(ngModel)]="receiptTitle" placeholder="請輸入收據抬頭">
+            </div>
+            <div class="form-group">
+              <label>
+                統一編號
+                <span class="optional">
+                  （非必填）
+                </span>
+              </label>
+              <input
+                type="text"
+                name="taxId"
+                [(ngModel)]="taxId"
+                placeholder="若需要請輸入統一編號">
+            </div>
+          </div>
+        }
+        <div class="section-title">
+          <span>3</span>
+          感謝狀
+        </div>
+        <div class="form-group">
+          <label>
+            是否需要感謝狀？
+            <span>*</span>
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="needThankYou" value="yes" [(ngModel)]="needThankYou">
+              <span>
+                需要
+              </span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="needThankYou" value="no" [(ngModel)]="needThankYou">
+              <span>
+                不需要
+              </span>
+            </label>
+          </div>
+        </div>
+        <div class="section-title">
+          <span>4</span>
+          其他資訊
+        </div>
+        <div class="form-group">
+          <label>
+            備註
+          </label>
+          <textarea name="note" [(ngModel)]="note" placeholder="如果有其他需要說明的事項，可以填寫在這裡" (input)="autoResize($event)">
+          </textarea>
+        </div>
+        <div class="notice">
+          <strong>
+            <i class="fa-solid fa-box"></i>
+            物資捐助提醒
+          </strong>
+          <p>
+            為避免物資誤送或與目前需求不符，
+            完成捐贈申請後，系統才會提供本次捐贈的指定接收地址。
+          </p>
+          <p>
+            請勿在尚未確認前直接將物資寄送至受助單位。
+          </p>
+        </div>
+        <div class="form-buttons">
+           <button type="button" class="cancel-button" (click)="cancelForm()">
+            取消
+          </button>
+          <button type="submit" class="submit-button">
+            確認捐贈
+          </button>
+        </div>
+      </form>
+    }
+    @if (submitted) {
+      <div class="success-page">
+        <!-- 成功圖示 -->
+        <div class="success-icon">
+          ✓
+        </div>
+        <h1>
+          捐贈申請成功
+        </h1>
+        <p class="success-material">
+          捐助物資：
+          <strong>
+            {{ demand?.item }}
+          </strong>
+        </p>
+        <p class="success-text">
+          感謝您的愛心，以下為本次捐贈的接收資訊。
+        </p>
+        <div class="address-box">
+          <h2>
+            <i class="fa-solid fa-box"></i> 物資接收資訊
+          </h2>
+          <div class="address-item">
+            <span>
+              接收單位
+            </span>
+            <strong>
+              <!--{{ demand?.recipient }}-->
+            </strong>
+          </div>
+          <div class="address-item">
+            <span>
+              接收地址
+            </span>
+            <strong>
+             {{ demand?.address }}
+            </strong>
+          </div>
+          <div class="address-item">
+            <span>
+              聯絡電話
+            </span>
+            <strong>
+               {{ demand?.phone }}
+            </strong>
+          </div>
+        </div>
+        <div class="address-notice">
+          <strong>
+            <i class="fa-solid fa-exclamation"></i> 寄送注意事項
+          </strong>
+          <p>
+            請依照以上指定地址寄送物資，
+            勿直接寄送至其他受助單位。
+          </p>
+          <p>
+            若寄送方式或地址有任何疑問，
+            請先與接收單位聯繫確認。
+          </p>
+        </div>
+        <div class="donation-summary">
+        <h2>
+          本次捐贈詳情
+        </h2>
+        <div class="summary-item">
+          <span>實際捐助物</span>
+          <strong>
+            {{ actualMaterial }}
+          </strong>
+        </div>
+        <div class="summary-item">
+          <span>捐助數量</span>
+          <strong>
+            {{ quantity }} {{ demand?.unit }}
+          </strong>
+        </div>
+        <div class="summary-item">
+          <span>捐助人</span>
+          <strong>
+            {{ donorName }}
+          </strong>
+        </div>
+        <div class="summary-item">
+          <span>聯絡電話</span>
+          <strong>
+            {{ phone }}
+          </strong>
+        </div>
+      </div>
+        @if (needProofUpload) {
+          <div class="proof-upload">
+            <h2>
+              <span class="material-symbols-outlined" aria-hidden="true">attach_file</span>
+              上傳捐贈完成證明
+            </h2>
+            <p>
+              @if (needReceipt === 'yes') {
+                您已申請捐贈收據。
+              }
+              @if (needThankYou === 'yes') {
+                您已申請感謝狀。
+              }
+              <br>
+              完成實際捐贈後，請上傳相關證明，
+              供受助單位確認。
+            </p>
+            <label class="upload-button">
+              選擇檔案
+              <input type="file" accept="image/*,.pdf" (change)="onProofSelected($event)">
+            </label>
+            @if (proofFileName) {
+              <p class="file-name">
+                已選擇：
+                {{ proofFileName }}
+              </p>
+              <button type="button" class="upload-submit-button" (click)="uploadProof()">
+                上傳捐贈完成證明
+              </button>
+            }
+          </div>
+        }
+        <div class="success-buttons">
+          <button type="button" class="back-button" (click)="goToDisasterOpen()">
+            完成捐贈，返回災害救助
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

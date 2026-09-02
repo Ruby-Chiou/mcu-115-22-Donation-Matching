@@ -1,0 +1,30 @@
+<div class="card-list">
+
+  @if (disasterData().isOpen && type === 'material') {
+
+    @for (demand of filteredDemands; track demand.id) {
+
+      <app-donor-disaster-card
+        type="material"
+        [demand]="demand"
+        [demandId]="demand.id">
+      </app-donor-disaster-card>
+
+    }
+
+  }
+
+  @else if (disasterData().isOpen && type === 'volunteer') {
+
+    @for (volunteer of filteredVolunteers; track volunteer.id) {
+
+      <app-donor-disaster-card
+        type="volunteer"
+        [volunteer]="volunteer">
+      </app-donor-disaster-card>
+
+    }
+
+  }
+
+</div>

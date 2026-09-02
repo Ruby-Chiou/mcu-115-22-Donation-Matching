@@ -1,0 +1,227 @@
+<div class="detail-page">
+  <!-- 返回需求清單 -->
+  <button
+    type="button"
+    class="back-button"
+    (click)="goBackToList()">
+    ← 返回需求清單
+  </button>
+  <!-- 頁面標題 -->
+  <div class="detail-header">
+    <h1>災害志工需求詳情</h1>
+  </div>
+  <!-- =========================
+       志工主要資訊
+  ========================== -->
+  <div class="detail-main">
+
+    <!-- 右邊：志工資訊 -->
+    <div class="detail-info">
+      <!-- 志工類型 -->
+      <h2>
+        {{ volunteer.type }}
+      </h2>
+      <!-- 優先程度 -->
+      <div
+        class="urgency"
+        [class.normal]="volunteer.priority === '普通'"
+        [class.urgent]="volunteer.priority === '緊急'"
+        [class.very-urgent]="volunteer.priority === '非常緊急'">
+        <span class="urgency-icon">●</span>
+        {{ volunteer.priority }}
+      </div>
+      <!-- 人數資訊 -->
+      <div class="quantity-info">
+        <div class="info-item">
+          <span>需求人數</span>
+          <strong>
+            {{ volunteer.people ?? 0 }} 人
+          </strong>
+        </div>
+        <div class="info-item">
+          <span>剩餘需求</span>
+          <strong>
+            {{ getRemaining() }} 人
+          </strong>
+        </div>
+      </div>
+      <!-- 目前沒有已報名人數，因此暫時不顯示報名進度 -->
+      <!-- 需求原因 -->
+      <div class="organization-box">
+        <span class="organization-label">
+          需求原因
+        </span>
+        <strong>
+          {{ volunteer.reason }}
+        </strong>
+      </div>
+    </div>
+  </div>
+  <!-- =========================
+       服務資訊
+  ========================== -->
+  <div class="service-detail">
+    <h2>服務資訊</h2>
+    <div class="service-info">
+      <!-- 服務類型 -->
+      <div class="service-item">
+        <span>
+          <i class="fa-solid fa-briefcase"></i>
+          志工類型
+        </span>
+        <strong>
+          {{ volunteer.type }}
+        </strong>
+      </div>
+      <!-- 服務地點 -->
+      <div class="service-item">
+        <span>
+          <i class="fa-solid fa-location-dot"></i>
+          服務地點
+        </span>
+        <strong>
+          {{ volunteer.location }}
+        </strong>
+      </div>
+      <!-- 服務日期 -->
+      <div class="service-item">
+        <span>
+          <i class="fa-regular fa-calendar"></i>
+          服務日期
+        </span>
+        <strong>
+          {{ volunteer.date }}
+        </strong>
+      </div>
+      <!-- 現場狀況 -->
+      <div class="service-item">
+        <span>
+          <i class="fa-solid fa-circle-info"></i>
+          現場狀況
+        </span>
+        <strong>
+          {{ volunteer.condition }}
+        </strong>
+      </div>
+    </div>
+  </div>
+  <!-- =========================
+       工作內容
+  ========================== -->
+  <div class="description">
+    <h2>工作內容</h2>
+    <p>
+      {{ volunteer.workContent }}
+    </p>
+    @if (volunteer.note) {
+      <p>
+        備註：{{ volunteer.note }}
+      </p>
+    }
+  </div>
+  <!-- =========================
+       志工需求條件
+  ========================== -->
+  <div class="requirement-detail">
+    <h2>需求資訊</h2>
+    <ul>
+      <li>
+        優先程度：{{ volunteer.priority }}
+      </li>
+      <li>
+        需求人數：{{ volunteer.people ?? 0 }} 人
+      </li>
+      <li>
+        現場狀況：{{ volunteer.condition }}
+      </li>
+      <li>
+        需求原因：{{ volunteer.reason }}
+      </li>
+    </ul>
+  </div>
+  <!-- =========================
+       聯絡資訊
+  ========================== -->
+  <div class="organization-detail">
+    <h2>聯絡資訊</h2>
+
+    <div class="organization-info">
+
+      <div class="organization-item">
+        <span>聯絡人</span>
+
+        <strong>
+          {{ volunteer.contact }}
+        </strong>
+      </div>
+
+      <div class="organization-item">
+        <span>聯絡電話</span>
+
+        <strong>
+          {{ volunteer.phone }}
+        </strong>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =========================
+       留言區
+  ========================== -->
+  <div class="comment-section">
+
+    <h2>留言區</h2>
+
+    <!-- 留言輸入 -->
+    <div class="comment-form">
+
+      <textarea
+        [(ngModel)]="newComment"
+        rows="4"
+        placeholder="輸入你想說的話...">
+      </textarea>
+
+      <button
+        type="button"
+        class="comment-button"
+        (click)="addComment()">
+        發布留言
+      </button>
+
+    </div>
+
+    <!-- 留言列表 -->
+    <div class="comment-list">
+
+      @for (comment of comments; track $index) {
+
+        <div class="comment">
+
+          <div class="comment-header">
+
+            <strong>
+              {{ comment.user }}
+            </strong>
+
+            <span>
+              {{ comment.date }}
+            </span>
+
+          </div>
+
+          <p>
+            {{ comment.content }}
+          </p>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
+
+</div>
+

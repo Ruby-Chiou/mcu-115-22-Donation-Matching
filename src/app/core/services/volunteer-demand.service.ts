@@ -222,6 +222,11 @@ getSelectedDemands(): VolunteerDemand[] {
 
     });
   }
+  // 給志工卡片列表使用
+  getVolunteers(): VolunteerDemand[] {
+    return this.demands;
+  }
+
 
 
   // =========================
@@ -242,6 +247,12 @@ getSelectedDemands(): VolunteerDemand[] {
     id: number
   ): VolunteerDemand | undefined {
 
+    return this.demands.find(
+      demand => demand.id === id
+    );
+  }
+  // 給志工詳情頁使用
+  getVolunteerById(id: number): VolunteerDemand | undefined {
     return this.demands.find(
       demand => demand.id === id
     );

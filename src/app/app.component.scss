@@ -1,3 +1,43 @@
+.disaster-closed-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: grid;
+	place-items: center;
+	padding: 1.5rem;
+	background: rgb(15 23 42 / 55%);
+}
+
+.disaster-closed-modal {
+	width: min(100%, 25rem);
+	padding: 2rem;
+	border-radius: 0.5rem;
+	background: #fff;
+	box-shadow: 0 1rem 3rem rgb(15 23 42 / 25%);
+	text-align: center;
+}
+
+.disaster-closed-modal h2 {
+	margin: 0 0 0.75rem;
+	color: #172554;
+}
+
+.disaster-closed-modal p {
+	margin: 0 0 1.5rem;
+	color: #334155;
+	line-height: 1.6;
+}
+
+.disaster-closed-modal button {
+	min-height: 2.75rem;
+	padding: 0.65rem 1.25rem;
+	border: 0;
+	border-radius: 0.35rem;
+	background: #0f766e;
+	color: #fff;
+	cursor: pointer;
+	font: inherit;
+  }
 .dev-switcher {
   position: fixed; /* 固定位置，不隨頁面捲動而跑掉 */
   bottom: 20px; /* 距離底部 20px */
