@@ -1,16 +1,19 @@
 import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
+import { timeout, catchError, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
-import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/agency/demand';
-import { SupplyDeleteComponent } from '../../modal/supply-delete/supply-delete.component';
-import { PaginationComponent } from '../../pagination/pagination.component';
-import { SupplySearchBarComponent } from '../../search-bar/supply-search-bar/supply-search-bar.component';
-import { SupplySortBarComponent, SortType } from '../../sort-bar/supply-sort-bar/supply-sort-bar.component';
-import { SupplyFilterComponent, SupplyFilterState } from '../../filter/supply-filter/supply-filter.component';
-import { SupplyOffShelfComponent } from '../../modal/supply-off-shelf/supply-off-shelf.component';
-import { SupplyOnShelfComponent } from '../../modal/supply-on-shelf/supply-on-shelf.component';
+import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
+import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../models/agency/demand';
+import { SupplyDeleteComponent } from '../../../modal/supply-delete/supply-delete.component';
+import { PaginationComponent } from '../../../pagination/pagination.component';
+import { SupplySearchBarComponent } from '../../../search-bar/supply-search-bar/supply-search-bar.component';
+import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
+import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply-filter/supply-filter.component';
+import { SupplyOffShelfComponent } from '../../../modal/supply-off-shelf/supply-off-shelf.component';
+import { SupplyOnShelfComponent } from '../../../modal/supply-on-shelf/supply-on-shelf.component';
+import { SupplyLoadingComponent } from '../../../../components/loading/supply-loading/supply-loading.component';
 
 @Component({
   selector: 'app-disaster-list',
@@ -26,6 +29,7 @@ import { SupplyOnShelfComponent } from '../../modal/supply-on-shelf/supply-on-sh
     SupplySearchBarComponent,
     SupplySortBarComponent,
     SupplyFilterComponent,
+    SupplyLoadingComponent,
   ],
   templateUrl: './disaster-list.component.html',
   styleUrls: ['./disaster-list-A.component.scss'],
@@ -57,6 +61,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
   selectAll = false;
   isRestoringScroll = false;
+  isLoading = false;
 
   // 搜尋
   searchTerm = '';
@@ -126,7 +131,8 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private disasterDemandService: DisasterDemandService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
   }
@@ -222,35 +228,56 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
   // 讀取需求
   loadDemands() {
-    this.demands = this.disasterDemandService.getDemands().map((item) => {
-      let currentStatus: DisplayStatus = '已上架';
+    this.isLoading = true;
+    this.cdr.detectChanges();
 
-      if (item.status === '上架') {
-        currentStatus = '已上架';
-      }
+    this.disasterDemandService
+      .getDemandsFromServer()
+      .pipe(
+        timeout(2000),
 
-      if (item.status === '隱藏') {
-        currentStatus = '隱藏中';
-      }
+        // API 超時或錯誤 → 使用假資料
+        catchError(() => {
+          return of(this.disasterDemandService.getDemands());
+        })
+      )
+      .subscribe((data) => {
+        this.demands = data.map((item) => {
+          let currentStatus: DisplayStatus = '已上架';
 
-      if (item.status === '下架') {
-        currentStatus = '已下架';
-      }
+          if (item.status === '上架') {
+            currentStatus = '已上架';
+          }
 
-      return {
-        ...item,
-        selected: false,
-        status: item.status,
-        displayStatus: currentStatus,
-        displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
-        displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
-        displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
-        remaining: item.remaining ?? item.amount ?? 0,
-        category: item.category ?? '其他',
-      };
-    });
+          if (item.status === '隱藏') {
+            currentStatus = '隱藏中';
+          }
 
-    this.applyFilters(false);
+          if (item.status === '下架') {
+            currentStatus = '已下架';
+          }
+
+          return {
+            ...item,
+            selected: false,
+            status: item.status,
+            displayStatus: currentStatus,
+            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+            displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+            displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+            remaining: item.remaining ?? item.amount ?? 0,
+            category: item.category ?? '其他',
+          };
+        });
+
+        this.applyFilters(false);
+
+        // API 成功 / timeout fallback 都會走到這裡
+        this.isLoading = false;
+
+        // 強制 Angular 立即更新畫面
+        this.cdr.detectChanges();
+      });
   }
 
   // 搜尋

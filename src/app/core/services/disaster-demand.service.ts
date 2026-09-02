@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { DisasterDemand, CreateDisasterDemand } from '../../models/agency/demand';
 
 @Injectable({
@@ -34,8 +36,8 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: true,
       note: '請優先協助配送至物資短缺的避難收容場所。',
-      image: ['https://example.com/images/water.jpg'],
-      imageFileNames: ['礦泉水.jpg'],
+      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
+      imageFileNames: ['測試圖1'],
       createdAt: '2026-08-20T09:00:00',
       publishedAt: '2026-08-20T09:00:00',
       expectedOffShelfAt: '2026-08-27T09:00:00',
@@ -72,8 +74,8 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '食品請確認保存期限及外包裝完整。',
-      image: ['https://example.com/images/porridge.jpg'],
-      imageFileNames: ['即食白粥.jpg'],
+      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
+      imageFileNames: ['測試圖2'],
       createdAt: '2026-08-21T10:30:00',
       publishedAt: '2026-08-21T10:30:00',
       expectedOffShelfAt: '2026-09-04T10:30:00',
@@ -110,8 +112,8 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '成人男女外套皆可。',
-      image: ['https://example.com/images/jacket.jpg'],
-      imageFileNames: ['成人外套.jpg'],
+      image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?'],
+      imageFileNames: ['測試圖3'],
       createdAt: '2026-08-22T08:30:00',
       publishedAt: '2026-08-22T08:30:00',
       expectedOffShelfAt: '2026-09-21T08:30:00',
@@ -148,8 +150,11 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: true,
       note: '請保持毛毯乾燥。',
-      image: ['https://example.com/images/blanket.jpg'],
-      imageFileNames: ['防寒毛毯.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+      ],
+      imageFileNames: ['測試圖1', '測試圖2'],
       createdAt: '2026-08-23T11:00:00',
       publishedAt: '2026-08-23T11:00:00',
       expectedOffShelfAt: '2026-08-30T11:00:00',
@@ -183,8 +188,11 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: true,
       note: '醫療用品請勿提供已開封產品。',
-      image: ['https://example.com/images/first-aid.jpg'],
-      imageFileNames: ['外傷急救包.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖2', '測試圖3'],
       createdAt: '2026-08-24T08:00:00',
       publishedAt: '2026-08-24T08:00:00',
       expectedOffShelfAt: '2026-08-31T08:00:00',
@@ -221,8 +229,11 @@ export class DisasterDemandService {
       weekendAfternoon: false,
       weekendEvening: false,
       note: '請勿提供已拆封或受潮產品。',
-      image: ['https://example.com/images/diaper.jpg'],
-      imageFileNames: ['成人紙尿褲.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖1', '測試圖3'],
       createdAt: '2026-08-24T13:00:00',
       publishedAt: '2026-08-24T13:00:00',
       expectedOffShelfAt: '2026-09-07T13:00:00',
@@ -256,8 +267,12 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: false,
       note: '請確認包裝沒有破損。',
-      image: ['https://example.com/images/wipes.jpg'],
-      imageFileNames: ['酒精濕紙巾.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖1', '測試圖2', '測試圖3'],
       createdAt: '2026-08-24T14:00:00',
       publishedAt: '2026-08-24T14:00:00',
       expectedOffShelfAt: '2026-09-07T14:00:00',
@@ -291,8 +306,8 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: true,
       note: '請以未拆封產品為主。',
-      image: ['https://example.com/images/baby-diaper.jpg'],
-      imageFileNames: ['嬰兒紙尿布.jpg'],
+      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
+      imageFileNames: ['測試圖2'],
       createdAt: '2026-08-25T08:00:00',
       publishedAt: '2026-08-25T08:00:00',
       expectedOffShelfAt: '2026-09-01T08:00:00',
@@ -329,8 +344,8 @@ export class DisasterDemandService {
       weekendAfternoon: false,
       weekendEvening: false,
       note: '目前暫停募集。',
-      image: ['https://example.com/images/adult-diaper-l.jpg'],
-      imageFileNames: ['成人紙尿褲L號.jpg'],
+      image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?'],
+      imageFileNames: ['測試圖3'],
       createdAt: '2026-08-18T09:00:00',
     },
 
@@ -365,8 +380,11 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '請將日用與夜用產品分開標示。',
-      image: ['https://example.com/images/sanitary.jpg'],
-      imageFileNames: ['衛生棉.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+      ],
+      imageFileNames: ['測試圖1', '測試圖2'],
       createdAt: '2026-08-25T09:00:00',
       publishedAt: '2026-08-25T09:00:00',
       expectedOffShelfAt: '2026-09-08T09:00:00',
@@ -403,8 +421,11 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: true,
       note: '請標示飼料適用犬隻年齡。',
-      image: ['https://example.com/images/dog-food.jpg'],
-      imageFileNames: ['狗飼料.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖2', '測試圖3'],
       createdAt: '2026-08-24T15:00:00',
       publishedAt: '2026-08-24T15:00:00',
       expectedOffShelfAt: '2026-09-23T15:00:00',
@@ -441,8 +462,11 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: true,
       note: '請確認每支手電筒均可正常使用。',
-      image: ['https://example.com/images/flashlight.jpg'],
-      imageFileNames: ['LED手電筒.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖1', '測試圖3'],
       createdAt: '2026-08-25T10:00:00',
       publishedAt: '2026-08-25T10:00:00',
       expectedOffShelfAt: '2026-09-01T10:00:00',
@@ -476,8 +500,12 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: true,
       note: '請確認行動電源沒有異常狀況。',
-      image: ['https://example.com/images/power-bank.jpg'],
-      imageFileNames: ['行動電源.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖1', '測試圖2', '測試圖3'],
       createdAt: '2026-08-25T10:30:00',
       publishedAt: '2026-08-25T10:30:00',
       expectedOffShelfAt: '2026-09-01T10:30:00',
@@ -514,8 +542,8 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '二手設備需先確認安全性。',
-      image: ['https://example.com/images/stove.jpg'],
-      imageFileNames: ['卡式瓦斯爐.jpg'],
+      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
+      imageFileNames: ['測試圖1'],
       createdAt: '2026-08-24T16:00:00',
       publishedAt: '2026-08-24T16:00:00',
       expectedOffShelfAt: '2026-09-07T16:00:00',
@@ -549,8 +577,11 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: true,
       note: '大型物資請事先電話聯繫確認配送方式。',
-      image: ['https://example.com/images/tent.jpg'],
-      imageFileNames: ['臨時居住帳篷.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖2', '測試圖3'],
       createdAt: '2026-08-25T11:00:00',
       publishedAt: '2026-08-25T11:00:00',
       expectedOffShelfAt: '2026-09-01T11:00:00',
@@ -587,8 +618,11 @@ export class DisasterDemandService {
       weekendAfternoon: false,
       weekendEvening: true,
       note: '目前暫停募集。',
-      image: ['https://example.com/images/table-chair.jpg'],
-      imageFileNames: ['折疊桌椅.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+      ],
+      imageFileNames: ['測試圖1', '測試圖2'],
       createdAt: '2026-08-19T10:00:00',
     },
 
@@ -623,8 +657,8 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '請依食品種類分類裝箱。',
-      image: ['https://example.com/images/canned-food.jpg'],
-      imageFileNames: ['罐頭食品.jpg'],
+      image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?'],
+      imageFileNames: ['測試圖3'],
       createdAt: '2026-08-25T11:30:00',
       publishedAt: '2026-08-25T11:30:00',
       expectedOffShelfAt: '2026-09-24T11:30:00',
@@ -658,8 +692,11 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: true,
       note: '大型帆布請事前聯絡，以便安排搬運。',
-      image: ['https://example.com/images/tarpaulin.jpg'],
-      imageFileNames: ['防水帆布.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖1', '測試圖3'],
       createdAt: '2026-08-25T12:00:00',
       publishedAt: '2026-08-25T12:00:00',
       expectedOffShelfAt: '2026-09-08T12:00:00',
@@ -696,8 +733,11 @@ export class DisasterDemandService {
       weekendAfternoon: false,
       weekendEvening: false,
       note: '本筆需求已完成募集。',
-      image: ['https://example.com/images/medical-kit.jpg'],
-      imageFileNames: ['醫療照護用品.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖2', '測試圖3'],
       createdAt: '2026-08-18T08:00:00',
       publishedAt: '2026-08-18T08:00:00',
       expectedOffShelfAt: '2026-08-25T13:00:00',
@@ -731,8 +771,12 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: true,
       note: '清潔工具請盡量分類包裝。',
-      image: ['https://example.com/images/cleaning-kit.jpg'],
-      imageFileNames: ['環境清潔用品.jpg'],
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      ],
+      imageFileNames: ['測試圖1', '測試圖2', '測試圖3'],
       createdAt: '2026-08-25T12:30:00',
       publishedAt: '2026-08-25T12:30:00',
       expectedOffShelfAt: '2026-09-08T12:30:00',
@@ -750,9 +794,14 @@ export class DisasterDemandService {
     return this.demands;
   }
 
+  getDemandsFromServer(): Observable<DisasterDemand[]> {
+    return of(this.demands).pipe(delay(3000));
+  }
+
   getDemandBySerialNo(serialNo: number): DisasterDemand | undefined {
     return this.demands.find((demand) => demand.serialNo === serialNo);
   }
+
   updateDemand(updatedDemand: DisasterDemand) {
     const index = this.demands.findIndex((item) => item.serialNo === updatedDemand.serialNo);
 

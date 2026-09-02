@@ -2,9 +2,9 @@ import { Component, OnInit, HostListener, ChangeDetectorRef, inject } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
-import { EditableDisasterDemand } from '../../../models/agency/demand';
-import { SupplyImagePreviewComponent } from '../../modal/image-preview/supply-image-preview/supply-image-preview.component';
+import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
+import { EditableDisasterDemand } from '../../../../models/agency/demand';
+import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({
   selector: 'app-supply-batch-edit',
