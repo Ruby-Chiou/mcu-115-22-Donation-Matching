@@ -19,8 +19,10 @@ export class VolunteerDemandService {
   contact: '林先生',
   phone: '0926766326',
   note: '',
-  createdAt: '2026-08-01T10:00:00',
   messageCount: 7,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },
   {
   id: 2,
@@ -35,8 +37,10 @@ export class VolunteerDemandService {
   contact: '黃小姐 ',
   phone: '0968-372-479',
   note: '',
-  createdAt: '2026-08-05T10:00:00',
   messageCount: 10,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },
   {
   id: 3,
@@ -51,9 +55,10 @@ export class VolunteerDemandService {
   contact: '光復車站附近民宅 ',
   phone: '0988791556',
   note: '可能在鏟土沒接手機',
-
-  createdAt: '2026-08-05T10:00:00',
   messageCount: 10,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },
   {
   id: 4,
@@ -68,9 +73,10 @@ export class VolunteerDemandService {
   contact: '呂小姐',
   phone: '0972338088',
   note: '今晚22:00-明天6:00',
-
-  createdAt: '2026-08-10T10:00:00',
   messageCount: 10,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },
   {
   id: 5,
@@ -85,9 +91,10 @@ export class VolunteerDemandService {
   contact: '林先生',
   phone: '0900111222',
   note: '',
-
-  createdAt: '2026-08-10T12:00:00',
   messageCount: 1,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },
   {
   id: 6,
@@ -102,9 +109,10 @@ export class VolunteerDemandService {
   contact: '林坤祥',
   phone: '0977024963',
   note: '',
-
-  createdAt: '2026-08-12T15:00:00',
   messageCount: 8,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },{
   id: 7,
   type: '物資搬運',
@@ -118,9 +126,10 @@ export class VolunteerDemandService {
   contact: '志工回報',
   phone: '無',
   note: '',
-
-  createdAt: '2026-08-13T15:00:00',
   messageCount: 10,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },
   {
   id: 8,
@@ -135,9 +144,10 @@ export class VolunteerDemandService {
   contact: '林智偉',
   phone: '0933480505',
   note: '',
-
-  createdAt: '2026-08-09T15:00:00',
   messageCount: 5,
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
   },
   {
   id: 9,
@@ -152,10 +162,11 @@ export class VolunteerDemandService {
   contact: '陳先生',
   phone: '0922022279',
   note: '家中人員不便移動',
-
-  createdAt: '',
   messageCount: 10,
-  },
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
+},
 {
   id: 10,
   type: '醫療照護',
@@ -169,11 +180,12 @@ export class VolunteerDemandService {
   contact: '光復火車站醫療站',
   phone: '無',
   note: '',
-
-  createdAt: '',
   messageCount: 16,
-  },
-  {
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
+},
+{
   id: 11,
   type: '醫療照護',
   people: 10,
@@ -186,10 +198,11 @@ export class VolunteerDemandService {
   contact: '成先生 ',
   phone: '0986623182',
   note: '北富村偏遠，醫療急救物資缺乏、山貓不足',
-
-  createdAt: '2026-08-07T15:00:00',
   messageCount: 10,
-  },
+  createdAt: '2026-08-25T11:30:00',
+  publishedAt: '2026-08-25T11:30:00',
+  expectedOffShelfAt: '2026-09-24T11:30:00',
+},
 ]
   private storageKey = 'volunteerDemands';
 private selectedDemands: VolunteerDemand[] = [];

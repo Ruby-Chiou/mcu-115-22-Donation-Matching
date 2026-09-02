@@ -1,6 +1,31 @@
 <div class="container">
   <h1>志工需求詳細資料</h1>
 
+  <div class="detail-header-info" *ngIf="demand">
+    <div class="info-tag">
+      <span class="info-label">需求編號</span>
+      <span class="info-value">C{{ demand.id }}</span>
+    </div>
+  </div>
+  <div class="detail-table" *ngIf="demand">
+    <!-- 創建日期 -->
+    <div class="detail-row">
+      <div class="detail-title">創建日期</div>
+      <div class="detail-content">{{ demand.createdAt ? (demand.createdAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
+
+    <!-- 上架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">上架日期</div>
+      <div class="detail-content">{{ demand.publishedAt ? (demand.publishedAt | date:'yyyy/MM/dd HH:mm') : '尚未上架' }}</div>
+    </div>
+
+    <!-- 預計下架日期 / 下架日期 -->
+    <div class="detail-row">
+      <div class="detail-title">{{ demand.status === '下架' ? '下架日期' : '預計下架日期' }}</div>
+
+      <div class="detail-content">{{ demand.expectedOffShelfAt ? (demand.expectedOffShelfAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
+    </div>
   <div class="detail-table" *ngIf="demand">
     <!-- 需求類型 -->
     <div class="detail-row">

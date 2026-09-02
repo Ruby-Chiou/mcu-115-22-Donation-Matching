@@ -1,9 +1,6 @@
 export interface VolunteerDemand {
 // 志工需求資料
   id: number;
-
-  createdAt?: string;
-
   // 志工類型
   type: string;
 
@@ -39,6 +36,9 @@ export interface VolunteerDemand {
 
   // 留言數
   messageCount?: number;
+  createdAt?: string; // 建立時間
+  publishedAt?: string; // 上架時間
+  expectedOffShelfAt?: string; // 預計下架時間
 }
 
 
