@@ -1,11 +1,7 @@
 <div class="container">
-  <!-- 資料載入中 -->
-  <div class="loading-container" *ngIf="isLoading">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">資料載入中，請稍候...</div>
-  </div>
-
   <!-- 資料載入完成後才顯示列表 -->
+  <app-supply-loading *ngIf="isLoading"></app-supply-loading>
+
   <ng-container *ngIf="!isLoading">
     <!-- 頂部按鈕區 -->
     <div class="top-action-bar">
@@ -53,7 +49,6 @@
       <tr *ngIf="filteredDemands.length === 0">
         <td colspan="10" class="empty-message">
           <div class="empty-title">尚未輸入需求或無符合條件的需求</div>
-
           <div class="empty-description">請點選上方「新增需求」建立災害需求，或嘗試重新篩選。</div>
         </td>
       </tr>
@@ -81,17 +76,12 @@
           <td class="checkbox-column">
             <input type="checkbox" [(ngModel)]="item.selected" />
           </td>
-
           <td class="serialNo-column">B{{ item.serialNo }}</td>
-
           <td class="item-column" [title]="item.item">
             <div class="item-text">{{ item.item }}</div>
           </td>
-
           <td class="category-column">{{ item.category }}</td>
-
           <td>{{ item.amount }} {{ item.unit }}</td>
-
           <td
             [ngClass]="{
               'normal': item.priority === '普通',
@@ -101,15 +91,10 @@
           >
             {{ item.priority }}
           </td>
-
           <td>{{ item.remaining }} {{ item.unit }}</td>
-
           <td class="created-time-column">{{ item.displayCreatedAt }}</td>
-
           <td class="published-time-column">{{ item.displayPublishedAt }}</td>
-
           <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
-
           <td class="message-column">
             <a [routerLink]="['/agency/disaster-message', item.serialNo]"> {{ item.messageCount || 0 }} </a>
           </td>
@@ -117,11 +102,8 @@
           <td class="operation-column">
             <div class="operation-flex">
               <button (click)="goToDetail(item.serialNo!)">查看</button>
-
               <button (click)="goToEdit(item.serialNo!)">編輯</button>
-
               <button class="delete-btn" (click)="openDeleteModal(item.serialNo!)">刪除</button>
-
               <select
                 [value]="item.displayStatus"
                 (change)="changeStatus(item, $event)"

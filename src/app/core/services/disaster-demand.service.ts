@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { DisasterDemand, CreateDisasterDemand } from '../../models/agency/demand';
 
 @Injectable({
@@ -790,6 +792,10 @@ export class DisasterDemandService {
 
   getDemands() {
     return this.demands;
+  }
+
+  getDemandsFromServer(): Observable<DisasterDemand[]> {
+    return of(this.demands).pipe(delay(3000));
   }
 
   getDemandBySerialNo(serialNo: number): DisasterDemand | undefined {
