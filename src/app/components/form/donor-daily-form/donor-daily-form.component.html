@@ -66,34 +66,54 @@
           <small class="input-hint">
             請填寫實際準備捐贈的品牌及物資名稱
           </small>
-          <!-- 上傳物資照片 -->
-   <label class="label-row">
-  上傳物資照片<span>*</span>
+        <!-- 上傳物資照片 -->
+
+<!-- 上傳物資照片 / 影片 -->
+
+<label class="label-row">
+  上傳物資照片及影片<span>*</span>
 </label>
 
 <div class="image-upload-box">
   <div class="image-upload-area">
 
-    @if (materialFiles.length < 5) {
-      <div class="upload-controls">
+@if (materialFiles.length + materialVideoFiles.length < 5) {
 
-        <label class="image-upload-btn">
-          <i class="fa-solid fa-image"></i>
-          選擇圖片
+  <div class="upload-controls">
 
-          <input
-            type="file"
-            accept="image/*"
-            (change)="onImageSelected($event)"
-          />
-        </label>
+    <!-- 圖片 -->
+    <label class="image-upload-btn">
+      <i class="fa-solid fa-image"></i>
+      選擇圖片
 
-        <span class="image-upload-hint">
-          可上傳 JPG、PNG 等圖片，大小上限 5MB
-        </span>
+      <input
+        type="file"
+        accept="image/*"
+        (change)="onImageSelected($event)"
+      />
+    </label>
 
-      </div>
-    }
+    <!-- 影片 -->
+    <label class="image-upload-btn">
+      <i class="fa-solid fa-video"></i>
+      上傳影片
+
+      <input
+        type="file"
+        accept="video/*"
+        (change)="onVideoSelected($event)"
+      />
+    </label>
+
+    <span class="image-upload-hint">
+      可上傳 JPG、PNG 等圖片或 MP4、MOV 等影片，大小上限 5MB
+    </span>
+
+  </div>
+
+}
+
+
 
     @if (materialFiles.length > 0) {
       <div class="selected-image-list">

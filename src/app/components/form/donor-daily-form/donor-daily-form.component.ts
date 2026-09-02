@@ -209,5 +209,41 @@ onMaterialFileSelected(event: Event): void {
     this.previewImage = '';
     this.previewImageName = '';
   }
+  materialVideoFiles: File[] = [];
+
+onVideoSelected(event: Event): void {
+const input = event.target as HTMLInputElement;
+
+if (!input.files || input.files.length === 0) {
+return;
+}
+
+const file = input.files[0];
+
+// 檢查檔案大小：5MB
+if (file.size > 5 * 1024 * 1024) {
+alert('影片大小不能超過 5MB');
+input.value = '';
+return;
+}
+
+// 檢查是否為影片
+if (!file.type.startsWith('video/')) {
+alert('請選擇影片檔案');
+input.value = '';
+return;
+}
+
+// 最多 5 個媒體
+if (this.materialFiles.length + this.materialVideoFiles.length >= 5) {
+alert('最多只能上傳 5 個照片或影片');
+input.value = '';
+return;
+}
+
+this.materialVideoFiles.push(file);
+
+console.log('目前影片：', this.materialVideoFiles);
+}
 
 }
