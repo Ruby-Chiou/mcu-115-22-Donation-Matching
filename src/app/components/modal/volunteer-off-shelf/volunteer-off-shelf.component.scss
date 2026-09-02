@@ -1,0 +1,121 @@
+/* =========================
+   手動下架提示框
+   ========================= */
+
+.off-shelf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.off-shelf-modal {
+  width: 460px;
+  max-width: calc(100% - 40px);
+
+  padding: 28px 30px;
+
+  background: #fff;
+  border-radius: 16px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+
+  text-align: center;
+
+  h2 {
+    margin: 0 0 20px;
+    font-size: 22px;
+    color: #333;
+  }
+
+  p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #555;
+  }
+
+  .warning-text {
+    font-weight: 700;
+    color: #d32f2f;
+
+    /* 內文中的「隱藏」：改為高質感的琥珀橘色，擺脫濁感 */
+    .hidden-status {
+      color: #e65100;
+      font-weight: 700;
+    }
+  }
+
+  .system-note {
+    margin-top: 18px;
+    font-size: 14px;
+    color: #777;
+  }
+}
+
+.off-shelf-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  margin-top: 25px;
+
+  button {
+    min-width: 90px;
+    padding: 9px 18px;
+
+    border: 0;
+    border-radius: 10px;
+
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .cancel-btn {
+    background: #e0e0e0;
+    color: #333;
+
+    &:hover {
+      background: #bdbdbd;
+    }
+  }
+
+  /* 隱藏按鈕：字體改用高質感的琥珀橘 `#e65100` */
+  .hide-btn {
+    background: #fff3e0;
+    color: #e65100;
+
+    &:hover {
+      background: #ffe0b2;
+    }
+  }
+
+  .confirm-off-btn {
+    background: #d32f2f;
+    color: #fff;
+
+    &:hover {
+      background: #b71c1c;
+    }
+  }
+}
+
+/* 取消按鈕 */
+.back-btn {
+  background-color: #90caf9;
+  color: #1565c0;
+}
+
+.back-btn:hover {
+  background-color: #64b5f6;
+}
+
+.hidden-status {
+  color: #e65100;
+  font-weight: 700;
+}
