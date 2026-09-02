@@ -1,4 +1,6 @@
 import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
+import { timeout, catchError, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -11,6 +13,7 @@ import { PaginationComponent } from '../../../pagination/pagination.component';
 import { DailySearchBarComponent } from '../../../search-bar/daily-search-bar/daily-search-bar.component';
 import { DailySortBarComponent, SortType } from '../../../sort-bar/daily-sort-bar/daily-sort-bar.component';
 import { DailyFilterComponent } from '../../../filter/daily-filter/daily-filter.component';
+import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
 
 type ReceiveMethod = '寄送' | '面交';
 
@@ -43,6 +46,7 @@ type DailyListItem = DailyDemand & {
     SupplyDeleteComponent,
     SupplyOffShelfComponent,
     SupplyOnShelfComponent,
+    SupplyLoadingComponent,
     PaginationComponent,
     DailySearchBarComponent,
     DailySortBarComponent,
@@ -131,7 +135,8 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private dailyDemandService: DailyDemandService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
   }
@@ -252,12 +257,17 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   // 讀取需求
   loadDemands(): void {
     this.isLoading = true;
+    this.cdr.detectChanges();
 
-    // 先讓 Loading 畫面確實顯示
-    setTimeout(() => {
-      try {
-        const data = this.dailyDemandService.getDemands();
-
+    this.dailyDemandService
+      .getDemandsFromServer()
+      .pipe(
+        timeout(2000),
+        catchError(() => {
+          return of(this.dailyDemandService.getDemands());
+        })
+      )
+      .subscribe((data) => {
         this.demands = data.map((item) => {
           let currentStatus: DailyDisplayStatus = '已上架';
 
@@ -292,16 +302,10 @@ export class DailyListComponent implements OnInit, AfterViewInit {
         });
 
         this.applyFilters(false);
-      } catch (error) {
-        console.error('日常需求資料載入失敗：', error);
 
-        this.demands = [];
-        this.filteredDemands = [];
-        this.pagedDemands = [];
-      } finally {
         this.isLoading = false;
-      }
-    }, 800);
+        this.cdr.detectChanges();
+      });
   }
 
   // 搜尋

@@ -213,7 +213,9 @@
       </div>
     </div>
 
+    <!-- ========================= -->
     <!-- 需求對象區塊 -->
+    <!-- ========================= -->
     <div class="service-target-area" [class.error-area]="submitted && !hasServiceTarget">
       <!-- 左側 固定需求對象 -->
       <div class="service-target-section">
@@ -223,15 +225,10 @@
         </label>
 
         <div class="service-target-box">
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['老人']" /> 老人</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['嬰幼兒']" /> 嬰幼兒</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['孩童']" /> 孩童</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['青少年']" /> 青少年</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['身障']" /> 身障</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['貧困']" /> 貧困</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['重症照護']" /> 重症照護</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['動物']" /> 動物</label>
-          <label><input type="checkbox" [(ngModel)]="demand.serviceTargets['無家者']" /> 無家者</label>
+          <label *ngFor="let target of serviceTargetOptions">
+            <input type="checkbox" [checked]="isServiceTargetSelected(target)" (change)="toggleServiceTarget(target)" />
+            {{ target }}
+          </label>
         </div>
       </div>
 
@@ -240,7 +237,14 @@
         <label class="label-row align-title"> 其他需求對象 </label>
 
         <div class="custom-service-list">
-          <div class="custom-service-row" *ngFor="let target of demand.customServiceTargets; let i = index; trackBy: trackByIndex">
+          <div
+            class="custom-service-row"
+            *ngFor="
+              let target of demand.customServiceTargets;
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
             <input
               class="custom-service-input"
               maxlength="50"
@@ -273,9 +277,9 @@
       </div>
     </div>
 
-    <!-- 物資狀態區（完美鏡射上方對齊架構） -->
+    <!-- 物資狀態區 -->
     <div class="condition-area">
-      <!-- 左側  接受物資需求狀態 -->
+      <!-- 左側 接受物資需求狀態 -->
       <div class="condition-section">
         <label class="label-row align-title condition-title"> 接受物資需求狀態 </label>
 
@@ -312,6 +316,7 @@
               {{ getConditionIcon(demand.conditions['全新']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">二手</span>
             <button
@@ -324,6 +329,7 @@
               {{ getConditionIcon(demand.conditions['二手']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">有擦痕</span>
             <button
@@ -336,6 +342,7 @@
               {{ getConditionIcon(demand.conditions['有擦痕']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">過期</span>
             <button
@@ -348,6 +355,7 @@
               {{ getConditionIcon(demand.conditions['過期']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">毀損</span>
             <button
@@ -363,12 +371,19 @@
         </div>
       </div>
 
-      <!-- 右側 自訂物品狀態（位置與增減方式完全同步） -->
+      <!-- 右側 自訂物品狀態 -->
       <div class="custom-condition-section">
         <label class="label-row align-title"> 其它物資需求狀態 </label>
 
         <div class="custom-condition-list">
-          <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let i = index; trackBy: trackByIndex">
+          <div
+            class="custom-condition-row"
+            *ngFor="
+              let condition of demand.customConditions;
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
             <input
               class="custom-condition-input"
               maxlength="100"
@@ -428,7 +443,10 @@
     </div>
 
     <!-- 公開狀態 -->
-    <label class="label-row align-title"> 公開狀態 <span class="required">*</span> </label>
+    <label class="label-row align-title">
+      公開狀態
+      <span class="required">*</span>
+    </label>
 
     <div class="status-box">
       <label>
@@ -466,7 +484,7 @@
       </label>
     </div>
 
-    <!-- 接收資訊：固定顯示 -->
+    <!-- 接收資訊 -->
     <div class="receive-info-box">
       <!-- 收件人 -->
       <label class="label-row">
@@ -521,13 +539,13 @@
     />
 
     <!-- 聯絡時間 -->
-
     <label class="label-row contact-time-title">聯絡時間</label>
 
     <div class="contact-time-box">
       <!-- 是否區分平日、假日 -->
       <div class="contact-time-different-row">
-        <span class="contact-time-question">平日、假日聯絡時段是否不同？</span>
+        <span class="contact-time-question"> 平日、假日聯絡時段是否不同？ </span>
+
         <div class="different-toggle">
           <button
             type="button"
@@ -550,9 +568,9 @@
       </div>
 
       <!-- 不區分平日、假日 -->
-
       <div class="contact-time-group" *ngIf="!demand.contactTimeSeparate">
         <div class="contact-time-group-title">聯絡時段</div>
+
         <div class="contact-time-options">
           <label class="time-option">
             <input type="checkbox" [(ngModel)]="demand.contactTimeMorning" />
@@ -575,7 +593,6 @@
       </div>
 
       <!-- 區分平日、假日 -->
-
       <div class="contact-time-separated" *ngIf="demand.contactTimeSeparate">
         <!-- 平日 -->
         <div class="contact-time-group">
@@ -634,6 +651,7 @@
       其他說明（備註）
       <span class="word-count" *ngIf="demand.note"> {{ demand.note.length }}/300 </span>
     </label>
+
     <textarea
       class="note-textarea"
       maxlength="300"

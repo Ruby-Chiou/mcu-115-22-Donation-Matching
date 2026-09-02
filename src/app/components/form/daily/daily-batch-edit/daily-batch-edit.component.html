@@ -207,47 +207,63 @@
 
           <div class="service-target-box">
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['老人']" />
+              <input type="checkbox" [checked]="isServiceTargetSelected(demand, '老人')" (change)="toggleServiceTarget(demand, '老人')" />
               老人
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['嬰幼兒']" />
+              <input
+                type="checkbox"
+                [checked]="isServiceTargetSelected(demand, '嬰幼兒')"
+                (change)="toggleServiceTarget(demand, '嬰幼兒')"
+              />
               嬰幼兒
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['孩童']" />
+              <input type="checkbox" [checked]="isServiceTargetSelected(demand, '孩童')" (change)="toggleServiceTarget(demand, '孩童')" />
               孩童
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['青少年']" />
+              <input
+                type="checkbox"
+                [checked]="isServiceTargetSelected(demand, '青少年')"
+                (change)="toggleServiceTarget(demand, '青少年')"
+              />
               青少年
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['身障']" />
+              <input type="checkbox" [checked]="isServiceTargetSelected(demand, '身障')" (change)="toggleServiceTarget(demand, '身障')" />
               身障
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['貧困']" />
+              <input type="checkbox" [checked]="isServiceTargetSelected(demand, '貧困')" (change)="toggleServiceTarget(demand, '貧困')" />
               貧困
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['重症照護']" />
+              <input
+                type="checkbox"
+                [checked]="isServiceTargetSelected(demand, '重症照護')"
+                (change)="toggleServiceTarget(demand, '重症照護')"
+              />
               重症照護
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['動物']" />
+              <input type="checkbox" [checked]="isServiceTargetSelected(demand, '動物')" (change)="toggleServiceTarget(demand, '動物')" />
               動物
             </label>
 
             <label>
-              <input type="checkbox" [(ngModel)]="demand.serviceTargets['無家者']" />
+              <input
+                type="checkbox"
+                [checked]="isServiceTargetSelected(demand, '無家者')"
+                (change)="toggleServiceTarget(demand, '無家者')"
+              />
               無家者
             </label>
           </div>

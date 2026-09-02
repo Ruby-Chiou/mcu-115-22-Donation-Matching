@@ -34,6 +34,7 @@
 
       <div class="detail-content">{{ demand.expectedOffShelfAt ? (demand.expectedOffShelfAt | date:'yyyy/MM/dd HH:mm') : '無' }}</div>
     </div>
+
     <!-- 需求物 -->
     <div class="detail-row">
       <div class="detail-title">需求物</div>
@@ -95,7 +96,12 @@
               type="button"
               class="image-name-btn"
               *ngFor="let image of demand.image; let i = index"
-              (click)="openImagePreview(image, demand.imageFileNames?.[i] || '物資圖片' + (i + 1))"
+              (click)="
+                openImagePreview(
+                  image,
+                  demand.imageFileNames?.[i] || '物資圖片' + (i + 1)
+                )
+              "
             >
               <i class="fa-solid fa-image"></i>
 
@@ -120,8 +126,9 @@
     <div class="detail-row">
       <div class="detail-title">其他自訂需求對象</div>
       <div class="detail-content">
-        <ng-container *ngIf="hasCustomServiceTargets(); else noServiceTarget">{{ getCustomServiceTargets() }}</ng-container>
-        <ng-template #noServiceTarget>無</ng-template>
+        <ng-container *ngIf="hasCustomServiceTargets(); else noServiceTarget"> {{ getCustomServiceTargets() }} </ng-container>
+
+        <ng-template #noServiceTarget> 無 </ng-template>
       </div>
     </div>
 
@@ -135,8 +142,9 @@
     <div class="detail-row">
       <div class="detail-title">其他物品狀態</div>
       <div class="detail-content">
-        <ng-container *ngIf="hasCustomConditions(); else noCondition">{{ getCustomConditions() }}</ng-container>
-        <ng-template #noCondition>無</ng-template>
+        <ng-container *ngIf="hasCustomConditions(); else noCondition"> {{ getCustomConditions() }} </ng-container>
+
+        <ng-template #noCondition> 無 </ng-template>
       </div>
     </div>
 
@@ -167,15 +175,22 @@
       <div class="detail-content">
         <span *ngIf="demand.receiveMethod['寄送']"> 寄送 </span>
 
-        <span *ngIf="demand.receiveMethod['寄送'] && demand.receiveMethod['面交']"> 、 </span>
+        <span
+          *ngIf="
+            demand.receiveMethod['寄送'] &&
+            demand.receiveMethod['面交']
+          "
+        >
+          、
+        </span>
 
         <span *ngIf="demand.receiveMethod['面交']"> 面交 </span>
 
         <span
           *ngIf="
-        !demand.receiveMethod['寄送'] &&
-        !demand.receiveMethod['面交']
-      "
+            !demand.receiveMethod['寄送'] &&
+            !demand.receiveMethod['面交']
+          "
         >
           無
         </span>
@@ -221,7 +236,9 @@
 
   <div class="button-area">
     <button class="back-btn" (click)="goBack()">返回</button>
+
     <button class="edit-btn" [routerLink]="['/agency/daily-edit', demand?.serialNo]" [queryParams]="{ from: 'detail' }">編輯</button>
+
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>

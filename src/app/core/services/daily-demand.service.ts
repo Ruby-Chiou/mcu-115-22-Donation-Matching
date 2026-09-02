@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { DailyDemand, CreateDailyDemand } from '../../models/agency/daily-demand';
 
 @Injectable({
@@ -23,17 +25,7 @@ export class DailyDemandService {
       note: '若一次提供超過20包，請事前聯絡機構安排收貨時間。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['貧困'],
       customServiceTargets: ['弱勢家庭'],
       serviceTargetDescription: '貧困、弱勢家庭',
 
@@ -86,17 +78,7 @@ export class DailyDemandService {
       note: '尺寸以M、L、XL為主，寄送前請確認外箱標示清楚。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: true,
-        貧困: false,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['老人', '身障'],
       customServiceTargets: [],
       serviceTargetDescription: '老人、身障',
 
@@ -152,17 +134,7 @@ export class DailyDemandService {
       note: '不同年齡階段奶粉皆可，請提供品牌與適用年齡資訊。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: true,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['嬰幼兒', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '嬰幼兒、貧困',
 
@@ -215,17 +187,7 @@ export class DailyDemandService {
       note: '面交時間需事前電話確認，避免機構無人收件。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['孩童', '青少年', '貧困'],
       customServiceTargets: ['成人'],
       serviceTargetDescription: '孩童、青少年、貧困、成人',
 
@@ -281,17 +243,7 @@ export class DailyDemandService {
       note: '液體洗衣精及洗衣粉皆可。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '貧困',
 
@@ -344,17 +296,7 @@ export class DailyDemandService {
       note: '請避免捐贈已拆封或單片包裝破損之用品。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['青少年', '貧困'],
       customServiceTargets: ['女性'],
       serviceTargetDescription: '青少年、貧困、女性',
 
@@ -407,17 +349,7 @@ export class DailyDemandService {
       note: '請在外箱標示犬用或貓用。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: true,
-        無家者: false,
-      },
+      serviceTargets: ['貧困', '動物'],
       customServiceTargets: [],
       serviceTargetDescription: '貧困、動物',
 
@@ -474,17 +406,7 @@ export class DailyDemandService {
       note: '獨立包裝或整盒包裝皆可。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: true,
-        貧困: false,
-        重症照護: true,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['身障', '重症照護'],
       customServiceTargets: ['一般服務對象', '工作人員'],
       serviceTargetDescription: '身障、重症照護、一般服務對象、工作人員',
 
@@ -537,17 +459,7 @@ export class DailyDemandService {
       note: '面交請提前預約。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['孩童', '貧困'],
       customServiceTargets: ['成人'],
       serviceTargetDescription: '孩童、貧困、成人',
 
@@ -600,17 +512,7 @@ export class DailyDemandService {
       note: '希望以國小學童尺寸為主。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['孩童', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '孩童、貧困',
 
@@ -666,17 +568,7 @@ export class DailyDemandService {
       note: '請勿捐贈已過期或即將到期食品。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['貧困'],
       customServiceTargets: ['急難家庭'],
       serviceTargetDescription: '貧困、急難家庭',
 
@@ -730,17 +622,7 @@ export class DailyDemandService {
       note: '不同口味皆可，特殊醫療用途產品請先聯繫確認。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: true,
-        貧困: false,
-        重症照護: true,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['老人', '身障', '重症照護'],
       customServiceTargets: [],
       serviceTargetDescription: '老人、身障、重症照護',
 
@@ -797,17 +679,7 @@ export class DailyDemandService {
       note: '紙箱外觀若有輕微破損但商品完整仍可接受。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['老人', '孩童', '貧困'],
       customServiceTargets: ['一般家庭'],
       serviceTargetDescription: '老人、孩童、貧困、一般家庭',
 
@@ -860,17 +732,7 @@ export class DailyDemandService {
       note: '二手用品需確認通電與自動斷電功能正常。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['老人', '貧困'],
       customServiceTargets: ['獨居長者'],
       serviceTargetDescription: '老人、貧困、獨居長者',
 
@@ -926,17 +788,7 @@ export class DailyDemandService {
       note: '希望為全新商品，刷毛需柔軟。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['孩童', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '孩童、貧困',
 
@@ -989,17 +841,7 @@ export class DailyDemandService {
       note: '體積較大，僅接受面交。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['貧困'],
       customServiceTargets: ['急難家庭', '臨時安置家庭'],
       serviceTargetDescription: '貧困、急難家庭、臨時安置家庭',
 
@@ -1055,17 +897,7 @@ export class DailyDemandService {
       note: '成人及兒童尺寸均有需求。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['老人', '孩童', '貧困'],
       customServiceTargets: ['成人'],
       serviceTargetDescription: '老人、孩童、貧困、成人',
 
@@ -1118,17 +950,7 @@ export class DailyDemandService {
       note: '原味或低糖口味皆可。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: false,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['老人', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '老人、貧困',
 
@@ -1184,17 +1006,7 @@ export class DailyDemandService {
       note: '二手商品需確認電池狀況正常，若有充電線也歡迎一併提供。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: false,
-        嬰幼兒: false,
-        孩童: false,
-        青少年: true,
-        身障: false,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['青少年', '貧困'],
       customServiceTargets: ['弱勢成人'],
       serviceTargetDescription: '青少年、貧困、弱勢成人',
 
@@ -1253,17 +1065,7 @@ export class DailyDemandService {
       note: '此項需求內容較為彈性，若有大量物資或不同種類物資欲捐贈，請先聯絡機構確認，方便安排分類與配送。',
       brand: '不限品牌',
 
-      serviceTargets: {
-        老人: true,
-        嬰幼兒: false,
-        孩童: true,
-        青少年: true,
-        身障: true,
-        貧困: true,
-        重症照護: false,
-        動物: false,
-        無家者: false,
-      },
+      serviceTargets: ['老人', '孩童', '青少年', '身障', '貧困'],
       customServiceTargets: ['急難家庭', '低收入戶', '弱勢家庭', '獨居長者'],
       serviceTargetDescription: '老人、孩童、青少年、身障、貧困、急難家庭、低收入戶、弱勢家庭、獨居長者',
 
@@ -1319,6 +1121,10 @@ export class DailyDemandService {
 
   getDemands() {
     return this.demands;
+  }
+
+  getDemandsFromServer(): Observable<DailyDemand[]> {
+    return of(this.demands).pipe(delay(3000));
   }
 
   getDemandById(serialNo: number): DailyDemand | undefined {

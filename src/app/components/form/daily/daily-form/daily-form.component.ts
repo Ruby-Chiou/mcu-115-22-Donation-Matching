@@ -24,6 +24,12 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   fromDetail = false;
   hasServiceTarget = true;
 
+  // =========================================================
+  // 固定需求對象
+  // 資料庫改成使用陣列，因此前端也改成 string[]
+  // =========================================================
+  serviceTargetOptions: string[] = ['老人', '嬰幼兒', '孩童', '青少年', '身障', '貧困', '重症照護', '動物', '無家者'];
+
   // 圖片
   imageFiles: File[] = [];
 
@@ -67,6 +73,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     amountDescription: '',
     reason: '',
     description: '',
+
     contactTimeWeekday: false,
     contactTimeWeekend: false,
     contactTimeMorning: false,
@@ -86,19 +93,13 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     contactTimeWeekendAfternoon: false,
     contactTimeWeekendEvening: false,
 
-    //服務對象
-    serviceTargets: {
-      老人: false,
-      嬰幼兒: false,
-      孩童: false,
-      青少年: false,
-      身障: false,
-      貧困: false,
-      重症照護: false,
-      動物: false,
-      無家者: false,
-    },
+    // =========================================================
+    // 服務對象
+    // 改成陣列，不再使用 boolean object
+    // =========================================================
+    serviceTargets: [],
 
+    // 自訂需求對象維持原本陣列
     customServiceTargets: [''],
 
     // 資料庫使用：合併後的需求對象
@@ -114,15 +115,18 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     },
 
     customConditions: [''],
+
     // 資料庫使用：合併後的物資需求狀態
     conditionDescription: '',
 
     priority: '普通',
     status: '隱藏',
+
     receiveMethod: {
       寄送: false,
       面交: false,
     },
+
     recipient: '',
     address: '',
     phone: '',
@@ -138,7 +142,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+  // =========================================================
   // 點擊類別下拉選單以外的地方時關閉
+  // =========================================================
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -162,15 +168,38 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
 
+    // =========================================================
     // 編輯模式
+    // =========================================================
     if (serialNo) {
       this.isEditMode = true;
 
       const data = this.dailyDemandService.getDemands().find((item) => item.serialNo === serialNo);
 
       if (data) {
+        // =====================================================
+        // 需求對象
+        //
+        // 新資料庫格式：
+        // serviceTargets: ['老人', '嬰幼兒', '身障']
+        //
+        // 這裡同時保留舊 boolean object 的相容處理，
+        // 避免你目前還沒全部改完的假資料直接爆錯。
+        // =====================================================
+
+        let serviceTargets: string[] = [];
+
+        if (Array.isArray(data.serviceTargets)) {
+          serviceTargets = [...data.serviceTargets];
+        } else if (data.serviceTargets && typeof data.serviceTargets === 'object') {
+          serviceTargets = Object.entries(data.serviceTargets)
+            .filter(([, value]) => Boolean(value))
+            .map(([key]) => key);
+        }
+
         this.demand = {
           ...data,
+
           status: data.status ?? '上架',
           remaining: data.remaining ?? null,
 
@@ -190,37 +219,37 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
           imageFileNames: [...(data.imageFileNames ?? [])],
 
           contactTimeWeekday: data.contactTimeWeekday ?? false,
+
           contactTimeWeekend: data.contactTimeWeekend ?? false,
+
           contactTimeMorning: data.contactTimeMorning ?? false,
+
           contactTimeAfternoon: data.contactTimeAfternoon ?? false,
+
           contactTimeEvening: data.contactTimeEvening ?? false,
 
           contactTimeSeparate: data.contactTimeSeparate ?? false,
 
           contactTimeWeekdayMorning: data.contactTimeWeekdayMorning ?? false,
+
           contactTimeWeekdayAfternoon: data.contactTimeWeekdayAfternoon ?? false,
+
           contactTimeWeekdayEvening: data.contactTimeWeekdayEvening ?? false,
 
           contactTimeWeekendMorning: data.contactTimeWeekendMorning ?? false,
+
           contactTimeWeekendAfternoon: data.contactTimeWeekendAfternoon ?? false,
+
           contactTimeWeekendEvening: data.contactTimeWeekendEvening ?? false,
 
           serviceTargetDescription: data.serviceTargetDescription ?? '',
+
           conditionDescription: data.conditionDescription ?? '',
 
-          serviceTargets: data.serviceTargets
-            ? { ...data.serviceTargets }
-            : {
-                老人: false,
-                嬰幼兒: false,
-                孩童: false,
-                青少年: false,
-                身障: false,
-                貧困: false,
-                重症照護: false,
-                動物: false,
-                無家者: false,
-              },
+          // ===================================================
+          // 需求對象改成陣列
+          // ===================================================
+          serviceTargets: serviceTargets,
 
           customServiceTargets: data.customServiceTargets?.length ? [...data.customServiceTargets] : [''],
 
@@ -267,19 +296,60 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     const response = await fetch(base64);
     const blob = await response.blob();
 
-    return new File([blob], fileName, { type: blob.type });
+    return new File([blob], fileName, {
+      type: blob.type,
+    });
   }
 
+  // =========================================================
+  // 接收方式
+  // =========================================================
   get hasReceiveMethod(): boolean {
     return this.demand.receiveMethod['寄送'] || this.demand.receiveMethod['面交'];
   }
 
+  // =========================================================
+  // 需求對象
+  // =========================================================
+
+  /**
+   * 判斷需求對象是否已被選取
+   */
+  isServiceTargetSelected(target: string): boolean {
+    return this.demand.serviceTargets.includes(target);
+  }
+
+  /**
+   * 點擊需求對象 checkbox
+   *
+   * 如果原本沒有 → 加入陣列
+   * 如果原本有 → 從陣列移除
+   */
+  toggleServiceTarget(target: string): void {
+    const index = this.demand.serviceTargets.indexOf(target);
+
+    if (index === -1) {
+      this.demand.serviceTargets.push(target);
+    } else {
+      this.demand.serviceTargets.splice(index, 1);
+    }
+
+    // 即時更新資料庫使用的合併欄位
+    this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
+  }
+
+  // =========================================================
+  // 儲存
+  // =========================================================
   save() {
     this.submitted = true;
 
-    this.hasServiceTarget =
-      Object.values(this.demand.serviceTargets).some((value: boolean) => value) ||
-      this.demand.customServiceTargets.some((target) => target.trim());
+    // =======================================================
+    // 需求對象改成陣列後：
+    // 只要固定需求對象陣列有資料，或自訂需求對象有資料，
+    // 就代表至少有選擇一個需求對象。
+    // =======================================================
+    this.hasServiceTarget = this.demand.serviceTargets.length > 0 || this.demand.customServiceTargets.some((target) => target.trim());
 
     const hasReceiveMethod = this.demand.receiveMethod.寄送 || this.demand.receiveMethod.面交;
 
@@ -351,25 +421,47 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    // =======================================================
+    // 需求對象驗證
+    // =======================================================
     if (!this.hasServiceTarget) {
       this.scrollToServiceTarget();
       return;
     }
+
+    // =======================================================
     // 清除空白的自訂欄位
+    // =======================================================
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
+
     this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
+
+    // =======================================================
     // 保留至少一個輸入框
+    // =======================================================
     if (this.demand.customConditions.length === 0) {
       this.demand.customConditions.push('');
     }
+
     if (this.demand.customServiceTargets.length === 0) {
       this.demand.customServiceTargets.push('');
     }
 
+    // =======================================================
+    // 建立資料庫使用的合併欄位
+    // =======================================================
+    this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
+
+    this.demand.conditionDescription = this.buildConditionDescription();
+
+    // =======================================================
+    // 編輯
+    // =======================================================
     if (this.isEditMode) {
       const originalStatus = this.dailyDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo)?.status;
 
       const originalPublishedAt = this.demand.publishedAt;
+
       const now = new Date();
 
       if (this.demand.status === '上架') {
@@ -401,18 +493,19 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/agency/daily']);
       }
     } else {
-      // 按下「發布需求」的時間
+      // =====================================================
+      // 新增
+      // =====================================================
+
       const createdDate = new Date();
 
-      // 創建日期：記錄按下發布的日期
+      // 創建日期
       this.demand.createdAt = createdDate.toISOString();
 
       // 如果新增時選擇「上架」
       if (this.demand.status === '上架') {
-        // 上架日期 = 發布日期
         this.demand.publishedAt = createdDate.toISOString();
 
-        // 計算預計下架日期
         this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, this.demand.priority);
       } else {
         // 隱藏：尚未上架
@@ -426,16 +519,29 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // 整合需求對象：固定需求對象 + 其他自訂需求對象
+  // =========================================================
+  // 整合需求對象
+  //
+  // 固定需求對象：
+  // ['老人', '嬰幼兒', '身障']
+  //
+  // 自訂需求對象：
+  // ['獨居者', '低收入戶']
+  //
+  // 最後：
+  // 老人、嬰幼兒、身障、獨居者、低收入戶
+  // =========================================================
   buildServiceTargetDescription(): string {
     const targets: string[] = [];
 
-    Object.entries(this.demand.serviceTargets).forEach(([key, value]) => {
-      if (value) {
-        targets.push(`${key}✓`);
+    // 固定需求對象直接從陣列取得
+    this.demand.serviceTargets.forEach((target) => {
+      if (target.trim()) {
+        targets.push(`${target}✓`);
       }
     });
 
+    // 自訂需求對象
     this.demand.customServiceTargets.forEach((target) => {
       const value = target.trim();
 
@@ -447,14 +553,31 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return targets.join('、');
   }
 
-  // 整合物資需求狀態：接受物資狀態 + 其他自訂物資狀態
+  // =========================================================
+  // 整合物資需求狀態
+  // =========================================================
   buildConditionDescription(): string {
     const conditions = [
-      { name: '全新', value: this.demand.conditions.全新 },
-      { name: '二手', value: this.demand.conditions.二手 },
-      { name: '有擦痕', value: this.demand.conditions.有擦痕 },
-      { name: '過期', value: this.demand.conditions.過期 },
-      { name: '毀損', value: this.demand.conditions.毀損 },
+      {
+        name: '全新',
+        value: this.demand.conditions.全新,
+      },
+      {
+        name: '二手',
+        value: this.demand.conditions.二手,
+      },
+      {
+        name: '有擦痕',
+        value: this.demand.conditions.有擦痕,
+      },
+      {
+        name: '過期',
+        value: this.demand.conditions.過期,
+      },
+      {
+        name: '毀損',
+        value: this.demand.conditions.毀損,
+      },
     ];
 
     const result: string[] = [];
@@ -478,6 +601,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return result.join('、');
   }
 
+  // =========================================================
+  // 自訂物資狀態
+  // =========================================================
   addCustomCondition() {
     if (this.demand.customConditions.length < 5) {
       this.demand.customConditions.push('');
@@ -490,8 +616,15 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     if (this.demand.customConditions.length === 0) {
       this.demand.customConditions.push('');
     }
+
+    this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
+
+    this.demand.conditionDescription = this.buildConditionDescription();
   }
 
+  // =========================================================
+  // 預計下架日期
+  // =========================================================
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DailyDemand['priority']): string {
     const offShelfDate = new Date(publishedDate);
 
@@ -512,6 +645,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return offShelfDate.toISOString();
   }
 
+  // =========================================================
+  // 自訂需求對象
+  // =========================================================
   addCustomServiceTarget() {
     if (this.demand.customServiceTargets.length < 5) {
       this.demand.customServiceTargets.push('');
@@ -527,8 +663,10 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     // 建立資料庫使用的合併欄位
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
+
     this.demand.conditionDescription = this.buildConditionDescription();
   }
+
   scrollToServiceTarget() {
     const element = document.querySelector('.service-target-area');
 
@@ -540,6 +678,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // =========================================================
+  // 物資狀態
+  // =========================================================
   toggleCondition(key: keyof DailyDemand['conditions']) {
     const current = this.demand.conditions[key];
 
@@ -564,6 +705,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return '―';
   }
 
+  // =========================================================
+  // 剩餘需求
+  // =========================================================
   onRemainingChange() {
     if (this.demand.remaining !== null && this.demand.remaining !== undefined) {
       this.demand.remaining = Number(this.demand.remaining);
@@ -575,13 +719,16 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // =========================================================
+  // 數字長度限制
+  // =========================================================
   limitNumberLength(event: Event, field: 'amount' | 'remaining') {
     const input = event.target as HTMLInputElement;
 
     // 只允許數字
     let value = input.value.replace(/[^0-9]/g, '');
 
-    // 最多 10 位，超過的部分直接截掉
+    // 最多 10 位
     if (value.length > 10) {
       value = value.substring(0, 10);
     }
@@ -604,6 +751,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       // 不能超過需求數量
       if (numberValue !== null && this.demand.amount !== null && numberValue > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
+
         input.value = this.demand.amount.toString();
       } else {
         this.demand.remaining = numberValue;
@@ -611,6 +759,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // =========================================================
+  // 一般文字長度限制
+  // =========================================================
   limitTextLength(field: 'item' | 'amountDescription' | 'reason' | 'description' | 'brand' | 'note', maxLength: number) {
     const value = this.demand[field];
 
@@ -618,7 +769,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // 超過最大長度時，直接截斷並同步回輸入框
     if (value.length > maxLength) {
       this.demand[field] = value.substring(0, maxLength);
     }
@@ -632,6 +782,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // =========================================================
+  // 自訂陣列文字長度限制
+  // =========================================================
   limitCustomArrayTextLength(field: 'customServiceTargets' | 'customConditions', index: number, maxLength: number) {
     const value = this.demand[field][index];
 
@@ -640,6 +793,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // =========================================================
+  // 圖片
+  // =========================================================
   onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
 
@@ -679,6 +835,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       }
 
       this.demand.image.push(reader.result as string);
+
       this.demand.imageFileNames.push(file.name);
     };
 

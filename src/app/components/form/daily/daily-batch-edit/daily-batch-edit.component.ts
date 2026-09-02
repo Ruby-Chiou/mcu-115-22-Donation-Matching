@@ -71,17 +71,12 @@ export class DailyBatchEditComponent implements OnInit {
         // =========================
         // 服務對象
         // =========================
-        serviceTargets: item.serviceTargets || {
-          老人: false,
-          嬰幼兒: false,
-          孩童: false,
-          青少年: false,
-          身障: false,
-          貧困: false,
-          重症照護: false,
-          動物: false,
-          無家者: false,
-        },
+        // 資料庫現在使用陣列：
+        // ['老人', '孩童', '貧困']
+        //
+        // 如果舊資料還是物件格式，這裡也會轉成陣列，
+        // 避免舊的 localStorage 資料造成錯誤。
+        serviceTargets: this.convertServiceTargets(item.serviceTargets),
 
         customServiceTargets: item.customServiceTargets?.length ? item.customServiceTargets : [''],
 
@@ -185,6 +180,68 @@ export class DailyBatchEditComponent implements OnInit {
     }
 
     console.log('批次修改資料:', this.editDemands);
+  }
+
+  // =========================================================
+  // 將需求對象轉換成資料庫使用的陣列
+  // =========================================================
+  convertServiceTargets(serviceTargets: any): string[] {
+    // 已經是陣列
+    if (Array.isArray(serviceTargets)) {
+      return serviceTargets.filter((target) => typeof target === 'string' && target.trim() !== '');
+    }
+
+    // 舊資料如果還是：
+    // {
+    //   老人: true,
+    //   嬰幼兒: false,
+    //   孩童: true
+    // }
+    //
+    // 就轉換成：
+    // ['老人', '孩童']
+    if (serviceTargets && typeof serviceTargets === 'object') {
+      return Object.entries(serviceTargets)
+        .filter(([, value]) => value === true)
+        .map(([key]) => key);
+    }
+
+    // 沒有資料
+    return [];
+  }
+
+  // =========================================================
+  // 判斷需求對象是否已勾選
+  // =========================================================
+  isServiceTargetSelected(demand: EditableDailyDemand, target: string): boolean {
+    return Array.isArray(demand.serviceTargets) && demand.serviceTargets.includes(target);
+  }
+
+  // =========================================================
+  // 切換需求對象
+  //
+  // 勾選 → 加入陣列
+  // 取消 → 從陣列移除
+  // =========================================================
+  toggleServiceTarget(demand: EditableDailyDemand, target: string): void {
+    if (!Array.isArray(demand.serviceTargets)) {
+      demand.serviceTargets = [];
+    }
+
+    const index = demand.serviceTargets.indexOf(target);
+
+    if (index === -1) {
+      // 尚未選擇 → 加入
+      demand.serviceTargets.push(target);
+    } else {
+      // 已經選擇 → 移除
+      demand.serviceTargets.splice(index, 1);
+    }
+
+    // 有選擇需求對象後，移除錯誤狀態
+    if (demand.serviceTargets.length > 0) {
+      demand.serviceTargetError = false;
+    }
   }
 
   // =========================
@@ -380,17 +437,20 @@ export class DailyBatchEditComponent implements OnInit {
 
   // =========================================================
   // 整合需求對象
-  // 固定需求對象 + 其他自訂需求對象
+  //
+  // 固定需求對象陣列 + 其他自訂需求對象
   // =========================================================
   buildServiceTargetDescription(demand: EditableDailyDemand): string {
     const targets: string[] = [];
 
-    Object.entries(demand.serviceTargets || {}).forEach(([key, value]) => {
-      if (value) {
-        targets.push(`${key}✓`);
+    // 固定需求對象
+    (demand.serviceTargets || []).forEach((target) => {
+      if (target && target.trim()) {
+        targets.push(`${target}✓`);
       }
     });
 
+    // 自訂需求對象
     (demand.customServiceTargets || []).forEach((target) => {
       const value = target.trim();
 
@@ -404,6 +464,7 @@ export class DailyBatchEditComponent implements OnInit {
 
   // =========================================================
   // 整合物資需求狀態
+  //
   // 固定物資狀態 + 其他自訂物資狀態
   // =========================================================
   buildConditionDescription(demand: EditableDailyDemand): string {
@@ -529,8 +590,8 @@ export class DailyBatchEditComponent implements OnInit {
       // 服務對象
       // =========================
       const hasServiceTarget =
-        Object.values(item.serviceTargets || {}).some((value: any) => value) ||
-        item.customServiceTargets?.some((target: string) => target.trim());
+        (Array.isArray(item.serviceTargets) && item.serviceTargets.length > 0) ||
+        item.customServiceTargets?.some((target: string) => target.trim() !== '');
 
       if (!hasServiceTarget) {
         item.serviceTargetError = true;
@@ -592,6 +653,13 @@ export class DailyBatchEditComponent implements OnInit {
 
       if (item.customServiceTargets.length === 0) {
         item.customServiceTargets.push('');
+      }
+
+      // =========================
+      // 確保需求對象為陣列
+      // =========================
+      if (!Array.isArray(item.serviceTargets)) {
+        item.serviceTargets = [];
       }
 
       // =========================

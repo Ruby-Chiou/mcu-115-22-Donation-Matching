@@ -57,25 +57,16 @@ export interface DailyDemand {
   imageFileNames?: string[]; // 物資圖片檔名
 
   // 需求對象
-  // 前端使用：固定需求對象勾選
-  serviceTargets: {
-    老人: boolean;
-    嬰幼兒: boolean;
-    孩童: boolean;
-    青少年: boolean;
-    身障: boolean;
-    貧困: boolean;
-    重症照護: boolean;
-    動物: boolean;
-    無家者: boolean;
-  };
+  // 資料庫使用：以陣列儲存需求對象
+  // 例如：['老人', '孩童', '貧困']
+  serviceTargets: string[];
 
   // 前端使用：其他自訂需求對象
   // 最多 5 個
   customServiceTargets: string[];
 
-  // 資料庫使用：合併後的需求對象內容
-  // 內容包含「固定需求對象」及「其他自訂需求對象」
+  // 資料庫使用：需求對象內容
+  // 內容包含固定需求對象及其他自訂需求對象
   serviceTargetDescription?: string;
 
   // 物資接受條件

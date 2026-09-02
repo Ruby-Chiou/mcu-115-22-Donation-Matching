@@ -14,8 +14,11 @@ import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply
 })
 export class DailyDetailComponent implements OnInit, AfterViewInit {
   demand?: DailyDemand;
+
   showDeleteModal: boolean = false;
+
   listNumber?: number;
+
   showImagePreview = false;
   previewImage = '';
   previewImageName = '';
@@ -28,33 +31,44 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+
     this.demand = this.service.getDemandById(serialNo);
+
     this.listNumber = this.demand?.serialNo;
 
     if (this.demand) {
       this.demand.remaining ??= this.demand.amount ?? 0;
-      this.demand.customConditions ??= [];
-      this.demand.customServiceTargets ??= [];
-      if (this.demand) {
-        this.demand.remaining ??= this.demand.amount ?? 0;
-        this.demand.customConditions ??= [];
-        this.demand.customServiceTargets ??= [];
 
-        this.demand.serviceTargets ??= {
-          老人: false,
-          嬰幼兒: false,
-          孩童: false,
-          青少年: false,
-          身障: false,
-          貧困: false,
-          重症照護: false,
-          動物: false,
-          無家者: false,
-        };
-      }
+      this.demand.customConditions ??= [];
+
+      this.demand.customServiceTargets ??= [];
+
+      /*
+       * 需求對象現在改成陣列：
+       *
+       * serviceTargets: ['老人', '孩童', '貧困']
+       *
+       * 不再使用：
+       *
+       * serviceTargets: {
+       *   老人: true,
+       *   嬰幼兒: false,
+       *   ...
+       * }
+       */
+      this.demand.serviceTargets ??= [];
     }
   }
 
+  /**
+   * 取得需求對象完整文字
+   *
+   * 例如：
+   * serviceTargets = ['老人', '孩童', '貧困']
+   *
+   * 顯示：
+   * 老人、孩童、貧困
+   */
   getServiceTargetDescription(): string {
     if (!this.demand) {
       return '無';
@@ -62,12 +76,20 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
 
     const result: string[] = [];
 
-    Object.entries(this.demand.serviceTargets || {}).forEach(([key, value]) => {
+    /*
+     * 固定需求對象現在直接從陣列取得
+     */
+    (this.demand.serviceTargets || []).forEach((target) => {
+      const value = target.trim();
+
       if (value) {
-        result.push(`${key}✓`);
+        result.push(`${value}✓`);
       }
     });
 
+    /*
+     * 其他自訂需求對象
+     */
     (this.demand.customServiceTargets || []).forEach((target) => {
       const value = target.trim();
 
@@ -85,11 +107,26 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
     }
 
     const conditions = [
-      { name: '全新', value: this.demand.conditions?.全新 },
-      { name: '二手', value: this.demand.conditions?.二手 },
-      { name: '有擦痕', value: this.demand.conditions?.有擦痕 },
-      { name: '過期', value: this.demand.conditions?.過期 },
-      { name: '毀損', value: this.demand.conditions?.毀損 },
+      {
+        name: '全新',
+        value: this.demand.conditions?.全新,
+      },
+      {
+        name: '二手',
+        value: this.demand.conditions?.二手,
+      },
+      {
+        name: '有擦痕',
+        value: this.demand.conditions?.有擦痕,
+      },
+      {
+        name: '過期',
+        value: this.demand.conditions?.過期,
+      },
+      {
+        name: '毀損',
+        value: this.demand.conditions?.毀損,
+      },
     ];
 
     const result: string[] = [];
@@ -135,6 +172,7 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   // 刪除完成後返回列表
   onDeleted() {
     this.showDeleteModal = false;
+
     this.router.navigate(['/agency/daily']);
   }
 
@@ -160,18 +198,29 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
     return this.demand?.serialNo != null ? [this.demand.serialNo] : [];
   }
 
-  // 取得勾選的服務對象，以頓號連結；若皆無則回傳 '無'
+  /**
+   * 取得勾選的需求對象
+   *
+   * 現在 serviceTargets 是陣列，例如：
+   *
+   * ['老人', '孩童', '貧困']
+   *
+   * 直接 join 成：
+   *
+   * 老人、孩童、貧困
+   */
   getSelectedServiceTargets(): string {
     if (!this.demand) {
       return '無';
     }
 
-    const selected = Object.entries(this.demand.serviceTargets || {})
-      .filter(([_, value]) => value)
-      .map(([key]) => key);
+    const selected = Array.isArray(this.demand.serviceTargets)
+      ? this.demand.serviceTargets.filter((target) => typeof target === 'string' && target.trim() !== '').map((target) => target.trim())
+      : [];
 
     return selected.length > 0 ? selected.join('、') : '無';
   }
+
   // 檢查是否有有效填寫的其他服務對象
   hasCustomServiceTargets(): boolean {
     return (
@@ -179,6 +228,7 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
       this.demand.customServiceTargets.some((target: string) => target && target.trim() !== '')
     );
   }
+
   // 取得其他自訂服務對象文字
   getCustomServiceTargets(): string {
     return this.demand?.customServiceTargets?.filter((target) => target && target.trim()).join('、') || '無';
@@ -192,7 +242,7 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // 取得其他物品狀態文字
+  // 取得其他自訂物品狀態文字
   getCustomConditions(): string {
     return this.demand?.customConditions?.filter((condition) => condition && condition.trim()).join('、') || '無';
   }
@@ -336,7 +386,9 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
         .filter((condition) => condition.value)
         .map(
           (condition) =>
-            `${condition.name}：<span class="${condition.value === '接受' ? 'accept' : 'reject'}">${this.getConditionIcon(condition.value)}</span> ${condition.value}`
+            `${condition.name}：<span class="${condition.value === '接受' ? 'accept' : 'reject'}">${this.getConditionIcon(
+              condition.value
+            )}</span> ${condition.value}`
         )
         .join(' ｜ ') || '無'
     );
