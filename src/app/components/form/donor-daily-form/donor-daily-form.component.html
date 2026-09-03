@@ -66,96 +66,91 @@
           <small class="input-hint">
             請填寫實際準備捐贈的品牌及物資名稱
           </small>
-        <!-- 上傳物資照片 -->
-
-<!-- 上傳物資照片 / 影片 -->
-
-<label class="label-row">
-  上傳物資照片及影片<span>*</span>
-</label>
-
-<div class="image-upload-box">
-  <div class="image-upload-area">
-
-@if (materialFiles.length + materialVideoFiles.length < 5) {
-
-  <div class="upload-controls">
-
-    <!-- 圖片 -->
-    <label class="image-upload-btn">
-      <i class="fa-solid fa-image"></i>
-      選擇圖片
-
-      <input
-        type="file"
-        accept="image/*"
-        (change)="onImageSelected($event)"
-      />
-    </label>
-
-    <!-- 影片 -->
-    <label class="image-upload-btn">
-      <i class="fa-solid fa-video"></i>
-      上傳影片
-
-      <input
-        type="file"
-        accept="video/*"
-        (change)="onVideoSelected($event)"
-      />
-    </label>
-
-    <span class="image-upload-hint">
-      可上傳 JPG、PNG 等圖片或 MP4、MOV 等影片，大小上限 5MB
-    </span>
-
-  </div>
-
-}
-
-
-
-    @if (materialFiles.length > 0) {
-      <div class="selected-image-list">
-
-        @for (
-          image of materialFiles;
-          track $index;
-          let i = $index
-        ) {
-          <div class="selected-image">
-
-            <button
-              type="button"
-              class="selected-image-name"
-              (click)="openImagePreview(
-                materialPreviewImages[i],
-                image.name
-              )"
-            >
-              {{ image.name }}
-            </button>
-
-            <button
-              type="button"
-              class="remove-image-btn"
-              (click)="removeImage(i)"
-            >
-              移除圖片
-            </button>
-
+          <!-- 上傳物資照片 -->
+          <label class="label-row">
+            上傳物資照片<span>*</span>
+          </label>
+          <div class="image-upload-box">
+            <div class="image-upload-area">
+              <div class="upload-controls">
+                <label class="image-upload-btn">
+                  <i class="fa-solid fa-image"></i>
+                  選擇圖片
+                  <input
+                    type="file"
+                    accept="image/*"
+                    (change)="onImageSelected($event)"
+                  />
+                </label>
+                <span class="image-upload-hint">
+                  可上傳 JPG、PNG 等圖片
+                </span>
+              </div>
+              <!-- 已選擇的圖片 -->
+              @if (materialFiles.length > 0) {
+                <div class="selected-image-list">
+                  @for (file of materialFiles; track $index) {
+                    <div class="selected-image">
+                      <span class="selected-image-name">
+                        <i class="fa-solid fa-image"></i>
+                        {{ file.name }}
+                      </span>
+                      <button
+                        type="button"
+                        class="remove-image-btn"
+                        (click)="removeImage($index)"
+                      >
+                        移除
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           </div>
-        }
-
-      </div>
-    }
-</div>
-  </div>
-</div>
-
-        <!-- =================================================
-             收據
-        ================================================ -->
+          <label class="label-row">
+            上傳物資影片
+          </label>
+          <div class="image-upload-box">
+            <div class="image-upload-area">
+              <div class="upload-controls">
+                <label class="image-upload-btn">
+                  <i class="fa-solid fa-video"></i>
+                  上傳影片
+                  <input
+                    type="file"
+                    accept="video/*"
+                    (change)="onVideoSelected($event)"
+                  />
+                </label>
+                <span class="image-upload-hint">
+                  可上傳 MP4、MOV 等影片
+                </span>
+              </div>
+              <!-- 已選擇的影片 -->
+              @if (materialVideoFiles.length > 0) {
+                <div class="selected-image-list">
+                  @for (file of materialVideoFiles; track $index) {
+                    <div class="selected-image">
+                      <span class="selected-image-name">
+                        <i class="fa-solid fa-video"></i>
+                        {{ file.name }}
+                      </span>
+                      <button
+                        type="button"
+                        class="remove-image-btn"
+                        (click)="removeVideo($index)"
+                      >
+                        移除
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+          </div>
+            </div>
+          </div>
+        <!--收據-->
         <div class="section-title">
           <span>2</span>
           捐贈收據
@@ -216,9 +211,7 @@
             </div>
           </div>
         }
-        <!-- =================================================
-             感謝狀
-        ================================================= -->
+        <!-- 感謝狀-->
         <div class="section-title">
           <span>3</span>
           感謝狀
@@ -243,9 +236,7 @@
             </label>
           </div>
         </div>
-        <!-- =================================================
-             其他資訊
-        ================================================= -->
+        <!-- 其他資訊 -->
         <div class="section-title">
           <span>4</span>
           其他資訊
@@ -257,12 +248,10 @@
           <textarea name="note" [(ngModel)]="note" placeholder="如果有其他需要說明的事項，可以填寫在這裡" (input)="autoResize($event)">
           </textarea>
         </div>
-        <!-- =================================================
-             注意事項
-        ================================================= -->
+        <!-- 注意事項 -->
         <div class="notice">
           <strong>
-            📦 物資寄送提醒
+            <i class="fa-solid fa-box"></i> 物資寄送提醒
           </strong>
           <p>
             為避免物資誤送或與目前需求不符，
@@ -272,9 +261,7 @@
             請勿在尚未確認前直接將物資寄送至受助單位。
           </p>
         </div>
-        <!-- =================================================
-             確認按鈕
-        ================================================= -->
+        <!-- 確認按鈕-->
         <div class="form-buttons">
            <button type="button" class="cancel-button" (click)="cancelForm()">
             取消
@@ -285,10 +272,7 @@
         </div>
       </form>
     }
-    <!-- =================================================
-         捐贈成功頁面
-         ⭐ 只有 submitted = true 才會出現
-    ================================================ -->
+    <!-- 捐贈成功頁面只有 submitted = true 才會出現-->
     @if (submitted) {
       <div class="success-page">
         <!-- 成功圖示 -->
@@ -301,12 +285,10 @@
         <p class="success-text">
           感謝您的愛心，以下為本次捐贈的接收資訊。
         </p>
-        <!-- =================================================
-             接收地址
-        ================================================= -->
+        <!-- 接收地址-->
         <div class="address-box">
           <h2>
-            📦 物資接收資訊
+            <i class="fa-solid fa-box"></i> 物資接收資訊
           </h2>
           <div class="address-item">
             <span>
@@ -328,7 +310,7 @@
         <!-- 寄送注意事項 -->
         <div class="address-notice">
           <strong>
-            ⚠️ 寄送注意事項
+            <i class="fa-solid fa-exclamation"></i>寄送注意事項
           </strong>
           <p>
             請依照以上指定地址寄送物資，
@@ -364,12 +346,12 @@
           </p>
         </div>
         <!--捐贈完成證明
-        ⭐ 只有「需要收據」或「需要感謝狀」
+         只有「需要收據」或「需要感謝狀」
                 才會顯示-->
         @if (needProofUpload) {
           <div class="proof-upload">
             <h2>
-              📎 上傳捐贈完成證明
+            <span class="material-symbols-outlined" aria-hidden="true">attach_file</span> 上傳捐贈完成證明
             </h2>
             <p>
               @if (needReceipt === 'yes') {
@@ -397,12 +379,9 @@
             }
           </div>
         }
-        <!-- =================================================
-             ⭐ 完成捐贈
-
+        <!-- 完成捐贈
              這個按鈕現在一定只會在 submitted
-             成功頁面出現
-        ================================================= -->
+             成功頁面出現-->
         <div class="success-buttons">
           <button type="button" class="back-button" (click)="goToDisasterOpen()">
             完成捐贈，返回災害救助

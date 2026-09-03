@@ -221,7 +221,7 @@ return;
 const file = input.files[0];
 
 // 檢查檔案大小：5MB
-if (file.size > 5 * 1024 * 1024) {
+if (file.size > 100 * 1024 * 1024) {
 alert('影片大小不能超過 5MB');
 input.value = '';
 return;
@@ -240,10 +240,11 @@ alert('最多只能上傳 5 個照片或影片');
 input.value = '';
 return;
 }
-
 this.materialVideoFiles.push(file);
-
 console.log('目前影片：', this.materialVideoFiles);
 }
 
+removeVideo(index: number): void {
+  this.materialVideoFiles.splice(index, 1);
+}
 }
