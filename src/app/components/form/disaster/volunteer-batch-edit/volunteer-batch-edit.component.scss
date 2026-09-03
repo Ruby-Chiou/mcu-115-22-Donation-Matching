@@ -10,42 +10,62 @@ h1 {
   color: var(--color-brand-primary);
 }
 
+/*批次編輯標題*/
 .batch-edit-header {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
-/* 修改 .info-tag 及其子元素 */
+/* 批次編輯上方操作按鈕 */
+.edit-top-button-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-top-button-area button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.edit-top-button-area button:hover {
+  opacity: 0.85;
+}
+
 .info-tag {
   display: inline-flex;
-  align-items: center; /* 確保內部元件垂直置中 */
+  align-items: center;
   justify-content: center;
   background-color: #f0f4f9;
   border: 1px solid #d0e1f9;
   border-radius: 8px;
   padding: 8px 16px;
   gap: 8px;
+  line-height: 1;
 }
 
 .info-label {
-  font-size: 19px;
+  font-size: 15px; /* 原為 18px，調小讓文字「需求編號」變小 */
   color: #5f6368;
   font-weight: 500;
-  line-height: 1; /* 保留 line-height: 1 */
+  line-height: 1;
 }
 
 .info-value {
-  font-size: 19px;
+  font-size: 18px; /* 原為 17px，可維持或微調放大編號 */
   color: var(--color-brand-primary);
   font-weight: 700;
   font-family: monospace, sans-serif;
   letter-spacing: 0.5px;
   line-height: 1;
-
-  /* 💡 新增這行：微調數字向上提升 1 px，達到視覺完美對齊 */
-  transform: translateY(-1px);
 }
 
 /* =========================
@@ -351,48 +371,6 @@ textarea {
 }
 
 /* =========================
-   按鈕區（修正：增加 margin-bottom 推開 Footer）
-========================= */
-
-.button-area {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 25px;
-  margin-bottom: 30px; /* 👈 新增下邊距，防止按鈕被 Footer 擋住 */
-}
-
-.button-area button {
-  padding: 8px 18px;
-  border-radius: 15px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-/* 儲存全部修改 */
-.save-btn {
-  background-color: var(--color-brand-primary);
-  color: white;
-}
-
-/* 取消 */
-.back-btn {
-  background-color: #64b5f6;
-  color: #0d47a1;
-}
-
-/* hover */
-.save-btn:hover {
-  opacity: 0.85;
-}
-
-.back-btn:hover {
-  background-color: #42a5f5;
-}
-
-/* =========================
    錯誤與必填提示
 ========================= */
 
@@ -471,4 +449,41 @@ hr {
   font-size: 14px;
   font-weight: normal;
   white-space: normal;
+}
+/*按鈕區*/
+.button-area {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+  margin-bottom: 30px;
+}
+
+.button-area button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.save-btn {
+  background-color: var(--color-brand-primary);
+  color: white;
+}
+
+.back-btn {
+  background-color: #64b5f6;
+  color: #0d47a1;
+}
+
+.save-btn:hover {
+  opacity: 0.85;
+}
+
+.back-btn:hover {
+  background-color: #42a5f5;
 }

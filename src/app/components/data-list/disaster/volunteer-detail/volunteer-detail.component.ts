@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { VolunteerDeleteComponent } from '../../modal/volunteer-delete/volunteer-delete.component';
-import {VolunteerDemandService} from '../../../core/services/volunteer-demand.service';
-import {  VolunteerDemand } from '../../../models/agency/vdemand';
+import { VolunteerDeleteComponent } from '../../../modal/volunteer-delete/volunteer-delete.component';
+import {VolunteerDemandService} from '../../../../core/services/volunteer-demand.service';
+import {  VolunteerDemand } from '../../../../models/agency/vdemand';
 
 @Component({
   selector: 'app-volunteer-detail',

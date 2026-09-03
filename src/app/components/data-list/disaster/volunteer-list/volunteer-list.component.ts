@@ -2,15 +2,17 @@ import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { VolunteerDeleteComponent } from '../../modal/volunteer-delete/volunteer-delete.component';
-import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
-import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../models/agency/vdemand';
-import { PaginationComponent } from '../../pagination/pagination.component';
-import { VolunteerSearchBarComponent } from '../../search-bar/volunteer-search-bar/volunteer-search-bar.component';
-import { VolunteerSortBarComponent, SortType } from '../../sort-bar/volunteer-sort-bar/volunteer-sort-bar.component';
-import { VolunteerFilterComponent, VolunteerFilterState } from '../../filter/volunteer-filter/volunteer-filter.component';
-import { VolunteerOffShelfComponent } from '../../modal/volunteer-off-shelf/volunteer-off-shelf.component';
-import { VolunteerOnShelfComponent } from '../../modal/volunteer-on-shelf/volunteer-on-shelf.component';
+import { VolunteerDeleteComponent } from '../../../modal/volunteer-delete/volunteer-delete.component';
+import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/vdemand';
+import { PaginationComponent } from '../../../pagination/pagination.component';
+import { VolunteerSearchBarComponent } from '../../../search-bar/volunteer-search-bar/volunteer-search-bar.component';
+import { VolunteerSortBarComponent, SortType } from '../../../sort-bar/volunteer-sort-bar/volunteer-sort-bar.component';
+import { VolunteerFilterComponent, VolunteerFilterState } from '../../../filter/volunteer-filter/volunteer-filter.component';
+import { VolunteerOffShelfComponent } from '../../../modal/volunteer-off-shelf/volunteer-off-shelf.component';
+import { VolunteerOnShelfComponent } from '../../../modal/volunteer-on-shelf/volunteer-on-shelf.component';
+import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
+
 
 @Component({
   selector: 'app-volunteer-list',
@@ -25,7 +27,8 @@ import { VolunteerOnShelfComponent } from '../../modal/volunteer-on-shelf/volunt
     VolunteerSortBarComponent,
     VolunteerFilterComponent,
     VolunteerOffShelfComponent,
-    VolunteerOnShelfComponent
+    VolunteerOnShelfComponent,
+    SupplyLoadingComponent
     ],
   templateUrl: './volunteer-list.component.html',
   styleUrl: './volunteer-list.component.scss',
@@ -55,6 +58,7 @@ export class VolunteerListComponent {
     })[] = [];
 
   selectAll = false;
+  isLoading = false;
   isRestoringScroll = false;
   // 搜尋
   searchTerm = '';
@@ -184,43 +188,49 @@ typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資�
     this.saveListPosition();
   }
   // 讀取需求
-  loadDemands() {
+ loadDemands() {
+  this.isLoading = true;
+
   const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
     上架: '已上架',
     隱藏: '隱藏中',
     下架: '已下架',
   };
 
-  this.demands = this.VolunteerDemandService.getDemands().map((item) => {
-    return {
-      ...item,
+  setTimeout(() => {
+    this.demands = this.VolunteerDemandService.getDemands().map((item) => {
+      return {
+        ...item,
 
-      selected: false,
+        selected: false,
 
-      displayStatus: displayStatus[item.status],
+        displayStatus: displayStatus[item.status],
 
-      displayCreatedAt:
-        item.status === '隱藏'
-          ? '尚未發布'
-          : item.createdAt
-            ? new Date(item.createdAt).toLocaleDateString('zh-TW')
-            : '尚未發布',
+        displayCreatedAt:
+          item.status === '隱藏'
+            ? '尚未發布'
+            : item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString('zh-TW')
+              : '尚未發布',
 
-      displayPublishedAt:
-        item.publishedAt
-          ? new Date(item.publishedAt).toLocaleDateString('zh-TW')
-          : '尚未上架',
+        displayPublishedAt:
+          item.publishedAt
+            ? new Date(item.publishedAt).toLocaleDateString('zh-TW')
+            : '尚未上架',
 
-      displayOffShelfAt:
-        item.expectedOffShelfAt
-          ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW')
-          : '—',
+        displayOffShelfAt:
+          item.expectedOffShelfAt
+            ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW')
+            : '—',
 
-      category: item.type ?? '其他',
-    };
-  });
+        category: item.type ?? '其他',
+      };
+    });
 
-  this.applyFilters(false);
+    this.applyFilters(false);
+
+    this.isLoading = false;
+  }, 500);
 }
   // 搜尋
     onSearchChange(value: string) {

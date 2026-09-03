@@ -114,21 +114,21 @@ export const routes: Routes = [
   // 4.6 災害需求志工管理區
   {
     path: 'agency/volunteer-form',
-    loadComponent: () => import('./components/form/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
+    loadComponent: () => import('./components/form/disaster/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
   },
   {
     path: 'agency/volunteer-edit/:id',
-    loadComponent: () => import('./components/form/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
+    loadComponent: () => import('./components/form/disaster/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
   },
   {
     path: 'agency/volunteer-detail/:id',
     loadComponent: () =>
-      import('./components/data-list/volunteer-detail/volunteer-detail.component').then((m) => m.VolunteerDetailComponent),
+      import('./components/data-list/disaster/volunteer-detail/volunteer-detail.component').then((m) => m.VolunteerDetailComponent),
   },
   {
     path: 'agency/volunteer-batch-edit',
     loadComponent: () =>
-      import('./components/form/volunteer-batch-edit/volunteer-batch-edit.component').then((m) => m.VolunteerBatchEditComponent),
+      import('./components/form/disaster/volunteer-batch-edit/volunteer-batch-edit.component').then((m) => m.VolunteerBatchEditComponent),
   },
 
   // 5. 系統後台模組 (管理員端)

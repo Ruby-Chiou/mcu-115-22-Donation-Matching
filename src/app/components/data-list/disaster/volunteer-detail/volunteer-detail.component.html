@@ -1,12 +1,26 @@
 <div class="container">
   <h1>志工需求詳細資料</h1>
-
-  <div class="detail-header-info" *ngIf="demand">
-    <div class="info-tag">
-      <span class="info-label">需求編號</span>
-      <span class="info-value">C{{ demand.id }}</span>
-    </div>
+  <div class="detail-header-info">
+  <!-- 左邊：需求編號 -->
+  <div class="info-tag">
+    <span class="info-label">需求編號</span>
+    <span class="info-value">{{ demand?.id }}</span>
   </div>
+  <!-- 右邊：按鈕 -->
+  <div class="button-area">
+    <button class="back-btn" (click)="goBack()">返回</button>
+    <button
+      class="edit-btn"
+      [routerLink]="['/agency/volunteer-edit', demand?.id]"
+      [queryParams]="{ from: 'detail', number: getDeleteIds() }"
+    >
+      編輯
+    </button>
+    <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
+  </div>
+</div>
+
+<div class="detail-table" *ngIf="demand">
   <div class="detail-table" *ngIf="demand">
     <!-- 創建日期 -->
     <div class="detail-row">
@@ -104,7 +118,6 @@
     <button class="delete-btn" (click)="openDeleteModal()">刪除</button>
   </div>
 </div>
-
 <app-volunteer-delete
   *ngIf="showDeleteModal"
   [demandIds]="getDeleteIds()"

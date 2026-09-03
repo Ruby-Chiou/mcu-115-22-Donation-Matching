@@ -9,42 +9,79 @@ h1 {
   color: var(--color-brand-primary);
 }
 
-.batch-edit-header {
+/*編輯頁需求編號*/
+.edit-header-info {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
-/* 修改 .info-tag 及其子元素 */
+/* 編輯頁上方操作按鈕 */
+.edit-top-button-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-top-button-area button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.edit-top-button-area button:hover {
+  opacity: 0.85;
+}
+/*按鈕顏色*/
+.save-btn {
+  background-color: var(--color-brand-primary);
+  color: white;
+}
+
+.back-btn {
+  background-color: #64b5f6;
+  color: #0d47a1;
+}
+
+.back-btn:hover {
+  background-color: #42a5f5;
+}
+
+.button-area button:hover {
+  opacity: 0.85;
+}
 .info-tag {
   display: inline-flex;
-  align-items: center; /* 確保內部元件垂直置中 */
+  align-items: center;
   justify-content: center;
   background-color: #f0f4f9;
   border: 1px solid #d0e1f9;
   border-radius: 8px;
   padding: 8px 16px;
   gap: 8px;
+  line-height: 1;
 }
 
 .info-label {
-  font-size: 19px;
+  font-size: 15px;
   color: #5f6368;
   font-weight: 500;
-  line-height: 1; /* 保留 line-height: 1 */
+  line-height: 1;
 }
 
 .info-value {
-  font-size: 19px;
+  font-size: 15px;
   color: var(--color-brand-primary);
   font-weight: 700;
   font-family: monospace, sans-serif;
   letter-spacing: 0.5px;
   line-height: 1;
-
-  /* 💡 新增這行：微調數字向上提升 1 px，達到視覺完美對齊 */
-  transform: translateY(-1px);
 }
 
 .form-label {
@@ -53,13 +90,10 @@ h1 {
   border-radius: 15px;
   padding: 30px;
 }
-
-
 /* 每一個欄位 */
 .form-group {
   margin-bottom: 45px;
 }
-
 
 /* 標題 */
 .form-group label {
@@ -249,53 +283,33 @@ h1 {
 ========================= */
 
 .form-actions {
+ width: 100%;
   display: flex;
   justify-content: flex-end;
-  align-items: center;
+  gap: 10px;
+  margin: 25px 0;
 
-  gap: 15px;
-
-  padding: 35px 40px 20px;
-
-  background-color: white;
 }
-
+.form-actions button {
+  padding: 8px 18px ;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
 
 /* 取消 */
 .cancel-btn {
-  background-color: #65b8ed;
-  color: white;
-
-  border: none;
-  border-radius: 30px;
-
-  padding: 14px 28px;
-
-  font-size: 20px;
-  font-weight: bold;
-
-  cursor: pointer;
-
-  transition: 0.2s;
+  background-color: #64b5f6;
+  color: #0d47a1;
 }
-
 
 /* 發布需求 */
 .publish-btn {
-  background-color: #0868c7;
+  background-color: var(--color-brand-primary);
   color: white;
-
-  border: none;
-  border-radius: 30px;
-
-  padding: 14px 28px;
-
-  font-size: 20px;
-  font-weight: bold;
-
-  cursor: pointer;
-
-  transition: 0.2s;
 }
 
 
@@ -469,22 +483,6 @@ h1 {
   background: #188647;
   box-shadow: 0 5px 12px rgba(31, 157, 85, 0.2);
   transform: translateY(-1px);
-}
-
-@keyframes cancel-modal-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes cancel-modal-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 /* 未填寫必填欄位 */

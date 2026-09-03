@@ -4,11 +4,12 @@
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   font-size: 24px;
   font-weight: 600;
   color: var(--color-brand-primary);
 }
+
 .detail-header-info {
   display: flex;
   align-items: center;
@@ -43,6 +44,7 @@ h1 {
   letter-spacing: 0.5px;
   line-height: 1; /* 👈 確保 label 與 value 居中對齊 */
 }
+
 /* 詳細資料表 */
 .detail-table {
   width: 100%;
@@ -80,25 +82,44 @@ h1 {
   white-space: pre-wrap;
 }
 
-/* 按鈕區 */
+/* 需求物欄位 */
+.item-detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* 需求物名稱 */
+.detail-item-name {
+  font-size: 16px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 .button-area {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 25px;
-  margin-bottom: 30px; /* 👈 新增這行：將按鈕向上推開，避免被 Footer 遮擋 */
+  margin-bottom: 0;
+}
+
+.detail-header-info .button-area {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .back-btn,
 .edit-btn,
 .delete-btn {
-  padding: 14px 28px;
-  border-radius: 30px;
+  padding: 8px 18px;
+  border-radius: 15px;
   border: none;
   cursor: pointer;
   color: white;
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .back-btn {
@@ -152,96 +173,76 @@ h1 {
 }
 
 /* 緊急優先度顏色 */
+.priority-detail {
+  white-space: normal;
+}
+
 .priority-detail.normal {
   color: #333333;
-  font-weight: 500;
 }
 
 .priority-detail.urgent {
   color: #f57c00;
-  font-weight: 500;
 }
 
 .priority-detail.very-urgent {
   color: #d32f2f;
-  font-weight: 500;
 }
 
 /* =========================
-   刪除確認 Modal 樣式（完全比照新增/編輯頁）
-========================= */
+   物資示意圖片
+   ========================= */
 
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+.image-detail-content {
   display: flex;
+  align-items: flex-start;
+}
+
+.image-name-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  z-index: 999;
+  gap: 10px;
 }
 
-.modal-box {
-  background-color: #ffffff;
-  width: 420px;
-  padding: 35px 30px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+.image-name-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
-  h2 {
-    margin: 0 0 15px 0;
-    color: var(--color-brand-primary, #0056b3);
-    font-size: 24px;
-    font-weight: 600;
-  }
+  padding: 7px 12px;
 
-  p {
-    margin: 0 0 25px 0;
-    font-size: 16px;
-    color: #333333;
-  }
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+
+  background-color: #f0f7ff;
+
+  color: #1565c0;
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+.image-name-btn:hover {
+  background-color: #e3f2fd;
+  border-color: #90caf9;
+}
 
-  button {
-    min-width: 100px;
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: none;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    color: #ffffff;
-    transition: opacity 0.2s;
+.image-name-btn i {
+  font-size: 14px;
+}
 
-    &:hover {
-      opacity: 0.9;
-    }
-  }
+/* =========================
+   聯絡時間
+   ========================= */
 
-  .cancel-btn {
-    background-color: #64b5f6;
-    color: #1565c0;
-
-    &:hover {
-      background-color: #42a5f5;
-    }
-  }
-
-  .confirm-btn {
-    background-color: #d32f2f;
-    color: white;
-
-    &:hover {
-      background-color: #b71c1c;
-    }
-  }
+.contact-time-detail {
+  white-space: normal;
+  line-height: 1.8;
 }

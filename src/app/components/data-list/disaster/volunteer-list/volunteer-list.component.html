@@ -1,3 +1,7 @@
+<div class="container">
+  <!-- 資料載入中 -->
+  <app-supply-loading *ngIf="isLoading"></app-supply-loading>
+  <ng-container *ngIf="!isLoading">
 <div class="volunteer-section">
   <h1>志工需求列表</h1>
   <!-- 新增志工需求 -->
@@ -141,7 +145,7 @@
     (pageChange)="goToPage($event)"
   ></app-pagination>
 </div>
-
+</ng-container>
 <app-volunteer-delete
   *ngIf="showDeleteModal"
   [demandIds]="deleteIds"

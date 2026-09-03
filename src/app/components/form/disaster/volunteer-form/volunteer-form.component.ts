@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
-import { VolunteerDemand } from '../../../models/agency/vdemand';
+import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+import { VolunteerDemand } from '../../../../models/agency/vdemand';
 
 @Component({
   selector: 'app-volunteer-form',

@@ -1,19 +1,19 @@
 <div class="container">
   <h1>批次編輯志工急難需求</h1>
-
-  <!-- 多筆卡片逐一編輯 -->
-  <div
-    class="form-box"
-    [ngClass]="i % 2 === 0 ? 'light-box' : 'dark-box'"
-    *ngFor="let demand of editDemands; let i = index"
-  >
-    <div class="batch-edit-header">
-      <div class="info-tag" *ngIf="demand.id">
-        <span class="info-label">需求編號</span>
-        <span class="info-value">C{{ demand.id }}</span>
+  <ng-container *ngFor="let demand of editDemands; let i = index">
+  <div class="batch-edit-header">
+    <div class="info-tag">
+      <span class="info-label">需求編號</span>
+      <span class="info-value">C{{ demand.id }}</span>
+    </div>
+   <!-- 上方操作按鈕 -->
+      <div class="edit-top-button-area">
+        <button type="button" class="back-btn" (click)="cancel()">取消</button>
+        <button type="button" class="save-btn" (click)="saveAll()">儲存全部修改</button>
       </div>
     </div>
-
+ <!-- 藍色大框框 -->
+    <div class="form-box" [ngClass]="i % 2 === 0 ? 'light-box' : 'dark-box'">
     <!-- 志工需求類型 -->
     <label class="label-row">
       志工需求類型
@@ -192,13 +192,12 @@
       placeholder="請輸入其他說明"
       [(ngModel)]="demand.note"
     ></textarea>
-
     <hr />
   </div>
-
+</ng-container>
   <!-- 操作按鈕 -->
   <div class="button-area">
     <button type="button" class="back-btn" (click)="cancel()">取消</button>
     <button type="button" class="save-btn" (click)="saveAll()">儲存全部修改</button>
   </div>
-</div>
+

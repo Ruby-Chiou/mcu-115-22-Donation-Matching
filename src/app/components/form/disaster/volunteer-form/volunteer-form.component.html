@@ -1,13 +1,19 @@
 <div class="form-container">
   <h1>{{ isEditMode ? '編輯志工需求內容' : '新增志工需求' }}</h1>
-  <!-- 志工需求類型 -->
-  <div class="form-label">
-    <div class="batch-edit-header">
-      <div class="info-tag" *ngIf="demand.id">
+
+    <!-- 編輯模式：需求編號 + 上方操作按鈕 -->
+    <div class="edit-header-info" *ngIf="isEditMode && demand">
+    <div class="info-tag">
         <span class="info-label">需求編號</span>
         <span class="info-value">C{{ demand.id }}</span>
       </div>
+        <div class="edit-top-button-area">
+      <button class="back-btn" (click)="onCancel()">取消</button>
+      <button class="save-btn" (click)="onPublish()">儲存</button>
     </div>
+  </div>
+
+<div class="form-label">
     <div class="form-group">
       <label>志工需求類型 <span>*</span></label>
       <select [(ngModel)]="demand.type"[class.invalid-field]="isInvalid('type')">
@@ -193,6 +199,7 @@
   </div>
 </div>
 
+
 <div
   class="success-modal-backdrop"
   *ngIf="showSuccessModal">
@@ -226,9 +233,8 @@
     {{ isEditMode ? '儲存' : '發布需求' }}
   </button>
 </div>
-
-<div
-  class="cancel-modal-backdrop"
+</div>
+<div class="cancel-modal-backdrop"
   *ngIf="showCancelModal"
   role="presentation"
   (click)="closeCancelModal()">
@@ -255,3 +261,4 @@
     </div>
   </section>
 </div>
+
