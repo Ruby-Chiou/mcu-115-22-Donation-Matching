@@ -112,7 +112,9 @@ export class DonorDisasterCardListComponent {
 
       const locationMatch =
         filters.volunteerLocation.length === 0 ||
-        filters.volunteerLocation.includes(volunteer.location);
+        filters.volunteerLocation.some(
+          location => volunteer.location.includes(location)
+        );
 
       return typeMatch && locationMatch;
     });

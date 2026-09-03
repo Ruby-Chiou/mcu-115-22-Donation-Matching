@@ -8,10 +8,34 @@
          物資需求
     ========================== -->
     @if (type === 'material') {
-     <div class="card-image">
-      <img
-        [src]="demand?.image?.[currentImageIndex] || '預設圖片網址'"
-        [alt]="demand?.item ?? '物資需求'">
+     <div class="image-wrapper">
+      <!-- 左箭頭 -->
+      @if ((demand?.image?.length ?? 0) > 1) {
+        <button
+          type="button"
+          class="image-arrow previous"
+          (click)="previousImage($event)">
+          ‹
+        </button>
+      }
+
+      <!-- 圖片 -->
+      <div class="card-image">
+        <img
+          [src]="demand?.image?.[currentImageIndex] || '預設圖片網址'"
+          [alt]="demand?.item ?? '物資需求'">
+      </div>
+
+      <!-- 右箭頭 -->
+      @if ((demand?.image?.length ?? 0) > 1) {
+        <button
+          type="button"
+          class="image-arrow next"
+          (click)="nextImage($event)">
+           ›
+        </button>
+      }
+
     </div>
       <h2 class="material-name">
         {{ demand?.item }}

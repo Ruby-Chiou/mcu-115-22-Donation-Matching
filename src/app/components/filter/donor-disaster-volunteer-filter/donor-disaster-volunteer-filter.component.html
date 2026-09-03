@@ -1,0 +1,66 @@
+<div class="volunteer-filter">
+  <!-- 志工類型 -->
+  <div class="filter-group">
+    <h3>
+      依服務類型
+    </h3>
+    <div class="pill-list">
+      @for (
+        option of volunteerTypeOptions;
+        track option
+      ) {
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="filters.volunteerType.includes(option)"
+          (click)="toggleVolunteerType(option)">
+          {{ option }}
+      </button>
+      }
+    </div>
+  </div>
+  <!-- 志工地點 -->
+  <div class="filter-group">
+    <h3>
+      依服務地點
+    </h3>
+    <div class="pill-list">
+      @for (
+        option of volunteerLocationOptions;
+        track option
+      ) {
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="filters.volunteerLocation.includes(option) "
+          (click)="toggleVolunteerLocation(option)">
+          {{ option }}
+        </button>
+      }
+    </div>
+  </div>
+  <!-- 剩餘名額 -->
+  <div class="filter-group">
+    <h3>
+      剩餘名額
+    </h3>
+    <div class="pill-list">
+      <button
+        type="button"
+        class="pill-btn"
+        [class.active]="filters.hasRemaining"
+        (click)="toggleRemaining()">
+        尚有剩餘名額
+      </button>
+    </div>
+  </div>
+  <!-- 重置 -->
+  <div class="filter-footer">
+    <button
+      type="button"
+      class="reset-btn"
+      (click)="resetFilters()">
+      重置篩選
+    </button>
+  </div>
+</div>

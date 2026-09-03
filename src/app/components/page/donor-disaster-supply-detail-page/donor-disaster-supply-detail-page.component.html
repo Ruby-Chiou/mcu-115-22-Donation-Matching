@@ -17,10 +17,11 @@ class="back-button"
   ========================== -->
   <div class="detail-main">
 <!-- 左邊：物資圖片 -->
+<!-- 左邊：物資圖片 -->
 <div class="detail-image">
-  <img
-    [src]="demand.image?.[0] || 'https://api.fnkr.net/testimg/400x400/DDDDDD/999999/?text=物資圖片'"
-    [alt]="demand.item">
+  <app-supply-detail-carousel
+    [images]="demand.image ?? []">
+  </app-supply-detail-carousel>
 </div>
 <!-- 右邊：物資資訊 -->
 <div class="detail-info">
@@ -217,22 +218,25 @@ class="back-button"
       </div>
     </div>
     <!-- 自訂狀態 -->
-    @if (demand.customConditions.length > 0) {
-      <div class="custom-condition">
+
+  </div>
+  @if (demand.customConditions.length > 0) {
+      <div class="organization-item custom-condition">
         <span>
-          其他：
+          其他
         </span>
-        @for (
-          condition of demand.customConditions;
-          track condition
-        ) {
-          <span>
-            {{ condition }}
-          </span>
-        }
+        <div class="condition-content">
+          @for (
+            condition of demand.customConditions;
+            track condition
+          ) {
+            <span class="condition-item">
+              {{ condition }}
+            </span>
+          }
+        </div>
       </div>
     }
-  </div>
   <!-- 備註 -->
   @if (demand.note) {
     <div class="organization-item">

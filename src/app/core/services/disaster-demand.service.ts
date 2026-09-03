@@ -71,7 +71,11 @@ export class DisasterDemandService {
       contactTimeAfternoon: true,
       contactTimeEvening: false,
       note: '食品請確認保存期限及外包裝完整。',
-      image: [],
+      image: [
+  'https://images.unsplash.com/photo-1548839140-29a749e1cf4d',
+  'https://images.unsplash.com/photo-1523362628745-0c100150b504',
+  'https://images.unsplash.com/photo-1550507992-eb63ffee0847'
+],
       imageFileNames: [],
       createdAt: '2026-08-21T10:30:00',
       publishedAt: '2026-08-21T10:30:00',

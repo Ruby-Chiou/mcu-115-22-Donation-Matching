@@ -71,25 +71,24 @@ export class DonorDisasterCardComponent {
 
   currentImageIndex = 0;
 
-  private imageInterval?: ReturnType<typeof setInterval>;
 
-  ngOnInit(): void {
-    this.imageInterval = setInterval(() => {
+  previousImage(event: Event): void {
+    event.stopPropagation();
 
-      // ⭐ 你的 Service 欄位叫 image，不是 images
-      const images = this.demand?.image ?? [];
+    if (!this.demand?.image?.length) return;
 
-      if (images.length > 1) {
-        this.currentImageIndex =
-          (this.currentImageIndex + 1) % images.length;
-      }
-
-    }, 3000);
+    this.currentImageIndex =
+      this.currentImageIndex === 0
+        ? this.demand.image.length - 1
+        : this.currentImageIndex - 1;
   }
 
-  ngOnDestroy(): void {
-    if (this.imageInterval) {
-      clearInterval(this.imageInterval);
-    }
+  nextImage(event: Event): void {
+    event.stopPropagation();
+
+    if (!this.demand?.image?.length) return;
+
+    this.currentImageIndex =
+      (this.currentImageIndex + 1) % this.demand.image.length;
   }
 }

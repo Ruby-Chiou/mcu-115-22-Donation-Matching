@@ -1,93 +1,33 @@
-import { Component, inject, signal,OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DonorDisasterCardListComponent } from '../../data-list/donor-disaster-card-list/donor-disaster-card-list.component';
-import { DisasterControlService } from '../../../core/services/disaster-control.service';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DonorDisasterCardListComponent }from '../../data-list/donor-disaster-card-list/donor-disaster-card-list.component';
+import { DisasterControlService }from '../../../core/services/disaster-control.service';
+import { DisasterDemandService }from '../../../core/services/disaster-demand.service';
+import { DonorDisasterSupplyFilterComponent }from '../../filter/donor-disaster-supply-filter/donor-disaster-supply-filter.component';
+import { DonorDisasterVolunteerFilterComponent }from '../../filter/donor-disaster-volunteer-filter/donor-disaster-volunteer-filter.component';
 @Component({
   selector: 'app-donor-disaster-page',
-  imports: [DonorDisasterCardListComponent],
+  imports: [DonorDisasterCardListComponent,DonorDisasterSupplyFilterComponent,DonorDisasterVolunteerFilterComponent],
   templateUrl: './donor-disaster-page.component.html',
   styleUrl: './donor-disaster-page.component.scss',
 })
-
 export class DonorDisasterPageComponent implements OnInit {
+  showSupplyFilter = false;
+  showVolunteerFilter = false;
 
-  showFilterModal = false;
-  categoryOptions = [
-    '食物',
-    '衣物',
-    '醫療',
-    '嬰幼兒',
-    '生活用品',
-    '其他'
-  ];
-  priorityOptions = [
-    '普通',
-    '緊急',
-    '非常緊急'
-  ];
-  volunteerTypeOptions = [
-    '物資搬運',
-    '物資整理',
-    '環境清潔',
-    '災民陪伴'
-  ];
-  volunteerLocationOptions = [
-    '花蓮市',
-    '光復鄉'
-  ];
   materialFilters = {
-    // 類別
     category: [] as string[],
-    // 優先度
     priority: [] as string[],
-    // 是否只顯示有剩餘需求
     hasRemaining: false
   };
+  // =========================
+  // 志工篩選條件
+  // =========================
   volunteerFilters = {
-    // 服務類型
     volunteerType: [] as string[],
-    // 服務地點
     volunteerLocation: [] as string[],
-    // 是否只顯示有剩餘名額
     hasRemaining: false
   };
-  openFilterModal(): void {
-    this.showFilterModal = true;
-  }
-  closeFilterModal(): void {
-    this.showFilterModal = false;
-  }
-  toggleMaterialFilter(
-    type: 'category' | 'priority',
-    value: string
-  ): void {
-    const list = this.materialFilters[type];
-    const index = list.indexOf(value);
-    // 已經選擇 → 取消
-    if (index !== -1) {
-      list.splice(index, 1);
-    }
-    // 尚未選擇 → 加入
-    else {
-      list.push(value);
-    }
-  }
-  toggleVolunteerFilter(
-    type: 'volunteerType' | 'volunteerLocation',
-    value: string
-  ): void {
-    const list = this.volunteerFilters[type];
-    const index = list.indexOf(value);
-    // 已經選擇 → 取消
-    if (index !== -1) {
-      list.splice(index, 1);
-    }
-    // 尚未選擇 → 加入
-    else {
-      list.push(value);
-    }
-  }
   resetFilters(): void {
     // 目前在物資頁面
     if (this.activeType() === 'material') {
@@ -106,32 +46,19 @@ export class DonorDisasterPageComponent implements OnInit {
       };
     }
   }
-  applyFilters(): void {
-    if (this.activeType() === 'material') {
-      console.log(
-        '物資篩選條件：',
-        this.materialFilters
-      );
-    }
-    else {
-      console.log(
-        '志工篩選條件：',
-        this.volunteerFilters
-      );
-    }
-    // 關閉 Modal
-    this.showFilterModal = false;
-  }
   protected readonly activeType =
     signal<'material' | 'volunteer'>('material');
-  private disasterDemandService = inject(DisasterDemandService);
+  private disasterDemandService =
+    inject(DisasterDemandService);
   protected readonly disasterData =
     inject(DisasterControlService).data;
   protected readonly demands =
     this.disasterDemandService.getDemands();
-  private route = inject(ActivatedRoute);
+  private route =
+    inject(ActivatedRoute);
   ngOnInit(): void {
-    const section = this.route.snapshot.queryParamMap.get('section');
+    const section =
+      this.route.snapshot.queryParamMap.get('section');
     if (section === 'volunteer') {
       this.activeType.set('volunteer');
     }
@@ -152,4 +79,5 @@ export class DonorDisasterPageComponent implements OnInit {
         block: 'start',
       });
   }
+
 }
