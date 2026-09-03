@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
-import { DailyDemandService } from '../../../core/services/daily-demand.service';
+
+import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
+import { DailyDemandService } from '../../../../core/services/daily-demand.service';
 
 @Component({
   selector: 'app-supply-delete',

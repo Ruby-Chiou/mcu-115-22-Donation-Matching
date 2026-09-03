@@ -1,18 +1,20 @@
 import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { VolunteerDeleteComponent } from '../../../modal/volunteer-delete/volunteer-delete.component';
-import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
-import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/vdemand';
-import { PaginationComponent } from '../../../pagination/pagination.component';
-import { VolunteerSearchBarComponent } from '../../../search-bar/volunteer-search-bar/volunteer-search-bar.component';
-import { VolunteerSortBarComponent, SortType } from '../../../sort-bar/volunteer-sort-bar/volunteer-sort-bar.component';
-import { VolunteerFilterComponent, VolunteerFilterState } from '../../../filter/volunteer-filter/volunteer-filter.component';
-import { VolunteerOffShelfComponent } from '../../../modal/volunteer-off-shelf/volunteer-off-shelf.component';
-import { VolunteerOnShelfComponent } from '../../../modal/volunteer-on-shelf/volunteer-on-shelf.component';
-import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
 
+import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/volunteer-demand';
+
+import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
+import { VolunteerDeleteComponent } from '../../../modal/delete/volunteer-delete/volunteer-delete.component';
+import { PaginationComponent } from '../../../pagination/pagination.component';
+
+import { VolunteerSearchBarComponent } from '../../../search-bar/volunteer-search-bar/volunteer-search-bar.component';
+import { VolunteerFilterComponent, VolunteerFilterState } from '../../../filter/volunteer-filter/volunteer-filter.component';
+import { VolunteerSortBarComponent, SortType } from '../../../sort-bar/volunteer-sort-bar/volunteer-sort-bar.component';
+import { VolunteerOnShelfComponent } from '../../../modal/shelf/volunteer-on-shelf/volunteer-on-shelf.component';
+import { VolunteerOffShelfComponent } from '../../../modal/shelf/volunteer-off-shelf/volunteer-off-shelf.component';
 
 @Component({
   selector: 'app-volunteer-list',
@@ -28,34 +30,34 @@ import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-l
     VolunteerFilterComponent,
     VolunteerOffShelfComponent,
     VolunteerOnShelfComponent,
-    SupplyLoadingComponent
-    ],
+    SupplyLoadingComponent,
+  ],
   templateUrl: './volunteer-list.component.html',
   styleUrl: './volunteer-list.component.scss',
 })
 export class VolunteerListComponent {
-  demands: (VolunteerDemand& {
+  demands: (VolunteerDemand & {
     selected: boolean;
-        displayStatus: DisplayVolunteerStatus;
-        displayCreatedAt: string;
-        displayPublishedAt: string;
-        displayOffShelfAt: string;
-      })[] = [];
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  })[] = [];
 
-   filteredDemands: (VolunteerDemand & {
-      selected: boolean;
-      displayStatus: DisplayVolunteerStatus;
-      displayCreatedAt: string;
-      displayPublishedAt: string;
-      displayOffShelfAt: string;
-    })[] = [];
+  filteredDemands: (VolunteerDemand & {
+    selected: boolean;
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  })[] = [];
   pagedDemands: (VolunteerDemand & {
-      selected: boolean;
-      displayStatus: DisplayVolunteerStatus;
-      displayCreatedAt: string;
-      displayPublishedAt: string;
-      displayOffShelfAt: string;
-    })[] = [];
+    selected: boolean;
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  })[] = [];
 
   selectAll = false;
   isLoading = false;
@@ -82,26 +84,26 @@ export class VolunteerListComponent {
   deleteIds: number[] = [];
   deleteType: 'single' | 'batch' = 'single';
 
-   // 手動下架提示
-    showOffShelfWarning = false;
+  // 手動下架提示
+  showOffShelfWarning = false;
 
-    // 已下架無法重新上架提示
-    showOnShelfWarning = false;
+  // 已下架無法重新上架提示
+  showOnShelfWarning = false;
 
-    pendingOffShelfItem?: VolunteerDemand & {
-        selected: boolean;
-        displayStatus: DisplayVolunteerStatus;
-        displayCreatedAt: string;
-        displayPublishedAt: string;
-        displayOffShelfAt: string;
-    };
+  pendingOffShelfItem?: VolunteerDemand & {
+    selected: boolean;
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  };
   // 篩選選項
   statusOptions: DisplayVolunteerStatus[] = ['已上架', '隱藏中', '已下架'];
   priorityOptions: VolunteerDemand['priority'][] = ['普通', '緊急', '非常緊急'];
-typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資整理', '環境清潔', '醫療照護', '其他'];
+  typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資整理', '環境清潔', '醫療照護', '其他'];
   messageOptions = ['已回覆', '未回覆'];
 
-  selectedFilters:VolunteerFilterState = {
+  selectedFilters: VolunteerFilterState = {
     status: [],
     priority: [],
     lowRemaining: false,
@@ -115,7 +117,7 @@ typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資�
   ) {
     history.scrollRestoration = 'manual';
   }
- // 初始化
+  // 初始化
   ngOnInit() {
     const restoreListPosition = sessionStorage.getItem('restore-agency-disaster-list');
     if (restoreListPosition === 'true') {
@@ -188,78 +190,68 @@ typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資�
     this.saveListPosition();
   }
   // 讀取需求
- loadDemands() {
-  this.isLoading = true;
+  loadDemands() {
+    this.isLoading = true;
 
-  const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
-    上架: '已上架',
-    隱藏: '隱藏中',
-    下架: '已下架',
-  };
+    const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
+      上架: '已上架',
+      隱藏: '隱藏中',
+      下架: '已下架',
+    };
 
-  setTimeout(() => {
-    this.demands = this.VolunteerDemandService.getDemands().map((item) => {
-      return {
-        ...item,
+    setTimeout(() => {
+      this.demands = this.VolunteerDemandService.getDemands().map((item) => {
+        return {
+          ...item,
 
-        selected: false,
+          selected: false,
 
-        displayStatus: displayStatus[item.status],
+          displayStatus: displayStatus[item.status],
 
-        displayCreatedAt:
-          item.status === '隱藏'
-            ? '尚未發布'
-            : item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString('zh-TW')
-              : '尚未發布',
+          displayCreatedAt:
+            item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
 
-        displayPublishedAt:
-          item.publishedAt
-            ? new Date(item.publishedAt).toLocaleDateString('zh-TW')
-            : '尚未上架',
+          displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
 
-        displayOffShelfAt:
-          item.expectedOffShelfAt
-            ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW')
-            : '—',
+          displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
 
-        category: item.type ?? '其他',
-      };
-    });
-
-    this.applyFilters(false);
-
-    this.isLoading = false;
-  }, 500);
-}
-  // 搜尋
-    onSearchChange(value: string) {
-      this.searchTerm = value;
-      this.applyFilters();
-    }
-    // 排序
-    onSortChange(event: { selectedSort: SortType; sortAscending: boolean }) {
-      const scrollY = window.scrollY;
-      this.selectedSort = event.selectedSort;
-      this.sortAscending = event.sortAscending;
-      this.userHasSorted = true;
-      this.applySort();
-      setTimeout(() => {
-        window.scrollTo({
-          top: scrollY,
-          behavior: 'instant',
-        });
-      }, 0);
-    }
-    // 全選
-    toggleAll() {
-      this.pagedDemands.forEach((item) => {
-        item.selected = this.selectAll;
+          category: item.type ?? '其他',
+        };
       });
-    }
-    hasSelected() {
-      return this.filteredDemands.some((item) => item.selected);
-    }
+
+      this.applyFilters(false);
+
+      this.isLoading = false;
+    }, 500);
+  }
+  // 搜尋
+  onSearchChange(value: string) {
+    this.searchTerm = value;
+    this.applyFilters();
+  }
+  // 排序
+  onSortChange(event: { selectedSort: SortType; sortAscending: boolean }) {
+    const scrollY = window.scrollY;
+    this.selectedSort = event.selectedSort;
+    this.sortAscending = event.sortAscending;
+    this.userHasSorted = true;
+    this.applySort();
+    setTimeout(() => {
+      window.scrollTo({
+        top: scrollY,
+        behavior: 'instant',
+      });
+    }, 0);
+  }
+  // 全選
+  toggleAll() {
+    this.pagedDemands.forEach((item) => {
+      item.selected = this.selectAll;
+    });
+  }
+  hasSelected() {
+    return this.filteredDemands.some((item) => item.selected);
+  }
   // 批次編輯
   editSelected() {
     const selectedItems = this.filteredDemands.filter((item) => item.selected);
@@ -274,7 +266,7 @@ typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資�
   }
 
   // 篩選
-onFilterApply(filters: VolunteerFilterState) {
+  onFilterApply(filters: VolunteerFilterState) {
     this.selectedFilters = filters;
 
     this.applyFilters();
@@ -414,7 +406,6 @@ onFilterApply(filters: VolunteerFilterState) {
     this.updatePagination();
   }
 
-
   // 分頁
 
   updatePagination() {
@@ -464,57 +455,53 @@ onFilterApply(filters: VolunteerFilterState) {
     this.loadDemands();
   }
   // 修改狀態
-changeStatus(
-  item: VolunteerDemand & {
-        selected: boolean;
-        displayStatus: DisplayVolunteerStatus;
-        displayCreatedAt: string;
-        displayPublishedAt: string;
-        displayOffShelfAt: string;
-      },
-      event: Event
-    ) {
-  const select = event.target as HTMLSelectElement;
-  const newStatus = select.value as DisplayVolunteerStatus;
+  changeStatus(
+    item: VolunteerDemand & {
+      selected: boolean;
+      displayStatus: DisplayVolunteerStatus;
+      displayCreatedAt: string;
+      displayPublishedAt: string;
+      displayOffShelfAt: string;
+    },
+    event: Event
+  ) {
+    const select = event.target as HTMLSelectElement;
+    const newStatus = select.value as DisplayVolunteerStatus;
 
-  // 選擇「已下架」
-  if (newStatus === '已下架') {
-    const originalItem = this.VolunteerDemandService
-      .getDemands()
-      .find((demand) => demand.id === item.id);
-    // 暫存原本的顯示狀態
-    if (originalItem?.status === '上架') {
-      item.displayStatus = '已上架';
-    } else if (originalItem?.status === '隱藏') {
-      item.displayStatus = '隱藏中';
-    } else if (originalItem?.status === '下架') {
-      item.displayStatus = '已下架';
+    // 選擇「已下架」
+    if (newStatus === '已下架') {
+      const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+      // 暫存原本的顯示狀態
+      if (originalItem?.status === '上架') {
+        item.displayStatus = '已上架';
+      } else if (originalItem?.status === '隱藏') {
+        item.displayStatus = '隱藏中';
+      } else if (originalItem?.status === '下架') {
+        item.displayStatus = '已下架';
+      }
+      setTimeout(() => {
+        select.value = item.displayStatus;
+      });
+      this.pendingOffShelfItem = item;
+      this.showOffShelfWarning = true;
+      return;
     }
-    setTimeout(() => {
-      select.value = item.displayStatus;
-    });
-    this.pendingOffShelfItem = item;
-    this.showOffShelfWarning = true;
-    return;
+    // 選擇「已上架」或「隱藏中」
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+    // 已下架 → 禁止重新上架
+    if (newStatus === '已上架' && originalItem?.status === '下架') {
+      item.displayStatus = '已下架';
+      setTimeout(() => {
+        select.value = '已下架';
+      });
+      this.showOnShelfWarning = true;
+      return;
+    }
+    // 正常變更狀態
+    item.displayStatus = newStatus;
+    this.applyStatusChange(item);
   }
-  // 選擇「已上架」或「隱藏中」
-  const originalItem = this.VolunteerDemandService
-    .getDemands()
-    .find((demand) => demand.id === item.id);
-  // 已下架 → 禁止重新上架
-  if (newStatus === '已上架' && originalItem?.status === '下架') {
-    item.displayStatus = '已下架';
-    setTimeout(() => {
-      select.value = '已下架';
-    });
-    this.showOnShelfWarning = true;
-    return;
-  }
-  // 正常變更狀態
-  item.displayStatus = newStatus;
-  this.applyStatusChange(item);
-}
- // 確認手動下架
+  // 確認手動下架
   confirmManualOffShelf() {
     if (!this.pendingOffShelfItem) {
       return;
@@ -598,120 +585,120 @@ changeStatus(
     this.showOnShelfWarning = false;
   }
   // 實際處理狀態變更
-    private applyStatusChange(
-      item: VolunteerDemand & {
-        selected: boolean;
-        displayStatus: DisplayVolunteerStatus;
-        displayCreatedAt: string;
-        displayPublishedAt: string;
-        displayOffShelfAt: string;
-      }
-    ) {
-      // 取得原本儲存的資料
-      const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+  private applyStatusChange(
+    item: VolunteerDemand & {
+      selected: boolean;
+      displayStatus: DisplayVolunteerStatus;
+      displayCreatedAt: string;
+      displayPublishedAt: string;
+      displayOffShelfAt: string;
+    }
+  ) {
+    // 取得原本儲存的資料
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
 
-      const originalStatus = originalItem?.status;
+    const originalStatus = originalItem?.status;
 
-      let status: VolunteerStatus;
+    let status: VolunteerStatus;
 
-      switch (item.displayStatus) {
-        case '已上架':
-          status = '上架';
-          break;
+    switch (item.displayStatus) {
+      case '已上架':
+        status = '上架';
+        break;
 
-        case '隱藏中':
-          status = '隱藏';
-          break;
+      case '隱藏中':
+        status = '隱藏';
+        break;
 
-        default:
-          status = '上架';
-      }
-
-      const now = new Date();
-
-      // 上架
-      if (status === '上架') {
-        // 手動下架後禁止重新上架
-        if (originalStatus === '下架') {
-          item.displayStatus = '已下架';
-
-          this.showOnShelfWarning = true;
-
-          return;
-        }
-
-        // 原本不是上架
-        // → 現在重新上架
-        if (originalStatus !== '上架') {
-          item.publishedAt = now.toISOString();
-
-          // 建立日期只在建立時記錄
-          if (!item.createdAt) {
-            item.createdAt = now.toISOString();
-          }
-        }
-
-        // 原本就是上架
-        // → 保留原本上架日期
-        else if (originalItem?.publishedAt) {
-          item.publishedAt = originalItem.publishedAt;
-        }
-
-        // 重新計算預計下架日期
-        if (item.publishedAt) {
-          item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
-        }
-
-        item.status = '上架';
-
-        item.displayStatus = '已上架';
-
-        item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
-
-        item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
-      }
-
-      // 隱藏
-      else if (status === '隱藏') {
-        item.status = '隱藏';
-
-        // 隱藏後視為尚未上架
-        item.publishedAt = undefined;
-
-        item.expectedOffShelfAt = undefined;
-
-        item.displayStatus = '隱藏中';
-
-        item.displayPublishedAt = '尚未上架';
-
-        item.displayOffShelfAt = '—';
-      }
-
-      // 建立日期永遠保留
-      item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-      // 儲存
-      this.VolunteerDemandService.updateDemand(item);
+      default:
+        status = '上架';
     }
 
-    // 預計下架日期
-    calculateExpectedOffShelfDate(publishedDate: Date, priority: VolunteerDemand['priority']): string {
-      const offShelfDate = new Date(publishedDate);
+    const now = new Date();
 
-      switch (priority) {
-        case '普通':
-          offShelfDate.setDate(offShelfDate.getDate() + 30);
-          break;
+    // 上架
+    if (status === '上架') {
+      // 手動下架後禁止重新上架
+      if (originalStatus === '下架') {
+        item.displayStatus = '已下架';
 
-        case '緊急':
-          offShelfDate.setDate(offShelfDate.getDate() + 14);
-          break;
+        this.showOnShelfWarning = true;
 
-        case '非常緊急':
-          offShelfDate.setDate(offShelfDate.getDate() + 7);
-          break;
+        return;
       }
 
-      return offShelfDate.toISOString();
+      // 原本不是上架
+      // → 現在重新上架
+      if (originalStatus !== '上架') {
+        item.publishedAt = now.toISOString();
+
+        // 建立日期只在建立時記錄
+        if (!item.createdAt) {
+          item.createdAt = now.toISOString();
+        }
+      }
+
+      // 原本就是上架
+      // → 保留原本上架日期
+      else if (originalItem?.publishedAt) {
+        item.publishedAt = originalItem.publishedAt;
+      }
+
+      // 重新計算預計下架日期
+      if (item.publishedAt) {
+        item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+      }
+
+      item.status = '上架';
+
+      item.displayStatus = '已上架';
+
+      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+
+      item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
     }
+
+    // 隱藏
+    else if (status === '隱藏') {
+      item.status = '隱藏';
+
+      // 隱藏後視為尚未上架
+      item.publishedAt = undefined;
+
+      item.expectedOffShelfAt = undefined;
+
+      item.displayStatus = '隱藏中';
+
+      item.displayPublishedAt = '尚未上架';
+
+      item.displayOffShelfAt = '—';
+    }
+
+    // 建立日期永遠保留
+    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+
+    // 儲存
+    this.VolunteerDemandService.updateDemand(item);
+  }
+
+  // 預計下架日期
+  calculateExpectedOffShelfDate(publishedDate: Date, priority: VolunteerDemand['priority']): string {
+    const offShelfDate = new Date(publishedDate);
+
+    switch (priority) {
+      case '普通':
+        offShelfDate.setDate(offShelfDate.getDate() + 30);
+        break;
+
+      case '緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 14);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 7);
+        break;
+    }
+
+    return offShelfDate.toISOString();
+  }
 }

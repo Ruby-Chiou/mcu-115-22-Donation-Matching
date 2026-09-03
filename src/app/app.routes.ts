@@ -23,6 +23,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/daily/donor-daily-lobby/donor-daily-lobby.component').then((m) => m.DonorDailyLobbyComponent), // 日常捐助大廳
   },
   {
+    path: 'donor/daily/detail/:id',
+    loadComponent: () =>
+      import('./components/data-list/daily/donor-daily-detail/donor-daily-detail.component').then((m) => m.DonorDailyDetailComponent),
+  },
+  {
+    path: 'donor/daily/form/:id',
+    loadComponent: () => import('./components/form/donor-daily-form/donor-daily-form.component').then((m) => m.DonorDailyFormComponent),
+  },
+
+  {
     path: 'donor/disaster',
     loadComponent: () =>
       import('./features/disaster/donor-disaster-lobby/donor-disaster-lobby.component').then((m) => m.DonorDisasterLobbyComponent), // 災害救助大廳

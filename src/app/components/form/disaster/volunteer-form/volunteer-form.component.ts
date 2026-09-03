@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
-import { VolunteerDemand } from '../../../../models/agency/vdemand';
+import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 
 @Component({
   selector: 'app-volunteer-form',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './volunteer-form.component.html',
-  styleUrls: ['./volunteer-form.component.scss']
+  styleUrls: ['./volunteer-form.component.scss'],
 })
 export class VolunteerFormComponent implements OnInit {
   // 是否為編輯模式
@@ -37,7 +37,7 @@ export class VolunteerFormComponent implements OnInit {
     status: '上架',
     contact: '',
     phone: '',
-    note: ''
+    note: '',
   };
 
   constructor(
@@ -47,7 +47,6 @@ export class VolunteerFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
     // 從網址取得 id
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -62,9 +61,7 @@ export class VolunteerFormComponent implements OnInit {
   // 載入要編輯的資料
   loadEditDemand(id: number): void {
     const demands = this.volunteerDemandService.getDemands();
-    const target = demands.find(
-      demand => demand.id === id
-    );
+    const target = demands.find((demand) => demand.id === id);
     if (!target) {
       alert('找不到這筆志工需求');
       this.router.navigate(['/agency/disaster']);
@@ -72,23 +69,21 @@ export class VolunteerFormComponent implements OnInit {
     }
 
     // 深拷貝
-    this.demand = JSON.parse(
-      JSON.stringify(target)
-    );
+    this.demand = JSON.parse(JSON.stringify(target));
     console.log('目前編輯資料：', this.demand);
   }
 
   // 判斷欄位是否需要紅框
-    limitPeopleInput(event: Event): void {
-      const input = event.target as HTMLInputElement;
-      const people = Number(input.value);
-      if (people > 500) {
-        input.value = '500';
-        this.demand.people = 500;
-      }
+  limitPeopleInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const people = Number(input.value);
+    if (people > 500) {
+      input.value = '500';
+      this.demand.people = 500;
     }
+  }
 
- setPeople(value: string | number | null): void {
+  setPeople(value: string | number | null): void {
     if (value === null || value === '') {
       this.demand.people = null;
       return;
@@ -104,9 +99,7 @@ export class VolunteerFormComponent implements OnInit {
       case 'type':
         return !this.demand.type;
       case 'people':
-        return !this.demand.people ||
-               this.demand.people < 1 ||
-               this.demand.people > 500;
+        return !this.demand.people || this.demand.people < 1 || this.demand.people > 500;
       case 'location':
         return !this.demand.location.trim();
       case 'condition':
@@ -124,8 +117,8 @@ export class VolunteerFormComponent implements OnInit {
     }
   }
 
-   // 儲存 / 發布
-    onPublish(): void {
+  // 儲存 / 發布
+  onPublish(): void {
     // 清除之前錯誤
     this.invalidFields = [];
 
@@ -133,11 +126,7 @@ export class VolunteerFormComponent implements OnInit {
     if (!this.demand.type) {
       this.invalidFields.push('type');
     }
-    if (
-      !this.demand.people ||
-      this.demand.people < 1 ||
-      this.demand.people > 500
-    ) {
+    if (!this.demand.people || this.demand.people < 1 || this.demand.people > 500) {
       this.invalidFields.push('people');
     }
     if (!this.demand.location.trim()) {
@@ -162,14 +151,11 @@ export class VolunteerFormComponent implements OnInit {
     // 有欄位錯誤
     if (this.invalidFields.length > 0) {
       setTimeout(() => {
-        const firstInvalid =
-          document.querySelector(
-            '.invalid-field'
-          ) as HTMLElement;
+        const firstInvalid = document.querySelector('.invalid-field') as HTMLElement;
         if (firstInvalid) {
           firstInvalid.scrollIntoView({
             behavior: 'smooth',
-            block: 'center'
+            block: 'center',
           });
           firstInvalid.focus();
         }
@@ -179,13 +165,8 @@ export class VolunteerFormComponent implements OnInit {
 
     // 編輯模式
     if (this.isEditMode) {
-      this.volunteerDemandService.updateDemand(
-        this.demand
-      );
-      console.log(
-        '修改後的志工需求：',
-        this.demand
-      );
+      this.volunteerDemandService.updateDemand(this.demand);
+      console.log('修改後的志工需求：', this.demand);
       this.successMessage = '志工需求修改成功！';
       this.showSuccessModal = true;
       return;
@@ -195,18 +176,12 @@ export class VolunteerFormComponent implements OnInit {
     const newDemand: VolunteerDemand = {
       ...this.demand,
       id: this.getNextDemandId(),
-      createdAt:
-        new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       status: this.demand.status,
-      messageCount: 0
+      messageCount: 0,
     };
-    this.volunteerDemandService.addDemand(
-      newDemand
-    );
-    console.log(
-      '新增志工需求：',
-      newDemand
-    );
+    this.volunteerDemandService.addDemand(newDemand);
+    console.log('新增志工需求：', newDemand);
     this.successMessage = '志工需求發布成功！';
     this.showSuccessModal = true;
   }
@@ -222,9 +197,7 @@ export class VolunteerFormComponent implements OnInit {
       this.showCancelModal = true;
       return;
     }
-    this.router.navigate([
-      '/agency/disaster'
-    ]);
+    this.router.navigate(['/agency/disaster']);
   }
   closeCancelModal(): void {
     this.showCancelModal = false;

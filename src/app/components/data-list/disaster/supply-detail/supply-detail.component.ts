@@ -1,9 +1,11 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
-import { DisasterDemand } from '../../../../models/agency/demand';
-import { SupplyDeleteComponent } from '../../../modal/supply-delete/supply-delete.component';
+import { DisasterDemand } from '../../../../models/agency/disaster-demand';
+
+import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
-import { EditableDisasterDemand } from '../../../../models/agency/demand';
+import { EditableDisasterDemand } from '../../../../models/agency/disaster-demand';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 
 @Component({

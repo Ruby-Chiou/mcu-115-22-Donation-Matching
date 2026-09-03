@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
-import { DisasterDemand, ConditionStatus } from '../../../../models/agency/demand';
+import { DisasterDemand, ConditionStatus } from '../../../../models/agency/disaster-demand';
 
 @Component({
   selector: 'app-supply-form',

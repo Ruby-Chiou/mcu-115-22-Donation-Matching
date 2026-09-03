@@ -1,19 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { VolunteerDeleteComponent } from '../../../modal/volunteer-delete/volunteer-delete.component';
-import {VolunteerDemandService} from '../../../../core/services/volunteer-demand.service';
-import {  VolunteerDemand } from '../../../../models/agency/vdemand';
+import { CommonModule } from '@angular/common';
+
+import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
+import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+
+import { VolunteerDeleteComponent } from '../../../modal/delete/volunteer-delete/volunteer-delete.component';
 
 @Component({
   selector: 'app-volunteer-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink,VolunteerDeleteComponent ],
+  imports: [CommonModule, RouterLink, VolunteerDeleteComponent],
   templateUrl: './volunteer-detail.component.html',
-  styleUrl: './volunteer-detail.component.scss'
+  styleUrl: './volunteer-detail.component.scss',
 })
 export class VolunteerDetailComponent implements OnInit {
-
   demand: VolunteerDemand | null = null;
 
   showDeleteModal = false;
@@ -25,10 +26,7 @@ export class VolunteerDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
-    const id = Number(
-      this.route.snapshot.paramMap.get('id')
-    );
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!id) {
       console.error('找不到志工需求 ID');
@@ -39,15 +37,11 @@ export class VolunteerDetailComponent implements OnInit {
     this.loadDemand(id);
   }
 
-
   // =========================
   // 載入志工需求
   // =========================
   loadDemand(id: number): void {
-
-    const data = this.volunteerDemandService
-      .getDemands()
-      .find(item => item.id === id);
+    const data = this.volunteerDemandService.getDemands().find((item) => item.id === id);
 
     if (!data) {
       console.error('找不到志工需求：', id);
@@ -57,7 +51,6 @@ export class VolunteerDetailComponent implements OnInit {
 
     this.demand = data;
   }
-
 
   // 開啟刪除視窗
   openDeleteModal() {
@@ -81,5 +74,4 @@ export class VolunteerDetailComponent implements OnInit {
   getDeleteIds(): number[] {
     return this.demand?.id != null ? [this.demand.id] : [];
   }
-
 }

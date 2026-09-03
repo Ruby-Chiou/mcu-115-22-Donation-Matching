@@ -1,19 +1,22 @@
 import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
-import { timeout, catchError, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { timeout, catchError, of } from 'rxjs';
+
 import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
-import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../models/agency/demand';
-import { SupplyDeleteComponent } from '../../../modal/supply-delete/supply-delete.component';
+import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../models/agency/disaster-demand';
+
 import { PaginationComponent } from '../../../pagination/pagination.component';
-import { SupplySearchBarComponent } from '../../../search-bar/supply-search-bar/supply-search-bar.component';
-import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
-import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply-filter/supply-filter.component';
-import { SupplyOffShelfComponent } from '../../../modal/supply-off-shelf/supply-off-shelf.component';
-import { SupplyOnShelfComponent } from '../../../modal/supply-on-shelf/supply-on-shelf.component';
 import { SupplyLoadingComponent } from '../../../../components/loading/supply-loading/supply-loading.component';
+import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
+
+import { SupplySearchBarComponent } from '../../../search-bar/supply-search-bar/supply-search-bar.component';
+import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply-filter/supply-filter.component';
+import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
+import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
+import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 
 @Component({
   selector: 'app-disaster-list',

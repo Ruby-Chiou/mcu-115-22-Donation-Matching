@@ -1,0 +1,44 @@
+<div class="featured-card">
+  <div class="featured-image">
+    <span class="tag" [ngClass]="getPriorityClass(demand.priority)"> {{ demand.priority }} </span>
+    <img [src]="demand.image?.[0] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'" [alt]="demand.item || '物資圖片'" />
+  </div>
+  <div class="featured-content">
+    <h3>{{ demand.item }}</h3>
+    <div class="tags">
+      <span class="tag">{{ demand.category }}</span>
+      @if (demand.receiveMethod['寄送']) {
+      <span class="tag">寄送</span>
+      } @if (demand.receiveMethod['面交']) {
+      <span class="tag">面交</span>
+      }
+    </div>
+    <div class="info">
+      需求對象： @if (demand.serviceTargets.includes('老人')) {
+      <span class="info">老人</span>
+      } @if (demand.serviceTargets.includes('嬰幼兒')) {
+      <span class="info">嬰幼兒</span>
+      } @if (demand.serviceTargets.includes('孩童')) {
+      <span class="info">孩童</span>
+      } @if (demand.serviceTargets.includes('青少年')) {
+      <span class="info">青少年</span>
+      } @if (demand.serviceTargets.includes('身障')) {
+      <span class="info">身障</span>
+      } @if (demand.serviceTargets.includes('貧困')) {
+      <span class="info">貧困</span>
+      } @if (demand.serviceTargets.includes('重症照護')) {
+      <span class="info">重症照護</span>
+      } @if (demand.serviceTargets.includes('動物')) {
+      <span class="info">動物</span>
+      } @if (demand.serviceTargets.includes('無家者')) {
+      <span class="info">無家者</span>
+      }
+    </div>
+    <div class="info">
+      <p>需求數量： {{ demand.amount }} {{ demand.unit }}</p>
+      <p>{{ demand.recipient }}</p>
+      <p>{{ getRegion(demand.address) }}</p>
+    </div>
+    <button class="detail-btn" type="button" (click)="onView()">查看詳情</button>
+  </div>
+</div>

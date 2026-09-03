@@ -1,0 +1,133 @@
+@if (demand) {
+<div class="detail-info">
+  <div class="detail-page">
+    <button class="back-btn" routerLink="/donor/daily">← 返回</button>
+
+    <!-- 左邊圖片 -->
+    <div class="detail-image">
+      <!-- 優先度 -->
+      <span class="tag priority-tag" [ngClass]="getPriorityClass(demand.priority)"> {{ demand.priority }} </span>
+
+      <!-- 圖片 -->
+      <img
+        [src]="
+            demand.image?.[currentImageIndex]
+            || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
+          "
+        [alt]="demand.item || '物資圖片'"
+      />
+      <!-- 圓點 -->
+      <div class="image-dots" *ngIf="(demand.image?.length ?? 0) > 1">
+        <span *ngFor="let image of demand.image; let i = index" [class.active]="i === currentImageIndex" (click)="goToImage(i)"></span>
+      </div>
+    </div>
+
+    <!-- 右邊內容 -->
+    <div class="detail-content">
+      <h2>{{ demand.item }}</h2>
+      <div class="tags">
+        <span class="tag">{{ demand.category }}</span>
+      </div>
+
+      <div class="quantity-row">
+        <h3>需求數量</h3>
+        <p>{{ demand.amount }} {{ demand.unit }}</p>
+      </div>
+
+      <div class="quantity-row">
+        <h3>接收方</h3>
+        <p>{{ demand.recipient }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="quantity-row">
+    <h4>數量描述</h4>
+    <p class="description">{{ demand.amountDescription || '無' }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>接收方式</h4>
+    <p class="description">{{ getReceiveMethod() }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>需求原因</h4>
+    <p class="description">{{ demand.reason }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>需求描述</h4>
+    <p class="description">{{ demand.description }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>特殊品牌需求</h4>
+    <p class="description">{{ demand.brand || '無' }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>需求對象</h4>
+    <p class="description">{{ getServiceTargets() }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>物資狀態要求</h4>
+    <p class="description">{{ getConditions() }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>其他物品狀態</h4>
+    @if (hasCustomConditions()) {
+    <p class="description">{{ demand.customConditions }}</p>
+    } @else {
+    <p class="description">無</p>
+    }
+  </div>
+
+  <div class="quantity-row contact-row">
+    <h4>聯絡人</h4>
+    <p class="description">{{ demand.recipient }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>聯絡電話</h4>
+    <p class="description">{{ demand.phone }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>聯絡時間</h4>
+    <p class="description">
+      @if (demand.contactTimeWeekday) { 平日 } @if (demand.contactTimeWeekend) { 假日 } @if (demand.contactTimeWeekday &&
+      (demand.contactTimeMorning || demand.contactTimeAfternoon || demand.contactTimeEvening)) { ｜ } @if (demand.contactTimeMorning) { 上午
+      } @if (demand.contactTimeMorning && demand.contactTimeAfternoon) { 、 } @if (demand.contactTimeAfternoon) { 下午 } @if
+      (demand.contactTimeAfternoon && demand.contactTimeEvening) { 、 } @if (demand.contactTimeEvening) { 晚上 }
+    </p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>地址</h4>
+    <p class="description">{{ getRegion(demand.address) }}</p>
+  </div>
+
+  <div class="quantity-row">
+    <h4>其他說明</h4>
+    <p class="description">{{ demand.note }}</p>
+  </div>
+
+  <button class="contact-btn" [routerLink]="['/donor/daily/form', demand.serialNo]">我要捐助</button>
+
+  <div class="organization-intro">
+    <h3>需求單位介紹</h3>
+    <p>
+      博幼基金會於2002年成立，以「提升偏鄉資源不足孩子的學習成就與自信心，
+      讓他們未來有選擇職業和生活模式的能力」為使命，藉由「社工輔導及課輔教育」
+      兩大服務方法，培育社區師資、開發學習教材，運用社會資源使孩子維持健康、拓展視野，持續與各界跨域合作。
+      希望弭平先天的不平等，讓偏鄉孩子有充足的學習資源與機會，提升未來競爭力，達成「教育脫貧，讓知識帶希望回家」的願景。
+      期許孩子在不久的將來能真正「自立脫貧」，擁有充滿希望的家園，不再落入貧窮循環。
+    </p>
+  </div>
+</div>
+} @else {
+<div class="loading-state" style="padding: 40px; text-align: center">載入中，或找不到此筆資料...</div>
+}

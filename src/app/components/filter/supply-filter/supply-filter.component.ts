@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DisasterDemand, DisplayStatus } from '../../../models/agency/demand';
+import { DisasterDemand, DisplayStatus } from '../../../models/agency/disaster-demand';
 
 export interface SupplyFilterState {
   status: string[];

@@ -1,19 +1,22 @@
 import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
-import { timeout, catchError, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { DailyDemandService } from '../../../../core/services/daily-demand.service';
+import { timeout, catchError, of } from 'rxjs';
+
 import { DailyDemand, DailyDisplayStatus } from '../../../../models/agency/daily-demand';
-import { SupplyDeleteComponent } from '../../../modal/supply-delete/supply-delete.component';
-import { SupplyOffShelfComponent } from '../../../modal/supply-off-shelf/supply-off-shelf.component';
-import { SupplyOnShelfComponent } from '../../../modal/supply-on-shelf/supply-on-shelf.component';
+import { DailyDemandService } from '../../../../core/services/daily-demand.service';
+
 import { PaginationComponent } from '../../../pagination/pagination.component';
 import { DailySearchBarComponent } from '../../../search-bar/daily-search-bar/daily-search-bar.component';
-import { DailySortBarComponent, SortType } from '../../../sort-bar/daily-sort-bar/daily-sort-bar.component';
 import { DailyFilterComponent } from '../../../filter/daily-filter/daily-filter.component';
+import { DailySortBarComponent, SortType } from '../../../sort-bar/daily-sort-bar/daily-sort-bar.component';
+
 import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
+import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
+import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
+import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 
 type ReceiveMethod = '寄送' | '面交';
 

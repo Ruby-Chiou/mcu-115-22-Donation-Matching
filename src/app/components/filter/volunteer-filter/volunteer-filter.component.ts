@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../models/agency/vdemand';
+import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../models/agency/volunteer-demand';
 
 export interface VolunteerFilterState {
   status: DisplayVolunteerStatus[];
@@ -50,20 +50,17 @@ export class VolunteerFilterComponent {
   }
 
   // 切換篩選條件
-toggleFilter(
-  key: 'status' | 'priority' | 'messageStatus' | 'type',
-  value: string
-) {
-  const filters = this.selectedFilters[key] as string[];
+  toggleFilter(key: 'status' | 'priority' | 'messageStatus' | 'type', value: string) {
+    const filters = this.selectedFilters[key] as string[];
 
-  const index = filters.indexOf(value);
+    const index = filters.indexOf(value);
 
-  if (index > -1) {
-    filters.splice(index, 1);
-  } else {
-    filters.push(value);
+    if (index > -1) {
+      filters.splice(index, 1);
+    } else {
+      filters.push(value);
+    }
   }
-}
 
   // 切換剩餘數量
   toggleLowRemaining() {
@@ -76,7 +73,7 @@ toggleFilter(
       status: [],
       priority: [],
       lowRemaining: false,
-      type:[],
+      type: [],
       messageStatus: [],
     };
 
