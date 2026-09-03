@@ -15,17 +15,10 @@ export class AgencyLoginComponent {
 
   submitMessage = '';
 
-  loginForm = {
-    credentialPin: '',
-  };
-
-  onSubmit(): void {
-    if (!this.loginForm.credentialPin) {
-      this.submitMessage = '請輸入憑證PIN碼。';
-      return;
-    }
-    // TODO: 呼叫機構驗證登入 API
-    this.submitMessage = '機構驗證登入成功（示意）';
+  // 啟動行動自然人憑證 (FIDO) 驗證流程
+  launchFidoLogin(): void {
+    // TODO: 串接政府 FIDO 驗證 API 或重新導向至憑證閘道
+    this.submitMessage = '正在導向至內政部行動自然人憑證驗證頁面...（示意）';
   }
 
   onBackToRoleSelection(): void {

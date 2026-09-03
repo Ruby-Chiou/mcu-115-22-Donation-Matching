@@ -1,0 +1,244 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* 主卡片 */
+.register-form {
+  width: 100%;
+  max-width: 820px;
+  padding: 36px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--color-white) 0%, var(--bg-form) 100%);
+  box-shadow: var(--shadow-lg);
+  box-sizing: border-box;
+}
+
+/* 標題區 */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.form-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+  letter-spacing: -0.2px;
+  color: var(--color-text-dark);
+}
+
+.form-header p {
+  margin: 0;
+  color: var(--color-text-lighter);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* 小按鈕樣式 */
+.ghost-btn {
+  border: 1px solid var(--border-light);
+  background: var(--color-white);
+  color: var(--color-text-medium);
+  padding: 8px 12px;
+  border-radius: var(--border-radius-pill);
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 第三方 social 區塊 */
+.social-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  color: var(--color-text-medium);
+  font-weight: 600;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid var(--border-lightest);
+  background: var(--color-white);
+  color: var(--color-text-medium);
+  border-radius: var(--border-radius-pill);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.98rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.social-btn i {
+  font-size: 1.1rem;
+}
+
+.social-btn:hover {
+  border-color: var(--color-brand-primary-light);
+  box-shadow: var(--shadow-md);
+}
+
+/* 表單欄位網格 */
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.social-login {
+  grid-column: span 2;
+}
+
+/* 欄位樣式 */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--color-text-medium);
+}
+
+.field.full {
+  grid-column: span 2;
+}
+
+.field span {
+  font-weight: 700;
+  color: var(--color-text-medium);
+  font-size: 0.95rem;
+}
+
+/* input 基本樣式 */
+input[type='text'],
+input[type='email'],
+input[type='tel'],
+input[type='password'] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-lighter);
+  border-radius: var(--border-radius-main);
+  background: var(--color-white);
+  color: var(--color-text-dark);
+  box-sizing: border-box;
+  font-size: 0.98rem;
+  outline: none;
+  transition:
+    box-shadow 0.12s ease,
+    border-color 0.12s ease;
+}
+
+input:focus {
+  border-color: var(--color-brand-primary-light);
+  box-shadow: 0 6px 18px rgba(36, 100, 149, 0.06);
+}
+
+/* actions 連結 */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  grid-column: span 2;
+}
+
+.action-links a {
+  color: var(--color-brand-primary-light);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* button 列 */
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  grid-column: span 2;
+}
+
+.primary-btn {
+  border: 0;
+  border-radius: var(--border-radius-pill);
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--color-brand-primary-dark) 0%, var(--color-brand-primary-light) 100%);
+  color: var(--color-white);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: opacity 0.2s;
+}
+
+.primary-btn:hover {
+  opacity: 0.92;
+}
+
+/* submit message */
+.submit-message {
+  margin: 12px 0 0;
+  color: var(--color-error);
+  font-weight: 700;
+  grid-column: span 2;
+  text-align: right;
+}
+
+/* 錯誤紅框與震動特效 */
+.input-error {
+  border-color: var(--color-error) !important;
+  background-color: #fff1f2 !important;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15) !important;
+}
+
+@keyframes shakeKeyframe {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.shake {
+  animation: shakeKeyframe 0.4s ease-in-out;
+}
+
+/* 手機版響應式 */
+@media (max-width: 768px) {
+  .input-grid {
+    grid-template-columns: 1fr;
+  }
+  .field.full,
+  .social-login,
+  .actions,
+  .button-row,
+  .submit-message {
+    grid-column: span 1;
+  }
+  .register-form {
+    padding: 20px;
+    border-radius: 14px;
+  }
+}

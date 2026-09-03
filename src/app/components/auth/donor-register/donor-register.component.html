@@ -1,0 +1,71 @@
+<form class="register-form" #donorFormRef (ngSubmit)="onSubmit()">
+  <div class="form-header">
+    <div>
+      <h2>捐助者註冊</h2>
+      <p>歡迎成為捐助者，填寫帳號與聯絡資訊。</p>
+    </div>
+    <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
+  </div>
+
+  <div class="input-grid">
+    <div class="social-login">
+      <div class="social-row">
+        <p>或使用其他應用註冊</p>
+        <div class="social-buttons">
+          <button type="button" class="social-btn" (click)="socialRegister('google')">
+            Google<i class="fa-brands fa-google" style="color: #4285f4"></i>
+          </button>
+          <button type="button" class="social-btn" (click)="socialRegister('line')">
+            LINE<i class="fa-brands fa-line" style="color: #00c300"></i>
+          </button>
+          <button type="button" class="social-btn" (click)="socialRegister('facebook')">
+            Facebook
+            <i class="fa-brands fa-facebook" style="color: #1877f2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <label class="field full">
+      <span>電子信箱</span>
+      <input type="email" [(ngModel)]="donorForm.email" name="donorEmail" />
+    </label>
+
+    <label class="field full">
+      <span>帳號名稱</span>
+      <input type="text" [(ngModel)]="donorForm.accountName" name="donorAccountName" />
+    </label>
+
+    <label class="field full">
+      <span>真實姓名</span>
+      <input type="text" [(ngModel)]="donorForm.fullName" name="fullName" />
+    </label>
+
+    <label class="field full">
+      <span>聯絡電話</span>
+      <input type="tel" [(ngModel)]="donorForm.phone" name="phone" />
+    </label>
+
+    <label class="field">
+      <span>密碼</span>
+      <input type="password" [(ngModel)]="donorForm.password" name="donorPassword" />
+    </label>
+
+    <label class="field">
+      <span>確認密碼</span>
+      <input type="password" [(ngModel)]="donorForm.confirmPassword" name="donorConfirmPassword" />
+    </label>
+  </div>
+
+  <div class="actions">
+    <div class="action-links">
+      <a routerLink="/login" class="link-btn">已有帳號？直接登入</a>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button type="submit" class="primary-btn">送出註冊</button>
+  </div>
+
+  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+</form>

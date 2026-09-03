@@ -1,0 +1,117 @@
+<form class="register-form" #agencyFormRef (ngSubmit)="onSubmit()">
+  <div class="form-header">
+    <div>
+      <h2>受助者註冊</h2>
+      <p>請填寫機構資料與經辦人驗證資訊。</p>
+    </div>
+    <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
+  </div>
+
+  <div class="input-grid">
+    <label class="field full">
+      <span>電子信箱</span>
+      <input type="email" [(ngModel)]="agencyForm.email" name="agencyEmail" />
+    </label>
+
+    <label class="field full">
+      <span>機構名稱</span>
+      <input type="text" [(ngModel)]="agencyForm.agencyName" name="agencyAgencyName" />
+    </label>
+
+    <label class="field full">
+      <span>機構統一編號</span>
+      <input type="text" [(ngModel)]="agencyForm.registrationNumber" name="agencyRegistrationNumber" />
+    </label>
+
+    <label class="field full">
+      <span>負責人姓名</span>
+      <input type="text" [(ngModel)]="agencyForm.representative" name="agencyRepresentative" />
+    </label>
+
+    <label class="field full">
+      <span>機構聯絡電話</span>
+      <input type="tel" [(ngModel)]="agencyForm.contactPhone" name="agencyContactPhone" />
+    </label>
+
+    <label class="field full">
+      <span>機構預設地址</span>
+      <input type="text" [(ngModel)]="agencyForm.defaultAddress" name="agencyDefaultAddress" />
+    </label>
+
+    <!-- 經辦人驗證專用區塊 -->
+    <div class="field-group full">
+      <h3 class="group-title">經辦人 / 授權自然人資訊（供後續查證使用）</h3>
+
+      <div class="sub-grid">
+        <label class="field">
+          <span>聯絡人姓名</span>
+          <input type="text" [(ngModel)]="agencyForm.contactPersonName" name="contactPersonName" />
+        </label>
+
+        <label class="field">
+          <span>職稱</span>
+          <input type="text" [(ngModel)]="agencyForm.contactPersonTitle" name="contactPersonTitle" placeholder="例如：社工員、總幹事" />
+        </label>
+
+        <label class="field">
+          <span>所屬部門 / 單位</span>
+          <input type="text" [(ngModel)]="agencyForm.department" name="department" placeholder="例如：社會服務部" />
+        </label>
+
+        <label class="field">
+          <span>聯絡人電話 / 分機</span>
+          <input type="tel" [(ngModel)]="agencyForm.contactPersonPhone" name="contactPersonPhone" />
+        </label>
+
+        <label class="field full">
+          <span>聯絡人電子信箱</span>
+          <input type="email" [(ngModel)]="agencyForm.contactPersonEmail" name="contactPersonEmail" />
+        </label>
+
+        <label class="field full">
+          <span>授權證明文件（如委託書、職員識別證或大小章切結書）</span>
+          <div class="file-upload-wrapper">
+            <label for="verificationFileInput" class="custom-file-btn"> <i class="fa-solid fa-cloud-arrow-up"></i> 選擇檔案 </label>
+            <input type="file" id="verificationFileInput" name="verificationFileInput" (change)="onVerificationFile($event)" />
+            <span class="file-name-display"> {{ agencyForm.verificationDocumentUrl || '未選擇任何檔案' }} </span>
+          </div>
+        </label>
+
+        <label class="field full checkbox-field">
+          <input type="checkbox" [(ngModel)]="agencyForm.consentToContact" name="consentToContact" />
+          <span>我同意本平台於必要時透過上述聯絡方式進行身分與機構資格確認</span>
+        </label>
+
+        <label class="field full checkbox-field">
+          <input type="checkbox" [(ngModel)]="agencyForm.agreeToTerms" name="agreeToTerms" />
+          <span
+            >我已閱讀並同意接受本平台的
+            <a href="javascript:void(0);" class="terms-link" (click)="$event.preventDefault()">服務條款與隱私權政策</a></span
+          >
+        </label>
+      </div>
+    </div>
+
+    <label class="field">
+      <span>密碼</span>
+      <input type="password" [(ngModel)]="agencyForm.password" name="agencyPassword" />
+    </label>
+
+    <label class="field">
+      <span>確認密碼</span>
+      <input type="password" [(ngModel)]="agencyForm.confirmPassword" name="agencyConfirmPassword" />
+    </label>
+  </div>
+
+  <div class="actions">
+    <div class="action-links">
+      <a routerLink="/login" class="link-btn">已有帳號？直接登入</a>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button type="submit" class="primary-btn">送出註冊</button>
+  </div>
+
+  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+</form>
