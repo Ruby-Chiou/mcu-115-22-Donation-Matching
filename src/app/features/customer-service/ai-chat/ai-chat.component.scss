@@ -1,0 +1,769 @@
+.ai-chat-page {
+  min-height: calc(100vh - 80px);
+  padding: 42px 32px;
+  background: #f6f8fa;
+}
+
+/* =====================
+   頁面標題
+===================== */
+.page-header {
+  width: min(1260px, 100%);
+  margin: 0 auto 30px;
+}
+
+.page-header h1 {
+  margin: 0 0 10px;
+  color: #1f2937;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.page-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+/* =====================
+   主容器
+===================== */
+.support-container {
+  display: grid;
+  grid-template-columns: clamp(340px, 35%, 460px) minmax(0, 1fr);
+
+  width: min(1300px, 100%);
+  min-height: 920px;
+
+  /*
+    左右欄共用同一高度。
+    160px 預留給上方導覽、頁面 padding、頁面標題等空間。
+  */
+  height: calc(100vh - 160px);
+
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* =====================
+   FAQ 左側
+===================== */
+.faq-panel {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+
+  padding: 32px 26px;
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+}
+
+.panel-title {
+  margin-bottom: 26px;
+
+  h2 {
+    margin: 0 0 8px;
+
+    color: #1f2937;
+
+    font-size: 22px;
+  }
+
+  p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+  }
+}
+
+/* FAQ 區塊標題 */
+.faq-section {
+  margin-bottom: 24px;
+}
+
+.faq-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 0 0 14px;
+
+  font-size: 19px;
+  font-weight: 720;
+
+  padding: 10px 14px;
+
+  border-radius: 10px;
+}
+
+.donor-title {
+  color: #1e40af;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.recipient-title {
+  color: #065f46;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+}
+
+.section-icon {
+  font-size: 18px;
+}
+
+/* FAQ 問題清單：只讓這區能上下滾動 */
+.faq-list-wrapper {
+  max-height: 260px;
+  overflow-y: scroll;
+
+  padding-right: 6px;
+  margin-right: -6px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+
+    &:hover {
+      background: #9ca3af;
+    }
+  }
+}
+
+/* FAQ 列表 */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 捐助者問題樣式 */
+.donor-item {
+  border-left: 4px solid #3b82f6;
+
+  &:hover {
+    border-color: #2563eb;
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.15);
+  }
+
+  .faq-icon {
+    background: #eff6ff;
+    color: #2563eb;
+  }
+
+  strong {
+    color: #1e40af;
+  }
+}
+
+/* 受助者問題樣式 */
+.recipient-item {
+  border-left: 4px solid #10b981;
+
+  &:hover {
+    border-color: #059669;
+    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.15);
+  }
+
+  .faq-icon {
+    background: #ecfdf5;
+    color: #059669;
+  }
+
+  strong {
+    color: #065f46;
+  }
+}
+
+/* FAQ下滑解答 */
+.faq-entry {
+  overflow: hidden;
+}
+
+/* 保留原本 faq-item 樣式，補充以下內容 */
+.faq-item {
+  align-items: center;
+  border: 1px solid #e5e7eb;
+}
+
+.faq-content {
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+
+.faq-description {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #9ca3af;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.faq-arrow {
+  flex-shrink: 0;
+
+  color: #94a3b8;
+  font-size: 22px;
+  line-height: 1;
+
+  transition: transform 0.25s ease;
+}
+
+.faq-item.is-open .faq-arrow {
+  transform: rotate(180deg);
+}
+
+/* 點開問題時，讓問題卡片與答案連在一起 */
+.faq-item.is-open {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.faq-answer {
+  padding: 12px 16px 14px 30px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-top: 0;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+
+  animation: faqSlideDown 0.22s ease-out;
+}
+
+.faq-answer ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.faq-answer li {
+  margin-bottom: 7px;
+
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.faq-answer li:last-child {
+  margin-bottom: 0;
+}
+
+/* 捐助者展開答案：藍色左邊線 */
+.donor-answer {
+  border-left: 3px solid #3b82f6;
+}
+
+/* 受助者展開答案：綠色左邊線 */
+.recipient-answer {
+  border-left: 3px solid #10b981;
+}
+
+@keyframes faqSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FAQ 項目通用樣式 */
+.faq-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 14px;
+
+  width: 100%;
+
+  padding: 16px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  transition: 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.faq-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  flex-shrink: 0;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  border-radius: 50%;
+
+  transition: 0.2s;
+}
+
+.faq-item strong {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 17px;
+
+  transition: 0.2s;
+}
+
+.faq-item p {
+  margin: 0;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+  color: #9ca3af;
+
+  transition: 0.2s;
+}
+
+.faq-item:hover p {
+  color: #6b7280;
+}
+
+/* 聯絡管理員 */
+.contact-admin {
+  flex-shrink: 0;
+
+  margin-top: auto;
+  padding: 20px 0 0;
+
+  color: #6b7280;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.contact-admin span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #374151;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.contact-admin p {
+  margin: 0;
+
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* =====================
+   AI Chat 右側
+===================== */
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Header */
+.chat-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 26px 32px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chat-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+}
+
+.chat-title h2 {
+  margin: 0;
+
+  color: #1f2937;
+
+  font-size: 22px;
+}
+
+.chat-header p {
+  margin: 8px 0 0;
+
+  color: #9ca3af;
+
+  font-size: 14px;
+}
+
+.ai-indicator {
+  width: 11px;
+  height: 11px;
+
+  background: #22c55e;
+
+  border-radius: 50%;
+}
+
+.role-badge {
+  padding: 8px 14px;
+
+  color: #2563eb;
+
+  font-size: 14px;
+
+  background: #eff6ff;
+
+  border-radius: 22px;
+}
+
+/* =====================
+   訊息區
+===================== */
+.chat-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+
+  gap: 18px;
+
+  padding: 32px;
+  box-sizing: border-box;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  &::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+
+    &:hover {
+      background: #9ca3af;
+    }
+  }
+}
+
+.message-row {
+  display: flex;
+}
+
+.assistant-row {
+  justify-content: flex-start;
+}
+
+.user-row {
+  justify-content: flex-end;
+}
+
+/* 訊息泡泡 */
+.message-bubble {
+  max-width: 75%;
+
+  padding: 14px 18px;
+
+  font-size: 15px;
+
+  line-height: 1.8;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  border-radius: 14px;
+}
+
+.assistant-message {
+  color: #374151;
+
+  background: #f3f4f6;
+
+  border-bottom-left-radius: 4px;
+}
+
+.user-message {
+  color: #ffffff;
+
+  background: #2563eb;
+
+  border-bottom-right-radius: 4px;
+}
+
+/* Loading */
+.loading-message {
+  display: flex;
+
+  gap: 6px;
+
+  align-items: center;
+
+  min-width: 65px;
+
+  padding: 17px;
+}
+
+.loading-message span {
+  width: 7px;
+  height: 7px;
+
+  background: #9ca3af;
+
+  border-radius: 50%;
+
+  animation: typing 1.2s infinite;
+}
+
+.loading-message span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-message span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* =====================
+   Welcome
+===================== */
+.welcome-message {
+  display: flex;
+
+  flex: 1;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  max-width: 560px;
+
+  margin: auto;
+}
+
+.welcome-line {
+  width: 42px;
+  height: 5px;
+
+  margin-bottom: 20px;
+
+  background: #2563eb;
+
+  border-radius: 12px;
+}
+
+.welcome-message h3 {
+  margin: 0 0 12px;
+
+  color: #1f2937;
+
+  font-size: 26px;
+}
+
+.welcome-message p {
+  margin: 0 0 28px;
+
+  color: #6b7280;
+
+  font-size: 15px;
+
+  line-height: 1.9;
+}
+
+/* 建議問題 */
+.suggestion-list {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+}
+
+.suggestion-list button {
+  padding: 11px 16px;
+
+  color: #4b5563;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  transition: 0.2s;
+}
+
+.suggestion-list button:hover {
+  color: #2563eb;
+
+  border-color: #2563eb;
+
+  background: #eff6ff;
+}
+
+/* =====================
+   Error
+===================== */
+.error-message {
+  padding: 14px 32px;
+
+  color: #b91c1c;
+
+  font-size: 14px;
+
+  background: #fef2f2;
+
+  border-top: 1px solid #fee2e2;
+}
+
+/* =====================
+   Input
+===================== */
+.chat-input-area {
+  display: flex;
+
+  gap: 14px;
+
+  padding: 20px 32px;
+
+  background: #ffffff;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.chat-input-area textarea {
+  flex: 1;
+
+  min-height: 40px;
+
+  padding: 14px 16px;
+
+  resize: none;
+
+  font: inherit;
+
+  font-size: 15px;
+
+  background: #f9fafb;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  outline: none;
+}
+
+.chat-input-area textarea:focus {
+  background: #ffffff;
+
+  border-color: #2563eb;
+
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.chat-input-area button {
+  padding: 0 26px;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  background: #2563eb;
+
+  border: none;
+
+  border-radius: 10px;
+
+  transition: 0.2s;
+}
+
+.chat-input-area button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.chat-input-area button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.5;
+}
+
+/* =====================
+   Animation
+===================== */
+@keyframes typing {
+  0%, 60%, 100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+}
+

@@ -1,0 +1,183 @@
+<section class="ai-chat-page">
+  <!-- 頁面標題 -->
+  <div class="page-header">
+    <h1>客服與協助中心</h1>
+    <p>您可以查看常見問題，或直接詢問 AI 智慧客服</p>
+  </div>
+
+  <div class="support-container">
+    <!-- 左側 FAQ -->
+    <aside class="faq-panel">
+      <div class="panel-title">
+        <h2>常見問題</h2>
+        <p>快速找到您需要的協助</p>
+      </div>
+
+      <!-- 捐助者問題 -->
+      <div class="faq-section">
+        <h3 class="faq-section-title donor-title">
+          <span class="section-icon">🎁</span>
+          捐助者常見問題
+        </h3>
+
+        <div class="faq-list-wrapper">
+          <div class="faq-list">
+            @for (faq of donorFaqs; track faq.id) {
+            <div class="faq-entry">
+              <button
+                type="button"
+                class="faq-item donor-item"
+                [class.is-open]="expandedFaqId === faq.id"
+                (click)="toggleFaq(faq.id)"
+                [attr.aria-expanded]="expandedFaqId === faq.id"
+              >
+                <span class="faq-icon">?</span>
+
+                <span class="faq-content">
+                  <strong>{{ faq.question }}</strong>
+                </span>
+
+                <span class="faq-arrow" aria-hidden="true">⌄</span>
+              </button>
+
+              @if (expandedFaqId === faq.id) {
+              <div class="faq-answer donor-answer">
+                <ol>
+                  @for (step of faq.answer; track $index) {
+                  <li>{{ step }}</li>
+                  }
+                </ol>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- 受助者問題 -->
+      <div class="faq-section">
+        <h3 class="faq-section-title recipient-title">
+          <span class="section-icon">🤝</span>
+          受助者常見問題
+        </h3>
+
+        <div class="faq-list-wrapper">
+          <div class="faq-list">
+            @for (faq of recipientFaqs; track faq.id) {
+            <div class="faq-entry">
+              <button
+                type="button"
+                class="faq-item recipient-item"
+                [class.is-open]="expandedFaqId === faq.id"
+                (click)="toggleFaq(faq.id)"
+                [attr.aria-expanded]="expandedFaqId === faq.id"
+              >
+                <span class="faq-icon">?</span>
+
+                <span class="faq-content">
+                  <strong>{{ faq.question }}</strong>
+                </span>
+
+                <span class="faq-arrow" aria-hidden="true">⌄</span>
+              </button>
+
+              @if (expandedFaqId === faq.id) {
+              <div class="faq-answer recipient-answer">
+                <ol>
+                  @for (step of faq.answer; track $index) {
+                  <li>{{ step }}</li>
+                  }
+                </ol>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-admin">
+        <span>需要其他協助？</span>
+        <p>若 AI 無法解決您的問題，請聯絡管理員。</p>
+      </div>
+    </aside>
+
+    <!-- 右側 AI 客服 -->
+    <section class="chat-panel">
+      <!-- AI Header -->
+      <div class="chat-header">
+        <div>
+          <div class="chat-title">
+            <span class="ai-indicator"></span>
+            <h2>AI 智慧客服</h2>
+          </div>
+
+          <p>線上為您提供平台使用與服務相關協助</p>
+        </div>
+
+        <span class="role-badge"> {{ currentRole }} </span>
+      </div>
+
+      <!-- 訊息區 -->
+      <div class="chat-messages">
+        @if (messages.length === 0) {
+
+        <div class="welcome-message">
+          <h3>您好，有什麼可以協助您的嗎？</h3>
+
+          <p>您可以詢問平台功能、捐助流程、 物資申請或其他服務相關問題。</p>
+
+          <div class="suggestion-list">
+            <button type="button" (click)="message = '我忘記密碼了，如何重設？'">我忘記密碼了，如何重設？</button>
+
+            <button type="button" (click)="message = '這個流程太複雜了，我不會用！'">這個流程太複雜了，我不會用！</button>
+          </div>
+        </div>
+
+        } @for (item of messages; track $index) {
+
+        <div class="message-row" [class.user-row]="item.sender === 'user'" [class.assistant-row]="item.sender === 'assistant'">
+          <div class="message-bubble" [class.user-message]="item.sender === 'user'" [class.assistant-message]="item.sender === 'assistant'">
+            {{ item.content }}
+          </div>
+        </div>
+
+        } @if (isLoading) {
+
+        <div class="message-row assistant-row">
+          <div class="message-bubble assistant-message loading-message">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        }
+      </div>
+
+      <!-- 錯誤訊息 -->
+
+      @if (errorMessage) {
+
+      <div class="error-message">{{ errorMessage }}</div>
+
+      }
+
+      <!-- 輸入區 -->
+
+      <form class="chat-input-area" (ngSubmit)="sendMessage()">
+        <textarea
+          name="message"
+          [(ngModel)]="message"
+          (keydown)="onKeydown($event)"
+          [disabled]="isLoading"
+          placeholder="輸入您的問題..."
+          rows="2"
+        ></textarea>
+
+        <button type="submit" [disabled]="isLoading || !message.trim()" aria-label="送出訊息">送出</button>
+      </form>
+    </section>
+  </div>
+</section>
