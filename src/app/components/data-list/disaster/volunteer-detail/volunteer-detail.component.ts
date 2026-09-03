@@ -3,7 +3,7 @@ import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
-import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 
 import { VolunteerDeleteComponent } from '../../../modal/delete/volunteer-delete/volunteer-delete.component';
 
@@ -41,7 +41,7 @@ export class VolunteerDetailComponent implements OnInit {
   // 載入志工需求
   // =========================
   loadDemand(id: number): void {
-    const data = this.volunteerDemandService.getDemands().find((item) => item.id === id);
+    const data = this.volunteerDemandService.getDemands().find((item) => item.serialNo === id);
 
     if (!data) {
       console.error('找不到志工需求：', id);
@@ -72,6 +72,6 @@ export class VolunteerDetailComponent implements OnInit {
     this.router.navigate(['/agency/disaster']);
   }
   getDeleteIds(): number[] {
-    return this.demand?.id != null ? [this.demand.id] : [];
+    return this.demand?.serialNo != null ? [this.demand.serialNo] : [];
   }
 }

@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/volunteer-demand';
 
 import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
@@ -206,7 +206,8 @@ export class VolunteerListComponent {
 
           selected: false,
 
-          displayStatus: displayStatus[item.status],
+          // 這裡加上 as VolunteerStatus
+          displayStatus: displayStatus[item.status as VolunteerStatus],
 
           displayCreatedAt:
             item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
@@ -365,7 +366,7 @@ export class VolunteerListComponent {
 
       // 編號
       if (this.selectedSort === 'id') {
-        result = Number(a.id ?? 0) - Number(b.id ?? 0);
+        result = Number(a.serialNo ?? 0) - Number(b.serialNo ?? 0);
       }
 
       // 建立日期
@@ -439,7 +440,9 @@ export class VolunteerListComponent {
   }
 
   openBatchDeleteModal() {
-    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id !== undefined).map((item) => item.id as number);
+    this.deleteIds = this.filteredDemands
+      .filter((item) => item.selected && item.serialNo !== undefined)
+      .map((item) => item.serialNo as number);
     this.deleteType = 'batch';
     this.showDeleteModal = true;
   }
@@ -470,7 +473,7 @@ export class VolunteerListComponent {
 
     // 選擇「已下架」
     if (newStatus === '已下架') {
-      const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+      const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
       // 暫存原本的顯示狀態
       if (originalItem?.status === '上架') {
         item.displayStatus = '已上架';
@@ -487,7 +490,7 @@ export class VolunteerListComponent {
       return;
     }
     // 選擇「已上架」或「隱藏中」
-    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
     // 已下架 → 禁止重新上架
     if (newStatus === '已上架' && originalItem?.status === '下架') {
       item.displayStatus = '已下架';
@@ -509,7 +512,7 @@ export class VolunteerListComponent {
 
     const item = this.pendingOffShelfItem;
 
-    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
     const now = new Date();
 
@@ -595,7 +598,7 @@ export class VolunteerListComponent {
     }
   ) {
     // 取得原本儲存的資料
-    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
     const originalStatus = originalItem?.status;
 

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 
 // 讓元件專用的 UI 表單介面繼承原始的 VolunteerDemand，並擴充驗證屬性
@@ -21,7 +21,7 @@ export type VolunteerDemandItem = VolunteerDemand & {
 @Component({
   selector: 'app-volunteer-batch-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink], // 補上 CommonModule 以支援 *ngFor/*ngIf
+  imports: [CommonModule, FormsModule], // 補上 CommonModule 以支援 *ngFor/*ngIf
   templateUrl: './volunteer-batch-edit.component.html',
   styleUrl: './volunteer-batch-edit.component.scss',
 })

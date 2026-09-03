@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { DonorDailyCardComponent } from '../../../card/daily/donor-daily-card/donor-daily-card.component';
-import { DailyDemandService } from '../../../../core/services/daily-demand.service';
+import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 
 import { DailyFilter } from '../../../filter/donor-daily-filter/donor-daily-filter.component';

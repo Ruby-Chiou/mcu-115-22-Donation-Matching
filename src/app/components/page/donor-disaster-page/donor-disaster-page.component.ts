@@ -2,12 +2,12 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { DisasterControlService } from '../../../core/services/disaster-control.service';
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../core/services/agency-disaster-demand/disaster-demand.service';
 
 import { DonorDisasterSupplyFilterComponent } from '../../filter/donor-disaster-supply-filter/donor-disaster-supply-filter.component';
 import { DonorDisasterVolunteerFilterComponent } from '../../filter/donor-disaster-volunteer-filter/donor-disaster-volunteer-filter.component';
 
-import { DonorDisasterCardListComponent } from '../../data-list/donor-disaster-card-list/donor-disaster-card-list.component';
+import { DonorDisasterCardListComponent } from '../../data-list/disaster/donor-disaster-card-list/donor-disaster-card-list.component';
 
 @Component({
   selector: 'app-donor-disaster-page',

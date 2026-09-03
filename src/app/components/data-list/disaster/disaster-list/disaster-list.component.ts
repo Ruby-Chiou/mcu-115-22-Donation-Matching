@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { timeout, catchError, of } from 'rxjs';
 
-import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../models/agency/disaster-demand';
 
 import { PaginationComponent } from '../../../pagination/pagination.component';

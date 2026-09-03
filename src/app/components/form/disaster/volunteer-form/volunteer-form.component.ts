@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { VolunteerDemandService } from '../../../../core/services/volunteer-demand.service';
+import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 
 @Component({
@@ -26,7 +26,7 @@ export class VolunteerFormComponent implements OnInit {
   invalidFields: string[] = [];
   // 志工需求資料
   demand: VolunteerDemand = {
-    id: 0,
+    serialNo: 0,
     type: '',
     people: null,
     location: '',
@@ -61,7 +61,7 @@ export class VolunteerFormComponent implements OnInit {
   // 載入要編輯的資料
   loadEditDemand(id: number): void {
     const demands = this.volunteerDemandService.getDemands();
-    const target = demands.find((demand) => demand.id === id);
+    const target = demands.find((demand) => demand.serialNo === id);
     if (!target) {
       alert('找不到這筆志工需求');
       this.router.navigate(['/agency/disaster']);
@@ -175,7 +175,7 @@ export class VolunteerFormComponent implements OnInit {
     // 新增模式
     const newDemand: VolunteerDemand = {
       ...this.demand,
-      id: this.getNextDemandId(),
+      serialNo: this.getNextDemandId(),
       createdAt: new Date().toISOString(),
       status: this.demand.status,
       messageCount: 0,
@@ -187,7 +187,7 @@ export class VolunteerFormComponent implements OnInit {
   }
   private getNextDemandId(): number {
     const demands = this.volunteerDemandService.getDemands();
-    const maxId = demands.reduce((currentMax, demand) => Math.max(currentMax, demand.id), 0);
+    const maxId = demands.reduce((currentMax, demand) => Math.max(currentMax, demand.serialNo), 0);
     return maxId + 1;
   }
 

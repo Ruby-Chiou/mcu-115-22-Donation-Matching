@@ -2,159 +2,163 @@
   <!-- 資料載入中 -->
   <app-supply-loading *ngIf="isLoading"></app-supply-loading>
   <ng-container *ngIf="!isLoading">
-<div class="volunteer-section">
-  <h1>志工需求列表</h1>
-  <!-- 新增志工需求 -->
-  <div class="top-action-bar">
-    <button class="add-btn" routerLink="/agency/volunteer-form">新增志工需求</button>
-  </div>
-  <div class="toolbar-row">
-    <!-- 左側：全選 / 批次操作 -->
-    <div class="select-area">
-      <div class="select-all">
-        <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
-        <span>全選</span>
+    <div class="volunteer-section">
+      <h1>志工需求列表</h1>
+      <!-- 新增志工需求 -->
+      <div class="top-action-bar">
+        <button class="add-btn" routerLink="/agency/volunteer-form">新增志工需求</button>
+      </div>
+      <div class="toolbar-row">
+        <!-- 左側：全選 / 批次操作 -->
+        <div class="select-area">
+          <div class="select-all">
+            <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
+            <span>全選</span>
+          </div>
+
+          <div class="batch-buttons" *ngIf="hasSelected()">
+            <button (click)="editSelected()">編輯</button>
+            <button class="batch-delete-btn" (click)="openBatchDeleteModal()">刪除</button>
+          </div>
+        </div>
+
+        <!-- 右側操作區：搜尋 + 排序 + 篩選 -->
+        <div class="right-toolbar">
+          <!-- 搜尋 -->
+          <app-volunteer-search-bar [searchTerm]="searchTerm" (searchChange)="onSearchChange($event)"></app-volunteer-search-bar>
+
+          <!-- 排序 -->
+          <app-volunteer-sort-bar (sortChange)="onSortChange($event)"></app-volunteer-sort-bar>
+
+          <!-- 篩選 -->
+          <app-volunteer-filter
+            [statusOptions]="statusOptions"
+            [priorityOptions]="priorityOptions"
+            [typeOptions]="typeOptions"
+            [messageOptions]="messageOptions"
+            [selectedFilters]="selectedFilters"
+            (filterApply)="onFilterApply($event)"
+            (filterReset)="resetFilters()"
+          ></app-volunteer-filter>
+        </div>
       </div>
 
-      <div class="batch-buttons" *ngIf="hasSelected()">
-        <button (click)="editSelected()">編輯</button>
-        <button class="batch-delete-btn" (click)="openBatchDeleteModal()">刪除</button>
-      </div>
-    </div>
+      <!-- 志工需求表格 -->
+      <table class="volunteer-table">
+        <thead>
+          <tr>
+            <th class="checkbox-column" style="width: 55px">選取</th>
+            <th style="width: 60px">編號</th>
+            <th class="category-column" style="width: 90px">需求類型</th>
+            <th class="category-column" style="width: 90px">需求人數</th>
+            <th style="width: 105px">緊急優先度</th>
+            <th class="created-time-column" style="width: 95px">建立日期</th>
+            <th class="published-time-column" style="width: 95px">上架日期</th>
+            <th class="off-shelf-time-column" style="width: 100px">預計下架日期</th>
+            <th class="message-column" style="width: 75px">留言區</th>
+            <th class="operation-column" style="width: 340px">操作</th>
+          </tr>
+        </thead>
 
-    <!-- 右側操作區：搜尋 + 排序 + 篩選 -->
-    <div class="right-toolbar">
-      <!-- 搜尋 -->
-      <app-volunteer-search-bar [searchTerm]="searchTerm" (searchChange)="onSearchChange($event)"></app-volunteer-search-bar>
+        <tbody>
+          <!-- 有資料 -->
+          <tr *ngFor="let item of pagedDemands">
+            <!-- 選取 -->
+            <td class="checkbox-column">
+              <input type="checkbox" [(ngModel)]="item.selected" />
+            </td>
 
-      <!-- 排序 -->
-      <app-volunteer-sort-bar (sortChange)="onSortChange($event)"></app-volunteer-sort-bar>
+            <!-- 編號 -->
+            <td class="id-column">C{{ item.serialNo }}</td>
 
-      <!-- 篩選 -->
-      <app-volunteer-filter
-        [statusOptions]="statusOptions"
-        [priorityOptions]="priorityOptions"
-        [typeOptions]="typeOptions"
-        [messageOptions]="messageOptions"
-        [selectedFilters]="selectedFilters"
-        (filterApply)="onFilterApply($event)"
-        (filterReset)="resetFilters()"
-      ></app-volunteer-filter>
-    </div>
-  </div>
+            <!-- 需求類型 -->
+            <td>{{ item.type }}</td>
 
-  <!-- 志工需求表格 -->
-  <table class="volunteer-table">
-    <thead>
-      <tr>
-        <th class="checkbox-column" style="width: 55px">選取</th>
-        <th style="width: 60px">編號</th>
-        <th class="category-column" style="width: 90px">需求類型</th>
-        <th class="category-column" style="width: 90px">需求人數</th>
-        <th style="width: 105px">緊急優先度</th>
-        <th class="created-time-column" style="width: 95px">建立日期</th>
-        <th class="published-time-column" style="width: 95px">上架日期</th>
-        <th class="off-shelf-time-column" style="width: 100px">預計下架日期</th>
-        <th class="message-column" style="width: 75px">留言區</th>
-        <th class="operation-column" style="width: 340px">操作</th>
-      </tr>
-    </thead>
+            <!-- 需求人數 -->
+            <td>{{ item.people ?? 0 }} 人</td>
 
-    <tbody>
-      <!-- 有資料 -->
-      <tr *ngFor="let item of pagedDemands">
-        <!-- 選取 -->
-        <td class="checkbox-column">
-          <input type="checkbox" [(ngModel)]="item.selected" />
-        </td>
-
-        <!-- 編號 -->
-        <td class="id-column">C{{ item.id }}</td>
-
-        <!-- 需求類型 -->
-        <td>{{ item.type }}</td>
-
-        <!-- 需求人數 -->
-        <td>{{ item.people ?? 0 }} 人</td>
-
-        <!-- 優先度 -->
-        <td
-          [ngClass]="{
+            <!-- 優先度 -->
+            <td
+              [ngClass]="{
             'normal': item.priority === '普通',
             'urgent': item.priority === '緊急',
             'very-urgent': item.priority === '非常緊急'
-          }">{{ item.priority }}
-        </td>
+          }"
+            >
+              {{ item.priority }}
+            </td>
 
-        <!-- 發布時間 -->
-        <td class="created-time-column">{{ item.displayCreatedAt || '尚未發布' }}</td>
+            <!-- 發布時間 -->
+            <td class="created-time-column">{{ item.displayCreatedAt || '尚未發布' }}</td>
 
-        <!-- 下架時間 -->
-        <td class="created-time-column">{{ item.displayOffShelfAt || '—' }}</td>
-        <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
-        <!-- 留言 -->
-        <td class="message-column">
-          <a
-            [routerLink]="[
+            <!-- 下架時間 -->
+            <td class="created-time-column">{{ item.displayOffShelfAt || '—' }}</td>
+            <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
+            <!-- 留言 -->
+            <td class="message-column">
+              <a
+                [routerLink]="[
               '/agency/volunteer-message',
-              item.id
-            ]">
-            {{ item.messageCount || 0 }}
-          </a>
-        </td>
+              item.serialNo
+            ]"
+              >
+                {{ item.messageCount || 0 }}
+              </a>
+            </td>
 
-        <!-- 操作 -->
-        <td class="operation-column">
-          <div class="operation-flex">
-            <button (click)="goToDetail(item.id!)">查看</button>
-            <button (click)="goToEdit(item.id!)">編輯</button>
-            <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
+            <!-- 操作 -->
+            <td class="operation-column">
+              <div class="operation-flex">
+                <button (click)="goToDetail(item.serialNo!)">查看</button>
+                <button (click)="goToEdit(item.serialNo!)">編輯</button>
+                <button class="delete-btn" (click)="openDeleteModal(item.serialNo!)">刪除</button>
 
-            <select
-              [value]="item.displayStatus"
-              [(ngModel)]="item.displayStatus"
-              (change)="changeStatus(item, $event)"
-              [ngClass]="{
+                <select
+                  [value]="item.displayStatus"
+                  [(ngModel)]="item.displayStatus"
+                  (change)="changeStatus(item, $event)"
+                  [ngClass]="{
                 'status-on': item.displayStatus === '已上架',
                 'status-hide': item.displayStatus === '隱藏中',
                 'status-off': item.displayStatus === '已下架'
-              }">
-              <option value="已上架">已上架</option>
-              <option value="隱藏中">隱藏中</option>
-              <option value="已下架">已下架</option>
-            </select>
-          </div>
-        </td>
-      </tr>
+              }"
+                >
+                  <option value="已上架">已上架</option>
+                  <option value="隱藏中">隱藏中</option>
+                  <option value="已下架">已下架</option>
+                </select>
+              </div>
+            </td>
+          </tr>
 
-      <!-- 沒有資料 -->
-      <tr *ngIf="filteredDemands.length === 0">
-        <td colspan="10" class="empty-message">
-          <div class="empty-title">尚未輸入志工需求或無符合條件的需求</div>
-          <div class="empty-description">請點選上方「新增志工需求」建立需求。</div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          <!-- 沒有資料 -->
+          <tr *ngIf="filteredDemands.length === 0">
+            <td colspan="10" class="empty-message">
+              <div class="empty-title">尚未輸入志工需求或無符合條件的需求</div>
+              <div class="empty-description">請點選上方「新增志工需求」建立需求。</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-  <app-pagination
-    [pageSize]="pageSize"
-    [currentPage]="currentPage"
-    [totalPages]="totalPages"
-    [pageNumbers]="pageNumbers"
-    (pageChange)="goToPage($event)"
-  ></app-pagination>
-</div>
-</ng-container>
-<app-volunteer-delete
-  *ngIf="showDeleteModal"
-  [demandIds]="deleteIds"
-  [deleteType]="deleteType"
-  (closed)="closeDeleteModal()"
-  (deleted)="onDeleted()"
-></app-volunteer-delete>
+      <app-pagination
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [pageNumbers]="pageNumbers"
+        (pageChange)="goToPage($event)"
+      ></app-pagination>
+    </div>
+  </ng-container>
+  <app-volunteer-delete
+    *ngIf="showDeleteModal"
+    [demandIds]="deleteIds"
+    [deleteType]="deleteType"
+    (closed)="closeDeleteModal()"
+    (deleted)="onDeleted()"
+  ></app-volunteer-delete>
 
- <app-volunteer-off-shelf
+  <app-volunteer-off-shelf
     *ngIf="showOffShelfWarning"
     (closed)="cancelManualOffShelf()"
     (hide)="hideInsteadOfOffShelf()"
@@ -166,3 +170,4 @@
     (closed)="closeOnShelfWarning()"
     (confirmed)="closeOnShelfWarning()"
   ></app-volunteer-on-shelf>
+</div>

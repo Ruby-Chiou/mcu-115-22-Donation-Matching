@@ -1,5 +1,5 @@
-import {  Component,  EventEmitter,  Input,  Output,  OnInit,  inject} from '@angular/core';
-import {  VolunteerDemandService} from '../../../core/services/volunteer-demand.service';
+import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
+import { VolunteerDemandService } from '../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 
 export interface VolunteerFilters {
   volunteerType: string[];
@@ -11,24 +11,20 @@ export interface VolunteerFilters {
   standalone: true,
   imports: [],
   templateUrl: './donor-disaster-volunteer-filter.component.html',
-  styleUrl: './donor-disaster-volunteer-filter.component.scss'
+  styleUrl: './donor-disaster-volunteer-filter.component.scss',
 })
-export class DonorDisasterVolunteerFilterComponent
-  implements OnInit {
-
-  private volunteerDemandService =
-    inject(VolunteerDemandService);
+export class DonorDisasterVolunteerFilterComponent implements OnInit {
+  private volunteerDemandService = inject(VolunteerDemandService);
 
   @Input()
   filters: VolunteerFilters = {
     volunteerType: [],
     volunteerLocation: [],
-    hasRemaining: false
+    hasRemaining: false,
   };
 
   @Output()
-  filtersChange =
-    new EventEmitter<VolunteerFilters>();
+  filtersChange = new EventEmitter<VolunteerFilters>();
 
   // 依服務類型的選項
   volunteerTypeOptions: string[] = [];
@@ -37,33 +33,19 @@ export class DonorDisasterVolunteerFilterComponent
   volunteerLocationOptions: string[] = [];
 
   ngOnInit(): void {
-
-    const demands =
-      this.volunteerDemandService.getDemands();
+    const demands = this.volunteerDemandService.getDemands();
 
     // =========================
     // 取得服務類型
     // =========================
 
-    this.volunteerTypeOptions = [
-      ...new Set(
-        demands
-          .map(demand => demand.type)
-          .filter(type => type !== '')
-      )
-    ];
+    this.volunteerTypeOptions = [...new Set(demands.map((demand) => demand.type).filter((type) => type !== ''))];
 
     // =========================
     // 取得服務地點
     // =========================
 
-    this.volunteerLocationOptions = [
-      ...new Set(
-        demands
-          .map(demand => demand.location.trim())
-          .filter(location => location !== '')
-      )
-    ];
+    this.volunteerLocationOptions = [...new Set(demands.map((demand) => demand.location.trim()).filter((location) => location !== ''))];
   }
 
   // =========================
@@ -71,28 +53,17 @@ export class DonorDisasterVolunteerFilterComponent
   // =========================
 
   toggleVolunteerType(value: string): void {
-
-    const volunteerType =
-      this.filters.volunteerType;
+    const volunteerType = this.filters.volunteerType;
 
     if (volunteerType.includes(value)) {
-
       this.filters = {
         ...this.filters,
-        volunteerType:
-          volunteerType.filter(
-            item => item !== value
-          )
+        volunteerType: volunteerType.filter((item) => item !== value),
       };
-
     } else {
-
       this.filters = {
         ...this.filters,
-        volunteerType: [
-          ...volunteerType,
-          value
-        ]
+        volunteerType: [...volunteerType, value],
       };
     }
 
@@ -104,28 +75,17 @@ export class DonorDisasterVolunteerFilterComponent
   // =========================
 
   toggleVolunteerLocation(value: string): void {
-
-    const volunteerLocation =
-      this.filters.volunteerLocation;
+    const volunteerLocation = this.filters.volunteerLocation;
 
     if (volunteerLocation.includes(value)) {
-
       this.filters = {
         ...this.filters,
-        volunteerLocation:
-          volunteerLocation.filter(
-            item => item !== value
-          )
+        volunteerLocation: volunteerLocation.filter((item) => item !== value),
       };
-
     } else {
-
       this.filters = {
         ...this.filters,
-        volunteerLocation: [
-          ...volunteerLocation,
-          value
-        ]
+        volunteerLocation: [...volunteerLocation, value],
       };
     }
 
@@ -137,11 +97,9 @@ export class DonorDisasterVolunteerFilterComponent
   // =========================
 
   toggleRemaining(): void {
-
     this.filters = {
       ...this.filters,
-      hasRemaining:
-        !this.filters.hasRemaining
+      hasRemaining: !this.filters.hasRemaining,
     };
 
     this.emitFilters();
@@ -152,29 +110,22 @@ export class DonorDisasterVolunteerFilterComponent
   // =========================
 
   resetFilters(): void {
-
     this.filters = {
       volunteerType: [],
       volunteerLocation: [],
-      hasRemaining: false
+      hasRemaining: false,
     };
 
     this.emitFilters();
   }
 
   private emitFilters(): void {
-
     this.filtersChange.emit({
-      volunteerType: [
-        ...this.filters.volunteerType
-      ],
+      volunteerType: [...this.filters.volunteerType],
 
-      volunteerLocation: [
-        ...this.filters.volunteerLocation
-      ],
+      volunteerLocation: [...this.filters.volunteerLocation],
 
-      hasRemaining:
-        this.filters.hasRemaining
+      hasRemaining: this.filters.hasRemaining,
     });
   }
 }

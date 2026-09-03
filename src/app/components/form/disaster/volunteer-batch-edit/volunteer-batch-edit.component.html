@@ -4,7 +4,7 @@
   <div class="batch-edit-header">
     <div class="info-tag">
       <span class="info-label">需求編號</span>
-      <span class="info-value">C{{ demand.id }}</span>
+      <span class="info-value">C{{ demand.serialNo }}</span>
     </div>
    <!-- 上方操作按鈕 -->
       <div class="edit-top-button-area">
@@ -79,7 +79,7 @@
       志工工作內容
       <span class="required">*</span>
       <span class="word-count">
-        {{ demand.workContent?.length || 0 }}/300
+        {{ demand.workContent.length || 0 }}/300
       </span>
     </label>
     <textarea
@@ -95,7 +95,7 @@
       需求原因
       <span class="required">*</span>
       <span class="word-count">
-        {{ demand.reason?.length || 0 }}/300
+        {{ demand.reason.length || 0 }}/300
       </span>
     </label>
     <textarea

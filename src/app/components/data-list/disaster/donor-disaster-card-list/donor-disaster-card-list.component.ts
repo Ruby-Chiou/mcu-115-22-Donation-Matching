@@ -1,14 +1,14 @@
 import { Component, Input, inject } from '@angular/core';
-import { DonorDisasterCardComponent } from '../../card/donor-disaster-card/donor-disaster-card.component';
 
-import { DisasterDemandService } from '../../../core/services/disaster-demand.service';
-import { DisasterDemand } from '../../../models/agency/demand';
+import { DonorDisasterCardComponent } from '../../../card/disaster/donor-disaster-card/donor-disaster-card.component';
+import { PaginationComponent } from '../../../pagination/pagination.component';
 
-import { VolunteerDemandService } from '../../../core/services/volunteer-demand.service';
-import { VolunteerDemand } from '../../../models/agency/vdemand';
+import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
+import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
+import { DisasterControlService } from '../../../../core/services/disaster-control.service';
 
-import { DisasterControlService } from '../../../core/services/disaster-control.service';
-import { PaginationComponent } from '../../pagination/pagination.component';
+import { DisasterDemand } from '../../../../models/agency/disaster-demand';
+import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 
 export interface MaterialFilters {
   category: string[];

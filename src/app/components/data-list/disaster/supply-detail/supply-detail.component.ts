@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 
 import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';

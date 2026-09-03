@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterModule, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-import { DailyDemandService } from '../../../../core/services/daily-demand.service';
+import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 
 @Component({

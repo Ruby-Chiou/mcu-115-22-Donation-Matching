@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DisasterDemandService } from '../../../../core/services/disaster-demand.service';
+import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 import { DisasterDemand, ConditionStatus } from '../../../../models/agency/disaster-demand';

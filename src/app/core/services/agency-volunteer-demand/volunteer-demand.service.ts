@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { VolunteerDemand } from '../../models/agency/volunteer-demand';
+import { VolunteerDemand } from '../../../models/agency/volunteer-demand';
 
 @Injectable({
   providedIn: 'root',
@@ -7,7 +7,7 @@ import { VolunteerDemand } from '../../models/agency/volunteer-demand';
 export class VolunteerDemandService {
   demands: VolunteerDemand[] = [
     {
-      id: 1,
+      serialNo: 1,
       type: '物資搬運',
       people: 5,
       location: '花蓮縣光復鄉大平村武昌街87號 ',
@@ -25,7 +25,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 2,
+      serialNo: 2,
       type: '物資整理',
       people: 10,
       location: '花蓮縣光復鄉大同村學士街11號',
@@ -43,7 +43,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 3,
+      serialNo: 3,
       type: '環境清潔',
       people: 10,
       location: '花蓮縣光復鄉大華村中央產業道路33號 ',
@@ -61,7 +61,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 4,
+      serialNo: 4,
       type: '物資整理',
       people: 10,
       location: '花蓮縣光復鄉大進村糖廠街19-6號',
@@ -79,7 +79,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 5,
+      serialNo: 5,
       type: '環境清潔',
       people: 3,
       location: '花蓮縣光復鄉北富村富田二街59號',
@@ -97,7 +97,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 6,
+      serialNo: 6,
       type: '環境清潔',
       people: 10,
       location: '花蓮縣光復鄉南富村建國路2段73巷1號',
@@ -115,7 +115,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 7,
+      serialNo: 7,
       type: '物資搬運',
       people: 10,
       location: '花蓮縣光復鄉大華村仁愛路55號 ',
@@ -133,7 +133,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 8,
+      serialNo: 8,
       type: '環境清潔',
       people: 3,
       location: '花蓮縣光復鄉大華村仁愛路35號 ',
@@ -151,7 +151,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 9,
+      serialNo: 9,
       type: '環境清潔',
       people: 15,
       location: '花蓮縣光復鄉大華村中正路一段97號',
@@ -169,7 +169,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 10,
+      serialNo: 10,
       type: '醫療照護',
       people: 8,
       location: '花蓮縣光復鄉大安村中正路一段2-1號',
@@ -187,7 +187,7 @@ export class VolunteerDemandService {
       expectedOffShelfAt: '2026-09-24T11:30:00',
     },
     {
-      id: 11,
+      serialNo: 11,
       type: '醫療照護',
       people: 10,
       location: '花蓮縣光復鄉東富路31號',
@@ -228,7 +228,6 @@ export class VolunteerDemandService {
     return this.demands;
   }
 
-
   // =========================
   // 取得全部
   // =========================
@@ -242,13 +241,11 @@ export class VolunteerDemandService {
   // =========================
 
   getDemandById(id: number): VolunteerDemand | undefined {
-    return this.demands.find((demand) => demand.id === id);
+    return this.demands.find((demand) => demand.serialNo === id);
   }
   // 給志工詳情頁使用
   getVolunteerById(id: number): VolunteerDemand | undefined {
-    return this.demands.find(
-      demand => demand.id === id
-    );
+    return this.demands.find((demand) => demand.serialNo === id);
   }
 
   // =========================
@@ -256,7 +253,7 @@ export class VolunteerDemandService {
   // =========================
 
   updateDemand(updatedDemand: VolunteerDemand): void {
-    const index = this.demands.findIndex((item) => item.id === updatedDemand.id);
+    const index = this.demands.findIndex((item) => item.serialNo === updatedDemand.serialNo);
 
     if (index !== -1) {
       this.demands[index] = updatedDemand;
@@ -268,11 +265,11 @@ export class VolunteerDemandService {
   // =========================
 
   deleteDemand(id: number): void {
-    this.demands = this.demands.filter((item) => item.id !== id);
+    this.demands = this.demands.filter((item) => item.serialNo !== id);
   }
   updateBatchDemands(updatedDemands: VolunteerDemand[]): void {
     this.demands = this.demands.map((existingDemand) => {
-      const updatedDemand = updatedDemands.find((item) => item.id === existingDemand.id);
+      const updatedDemand = updatedDemands.find((item) => item.serialNo === existingDemand.serialNo);
 
       // 有被勾選、且有修改 → 更新
       if (updatedDemand) {

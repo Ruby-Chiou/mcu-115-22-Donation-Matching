@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { DisasterDemand, CreateDisasterDemand } from '../../models/agency/disaster-demand';
+import { DisasterDemand, CreateDisasterDemand } from '../../../models/agency/disaster-demand';
 
 @Injectable({
   providedIn: 'root',

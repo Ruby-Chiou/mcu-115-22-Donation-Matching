@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
-import { donorDisasterGuard } from './components/card/donor-disaster.guard';
+import { donorDisasterGuard } from './core/guards/donor-disaster.guard';
 
 export const routes: Routes = [
   // 1. 預設首頁
@@ -30,7 +30,8 @@ export const routes: Routes = [
   },
   {
     path: 'donor/daily/form/:id',
-    loadComponent: () => import('./components/form/donor-daily-form/donor-daily-form.component').then((m) => m.DonorDailyFormComponent),
+    loadComponent: () =>
+      import('./components/form/daily/donor-daily-form/donor-daily-form.component').then((m) => m.DonorDailyFormComponent),
   },
 
   {
@@ -53,23 +54,32 @@ export const routes: Routes = [
   },
 
   {
-    path: 'donor/disaster/needs',
-    loadComponent: () =>import('./features/disaster/needs/needs.component').then((m) => m.NeedsComponent),  //災害歷史紀錄
+    path: 'donor/disaster/history',
+    loadComponent: () => import('./features/disaster/disaster-history/disaster-history.component').then((m) => m.DisasterHistoryComponent), //災害歷史紀錄(從needs更名為history)
   },
   {
-  path: 'donor/disaster/supply/detail/:id',
-  canActivate: [donorDisasterGuard],
-  loadComponent: () => import('./components/page/donor-disaster-supply-detail-page/donor-disaster-supply-detail-page.component').then((m) => m.DonorDisasterSupplyDetailPageComponent),
+    path: 'donor/disaster/supply/detail/:id',
+    canActivate: [donorDisasterGuard],
+    loadComponent: () =>
+      import('./components/page/donor-disaster-supply-detail-page/donor-disaster-supply-detail-page.component').then(
+        (m) => m.DonorDisasterSupplyDetailPageComponent
+      ),
   },
   {
-  path: 'donor/disaster/volunteer/detail/:id',
-  canActivate: [donorDisasterGuard],
-  loadComponent: () => import('./components/page/donor-disaster-volunteer-detail-page/donor-disaster-volunteer-detail-page.component').then((m) => m.DonorDisasterVolunteerDetailPageComponent),
+    path: 'donor/disaster/volunteer/detail/:id',
+    canActivate: [donorDisasterGuard],
+    loadComponent: () =>
+      import('./components/page/donor-disaster-volunteer-detail-page/donor-disaster-volunteer-detail-page.component').then(
+        (m) => m.DonorDisasterVolunteerDetailPageComponent
+      ),
   },
   {
-  path: 'donor/disaster/supply/form/:id',
-  canActivate: [donorDisasterGuard],
-  loadComponent: () => import('./components/form/donor-disaster-supply-form/donor-disaster-supply-form.component').then((m) => m.DonorDisasterSupplyFormComponent),
+    path: 'donor/disaster/supply/form/:id',
+    canActivate: [donorDisasterGuard],
+    loadComponent: () =>
+      import('./components/form/disaster/donor-disaster-supply-form/donor-disaster-supply-form.component').then(
+        (m) => m.DonorDisasterSupplyFormComponent
+      ),
   },
   // 4. 社福機構模組 (機構端)
   // 4.1 社福團體儀錶板
@@ -119,7 +129,9 @@ export const routes: Routes = [
   {
     path: 'agency/disaster',
     loadComponent: () =>
-      import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then((m) => m.AgencyDisasterWorkspaceComponent), // 急難救助需求管理區
+      import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then(
+        (m) => m.AgencyDisasterWorkspaceComponent
+      ), // 急難救助需求管理區
   },
   {
     path: 'agency/supply-form',
@@ -168,7 +180,8 @@ export const routes: Routes = [
   },
   {
     path: 'admin/disaster-control',
-    loadComponent: () => import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
+    loadComponent: () =>
+      import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
   },
   {
     path: 'admin/dashboard',

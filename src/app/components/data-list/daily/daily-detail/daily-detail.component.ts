@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-import { DailyDemandService } from '../../../../core/services/daily-demand.service';
+import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 
 import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';

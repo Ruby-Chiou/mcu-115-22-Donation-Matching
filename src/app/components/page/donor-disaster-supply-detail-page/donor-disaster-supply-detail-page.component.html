@@ -1,333 +1,209 @@
 <div class="detail-page">
-<button
-type="button"
-class="back-button"
-(click)="goBackToList()">
-← 返回需求清單 </button>
+  <button type="button" class="back-button" (click)="goBackToList()">← 返回需求清單</button>
   <!-- =========================
        頁面標題
   ==========================-->
   <div class="detail-header">
-    <h1>
-      急難救助需求詳情
-    </h1>
+    <h1>急難救助需求詳情</h1>
   </div>
   <!-- =========================
        物資主要資訊
   ========================== -->
   <div class="detail-main">
-<!-- 左邊：物資圖片 -->
-<!-- 左邊：物資圖片 -->
-<div class="detail-image">
-  <app-supply-detail-carousel
-    [images]="demand.image ?? []">
-  </app-supply-detail-carousel>
-</div>
-<!-- 右邊：物資資訊 -->
-<div class="detail-info">
-  <!-- 物資名稱 -->
-  <h2>
-    {{ demand.item }}
-  </h2>
-  <!-- 類別 -->
-  @if (demand.category) {
-    <div class="category">
-      {{ demand.category }}
+    <!-- 左邊：物資圖片 -->
+    <!-- 左邊：物資圖片 -->
+    <div class="detail-image">
+      <app-supply-detail-carousel [images]="demand.image ?? []"> </app-supply-detail-carousel>
     </div>
-  }
-  <!-- 緊急程度 -->
-  <div
-    class="urgency"
-    [ngClass]="getPriorityClass()">
-    <span class="urgency-icon">
-      ●
-    </span>
-    {{ demand.priority }}
-  </div>
-  <!-- 數量 -->
-  <div class="quantity-info">
-    <div class="info-item">
-      <span>
-        需求數量
-      </span>
-      <strong>
-        {{ demand.amount ?? 0 }}
-        {{ demand.unit }}
-      </strong>
-    </div>
-    <div class="info-item">
-      <span>
-        已募集
-      </span>
-      <strong>
-        {{
-          (demand.amount ?? 0)
-          -
-          (demand.remaining ?? 0)
-        }}
-        {{ demand.unit }}
-      </strong>
-    </div>
-    <div class="info-item">
-      <span>
-        剩餘需求
-      </span>
-      <strong>
-        {{ demand.remaining ?? 0 }}
-        {{ demand.unit }}
-      </strong>
-    </div>
-  </div>
-  <!-- 數量補充 -->
-  @if (demand.amountDescription) {
-    <div class="amount-description">
-      {{ demand.amountDescription }}
-    </div>
-  }
-  <!-- ========================
+    <!-- 右邊：物資資訊 -->
+    <div class="detail-info">
+      <!-- 物資名稱 -->
+      <h2>{{ demand.item }}</h2>
+      <!-- 類別 -->
+      @if (demand.category) {
+      <div class="category">{{ demand.category }}</div>
+      }
+      <!-- 緊急程度 -->
+      <div class="urgency" [ngClass]="getPriorityClass()">
+        <span class="urgency-icon"> ● </span>
+        {{ demand.priority }}
+      </div>
+      <!-- 數量 -->
+      <div class="quantity-info">
+        <div class="info-item">
+          <span> 需求數量 </span>
+          <strong> {{ demand.amount ?? 0 }} {{ demand.unit }} </strong>
+        </div>
+        <div class="info-item">
+          <span> 已募集 </span>
+          <strong> {{ (demand.amount ?? 0) - (demand.remaining ?? 0) }} {{ demand.unit }} </strong>
+        </div>
+        <div class="info-item">
+          <span> 剩餘需求 </span>
+          <strong> {{ demand.remaining ?? 0 }} {{ demand.unit }} </strong>
+        </div>
+      </div>
+      <!-- 數量補充 -->
+      @if (demand.amountDescription) {
+      <div class="amount-description">{{ demand.amountDescription }}</div>
+      }
+      <!-- ========================
        收受資訊
   ========================== -->
-  <div class="organization-box">
-    <span class="organization-label">
-      物資收受地點
-    </span>
-    <strong>
-      <i class="fa-regular fa-building"></i>
-      {{ demand.address || '尚未填寫' }}
-    </strong>
-    <!-- 我要捐助 -->
-    <div class="donate-action">
-      <button
-        type="button"
-        class="donate-button"
-        (click)="goToSupplyForm()">
-        我要捐助
-      </button>
+      <div class="organization-box">
+        <span class="organization-label"> 物資收受地點 </span>
+        <strong>
+          <i class="fa-regular fa-building"></i>
+          {{ demand.address || '尚未填寫' }}
+        </strong>
+        <!-- 我要捐助 -->
+        <div class="donate-action">
+          <button type="button" class="donate-button" (click)="goToSupplyForm()">我要捐助</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   </div>
   <!-- =========================
        物資需求資訊
   ========================== -->
   <div class="organization-detail">
-<h2>
-  需求資訊
-</h2>
-<div class="organization-info">
-  <!-- 收受地點 -->
-  <div class="organization-item">
-    <span>
-      收受地點
-    </span>
-    <strong>
-      {{ demand.address || '尚未填寫' }}
-    </strong>
-  </div>
-  <!-- 聯絡電話 -->
-  <div class="organization-item">
-    <span>
-      聯絡電話
-    </span>
-    <strong>
-      {{ demand.phone || '尚未填寫' }}
-    </strong>
-  </div>
-  <!-- 聯絡時間 -->
-  <div class="organization-item">
-    <span>
-      聯絡時間
-    </span>
-    <strong>
-      @if (demand.contactTimeWeekday) {
-        平日
-      }
-      @if (demand.contactTimeWeekend) {
-        ／假日
-      }
-      <br>
-      @if (demand.contactTimeMorning) {
-        上午
-      }
-      @if (demand.contactTimeAfternoon) {
-        ／下午
-      }
-      @if (demand.contactTimeEvening) {
-        ／晚上
-      }
-    </strong>
-  </div>
-  <!-- 品牌 -->
-  <div class="organization-item">
-    <span>
-      品牌要求
-    </span>
-    <strong>
-      {{ demand.brand || '不限品牌' }}
-    </strong>
-  </div>
-  <!-- 接受物資狀態 -->
-  <div class="organization-item">
-    <span>
-      接受物資狀態
-    </span>
-    <div class="condition-list">
-      <!-- 全新 -->
-      <div>
-        全新：
-        <strong [class.accept]=" demand.conditions['全新'] === '接受'"
-          [class.reject]="demand.conditions['全新'] === '不接受'">
-          {{ getConditionText(demand.conditions['全新'] ) }}
+    <h2>需求資訊</h2>
+    <div class="organization-info">
+      <!-- 收受地點 -->
+      <div class="organization-item">
+        <span> 收受地點 </span>
+        <strong> {{ demand.address || '尚未填寫' }} </strong>
+      </div>
+      <!-- 聯絡電話 -->
+      <div class="organization-item">
+        <span> 聯絡電話 </span>
+        <strong> {{ demand.phone || '尚未填寫' }} </strong>
+      </div>
+      <!-- 聯絡時間 -->
+      <div class="organization-item">
+        <span> 聯絡時間 </span>
+        <strong>
+          @if (demand.contactTimeDifferent) { @if (demand.weekdayMorning || demand.weekdayAfternoon || demand.weekdayEvening) { 平日： @if
+          (demand.weekdayMorning) { 上午 } @if (demand.weekdayAfternoon) { 下午 } @if (demand.weekdayEvening) { 晚上 }
+          <br />
+          } @if (demand.weekendMorning || demand.weekendAfternoon || demand.weekendEvening) { 假日： @if (demand.weekendMorning) { 上午 }
+          @if (demand.weekendAfternoon) { 下午 } @if (demand.weekendEvening) { 晚上 } } } @else { @if (demand.contactTimeMorning) { 上午 }
+          @if (demand.contactTimeAfternoon) { 下午 } @if (demand.contactTimeEvening) { 晚上 } }
         </strong>
       </div>
-      <!-- 二手 -->
-      <div>
-        二手：
-        <strong
-          [class.accept]="demand.conditions['二手'] === '接受'"
-          [class.reject]="demand.conditions['二手'] === '不接受'">
-          {{ getConditionText(demand.conditions['二手']) }}
-        </strong>
-      </div>
-      <!-- 有擦痕 -->
-      <div>
-        有擦痕：
-        <strong
-          [class.accept]="demand.conditions['有擦痕'] === '接受'"
-          [class.reject]="demand.conditions['有擦痕'] === '不接受'">
-          {{ getConditionText(demand.conditions['有擦痕'] ) }}
-        </strong>
-      </div>
-      <!-- 過期 -->
-      <div>
-        過期：
-        <strong
-          [class.accept]="demand.conditions['過期'] === '接受'"
-          [class.reject]=" demand.conditions['過期'] === '不接受'">
-          {{ getConditionText(demand.conditions['過期']) }}
-        </strong>
-      </div>
-      <!-- 毀損 -->
-      <div>
-        毀損:
-        <strong
-          [class.accept]="demand.conditions['毀損'] === '接受'"
-          [class.reject]="demand.conditions['毀損'] === '不接受'">
-          {{ getConditionText(demand.conditions['毀損']) }}
-        </strong>
-      </div>
-    </div>
-    <!-- 自訂狀態 -->
 
-  </div>
-  @if (demand.customConditions.length > 0) {
+      <!-- 品牌 -->
+      <div class="organization-item">
+        <span> 品牌要求 </span>
+        <strong> {{ demand.brand || '不限品牌' }} </strong>
+      </div>
+      <!-- 接受物資狀態 -->
+      <div class="organization-item">
+        <span> 接受物資狀態 </span>
+        <div class="condition-list">
+          <!-- 全新 -->
+          <div>
+            全新：
+            <strong [class.accept]=" demand.conditions['全新'] === '接受'" [class.reject]="demand.conditions['全新'] === '不接受'">
+              {{ getConditionText(demand.conditions['全新'] ) }}
+            </strong>
+          </div>
+          <!-- 二手 -->
+          <div>
+            二手：
+            <strong [class.accept]="demand.conditions['二手'] === '接受'" [class.reject]="demand.conditions['二手'] === '不接受'">
+              {{ getConditionText(demand.conditions['二手']) }}
+            </strong>
+          </div>
+          <!-- 有擦痕 -->
+          <div>
+            有擦痕：
+            <strong [class.accept]="demand.conditions['有擦痕'] === '接受'" [class.reject]="demand.conditions['有擦痕'] === '不接受'">
+              {{ getConditionText(demand.conditions['有擦痕'] ) }}
+            </strong>
+          </div>
+          <!-- 過期 -->
+          <div>
+            過期：
+            <strong [class.accept]="demand.conditions['過期'] === '接受'" [class.reject]=" demand.conditions['過期'] === '不接受'">
+              {{ getConditionText(demand.conditions['過期']) }}
+            </strong>
+          </div>
+          <!-- 毀損 -->
+          <div>
+            毀損:
+            <strong [class.accept]="demand.conditions['毀損'] === '接受'" [class.reject]="demand.conditions['毀損'] === '不接受'">
+              {{ getConditionText(demand.conditions['毀損']) }}
+            </strong>
+          </div>
+        </div>
+        <!-- 自訂狀態 -->
+      </div>
+      @if (demand.customConditions.length > 0) {
       <div class="organization-item custom-condition">
-        <span>
-          其他
-        </span>
+        <span> 其他 </span>
         <div class="condition-content">
-          @for (
-            condition of demand.customConditions;
-            track condition
-          ) {
-            <span class="condition-item">
-              {{ condition }}
-            </span>
+          @for ( condition of demand.customConditions; track condition ) {
+          <span class="condition-item"> {{ condition }} </span>
           }
         </div>
       </div>
-    }
-  <!-- 備註 -->
-  @if (demand.note) {
-    <div class="organization-item">
-      <span>
-        備註
-      </span>
-      <p>
-        {{ demand.note }}
-      </p>
+      }
+      <!-- 備註 -->
+      @if (demand.note) {
+      <div class="organization-item">
+        <span> 備註 </span>
+        <p>{{ demand.note }}</p>
+      </div>
+      }
     </div>
-  }
-</div>
   </div>
   <!-- =========================
        需求原因
   ========================== -->
   <div class="description">
-<h2>
-  需求原因
-</h2>
-<p>
-  {{ demand.reason || '尚未填寫' }}
-</p>
+    <h2>需求原因</h2>
+    <p>{{ demand.reason || '尚未填寫' }}</p>
   </div>
   <!-- =========================
        需求說明
   ========================== -->
   <div class="description">
-<h2>
-  需求說明
-</h2>
-<p>
-  {{ demand.description || '尚未填寫' }}
-</p>
+    <h2>需求說明</h2>
+    <p>{{ demand.description || '尚未填寫' }}</p>
   </div>
   <!-- =========================
        自訂條件 / 注意事項
   ========================== -->
-@if (demand.customConditions.length > 0) {
-<div class="description">
-  <h2>
-    捐助注意事項
-  </h2>
-  <ul>
-    @for (
-      condition of demand.customConditions;
-      track condition
-    ) {
-      <li>
-        {{ condition }}
-      </li>
-    }
-  </ul>
-</div>
-}
+  @if (demand.customConditions.length > 0) {
+  <div class="description">
+    <h2>捐助注意事項</h2>
+    <ul>
+      @for ( condition of demand.customConditions; track condition ) {
+      <li>{{ condition }}</li>
+      }
+    </ul>
+  </div>
+  }
   <!-- =========================
        留言區
   ========================== -->
   <div class="comment-section">
-<h2>
-  留言區
-</h2>
-<div class="comment-form">
-  <textarea
-    [(ngModel)]="newComment"
-    rows="4"
-    placeholder="輸入你想說的話...">
-  </textarea>
-  <button type="button" class="comment-button"(click)="addComment()">
-    發布留言
-  </button>
-</div>
-<div class="comment-list">
-  @for (
-    comment of comments;
-    track $index
-  ) {
-    <div class="comment">
-      <div class="comment-header">
-        <strong>
-          {{ comment.user }}
-        </strong>
-        <span>
-          {{ comment.date }}
-        </span>
-      </div>
-      <p>
-        {{ comment.content }}
-      </p>
+    <h2>留言區</h2>
+    <div class="comment-form">
+      <textarea [(ngModel)]="newComment" rows="4" placeholder="輸入你想說的話..."> </textarea>
+      <button type="button" class="comment-button" (click)="addComment()">發布留言</button>
     </div>
-  }
-</div>
+    <div class="comment-list">
+      @for ( comment of comments; track $index ) {
+      <div class="comment">
+        <div class="comment-header">
+          <strong> {{ comment.user }} </strong>
+          <span> {{ comment.date }} </span>
+        </div>
+        <p>{{ comment.content }}</p>
+      </div>
+      }
+    </div>
   </div>
 </div>

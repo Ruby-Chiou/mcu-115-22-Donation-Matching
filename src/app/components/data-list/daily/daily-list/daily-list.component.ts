@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { timeout, catchError, of } from 'rxjs';
 
 import { DailyDemand, DailyDisplayStatus } from '../../../../models/agency/daily-demand';
-import { DailyDemandService } from '../../../../core/services/daily-demand.service';
+import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 
 import { PaginationComponent } from '../../../pagination/pagination.component';
 import { DailySearchBarComponent } from '../../../search-bar/daily-search-bar/daily-search-bar.component';
