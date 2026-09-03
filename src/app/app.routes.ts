@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
+import { donorDisasterGuard } from './components/card/donor-disaster.guard';
 
 export const routes: Routes = [
   // 1. 預設首頁
@@ -34,6 +35,7 @@ export const routes: Routes = [
 
   {
     path: 'donor/disaster',
+    canActivate: [donorDisasterGuard],
     loadComponent: () =>
       import('./features/disaster/donor-disaster-lobby/donor-disaster-lobby.component').then((m) => m.DonorDisasterLobbyComponent), // 災害救助大廳
   },
@@ -50,6 +52,25 @@ export const routes: Routes = [
     loadComponent: () => import('./features/daily/daily-locations/daily-locations.component').then((m) => m.DailyLocationsComponent),
   },
 
+  {
+    path: 'donor/disaster/needs',
+    loadComponent: () =>import('./features/disaster/needs/needs.component').then((m) => m.NeedsComponent),  //災害歷史紀錄
+  },
+  {
+  path: 'donor/disaster/supply/detail/:id',
+  canActivate: [donorDisasterGuard],
+  loadComponent: () => import('./components/page/donor-disaster-supply-detail-page/donor-disaster-supply-detail-page.component').then((m) => m.DonorDisasterSupplyDetailPageComponent),
+  },
+  {
+  path: 'donor/disaster/volunteer/detail/:id',
+  canActivate: [donorDisasterGuard],
+  loadComponent: () => import('./components/page/donor-disaster-volunteer-detail-page/donor-disaster-volunteer-detail-page.component').then((m) => m.DonorDisasterVolunteerDetailPageComponent),
+  },
+  {
+  path: 'donor/disaster/supply/form/:id',
+  canActivate: [donorDisasterGuard],
+  loadComponent: () => import('./components/form/donor-disaster-supply-form/donor-disaster-supply-form.component').then((m) => m.DonorDisasterSupplyFormComponent),
+  },
   // 4. 社福機構模組 (機構端)
   // 4.1 社福團體儀錶板
   {
@@ -98,9 +119,7 @@ export const routes: Routes = [
   {
     path: 'agency/disaster',
     loadComponent: () =>
-      import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then(
-        (m) => m.AgencyDisasterWorkspaceComponent
-      ), // 急難救助需求管理區
+      import('./features/disaster/agency-disaster-workspace/agency-disaster-workspace.component').then((m) => m.AgencyDisasterWorkspaceComponent), // 急難救助需求管理區
   },
   {
     path: 'agency/supply-form',
@@ -149,8 +168,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/disaster-control',
-    loadComponent: () =>
-      import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
+    loadComponent: () => import('./features/disaster/admin-disaster-control/admin-disaster-control.component').then((m) => m.AdminDisasterControlComponent), // 日常切換災害模式以及發布公告(有點抽象)
   },
   {
     path: 'admin/dashboard',

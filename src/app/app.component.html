@@ -2,8 +2,23 @@
 <main class="main-container">
   <router-outlet></router-outlet>
 </main>
-<!-- <app-footer></app-footer> -->
+<app-footer></app-footer>
 
+@if (closedModal.isVisible()) {
+  <div class="disaster-closed-modal-backdrop" role="presentation">
+    <section
+      class="disaster-closed-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="disaster-closed-title">
+      <h2 id="disaster-closed-title">急難救助已關閉</h2>
+      <p>目前災害救助已結束，暫時無法進行物資捐助或志工報名。</p>
+      <button type="button" (click)="goToDisasterLobby()">
+        回到災後救助大廳
+      </button>
+    </section>
+  </div>
+}
 <!-- 懸浮切換面板 -->
 <div class="dev-switcher">
   <span class="title"><span class="material-symbols-outlined"> construction </span> 開發者身份切換</span>

@@ -1,0 +1,15 @@
+<div class="carousel">
+  @if (images.length === 0) {
+    <div class="no-image">
+      <span>物資圖片</span>
+    </div>
+  } @else {
+    <div class="carousel-main">
+      <img
+        [src]="images[currentIndex] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
+        alt="物資圖片"
+        class="main-image">
+    </div>
+  }
+</div>
+

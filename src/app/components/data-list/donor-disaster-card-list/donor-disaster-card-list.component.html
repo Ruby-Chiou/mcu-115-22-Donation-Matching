@@ -1,0 +1,16 @@
+<div class="card-list">
+  @if (disasterData().isOpen && type === 'material') { @for (demand of paginatedDemands; track demand.id) {
+  <app-donor-disaster-card type="material" [demand]="demand" [demandId]="demand.id"> </app-donor-disaster-card>
+  } } @else if (disasterData().isOpen && type === 'volunteer') { @for (volunteer of paginatedVolunteers; track volunteer.id) {
+  <app-donor-disaster-card type="volunteer" [volunteer]="volunteer"> </app-donor-disaster-card>
+  } }
+
+  <!-- 共用分頁按鈕元件 -->
+  <app-pagination
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [pageNumbers]="pageNumbers"
+    (pageChange)="goToPage($event)"
+  ></app-pagination>
+</div>

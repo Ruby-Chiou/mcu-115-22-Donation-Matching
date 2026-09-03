@@ -1,0 +1,201 @@
+<article  class="card"  [class.disaster-closed]="isDisasterClosed"  [class.volunteer-card]="type === 'volunteer'"  (click)="openDetail($event)">
+  @if (isDisasterClosed) {
+    <div class="closed-banner">災害救助已完畢</div>
+  }
+
+  <div class="card-content">
+    <!-- =========================
+         物資需求
+    ========================== -->
+    @if (type === 'material') {
+     <div class="image-wrapper">
+      <!-- 左箭頭 -->
+      @if ((demand?.image?.length ?? 0) > 1) {
+        <button
+          type="button"
+          class="image-arrow previous"
+          (click)="previousImage($event)">
+          ‹
+        </button>
+      }
+
+      <!-- 圖片 -->
+      <div class="card-image">
+        <img
+          [src]="demand?.image?.[currentImageIndex] || '預設圖片網址'"
+          [alt]="demand?.item ?? '物資需求'">
+      </div>
+
+      <!-- 右箭頭 -->
+      @if ((demand?.image?.length ?? 0) > 1) {
+        <button
+          type="button"
+          class="image-arrow next"
+          (click)="nextImage($event)">
+           ›
+        </button>
+      }
+
+    </div>
+      <h2 class="material-name">
+        {{ demand?.item }}
+      </h2>
+      <div class="urgency" [class]="getPriorityClass()">
+        ● {{ demand?.priority }}物資
+      </div>
+      <p class="organization">
+        受助機構：
+        <strong>
+          {{ demand?.address || '尚未填寫' }}
+        </strong>
+      </p>
+      <div class="quantity">
+        <span>剩餘數量</span>
+        <strong>
+          {{ demand?.remaining ?? 0 }} {{ demand?.unit }}
+        </strong>
+      </div>
+    }
+    <!-- =========================
+         災害志工需求
+    ========================== -->
+     @else {
+  <h2 class="material-name">
+      {{ volunteer?.type }}
+    </h2>
+
+   <div
+    class="urgency"
+    [class.urgent]="volunteer?.priority === '緊急'"
+    [class.very-urgent]="volunteer?.priority === '非常緊急'"
+    [class.normal]="volunteer?.priority === '普通'">
+    ● {{ volunteer?.priority }}需求
+  </div>
+
+    <p class="organization">
+      需求單位：
+      <strong>{{ volunteer?.contact }}</strong>
+    </p>
+
+    <div class="quantity">
+      <span>需求人數</span>
+      <strong>{{ volunteer?.people ?? 0 }} 人</strong>
+    </div>
+
+    <div class="quantity">
+      <span>服務地點</span>
+      <strong>{{ volunteer?.location }}</strong>
+    </div>
+
+    <div class="quantity">
+      <span>服務日期</span>
+      <strong>{{ volunteer?.date }}</strong>
+    </div>
+  }
+    <div class="card-buttons">
+      <button type="button" class="detail-button" [disabled]="isDisasterClosed" (click)="openDetail($event)">
+        了解詳情
+      </button>
+    </div>
+
+  </div>
+</article>
+<!-- =========================
+     詳情 Modal
+========================== -->
+@if (showDetail) {
+  <div class="modal-overlay" (click)="closeDetail($event)">
+    <section class="detail-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          {{
+            type === 'material' ? '災害物資需求詳情' : '災害志工需求詳情'
+          }}
+        </h2>
+        <button type="button" class="close-button" (click)="closeDetail($event)">
+          ×
+        </button>
+      </div>
+      <div class="modal-content">
+        <!-- =========================
+             物資詳情
+        ========================== -->
+        @if (type === 'material') {
+          <div class="modal-info">
+            <h3>
+              {{ demand?.item }}
+            </h3>
+            <div class="modal-item">
+              <span>受助機構</span>
+              <strong>
+                {{ demand?.address || '尚未填寫' }}
+              </strong>
+            </div>
+            <div class="modal-item">
+              <span>需求數量</span>
+              <strong>
+                {{ demand?.amount ?? 0 }} {{ demand?.unit }}
+              </strong>
+            </div>
+            <div class="modal-item">
+              <span>剩餘需求</span>
+              <strong>
+                {{ demand?.remaining ?? 0 }} {{ demand?.unit }}
+              </strong>
+            </div>
+          </div>
+        }
+        <!-- =========================
+             災害志工詳情
+        ========================== -->
+        @else {
+          <div class="modal-info">
+            <h3>
+              {{ volunteer?.type }}
+            </h3>
+            <div class="modal-item">
+              <span>需求類型</span>
+              <strong>
+                {{ volunteer?.type }}
+              </strong>
+            </div>
+            <div class="modal-item">
+              <span>需求人數</span>
+              <strong>
+                {{ volunteer?.people ?? 0 }} 人
+              </strong>
+            </div>
+            <div class="modal-item">
+              <span>服務地點</span>
+              <strong>
+                {{ volunteer?.location || '尚未填寫' }}
+              </strong>
+            </div>
+            <div class="modal-item">
+              <span>需求日期</span>
+              <strong>
+                {{ volunteer?.date || '尚未填寫' }}
+              </strong>
+            </div>
+            <div class="modal-item">
+              <span>優先程度</span>
+              <strong>
+                {{ volunteer?.priority }}
+              </strong>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="modal-detail-button" (click)="goToFullDetail($event)">
+          {{
+            type === 'material'
+              ? '我要捐助'
+              : '我要報名'
+          }}
+        </button>
+      </div>
+    </section>
+  </div>
+}
+

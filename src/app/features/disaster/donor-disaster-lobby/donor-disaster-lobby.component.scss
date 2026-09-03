@@ -1,86 +1,258 @@
-.lobby {
+:host {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.title {
+  text-align: center;
+  color: #005BAC;
+}
+
+.disaster-announcement {
+  max-width: 1250px;
+  margin: 0 auto 30px;
+  padding: 18px 22px;
+  border-left: 5px solid #005bac;
+  background: #eff6ff;
+  color: var(--color-text-main);
+}
+
+.disaster-announcement h2 {
+  margin: 0 0 8px;
+  color: #005bac;
+  font-size: 20px;
+}
+
+.disaster-announcement p {
+  margin: 0;
+  line-height: 1.7;
+
+}
+
+.disaster-announcement .scheduled-close {
+  margin-top: 8px;
+  color: var(--color-text-muted);
+  font-size: 24px;
+}
+
+.disaster-announcement .marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.disaster-announcement .marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: announcement-marquee 14s linear infinite;
+}
+
+@keyframes announcement-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disaster-announcement .marquee {
+    white-space: normal;
+  }
+
+  .disaster-announcement .marquee span {
+    padding-left: 0;
+    animation: none;
+  }
+}
+
+/* 1. 調整按鈕容器，寬度設為 1250px 並居中，間距設為 30px（與下方 menu-container 一致） */
+.title-row {
+  max-width: 1250px;
+  margin: 0 auto 30px auto;
   display: flex;
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 20px;
-  gap: 25px;
+  gap: 30px; /* 保持跟下方兩區塊之間的 gap 一模一樣 */
+}
 
-  // 讓左右兩邊的卡片拉到一樣高
-  align-items: stretch;
+/* 2. 左邊按鈕：對齊左側新聞區塊 (flex: 2) */
+.title-row .title-box:first-child {
+  flex: 2;
+  width: auto; /* 移除原本固定的 300px 寬度 */
+}
 
-  // 【左邊 80% 獨立底色大框】
-  .main {
-    flex: 8;
-    background-color: var(--bg-layer-1);
-    border-radius: var(--border-radius-main);
-    padding: 30px;
-    border: 1px solid var(--border-default);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+/* 3. 右邊按鈕：對齊右側卡片區塊 (flex: 1) */
+.title-row .title-box:last-child {
+  flex: 1;
+  width: auto; /* 移除原本固定的 300px 寬度 */
+}
 
-    .title {
-      font-size: 22px;
-      color: var(--color-text-main);
-      margin-top: 0;
-      margin-bottom: 25px;
-      font-weight: 600;
-    }
-    .news-card {
-      display: flex;
-      gap: 25px;
-      align-items: center;
+/* 4. 通用按鈕基礎樣式 (保留你原本的設定，移除 width) */
+.title-box {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  //border: 1px solid #ccc;
+  border-radius: 0px;
+  background: transparent;
+  box-sizing: border-box;
+}
+/* .history {
+transform: translateY(-50px);
+padding-left: 1100px;
+}
 
-      .card-image {
-      width: 60%;
-      height: 500px; // 統一高度，可改成 250、350 等
+/* 外層左右排列 */
+.menu-container {
+  max-width: 1250px;
+  margin: 0 auto;
+  display: flex;
+  gap: 30px;
+}
+
+/* 左側新聞 */
+.left-menu {
+  flex: 2;
+  height: 290px;
+  padding: 30px;
+
+  background-color: var(--bg-layer-1);
+  border-radius: var(--border-radius-main);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+
+  .news-card {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+
+    .card-image {
+      width: 45%;
+      height: 250px;
       overflow: hidden;
       border-radius: 12px;
-    }
 
-    .card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .card-text {
-        flex: 1; // 佔 50%
-        color: var(--color-text-main);
-        font-size: 16px;
-        line-height: 1.8;
-
-        .highlight {
-          color: var(--color-brand-primary);
-          font-weight: 600;
-          margin-top: 15px;
-        }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
-    .disaster-indicators {
-      display: flex;
-      justify-content: center; // 讓點點在卡片下方水平置中
-      gap: 8px; // 點與點之間的精緻間距
-      margin-top: 20px; // 跟上方卡片空出一些距離
 
-      .dot {
-        width: 10px;
-        height: 10px;
-        background-color: #bdc3c7; // 預設是暗淡的淺灰色
-        border-radius: 50%; // 強制變成正圓形
-        display: inline-block; // 確保圓形有實體能渲染
-        cursor: pointer;
-        transition: all 0.3s ease;
+    .card-text {
+      flex: 1;
+      color: var(--color-text-main);
+      font-size: 16px;
+      line-height: 1.8;
+      font-weight: 600;
 
-        &:hover {
-          background-color: var(--color-text-muted);
-          transform: scale(1.2);
-        }
-
-        &.active {
-          background-color: var(--color-brand-primary);
-          width: 24px; // 亮起時自動變成「膠囊狀」長條
-          border-radius: 5px;
-        }
+      .highlight {
+        color: var(--color-text-muted);
       }
     }
   }
 }
+
+/* 圓點 */
+.disaster-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    background-color: #bdc3c7;
+    border-radius: 50%;
+    cursor: pointer;
+
+    &.active {
+      background-color: var(--color-brand-primary);
+      width: 24px;
+      border-radius: 5px;
+    }
+  }
+}
+
+/* 右側三個框 */
+.right-menu {
+flex: 1;        // 改成跟左側一樣比例
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  .info-card {
+   flex: 1;        // 三個框平均分配高度
+  padding: 15px;
+
+    background-color: var(--bg-layer-1);
+    border-radius: var(--border-radius-main);
+    border: 1px solid var(--border-default);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+
+    cursor: pointer;
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+.map-section {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 520px;
+  margin-top: 40px;
+  background: var(--bg-layer-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--border-radius-main);
+  overflow: hidden;
+}
+
+.map-sidebar {
+  box-sizing: border-box;
+  flex: 0 0 280px;
+  width: 280px;
+  padding: 24px;
+  background: #fff;
+}
+
+.map-sidebar h2 {
+  margin: 0 0 20px;
+  color: #005bac;
+}
+
+.map-sidebar label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+.location-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font: inherit;
+}
+
+#disaster-map {
+  flex: 1;
+  min-width: 0;
+  min-height: 520px;
+}
+
+
+
