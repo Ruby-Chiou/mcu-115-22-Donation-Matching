@@ -3,7 +3,7 @@
   position: static;
 
   width: 100%;
-  margin-top: 10px;
+  margin-block: 15px;
   padding: 20px 24px;
 
   box-sizing: border-box;
@@ -17,18 +17,15 @@
   animation: filterSlideDown 0.2s ease;
 }
 
-
 // 篩選群組
 .filter-group {
   padding: 12px 0;
 }
 
-
 // 每個篩選群組之間加分隔線
 .filter-group:not(:last-child) {
   border-bottom: 1px solid #eee4d8;
 }
-
 
 // 標題
 .filter-group h3 {
@@ -40,14 +37,12 @@
   color: #4b3a2a;
 }
 
-
 // 選項排列
 .pill-list {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
 
 // 篩選按鈕
 .pill-btn {
@@ -67,12 +62,10 @@
     border-color 0.2s ease;
 }
 
-
 // 滑鼠移入
 .pill-btn:hover {
   background: #f7efe6;
 }
-
 
 // 已選取
 .pill-btn.active {
@@ -81,7 +74,6 @@
   color: #fff;
 }
 
-
 // 底部按鈕
 .filter-footer {
   display: flex;
@@ -89,7 +81,6 @@
 
   padding-top: 18px;
 }
-
 
 .reset-btn {
   padding: 8px 18px;
@@ -103,18 +94,15 @@
   cursor: pointer;
 }
 
-
 .reset-btn:hover {
   background: #f7efe6;
 }
-
 
 // ==========================
 // 向下展開動畫
 // ==========================
 
 @keyframes filterSlideDown {
-
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -124,5 +112,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-
 }

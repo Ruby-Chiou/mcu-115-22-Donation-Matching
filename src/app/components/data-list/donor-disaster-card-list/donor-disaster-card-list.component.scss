@@ -5,6 +5,14 @@
   gap: 24px;
   width: 100%;
   box-sizing: border-box;
+
+  // 讓分頁元件跨越整行，並強制置中於底部
+  app-pagination {
+    grid-column: 1 / -1; // 跨越從第一欄到最後一欄（佔滿整行）
+    display: flex;
+    justify-content: center; // 水平置中
+    padding: 10px 0;
+  }
 }
 
 @media (max-width: 1100px) {

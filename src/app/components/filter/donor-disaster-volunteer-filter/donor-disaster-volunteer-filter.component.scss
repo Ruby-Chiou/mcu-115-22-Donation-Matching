@@ -6,14 +6,15 @@
 .volunteer-filter {
   width: 100%;
   box-sizing: border-box;
+  margin-block: 15px;
+
   padding: 28px 32px;
 
   background: #fffdf9;
   border: 1px solid #e4d8c9;
   border-radius: 16px;
 
-  box-shadow:
-    0 6px 20px rgba(83, 61, 40, 0.10);
+  box-shadow: 0 6px 20px rgba(83, 61, 40, 0.1);
 
   animation: filterExpand 0.25s ease;
 }
@@ -111,7 +112,6 @@
 }
 
 @keyframes filterExpand {
-
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -121,5 +121,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-
 }
