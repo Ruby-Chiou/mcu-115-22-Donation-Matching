@@ -8,54 +8,52 @@
 
   } @else {
 
-    <!-- 圖片 + 左右箭頭 -->
     <div class="carousel-wrapper">
 
       <!-- 左箭頭 -->
-      @if (images.length > 1) {
-        <button
-          class="carousel-arrow arrow-left"
-          type="button"
-          (click)="prevImage()"
-          aria-label="上一張圖片">
-          ‹
-        </button>
-      }
+      <button
+        class="carousel-arrow arrow-left"
+        [class.hidden]="images.length <= 1"
+        type="button"
+        (click)="prevImage()"
+        aria-label="上一張圖片">
+        ‹
+      </button>
 
       <!-- 圖片 -->
       <div class="carousel-main">
         <img
           [src]="images[currentIndex]"
           alt="物資圖片"
-          class="main-image"
-        >
+          class="main-image">
       </div>
 
       <!-- 右箭頭 -->
-      @if (images.length > 1) {
-        <button
-          class="carousel-arrow arrow-right"
-          type="button"
-          (click)="nextImage()"
-          aria-label="下一張圖片">
-          ›
-        </button>
-      }
+      <button
+        class="carousel-arrow arrow-right"
+        [class.hidden]="images.length <= 1"
+        type="button"
+        (click)="nextImage()"
+        aria-label="下一張圖片">
+        ›
+      </button>
 
     </div>
 
-    <!-- 圓點 -->
-     @if (images.length > 1) {
-      <div class="carousel-dots">
-        @for (image of images; track $index) {
-          <span
-            class="dot"
-            [class.active]="$index === currentIndex"
-            (click)="goToImage($index)">
-          </span>
-        }
-      </div>
-    }
+    <!-- 固定的圓點區域 -->
+    <div
+      class="carousel-dots"
+      [class.hidden]="images.length <= 1">
+
+      @for (image of images; track $index) {
+        <span
+          class="dot"
+          [class.active]="$index === currentIndex"
+          (click)="goToImage($index)">
+        </span>
+      }
+
+    </div>
 
   }
 

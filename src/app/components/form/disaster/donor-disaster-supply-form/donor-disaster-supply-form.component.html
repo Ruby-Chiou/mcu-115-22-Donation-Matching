@@ -11,22 +11,43 @@
         </p>
       </div>
       <div class="material-image">
-          @if (demand) {
-            @if (demand.image && demand.image.length > 0) {
-              <img
-                [src]="demand.image[0]"
-                [alt]="demand.item">
-            } @else {
-              <div class="no-image">
-                尚未提供圖片
-              </div>
-            }
+        @if (demand) {
+
+          <!-- 優先度 -->
+          <span
+            class="tag priority-tag"
+            [ngClass]="getPriorityClass(demand.priority)"
+          >
+            {{ demand.priority }}
+          </span>
+
+          <!-- 圖片 -->
+          @if (demand.image && demand.image.length > 0) {
+
+            <img
+              [src]="
+                demand.image[0]
+                || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
+              "
+              [alt]="demand.item || '物資圖片'"
+            />
+
           } @else {
+
             <div class="no-image">
-              載入中...
+              尚未提供圖片
             </div>
+
           }
-        </div>
+
+        } @else {
+
+          <div class="no-image">
+            載入中...
+          </div>
+
+        }
+      </div>
                 <div class="material-text">
           <span class="label">
             捐助物資

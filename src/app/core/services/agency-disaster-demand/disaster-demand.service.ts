@@ -74,7 +74,9 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '食品請確認保存期限及外包裝完整。',
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
+      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'
+      ],
       imageFileNames: ['測試圖2'],
       createdAt: '2026-08-21T10:30:00',
       publishedAt: '2026-08-21T10:30:00',
