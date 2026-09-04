@@ -1,38 +1,108 @@
 .carousel {
-  width: 100%;
-}
-
-/* =========================
-   主圖片區域
-========================= */
-
-.carousel-main {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  border-radius: 12px;
-  background: #f5f5f5;
 }
 
-.main-image {
+/* 灰色圖片區 */
+.carousel-wrapper {
+  position: relative;
   width: 100%;
+  height: 320px;
+
+}
+
+.carousel-main {
+   width: 100%;
+  height: 320px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+/* 圖片 */
+.main-image {
+ width: 100%;
   height: 100%;
+
   display: block;
   object-fit: cover;
 }
 
-/* =========================
-   沒有圖片
-========================= */
+/* 箭頭 */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
 
-.no-image {
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  z-index: 10;
+
+  width: 40px;
+  height: 40px;
+
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+
+  font-size: 30px;
+  line-height: 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: #ddd;
-  color: #666;
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.arrow-left {
+  left: 10px;
+}
+
+.arrow-right {
+  right: 10px;
+}
+
+.carousel-arrow:hover {
+  background: #f5f5f5;
+}
+
+.carousel-arrow.hidden {
+  visibility: hidden;
+}
+
+/* 圓點固定在灰色框下面 */
+.carousel-dots {
+
+  width: 100%;
+  height: 100px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.carousel-dots.hidden {
+  display: none;
+}
+
+/* 圓點 */
+.dot {
+  width: 10px;
+  height: 10px;
+
+  flex-shrink: 0;
+
+  background: #cccccc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot.active {
+  background: #005bac;
 }
