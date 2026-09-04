@@ -96,7 +96,7 @@
           <td class="published-time-column">{{ item.displayPublishedAt }}</td>
           <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
           <td class="message-column">
-            <a [routerLink]="['/agency/disaster-message', item.serialNo]"> {{ item.messageCount || 0 }} </a>
+            <a [routerLink]="['/donor/disaster/supply/detail', item.serialNo]"> {{ item.messageCount || 0 }} </a>
           </td>
 
           <td class="operation-column">

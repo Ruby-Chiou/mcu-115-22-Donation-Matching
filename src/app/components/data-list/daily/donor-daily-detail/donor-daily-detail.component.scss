@@ -1,20 +1,46 @@
-.detail-info{
-  position: relative;
+/* 強制讓整個頁面元件底部保有寬敞空間 */
+:host {
+  display: block;
+  padding-bottom: 50px;
+}
+
+/* 上方主詳情區塊 */
+.detail-info {
   width: 100%;
   max-width: 800px;
-  box-sizing: border-box;
-
-  margin: 40px auto;
+  margin: 40px auto 30px auto;
   padding: 70px 30px 30px;
-
   background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
-.detail-page {
 
+/* 下方獨立留言區塊 */
+.comment-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* 上方主詳情區塊保留頂部返回按鈕留白 */
+.detail-info {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-top: 70px;
+}
+
+.detail-page {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 30px;
-
 }
 
 /* 左邊圖片 */
@@ -41,10 +67,8 @@
   top: 12px;
   left: 12px;
   z-index: 10;
-
   padding: 5px 12px;
   border-radius: 20px;
-
   color: white;
   font-size: 14px;
   font-weight: 700;
@@ -53,30 +77,21 @@
 .detail-image .priority-urgent {
   background: #f64d4d;
 }
-
 .detail-image .priority-normal {
   background: #f59e0b;
 }
-
-.detail-image .priority-low {
-  background: #999;
-}
-
+.detail-image .priority-low,
 .detail-image .priority-default {
   background: #999;
 }
 
-/* 圖片下方圓點*/
-
+/* 圖片下方圓點 */
 .image-dots {
   position: absolute;
   bottom: 10px;
   left: 50%;
-
   transform: translateX(-50%);
-
   z-index: 5;
-
   display: flex;
   align-items: center;
   gap: 6px;
@@ -85,13 +100,9 @@
 .image-dots span {
   width: 8px;
   height: 8px;
-
   border-radius: 50%;
-
   background: rgba(255, 255, 255, 0.6);
-
   cursor: pointer;
-
   transition: all 0.2s ease;
 }
 
@@ -100,6 +111,7 @@
   border-radius: 10px;
   background: white;
 }
+
 /* 右邊內容 */
 .detail-content {
   flex: 1;
@@ -108,20 +120,16 @@
   box-sizing: border-box;
 }
 
-/* 返回 */
+/* 返回按鈕 */
 .back-btn {
   position: absolute;
-  top: 25px;
-  left: 30px;
-
+  top: -45px;
+  left: 0;
   border: none;
   background: none;
-
   padding: 0;
-
   color: #666;
   font-size: 15px;
-
   cursor: pointer;
 }
 
@@ -132,7 +140,6 @@
 /* 標題 */
 .detail-content h2 {
   margin: 0 0 25px;
-
   font-size: 28px;
   color: #333;
 }
@@ -147,111 +154,42 @@
 }
 
 .quantity-row h3,
-.quantity-row p {
+.quantity-row p,
+.quantity-row h4 {
   margin: 0;
 }
 
 .quantity-row h4 {
-  margin: 0;
   min-width: 120px;
   text-align: right;
   flex-shrink: 0;
+  color: #555;
+  font-size: 16px;
 }
 
 .quantity-row .description {
   margin: 0;
   flex: 1;
-}
-
-/* 小標題 */
-.detail-content h4 {
-  margin: 22px 0 8px;
-
-  font-size: 16px;
   color: #555;
-}
-
-/* 需求資訊 */
-.info {
-  display: flex;
-  gap: 15px;
-}
-
-.info > div {
-  flex: 1;
-  min-width: 0;
-
-  padding: 12px;
-
-  background: #f7f7f7;
-  border-radius: 8px;
-
-  text-align: center;
-}
-
-.info span {
-  display: block;
-
-  margin-bottom: 5px;
-
-  font-size: 18px;
-  color: #888;
-}
-
-.info strong {
-  font-size: 18px;
-  color: #333;
-}
-
-/* 文字 */
-.detail-content p {
-  margin: 5px 0;
-
   line-height: 1.7;
-  color: #555;
 }
 
-.description {
-  max-width: 660px;
-  color: #555;
-}
-
-
-/* 我要捐助 */
+/* 我要捐助按鈕 */
 .contact-btn {
   display: block;
   margin-top: 25px;
   margin-left: auto;
-
   width: 180px;
   padding: 12px;
-
   border: none;
   border-radius: 8px;
-
   background: #e68a3a;
   color: white;
-
   font-size: 16px;
   font-weight: bold;
-
   cursor: pointer;
 }
-@media (max-width: 700px) {
-  .detail-page {
-    grid-template-columns: 1fr;
-    gap: 25px;
-    padding: 70px 20px 25px;
-  }
 
-  .detail-content {
-    text-align: center;
-  }
-
-  .info {
-    justify-content: center;
-  }
-}
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -262,49 +200,40 @@
 .tag {
   display: inline-block;
   padding: 5px 12px;
-
   border-radius: 20px;
-
   background: #f3e8dc;
   color: #b86b2c;
-
   font-size: 14px;
 }
-.organization-intro {
-  width: 90%;
-  margin: 40px auto 0;
 
+.organization-intro {
+  width: 100%;
+  margin: 40px auto 0;
   h3 {
     margin-bottom: 16px;
+    font-size: 20px;
   }
-
   p {
     line-height: 1.8;
-    color: var(--text);
+    color: #555;
     text-align: left;
   }
 }
-/* 留言區*/
-.comment-section {
-  margin-top: 30px;
-  padding: 30px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.08);
-}
+
+/* 留言區內部元素樣式 */
 .comment-section h2 {
   margin: 0 0 20px;
   font-size: 22px;
+  color: #333;
 }
-/* 留言輸入 */
+
 .comment-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 30px;
 }
+
 .comment-form textarea {
   width: 100%;
   padding: 12px;
@@ -316,10 +245,11 @@
   font-family: inherit;
   outline: none;
 }
+
 .comment-form textarea:focus {
   border-color: #ff6b35;
 }
-/* 發布留言 */
+
 .comment-button {
   align-self: flex-end;
   padding: 10px 24px;
@@ -331,10 +261,11 @@
   font-weight: 600;
   cursor: pointer;
 }
+
 .comment-button:hover {
   background: #e85a28;
 }
-/* 留言列表 */
+
 .comment-list {
   display: flex;
   flex-direction: column;
@@ -342,7 +273,7 @@
   width: 100%;
   box-sizing: border-box;
 }
-/* 單則留言 */
+
 .comment {
   width: 100%;
   box-sizing: border-box;
@@ -351,24 +282,36 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
 }
-/* 留言標題 */
+
 .comment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
+
 .comment-header strong {
   font-size: 16px;
   color: #333;
 }
+
 .comment-header span {
   font-size: 13px;
   color: #999;
 }
-/* 留言內容 */
+
 .comment p {
   margin: 0;
   line-height: 1.6;
   color: #555;
+}
+
+@media (max-width: 700px) {
+  .detail-page {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .detail-content {
+    text-align: center;
+  }
 }
