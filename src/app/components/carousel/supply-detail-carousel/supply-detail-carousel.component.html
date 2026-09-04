@@ -1,15 +1,62 @@
 <div class="carousel">
+
   @if (images.length === 0) {
+
     <div class="no-image">
       <span>物資圖片</span>
     </div>
-  } @else {
-    <div class="carousel-main">
-      <img
-        [src]="images[currentIndex] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
-        alt="物資圖片"
-        class="main-image">
-    </div>
-  }
-</div>
 
+  } @else {
+
+    <!-- 圖片 + 左右箭頭 -->
+    <div class="carousel-wrapper">
+
+      <!-- 左箭頭 -->
+      @if (images.length > 1) {
+        <button
+          class="carousel-arrow arrow-left"
+          type="button"
+          (click)="prevImage()"
+          aria-label="上一張圖片">
+          ‹
+        </button>
+      }
+
+      <!-- 圖片 -->
+      <div class="carousel-main">
+        <img
+          [src]="images[currentIndex]"
+          alt="物資圖片"
+          class="main-image"
+        >
+      </div>
+
+      <!-- 右箭頭 -->
+      @if (images.length > 1) {
+        <button
+          class="carousel-arrow arrow-right"
+          type="button"
+          (click)="nextImage()"
+          aria-label="下一張圖片">
+          ›
+        </button>
+      }
+
+    </div>
+
+    <!-- 圓點 -->
+     @if (images.length > 1) {
+      <div class="carousel-dots">
+        @for (image of images; track $index) {
+          <span
+            class="dot"
+            [class.active]="$index === currentIndex"
+            (click)="goToImage($index)">
+          </span>
+        }
+      </div>
+    }
+
+  }
+
+</div>
