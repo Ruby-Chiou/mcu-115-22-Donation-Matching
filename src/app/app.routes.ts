@@ -54,7 +54,7 @@ export const routes: Routes = [
   },
 
   {
-    path: 'donor/disaster/history',
+    path: 'disaster/history',
     loadComponent: () => import('./features/disaster/disaster-history/disaster-history.component').then((m) => m.DisasterHistoryComponent), //災害歷史紀錄(從needs更名為history)
   },
   {

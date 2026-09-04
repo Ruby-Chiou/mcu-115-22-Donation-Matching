@@ -28,6 +28,7 @@ export class AdminDashboardComponent {
       items: [
         { name: '日常捐助大廳', path: '/donor/daily', desc: '瀏覽日常物資與捐助' },
         { name: '災害救助大廳', path: '/donor/disaster', desc: '急難救助需求瀏覽' },
+        { name: '災害歷史紀錄', path: '/disaster/history', desc: '查看災害歷史紀錄' },
         { name: '歷史紀錄與進度追蹤', path: '/donor/history', desc: '查詢個人捐助歷史' },
       ],
     },

@@ -1,18 +1,15 @@
 <h1 class="title">災害救助大廳</h1>
 @if (disasterData().announcement || disasterData().scheduledCloseAt) {
-  <section class="disaster-announcement" aria-labelledby="announcement-title">
-    <h2 id="announcement-title">災害救助公告</h2>
-    @if (disasterData().announcement) {
-      <p>{{ disasterData().announcement }}</p>
-    }
-    @if (disasterData().scheduledCloseAt) {
-      <p class="scheduled-close marquee" role="status">
-        <span>
-          預計關閉災害捐助時間：{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }}
-        </span>
-      </p>
-    }
-  </section>
+<section class="disaster-announcement" aria-labelledby="announcement-title">
+  <h2 id="announcement-title">災害救助公告</h2>
+  @if (disasterData().announcement) {
+  <p>{{ disasterData().announcement }}</p>
+  } @if (disasterData().scheduledCloseAt) {
+  <p class="scheduled-close marquee" role="status">
+    <span> 預計關閉災害捐助時間：{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }} </span>
+  </p>
+  }
+</section>
 }
 <div class="title-row">
   <div class="title-box">政府最新消息</div>
@@ -36,23 +33,17 @@
       }
     </div>
   </aside>
-<aside class="right-menu">
-  @for (item of historyList; track item.text) {
+  <aside class="right-menu">
+    @for (item of historyList; track item.text) {
 
     <div class="info-card">
+      <h3>{{ item.text }}</h3>
 
-      <h3>
-        {{ item.text }}
-      </h3>
-
-      <p>
-        {{ item.highlight }}
-      </p>
-
+      <p>{{ item.highlight }}</p>
     </div>
 
-  }
-  <a [routerLink]="['/donor/disaster/needs']">查看歷史紀錄</a>
+    }
+    <a [routerLink]="['/disaster/history']">查看歷史紀錄</a>
   </aside>
 </div>
 
@@ -70,4 +61,3 @@
   </div>
   <div id="disaster-map"></div>
 </section>
-

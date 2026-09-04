@@ -1,14 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
-interface MaterialNeed {
+interface MaterialHistory {
   id: number;
   item: string;
   quantity: number;
   unit: string;
 }
 
-interface VolunteerNeed {
+interface VolunteerHistory {
   id: number;
   title: string;
   people: number;
@@ -22,12 +22,12 @@ interface DisasterSection {
   description: string;
   backgroundImage: string;
 
-  materialNeeds: MaterialNeed[];
-  volunteerNeeds: VolunteerNeed[];
+  materialNeeds: MaterialHistory[];
+  volunteerNeeds: VolunteerHistory[];
 }
 
 @Component({
-  selector: 'app-needs',
+  selector: 'app-disaster-history',
   imports: [RouterLink],
   templateUrl: './disaster-history.component.html',
   styleUrl: './disaster-history.component.scss',
