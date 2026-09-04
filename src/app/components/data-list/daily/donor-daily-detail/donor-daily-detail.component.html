@@ -127,6 +127,27 @@
       期許孩子在不久的將來能真正「自立脫貧」，擁有充滿希望的家園，不再落入貧窮循環。
     </p>
   </div>
+  <!-- =========================
+       留言區
+  ========================== -->
+  <div class="comment-section">
+    <h2>留言區</h2>
+    <div class="comment-form">
+      <textarea [(ngModel)]="newComment" rows="4" placeholder="輸入你想說的話..."> </textarea>
+      <button type="button" class="comment-button" (click)="addComment()">發布留言</button>
+    </div>
+    <div class="comment-list">
+      @for ( comment of comments; track $index ) {
+      <div class="comment">
+        <div class="comment-header">
+          <strong> {{ comment.user }} </strong>
+          <span> {{ comment.date }} </span>
+        </div>
+        <p>{{ comment.content }}</p>
+      </div>
+      }
+    </div>
+  </div>
 </div>
 } @else {
 <div class="loading-state" style="padding: 40px; text-align: center">載入中，或找不到此筆資料...</div>

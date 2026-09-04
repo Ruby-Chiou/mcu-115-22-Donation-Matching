@@ -1,14 +1,20 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterModule, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 
+interface Comment {
+  user: string;
+  date: string;
+  content: string;
+}
 @Component({
   selector: 'app-donor-daily-detail',
   standalone: true,
-  imports: [RouterLink, CommonModule, RouterModule],
+  imports: [RouterLink, CommonModule, RouterModule,FormsModule],
   templateUrl: './donor-daily-detail.component.html',
   styleUrl: './donor-daily-detail.component.scss',
 })
@@ -179,5 +185,39 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
       .filter(([_, value]) => value)
       .map(([key, value]) => `${key}：${value}`)
       .join('、');
+  }
+  // =========================
+  // 留言
+  // =========================
+  newComment = '';
+  comments: Comment[] = [
+    {
+      user: '王小明',
+      date: '2026/08/17',
+      content: '請問目前還需要礦泉水嗎？',
+    },
+    {
+      user: '陳小華',
+      date: '2026/08/16',
+      content: '已經準備好物資，希望可以幫助到災區。',
+    },
+  ];
+  addComment(): void {
+    if (!this.newComment.trim()) {
+      return;
+    }
+    this.comments.unshift({
+      user: '目前使用者',
+      date: this.getToday(),
+      content: this.newComment.trim(),
+    });
+    this.newComment = '';
+  }
+  getToday(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}/${month}/${day}`;
   }
 }
