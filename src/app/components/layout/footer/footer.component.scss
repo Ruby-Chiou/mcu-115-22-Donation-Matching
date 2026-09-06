@@ -1,45 +1,85 @@
 // ==========================================
-// 全域感謝公告欄（永遠置底）
+// 全域感謝公告欄
 // ==========================================
 .global-thanks-bar {
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
   background-color: #1c2833;
   color: var(--color-white);
-  padding: 6px 0; //高度調這
+  padding: 10px 0;
   box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
   z-index: 9999;
+  overflow: hidden;
+
+  .thanks-track {
+    width: 100%;
+    overflow: hidden;
+  }
 
   .thanks-content {
-    display: flex;
-    justify-content: center;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    font-size: 14px;
+    gap: 30px;
+    white-space: nowrap;
+    font-size: 16px;
     letter-spacing: 0.5px;
 
+    animation: marquee 12s linear infinite;
+
+  .thanks-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+    span {
+      display: flex;
+      align-items: center;
+      line-height: 1;
+      }
+    }
+
     .fa-heart {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #e74c3c;
-      animation: pulse 1.5s infinite; //讓愛心會微微跳動
+      line-height: 1;
+      animation: pulse 1.5s infinite;
     }
 
     strong {
       color: #f1c40f;
-      font-size: 16px;
+      font-size: 18px;
+      margin: 0 4px;
     }
   }
 }
+
+
+// 感謝文字跑馬燈
+@keyframes marquee {
+  from {
+    transform: translateX(100vw);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 
 // 愛心跳動動畫
 @keyframes pulse {
   0% {
     transform: scale(1);
   }
+
   50% {
-    transform: scale(1.15);
+    transform: scale(1.3);
   }
+
   100% {
     transform: scale(1);
   }

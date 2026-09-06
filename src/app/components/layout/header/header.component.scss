@@ -5,7 +5,7 @@ header {
   background-color: var(--nav-bg);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: 0;
+  top: 40px;
   z-index: 1000;
 
   .container {
@@ -18,11 +18,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 70px; // 固定導覽列高度
+    height: 90px; // 固定導覽列高度
   }
 
   .left .nav-name {
-    font-size: 20px;
+    font-size: 30px;
     font-weight: 700;
     color: var(--color-brand-primary);
     margin: 0;
@@ -43,7 +43,7 @@ header {
         text-decoration: none;
         color: var(--color-text-main);
         font-weight: 500;
-        font-size: 16px;
+        font-size: 22px;
         padding: 8px 4px;
         display: flex;
         align-items: center;
@@ -123,7 +123,7 @@ header {
     a {
       text-decoration: none;
       color: var(--color-text-main);
-      font-size: 16px;
+      font-size: 20px;
       font-weight: bold;
       &:hover {
         color: var(--color-brand-primary);
@@ -131,7 +131,7 @@ header {
     }
 
     i {
-      font-size: 18px;
+      font-size: 28px;
       cursor: pointer;
       color: var(--color-text-main);
       &:hover {
