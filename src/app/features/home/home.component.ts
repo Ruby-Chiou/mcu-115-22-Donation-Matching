@@ -1,6 +1,5 @@
 import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DonorDailyLobbyComponent } from '../daily/donor-daily-lobby/donor-daily-lobby.component';
 import { Router } from '@angular/router';
 // 1. 定義最新消息的資料結構
 interface NewsItem {
@@ -12,7 +11,7 @@ interface NewsItem {
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, DonorDailyLobbyComponent],
+  imports: [RouterLink],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

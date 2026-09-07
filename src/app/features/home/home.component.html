@@ -1,28 +1,107 @@
 <div class="lobby-grid">
+
+  <!-- 左側：最新消息 -->
   <section class="main-content">
     <h3 class="section-title">最新消息</h3>
+
     <div class="news-card">
       <div class="card-image">
         <img [src]="currentNews().image" [alt]="currentNews().text" />
       </div>
+
       <div class="card-text">
         <p>{{ currentNews().text }}</p>
         <p class="highlight">{{ currentNews().highlight }}</p>
       </div>
     </div>
+
     <div class="carousel-indicators">
       @for (i of [0, 1, 2]; track i) {
-      <span class="dot" [class.active]="currentIndex() === i" (click)="setSlide(i)"> </span>
+        <span
+          class="dot"
+          [class.active]="currentIndex() === i"
+          (click)="setSlide(i)">
+        </span>
       }
     </div>
   </section>
 
+
+  <!-- 右側：快速導覽 -->
   <aside class="right-sidebar">
-    <a routerLink="/news" class="sidebar-item"><i class="fa-solid fa-bullhorn"></i> 最新公告</a>
-    <a routerLink="/trends" class="sidebar-item"><i class="fa-solid fa-fire"></i> 熱門需求</a>
-    <a href="#" class="sidebar-item" (click)="goToDisaster($event)">
-      <i class="fa-solid fa-triangle-exclamation"></i> 災害救助</a>
+
+    <!-- 第一列 -->
+    <div class="sidebar-row">
+      <span class="row-title">我要捐物</span>
+
+      <a routerLink="/donor/daily" class="circle-button">
+  日常<br />捐助
+      </a>
+
+      <a href="#" class="circle-button" (click)="goToDisaster($event)">
+        災害<br />救助
+      </a>
+    </div>
+
+
+    <!-- 第二列 -->
+    <div class="sidebar-row">
+      <span class="row-title">認識我們</span>
+
+      <a href="#" class="circle-button">
+        平台<br />介紹
+      </a>
+
+      <a href="#" class="circle-button">
+        聯絡<br />我們
+      </a>
+    </div>
+
+
+    <!-- 第三列 -->
+    <div class="sidebar-row">
+      <span class="row-title">更多問題</span>
+
+      <a href="#" class="circle-button">
+        常見<br />問題
+      </a>
+
+      <a href="#" class="circle-button">
+        AI<br />客服
+      </a>
+    </div>
+
   </aside>
+
 </div>
 
-<app-donor-daily-lobby></app-donor-daily-lobby>
+<!-- 平台公告 -->
+<section class="platform-announcements">
+  <div class="announcement-title">
+    <i class="fa-solid fa-bullhorn"></i>
+    <span>平台公告</span>
+  </div>
+
+  <div class="announcement-list">
+    <div class="announcement-item">
+      <span class="announcement-date">26/09/07</span>
+      <span class="announcement-text">
+        系統更新通知：平台已於 26/09/07 完成系統更新，請使用者重新登入以享受最新功能。
+      </span>
+    </div>
+
+    <div class="announcement-item">
+      <span class="announcement-date">26/09/06</span>
+      <span class="announcement-text">
+        平台新增「災害救助」功能，提供民眾在災害發生時快速提出需求。
+      </span>
+    </div>
+
+    <div class="announcement-item">
+      <span class="announcement-date">26/09/05</span>
+      <span class="announcement-text">
+        系統維護通知：平台將於 26/09/07 進行系統維護，屆時可能暫時無法使用。
+      </span>
+    </div>
+  </div>
+</section>
