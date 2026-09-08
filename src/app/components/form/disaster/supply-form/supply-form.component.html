@@ -250,6 +250,7 @@
               {{ getConditionIcon(demand.conditions['全新']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">二手</span>
             <button
@@ -262,6 +263,7 @@
               {{ getConditionIcon(demand.conditions['二手']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">有擦痕</span>
             <button
@@ -274,6 +276,7 @@
               {{ getConditionIcon(demand.conditions['有擦痕']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">過期</span>
             <button
@@ -286,6 +289,7 @@
               {{ getConditionIcon(demand.conditions['過期']) }}
             </button>
           </div>
+
           <div class="condition-row">
             <span class="condition-name">毀損</span>
             <button
@@ -366,22 +370,25 @@
     </div>
 
     <!-- 公開狀態 -->
-    <label class="label-row align-title"> 公開狀態 <span class="required">*</span> </label>
+    <label class="label-row align-title">
+      公開狀態
+      <span class="required">*</span>
+    </label>
 
     <div class="status-box">
       <label>
-        <input type="radio" name="status" value="上架" [(ngModel)]="demand.status" />
+        <input type="radio" name="status" [checked]="demand.status === '上架'" (change)="onStatusSelect('上架')" />
         上架
       </label>
 
       <label>
-        <input type="radio" name="status" value="隱藏" [(ngModel)]="demand.status" />
+        <input type="radio" name="status" [checked]="demand.status === '隱藏'" (change)="onStatusSelect('隱藏')" />
         隱藏
       </label>
 
       <!-- 編輯模式才顯示下架 -->
       <label *ngIf="isEditMode">
-        <input type="radio" name="status" value="下架" [(ngModel)]="demand.status" />
+        <input type="radio" name="status" [checked]="demand.status === '下架'" (change)="onStatusSelect('下架')" />
         下架
       </label>
     </div>
@@ -528,6 +535,7 @@
       其他說明（備註）
       <span class="word-count" *ngIf="demand.note"> {{ demand.note.length }}/300 </span>
     </label>
+
     <textarea
       class="note-textarea"
       maxlength="300"
@@ -549,4 +557,19 @@
     [imageName]="previewImageName"
     (closed)="closeImagePreview()"
   ></app-supply-image-preview>
+
+  <!-- 手動下架確認視窗 -->
+  <app-supply-off-shelf
+    *ngIf="showOffShelfWarning"
+    (closed)="cancelManualOffShelf()"
+    (hide)="hideInsteadOfOffShelf()"
+    (confirmed)="confirmManualOffShelf()"
+  ></app-supply-off-shelf>
+
+  <!-- 已下架無法重新上架提示 -->
+  <app-supply-on-shelf
+    *ngIf="showOnShelfWarning"
+    (closed)="closeOnShelfWarning()"
+    (confirmed)="closeOnShelfWarning()"
+  ></app-supply-on-shelf>
 </div>
