@@ -1,6 +1,6 @@
 .featured-card {
   overflow: hidden;
-  height: 570px;
+  height: 590px;
   background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 10px;
@@ -57,26 +57,37 @@
 }
 /* 內容 */
 .featured-content {
-   flex: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   padding: 15px;
 }
-.featured-content h3 {
-  margin: 0 0 7px;
-  font-size: 22px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 .info {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   color: #777;
   font-size: 14px;
 }
 
+.info p {
+  margin: 3px 0;
+}
+
+/*查看詳情 */
+
+.detail-btn {
+  display: block;
+  margin-top: auto;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  background: #e68a3a;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
 /* 標籤 */
 .tags {
   display: flex;
@@ -96,17 +107,42 @@
 .info span:not(:last-child)::after {
   content: "、";
 }
-/* 查看詳情 */
-.detail-btn {
-  display: block;
-  margin-top: auto;
-  width: 100%;
-  padding: 6px 10px;
+.image-arrow {
+ position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 40px;
+  height: 60px;
+  padding: 0;
   border: none;
-  border-radius: 5px;
-  background: #e68a3a;
-  color: white;
+  background: transparent;
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
+  transform: translateY(-50%);
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.55);
+  opacity: 0.75;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.image-arrow.previous {
+  left: 4px;
+}
+.image-arrow.next {
+  right: 4px;
+}
+.image-arrow:hover {
+  opacity: 1;
+}
+.image-arrow.previous:hover {
+  transform: translateY(-50%) translateX(-2px);
+}
+.image-arrow.next:hover {
+  transform: translateY(-50%) translateX(2px);
+}
+.image-arrow:active {
+  transform: translateY(-50%) scale(0.95);
 }

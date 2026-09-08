@@ -149,8 +149,8 @@
   align-items: baseline;
   gap: 20px;
   width: 100%;
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .quantity-row h3,
@@ -173,7 +173,22 @@
   color: #555;
   line-height: 1.7;
 }
+.quantity-row.amount-description-row {
+  margin-top: 40px;
+}
+.quantity-row .description {
+  margin: 0;
+  flex: 1;
+  color: #555;
+  line-height: 1.7;
 
+  /* 讓 getConditions() 裡面的換行正常顯示 */
+  white-space: pre-line;
+}
+
+.quantity-row.amount-description-row {
+  margin-top: 40px;
+}
 /* 我要捐助按鈕 */
 .contact-btn {
   display: block;
@@ -314,4 +329,5 @@
   .detail-content {
     text-align: center;
   }
+
 }

@@ -1,8 +1,38 @@
 <div class="featured-card">
-  <div class="featured-image">
-    <span class="tag" [ngClass]="getPriorityClass(demand.priority)"> {{ demand.priority }} </span>
-    <img [src]="demand.image?.[0] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'" [alt]="demand.item || '物資圖片'" />
+<div class="featured-image">
+  <div class="image-wrapper">
+
+    <!-- 左箭頭 -->
+    @if ((demand?.image?.length ?? 0) > 1) {
+      <button
+        type="button"
+        class="image-arrow previous"
+        (click)="previousImage($event)">
+        ‹</button>
+      }
+    <!-- 優先程度 -->
+    <span
+      class="tag"
+      [ngClass]="getPriorityClass(demand.priority)">
+      {{ demand.priority }}
+    </span>
+
+    <!-- 圖片 -->
+    <img
+  [src]="demand.image?.[currentImageIndex] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
+  [alt]="demand.item || '物資圖片'"
+/>
+     <!-- 右箭頭 -->
+    @if ((demand?.image?.length ?? 0) > 1) {
+      <button
+        type="button"
+        class="image-arrow next"
+        (click)="nextImage($event)">
+        ›</button>
+    }
   </div>
+</div>
+
   <div class="featured-content">
     <h3>{{ demand.item }}</h3>
     <div class="tags">
@@ -14,31 +44,18 @@
       }
     </div>
     <div class="info">
-      需求對象： @if (demand.serviceTargets.includes('老人')) {
-      <span class="info">老人</span>
-      } @if (demand.serviceTargets.includes('嬰幼兒')) {
-      <span class="info">嬰幼兒</span>
-      } @if (demand.serviceTargets.includes('孩童')) {
-      <span class="info">孩童</span>
-      } @if (demand.serviceTargets.includes('青少年')) {
-      <span class="info">青少年</span>
-      } @if (demand.serviceTargets.includes('身障')) {
-      <span class="info">身障</span>
-      } @if (demand.serviceTargets.includes('貧困')) {
-      <span class="info">貧困</span>
-      } @if (demand.serviceTargets.includes('重症照護')) {
-      <span class="info">重症照護</span>
-      } @if (demand.serviceTargets.includes('動物')) {
-      <span class="info">動物</span>
-      } @if (demand.serviceTargets.includes('無家者')) {
-      <span class="info">無家者</span>
-      }
+      <p>需求對象：{{ demand.serviceTargetDescription }}</p>
     </div>
     <div class="info">
       <p>需求數量： {{ demand.amount }} {{ demand.unit }}</p>
+      </div>
+      <div class="info">
       <p>{{ demand.recipient }}</p>
+      </div>
+      <div class="info">
       <p>{{ getRegion(demand.address) }}</p>
+      </div>
     </div>
     <button class="detail-btn" type="button" (click)="onView()">查看詳情</button>
   </div>
-</div>
+
