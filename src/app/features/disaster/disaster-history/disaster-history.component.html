@@ -1,0 +1,70 @@
+<div class="title">
+    <h1>災害救助歷史紀錄</h1>
+  </div>
+@for (section of sections(); track section.id) {
+  <!-- 每一個災害區塊 -->
+  <div class="needs-container"  [style.background-image]="'url(' + section.backgroundImage + ')'">
+    <!-- 左側介紹 -->
+    <div class="intro">
+      <h3 class="section-title">
+        {{ section.sectionTitle }}
+      </h3>
+      <h1>
+        {{ section.title }}
+      </h1>
+      <p>
+        {{ section.description }}
+      </p>
+      <div class="button-group">
+  <button
+    class="back-btn"
+    routerLink="/donor/disaster">
+    ← 返回災害救助大廳
+  </button>
+
+</div>
+    </div>
+    <!-- 右側卡片 -->
+    <div class="cards">
+      <!-- 物資需求 -->
+      <div class="card">
+        <h2>物資需求清單</h2>
+        <div class="card-content">
+          @for (item of section.materialNeeds; track item.id) {
+            <div class="row">
+              <span>
+                {{ item.item }}
+              </span>
+              <span>
+                {{ item.quantity }}
+                {{ item.unit }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- 志工需求 -->
+      <div class="card">
+        <h2>志工需求清單</h2>
+        <div class="card-content">
+        @for (volunteer of section.volunteerNeeds; track volunteer.id) {
+          <div class="row">
+            <div>
+              <div>
+                {{ volunteer.title }}
+              </div>
+              <small>
+                {{ volunteer.location }}
+              </small>
+            </div>
+            <span>
+              {{ volunteer.people }} 人
+            </span>
+          </div>
+
+        }
+      </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,32 @@
+<div class="login-container">
+  <div class="form-header">
+    <div>
+      <h2>受助者登入</h2>
+      <p>請選擇憑證驗證方式以安全登入系統。</p>
+    </div>
+    <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
+  </div>
+
+  <div class="input-grid">
+    <div class="field full fido-guide-box">
+      <span>機構經辦人身分驗證</span>
+      <p class="guide-desc">
+        本系統採用內政部行動自然人憑證（FIDO）或政府憑證閘道，點擊下方按鈕將引導您至安全驗證頁面，系統不會記錄您的憑證密碼。
+      </p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="action-links">
+      <a routerLink="/register" class="link-btn">尚未註冊帳號？</a>
+    </div>
+  </div>
+
+  <div class="button-row">
+    <button type="button" class="primary-btn fido-action-btn" (click)="launchFidoLogin()">
+      <i class="fa-solid fa-shield-halved"></i> 使用行動自然人憑證登入
+    </button>
+  </div>
+
+  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+</div>

@@ -1,0 +1,19 @@
+<div class="off-shelf-overlay">
+  <div class="off-shelf-modal">
+    <h2>確認手動下架</h2>
+
+    <p>手動下架後，此需求將<strong>無法再次上架</strong>。</p>
+
+    <p class="warning-text">如果之後還想重新上架，請選擇「<span class="hidden-status">隱藏</span>」。</p>
+
+    <p class="system-note">※ 系統依預計下架日期自動下架的需求，之後仍可以重新上架。</p>
+
+    <div class="off-shelf-actions">
+      <button type="button" class="back-btn" (click)="close()">取消</button>
+
+      <button type="button" class="hide-btn" (click)="hideInstead()">隱藏</button>
+
+      <button type="button" class="confirm-off-btn" (click)="confirm()">確認下架</button>
+    </div>
+  </div>
+</div>

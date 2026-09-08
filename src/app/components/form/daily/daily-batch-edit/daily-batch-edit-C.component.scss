@@ -1,0 +1,272 @@
+.hint-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.form-box {
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 30px !important;
+}
+
+.image-upload-box {
+  width: 550px;
+  max-width: 100%;
+  margin-bottom: 40px;
+}
+
+.image-upload-area {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: #fff;
+  border: 2px dashed #b0bec5;
+  border-radius: 10px;
+}
+
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.image-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid #1565c0;
+  border-radius: 8px;
+  color: #1565c0;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.image-upload-btn:hover {
+  background: #f0f7ff;
+}
+
+.image-upload-btn input[type='file'] {
+  display: none;
+}
+
+.image-upload-hint {
+  color: #666;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.selected-image-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-image {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: #e8f3ff;
+  border: 1px solid #a6cffd;
+  border-radius: 8px;
+}
+
+.selected-image-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #1565c0;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-image-name:hover {
+  padding: 6px 12px !important;
+  background: #d0e5ff !important;
+  border-color: transparent !important;
+  border-radius: 8px !important;
+  color: #0d47a1 !important;
+  text-decoration: none !important;
+}
+
+.remove-image-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/* 捲軸 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.priority-limit-info {
+  margin-left: 8px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.receive-method-box input[type='checkbox'] {
+  width: auto !important;
+  height: auto;
+  flex: 0 0 auto;
+  margin: 2px 0 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+/* =========================
+   聯絡時間
+========================= */
+
+.contact-time-title {
+  margin-top: 5px !important;
+  color: #1a202c;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.contact-time-box {
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 35px;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.contact-time-different-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.contact-time-question {
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.different-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.different-btn {
+  min-width: 55px;
+  padding: 7px 16px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.different-btn:hover {
+  background: #f0f7ff;
+  border-color: #93c5fd;
+}
+
+.different-btn.active {
+  background: #e0f2fe;
+  border-color: #0284c7;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.contact-time-separated {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-time-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.contact-time-group-title {
+  width: 65px;
+  flex-shrink: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.contact-time-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

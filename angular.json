@@ -3,8 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "6096a43b-e826-4908-b837-a20b3a68630d"
-  },
+    "analytics": "dc69d88e-1ce8-42ed-b14e-1d22ee11b233"  },
   "newProjectRoot": "projects",
   "projects": {
     "donation-matching": {
@@ -55,7 +54,8 @@
                 "input": "public"
               }
             ],
-            "styles": [  "node_modules/leaflet/dist/leaflet.css",
+            "styles": [
+               "node_modules/leaflet/dist/leaflet.css",
               "src/styles.scss"]
           },
           "configurations": {

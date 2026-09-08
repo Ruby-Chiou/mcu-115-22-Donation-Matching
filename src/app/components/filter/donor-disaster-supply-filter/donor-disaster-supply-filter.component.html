@@ -1,0 +1,35 @@
+<div class="supply-filter">
+  <div class="filter-group">
+    <h3>依類別</h3>
+    <div class="pill-list">
+      @for (option of categoryOptions; track option) {
+        <button type="button" class="pill-btn" [class.active]="filters.category.includes(option)" (click)="toggleCategory(option)">
+          {{ option }}
+        </button>
+      }
+    </div>
+  </div>
+  <div class="filter-group">
+    <h3>依緊急優先度</h3>
+    <div class="pill-list">
+      @for (option of priorityOptions; track option) {
+        <button type="button" class="pill-btn" [class.active]="filters.priority.includes(option)" (click)="togglePriority(option)">
+          {{ option }}
+        </button>
+      }
+    </div>
+  </div>
+  <div class="filter-group">
+    <h3>剩餘需求</h3>
+    <div class="pill-list">
+      <button type="button" class="pill-btn" [class.active]="filters.hasRemaining" (click)="toggleRemaining()">
+        尚有剩餘需求
+      </button>
+    </div>
+  </div>
+  <div class="filter-footer">
+    <button type="button" class="reset-btn" (click)="resetFilters()">
+      重置篩選
+    </button>
+  </div>
+</div>

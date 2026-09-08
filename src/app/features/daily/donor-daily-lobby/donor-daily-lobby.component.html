@@ -1,11 +1,15 @@
-<div class="search">
-  <h3>搜尋區塊</h3>
-</div>
 
-<div class="need-order-card">
-  <h3>顯示需求訂單區塊</h3>
-</div>
+<app-donor-daily-search
+  (searchChange)="onSearchChange($event)"
+></app-donor-daily-search>
+
+<app-donor-daily-filter
+  (filterChange)="onFilterChange($event)"
+></app-donor-daily-filter>
+
+<app-donor-daily-card-list></app-donor-daily-card-list>
 
 <div class="ThanksAndBlacklist">
   <h3>黑名單與感謝榜區塊</h3>
 </div>
+

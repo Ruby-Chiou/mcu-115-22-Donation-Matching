@@ -2,20 +2,44 @@
 :root {
   /* 核心招牌色*/
   --color-brand-primary: var(--mat-sys-primary);
+  --color-brand-primary-light: #3f93e2;
+  --color-brand-primary-dark: #2b74c4;
 
   /* 2. 文字色 */
   --color-text-main: var(--mat-sys-on-surface);
   --color-text-muted: var(--mat-sys-on-surface-variant);
+  --color-text-dark: #163a53;
+  --color-text-medium: #27506b;
+  --color-text-light: #638096;
+  --color-text-lighter: #5f7f8f;
   --color-white: #ffffff;
 
   /* 3. 背景層次 (這是最容易變色的地方)*/
   --bg-layer-0: #f0f4f8;
   --bg-layer-1: #e4eaf0;
   --bg-layer-2: #c5d0db;
+  --bg-form: #f7fbff;
+  --bg-gradient-start: #eef6ff;
+  --bg-gradient-end: #fdf8f0;
 
-  /* 4. 輔助 */
+  /* 4. 邊框與分隔線 */
   --border-default: var(--mat-sys-outline-variant);
+  --border-light: #d7e4ef;
+  --border-lighter: #e2eef6;
+  --border-lightest: #e1eef8;
   --border-radius-main: 12px;
+  --border-radius-pill: 999px;
+
+  /* 5. 狀態色 */
+  --color-success: #0f7a43;
+  --color-error: #d32f2f;
+  --color-warning: #f57c00;
+
+  /* 6. Shadow */
+  --shadow-sm: 0 4px 12px rgba(14, 52, 77, 0.06);
+  --shadow-md: 0 8px 28px rgba(47, 112, 187, 0.16);
+  --shadow-lg: 0 18px 50px rgba(12, 45, 75, 0.12);
+  --shadow-xl: 0 20px 60px rgba(12, 45, 75, 0.16);
 
   //導覽列背景色
   --nav-bg: var(--mat-sys-surface);

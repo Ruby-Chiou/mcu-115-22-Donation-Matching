@@ -1,1 +1,37 @@
-<p>login works!</p>
+<section class="login-shell">
+  <!-- 1. 尚未選擇身分時，顯示身分選擇器 -->
+  <ng-container *ngIf="showRoleModal; else formView">
+    <div class="role-page">
+      <app-role-selector
+        title="請選擇登入身份"
+        description="捐助者可進行捐贈；受助者為社福團體與機構。"
+        (roleSelected)="selectRole($event)"
+      >
+      </app-role-selector>
+    </div>
+  </ng-container>
+
+  <!-- 2. 選擇身分後，載入對應的子元件 -->
+  <ng-template #formView>
+    <div class="form-card">
+      <!-- 捐助者登入獨立元件 (注意這裡改接 forgotPasswordClicked) -->
+      <app-donor-login
+        *ngIf="!isForgotPasswordStep && !isAgency"
+        (backToRoleSelection)="backToRoleSelection()"
+        (forgotPasswordClicked)="goToForgotPassword()"
+      >
+      </app-donor-login>
+
+      <!-- 受助機構登入獨立元件 (如果 agency 那邊也是用 forgotPasswordClicked，這裡也一樣接) -->
+      <app-agency-login
+        *ngIf="!isForgotPasswordStep && isAgency"
+        (backToRoleSelection)="backToRoleSelection()"
+        (forgotPasswordClicked)="goToForgotPassword()"
+      >
+      </app-agency-login>
+
+      <!-- 忘記密碼獨立元件 -->
+      <app-forgot-password *ngIf="isForgotPasswordStep" (backToLoginClicked)="backToLogin()"> </app-forgot-password>
+    </div>
+  </ng-template>
+</section>

@@ -1,0 +1,281 @@
+.container {
+  padding: 30px;
+}
+
+h1 {
+  margin-bottom: -4px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
+/*編輯頁需求編號*/
+.edit-header-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: -5px;
+}
+
+.info-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px;
+  gap: 8px;
+  line-height: 1;
+}
+
+.info-label {
+  font-size: 15px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.info-value {
+  font-size: 15px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.form-box {
+  background-color: #e3f2fd;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 30px !important;
+}
+
+/*標籤*/
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-main);
+  font-weight: 500;
+  font-size: 17px;
+}
+
+.form-box > label {
+  margin-top: 15px;
+}
+
+/*輸入框*/
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.short-input {
+  width: 250px;
+  resize: none;
+  overflow-wrap: break-word;
+}
+
+.item-input {
+  width: 450px;
+  min-height: 100px;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  resize: vertical;
+}
+
+/*數量 + 單位*/
+.quantity-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.quantity-box input {
+  margin-bottom: 20px;
+}
+
+.phone-input {
+  width: 420px;
+  margin-bottom: 30px;
+}
+
+.contact-time-title {
+  margin-top: 5px !important;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.unit-input {
+  width: 250px;
+}
+
+.medium-input {
+  width: 600px;
+}
+
+.receive-info-box .label-row:nth-of-type(2) {
+  margin-top: 8px !important;
+}
+
+.image-upload-box {
+  width: 550px;
+  max-width: 100%;
+  margin-bottom: 40px;
+}
+
+.image-upload-area {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border: 2px dashed #b0bec5;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 選擇圖片按鈕 */
+.image-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border: 1px solid #1565c0;
+  border-radius: 8px;
+  color: #1565c0;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.image-upload-btn:hover {
+  background-color: #f0f7ff;
+}
+
+/* 隱藏原生檔案選擇 */
+.image-upload-btn input[type='file'] {
+  display: none;
+}
+
+/* 上傳提示 */
+.image-upload-hint {
+  font-size: 14px;
+  color: #666666;
+  white-space: nowrap;
+}
+
+/* 圖片清單 */
+.selected-image-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-image {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #e8f3ff;
+  border: 1px solid #a6cffd;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.selected-image-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #1565c0;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selected-image-name:hover {
+  background-color: #d0e5ff !important;
+  border-color: transparent !important;
+  color: #0d47a1 !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+}
+
+/* 移除圖片按鈕 */
+.remove-image-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.remove-image-btn:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+/*接收方式*/
+.receive-method-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 35px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  box-sizing: border-box;
+  width: fit-content;
+}

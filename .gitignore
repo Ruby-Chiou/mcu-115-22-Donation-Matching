@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Force ignore general folders
+/node_modules/
+/dist/
+.angular/

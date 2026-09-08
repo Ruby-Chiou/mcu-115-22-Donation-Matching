@@ -1,0 +1,269 @@
+.service-target-box label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.service-target-box input[type='checkbox'] {
+  width: auto;
+  margin: 0;
+}
+
+.custom-service-target-section,
+.custom-condition-section {
+  width: calc(100% - 380px);
+  flex-shrink: 0;
+}
+
+.custom-service-list,
+.custom-condition-list {
+  display: grid;
+  grid-template-columns: repeat(2, 440px);
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  gap: 28px 30px;
+}
+
+.custom-service-row,
+.custom-condition-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 440px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.custom-service-input,
+.custom-condition-input {
+  width: 320px !important;
+  flex-shrink: 0;
+  margin-bottom: 0 !important;
+}
+
+/* 自訂下拉選單 */
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.custom-select-trigger span:first-child {
+  color: #333;
+}
+
+.dropdown-arrow {
+  margin-left: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.custom-select-options {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  max-height: 230px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.custom-option {
+  width: 100%;
+  height: 46px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 0;
+  color: #333;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.custom-option:hover {
+  background: #f0f7ff;
+  color: #1565c0;
+}
+
+/* 物資狀態區 */
+.condition-area {
+  display: flex;
+  align-items: flex-start;
+  gap: 114px;
+  margin: 35px 0;
+}
+
+.condition-title {
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+.condition-hint {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 12px;
+  padding-left: 2px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.category-field {
+  margin-bottom: 40px;
+}
+
+.hint-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.hint-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.hint-icon.unset {
+  background: #90a4ae;
+}
+
+.hint-icon.accept {
+  background: #66a96b;
+}
+
+.hint-icon.reject {
+  background: #c75b5b;
+}
+
+.optional {
+  color: #718096;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* =========================
+   聯絡時間
+========================= */
+
+.contact-time-title {
+  margin-top: 5px !important;
+  color: #1a202c;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.contact-time-box {
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 35px;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.contact-time-different-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.contact-time-question {
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.different-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.different-btn {
+  min-width: 55px;
+  padding: 7px 16px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #333;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.different-btn:hover {
+  background: #f0f7ff;
+  border-color: #93c5fd;
+}
+
+.different-btn.active {
+  background: #e0f2fe;
+  border-color: #0284c7;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.contact-time-separated {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-time-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.contact-time-group-title {
+  width: 65px;
+  flex-shrink: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.contact-time-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

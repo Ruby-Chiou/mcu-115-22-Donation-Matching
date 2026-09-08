@@ -1,0 +1,229 @@
+.container {
+  padding: 30px;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+}
+
+/*編輯頁需求編號*/
+.edit-header-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* 編輯頁上方操作按鈕 */
+.edit-top-button-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-top-button-area button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.edit-top-button-area button:hover {
+  opacity: 0.85;
+}
+
+.info-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f4f9;
+  border: 1px solid #d0e1f9;
+  border-radius: 8px;
+  padding: 8px 16px;
+  gap: 8px;
+  line-height: 1;
+}
+
+.info-label {
+  font-size: 15px;
+  color: #5f6368;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.info-value {
+  font-size: 15px;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-family: monospace, sans-serif;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+/*表單外框*/
+.form-box {
+  background-color: #e3f2fd;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 30px;
+}
+
+/*標籤*/
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-main);
+  font-weight: 500;
+  font-size: 17px;
+}
+
+.form-box > label {
+  margin-top: 15px;
+}
+
+/*輸入框*/
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.short-input {
+  width: 250px;
+  resize: none;
+  overflow-wrap: break-word;
+}
+
+.item-input {
+  width: 450px;
+  min-height: 100px;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  resize: vertical;
+}
+
+/*數量 + 單位*/
+.quantity-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.quantity-box input {
+  margin-bottom: 20px;
+}
+
+.phone-input {
+  width: 420px;
+  margin-bottom: 35px;
+}
+
+.contact-time-title {
+  margin-top: 15px;
+}
+
+.unit-input {
+  width: 250px;
+}
+
+.medium-input {
+  width: 600px;
+}
+
+/*短欄位（數量描述、可選類別）*/
+.short-field {
+  width: 515px;
+}
+
+.short-field textarea,
+.short-field select {
+  width: 100%;
+}
+
+.note-textarea {
+  width: 100%;
+  position: relative;
+  left: 0px;
+}
+
+/*物資示意圖片*/
+.image-upload-box {
+  width: 550px;
+  max-width: 100%;
+  margin-bottom: 40px;
+}
+
+.image-upload-area {
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border: 2px dashed #b0bec5;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 選擇圖片按鈕 */
+.image-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border: 1px solid #1565c0;
+  border-radius: 8px;
+  color: #1565c0;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.image-upload-btn:hover {
+  background-color: #f0f7ff;
+}
+
+/* 隱藏原生檔案選擇 */
+.image-upload-btn input[type='file'] {
+  display: none;
+}
+
+/* 上傳提示 (按鈕右側) */
+.image-upload-hint {
+  font-size: 14px;
+  color: #666666;
+  white-space: nowrap;
+}

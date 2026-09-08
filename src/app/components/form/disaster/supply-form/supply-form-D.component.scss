@@ -1,0 +1,98 @@
+/* 圖片清單 */
+.selected-image-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 單張圖片 */
+.selected-image {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* 圖片名稱 */
+.selected-image-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin: 0;
+  background-color: #e8f3ff;
+  border: 1px solid #a6cffd;
+  border-radius: 8px;
+  color: #1565c0;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 滑鼠懸停樣式（移除底線，改為加深背景） */
+.selected-image-name:hover {
+  background-color: #d0e5ff;
+  border-color: #1565c0;
+  color: #0d47a1;
+  text-decoration: none;
+}
+
+/* 單張圖片條狀列：直接作為膠囊載體 */
+.selected-image {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #e8f3ff;
+  border: 1px solid #a6cffd;
+  border-radius: 8px;
+}
+
+/* 內部的檔名取消所有背景與邊框 */
+.selected-image-name {
+  background: transparent;
+  border: none;
+  color: #1565c0;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 移除圖片按鈕 */
+.remove-image-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}

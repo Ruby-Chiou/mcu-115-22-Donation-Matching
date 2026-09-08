@@ -1,0 +1,36 @@
+<!-- 排序區 -->
+<div class="sort-group">
+  <button class="sort-icon-btn" (click)="toggleSortOrder()" title="切換排序方向">
+    <svg
+      class="sort-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M7 4v16M7 4l-4 4M7 4l4 4M17 20V4M17 20l4-4M17 20l-4-4" />
+    </svg>
+  </button>
+
+  <!-- 自訂質感下拉選單 -->
+  <div class="custom-dropdown" (click)="$event.stopPropagation()">
+    <button class="dropdown-trigger" (click)="toggleSortDropdown()" [class.active]="isSortDropdownOpen">
+      <span>{{ getSelectedSortLabel() }}</span>
+      <span class="arrow-icon"></span>
+    </button>
+
+    <!-- 展開選單面板 -->
+    <div class="dropdown-menu" *ngIf="isSortDropdownOpen">
+      <div
+        *ngFor="let opt of sortOptions"
+        class="dropdown-item"
+        [class.selected]="selectedSort === opt.value"
+        (click)="selectSortOption(opt.value)"
+      >
+        {{ opt.label }}
+      </div>
+    </div>
+  </div>
+</div>

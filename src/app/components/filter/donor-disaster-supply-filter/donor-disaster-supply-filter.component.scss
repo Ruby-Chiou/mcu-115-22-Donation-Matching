@@ -1,0 +1,115 @@
+.supply-filter {
+  display: block;
+  position: static;
+
+  width: 100%;
+  margin-block: 15px;
+  padding: 20px 24px;
+
+  box-sizing: border-box;
+
+  background: #fffdf9;
+  border: 1px solid #e4d8c9;
+  border-radius: 14px;
+
+  box-shadow: 0 6px 18px rgba(83, 61, 40, 0.08);
+
+  animation: filterSlideDown 0.2s ease;
+}
+
+// 篩選群組
+.filter-group {
+  padding: 12px 0;
+}
+
+// 每個篩選群組之間加分隔線
+.filter-group:not(:last-child) {
+  border-bottom: 1px solid #eee4d8;
+}
+
+// 標題
+.filter-group h3 {
+  margin: 0 0 10px;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  color: #4b3a2a;
+}
+
+// 選項排列
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+// 篩選按鈕
+.pill-btn {
+  padding: 7px 16px;
+
+  border: 1px solid #d8c8b7;
+  border-radius: 20px;
+
+  background: #fff;
+  color: #5c4a38;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+// 滑鼠移入
+.pill-btn:hover {
+  background: #f7efe6;
+}
+
+// 已選取
+.pill-btn.active {
+  background: #005bac;
+  border-color: #005bac;
+  color: #fff;
+}
+
+// 底部按鈕
+.filter-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  padding-top: 18px;
+}
+
+.reset-btn {
+  padding: 8px 18px;
+
+  border: 1px solid #d8c8b7;
+  border-radius: 8px;
+
+  background: #fff;
+  color: #5c4a38;
+
+  cursor: pointer;
+}
+
+.reset-btn:hover {
+  background: #f7efe6;
+}
+
+// ==========================
+// 向下展開動畫
+// ==========================
+
+@keyframes filterSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

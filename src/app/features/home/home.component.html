@@ -20,7 +20,8 @@
   <aside class="right-sidebar">
     <a routerLink="/news" class="sidebar-item"><i class="fa-solid fa-bullhorn"></i> 最新公告</a>
     <a routerLink="/trends" class="sidebar-item"><i class="fa-solid fa-fire"></i> 熱門需求</a>
-    <a routerLink="/donor/disaster" class="sidebar-item"><i class="fa-solid fa-triangle-exclamation"></i> 災害救助</a>
+    <a href="#" class="sidebar-item" (click)="goToDisaster($event)">
+      <i class="fa-solid fa-triangle-exclamation"></i> 災害救助</a>
   </aside>
 </div>
 

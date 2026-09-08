@@ -1,1 +1,247 @@
-<p>admin-disaster-control works!</p>
+<section class="disaster-control-card">
+
+  <h2>災害救助控制</h2>
+
+  <div class="disaster-control-item">
+
+    <div class="disaster-name">
+      災害救助
+    </div>
+
+    <div class="disaster-status">
+
+      @if (isDisasterOpen) {
+        <button
+          type="button"
+          class="close-btn"
+          (click)="closeDisaster()">
+
+          關閉災害救助
+
+        </button>
+
+      } @else {
+
+        <button
+          type="button"
+          class="open-btn"
+          (click)="openDisaster()">
+
+          開啟災害救助
+
+        </button>
+
+      }
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="schedule-card">
+  <h2>預約關閉災害捐助</h2>
+  @if (disasterData().scheduledCloseAt) {
+    <p class="scheduled-close-summary">
+      災害捐助將於
+      <strong>{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }}</strong>
+      關閉
+    </p>
+  } @else {
+    <p class="scheduled-close-summary empty">
+      尚未設定關閉時間
+    </p>
+  }
+  <div class="form-group">
+    <label for="scheduledCloseAt">
+      預計關閉時間
+    </label>
+    <input
+      id="scheduledCloseAt"
+      type="datetime-local"
+      [(ngModel)]="scheduledCloseAt">
+  </div>
+  <div class="form-group">
+    <label for="announcement">
+      災害救助公告
+    </label>
+    <textarea
+      id="announcement"
+      [(ngModel)]="announcement"
+      placeholder="例如：本次物資募集將於指定時間結束。">
+    </textarea>
+  </div>
+  <button
+    type="button"
+    class="save-btn"
+    (click)="saveSchedule()">
+    儲存預約設定
+  </button>
+</section>
+
+<section class="disaster-card">
+  <h2>目前災害資訊</h2>
+  @if (!isEditing) {
+
+
+    <div class="info-row">
+      <span class="label">災害名稱：</span>
+      <span>{{ disasterName || '尚未設定' }}</span>
+    </div>
+
+
+    <div class="info-row">
+      <span class="label">災害說明：</span>
+      <span>{{ disasterDescription || '尚未設定' }}</span>
+    </div>
+    <button
+      class="edit-btn"
+      (click)="startEditing()">
+      編輯災害資訊
+    </button>
+
+
+  }
+
+
+  @if (isEditing) {
+    <div class="edit-area">
+      <div class="form-group">
+        <label for="disasterName">
+          災害名稱
+        </label>
+        <input
+          id="disasterName"
+          type="text"
+          [(ngModel)]="disasterName"
+          placeholder="請輸入災害名稱">
+      </div>
+      <div class="form-group">
+        <label for="disasterDescription">
+          災害說明
+        </label>
+        <textarea
+          id="disasterDescription"
+          [(ngModel)]="disasterDescription"
+          placeholder="請輸入災害說明">
+        </textarea>
+      </div>
+      <button
+        class="save-btn"
+        (click)="saveDisaster()">
+        儲存災害資訊
+      </button>
+    </div>
+  }
+</section>
+<section class="image-card">
+  <h2>災害圖片</h2>
+  <!-- 圖片預覽 -->
+  @if (disasterImage) {
+    <div class="image-preview">
+      <img
+        [src]="disasterImage"
+        alt="災害圖片">
+    </div>
+  }
+  <!-- 尚未選擇圖片 -->
+  @if (!disasterImage) {
+    <div class="no-image">
+      尚未上傳災害圖片
+    </div>
+  }
+  <!-- 選擇圖片 -->
+  <label class="upload-btn">
+    選擇圖片
+    <input
+      type="file"
+      accept="image/*"
+      (change)="onImageSelected($event)">
+  </label>
+</section>
+<section class="material-card">
+  <h2>物資需求</h2>
+  <!-- 已經新增的物資 -->
+  @if (materialNeeds.length > 0) {
+    <div class="material-list">
+      @for (material of materialNeeds; track $index) {
+        <div class="material-item">
+          <div class="material-info">
+            <span class="material-name">
+              {{ material.item }}
+            </span>
+            <span class="material-quantity">
+              {{ material.quantity }} {{ material.unit }}
+            </span>
+          </div>
+          <button
+            class="delete-btn"
+            (click)="deleteMaterial($index)">
+            刪除
+          </button>
+        </div>
+      }
+    </div>
+  }
+  <!-- 還沒有物資 -->
+  @if (materialNeeds.length === 0 && !isAddingMaterial) {
+    <div class="empty-material">
+      尚未新增物資需求
+    </div>
+  }
+  <!-- 新增物資表單 -->
+  @if (isAddingMaterial) {
+    <div class="material-form">
+      <!-- 物資名稱 -->
+      <div class="form-group">
+        <label>
+          物資名稱
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="newMaterial.item"
+          placeholder="例如：礦泉水">
+      </div>
+      <!-- 需求數量 -->
+      <div class="form-group">
+        <label>
+          需求數量
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="newMaterial.quantity"
+          min="1"
+          placeholder="例如：100">
+      </div>
+      <!-- 單位 -->
+      <div class="form-group">
+        <label>
+          單位
+        </label>
+        <select [(ngModel)]="newMaterial.unit">
+          <option value="箱">箱</option>
+          <option value="件">件</option>
+          <option value="包">包</option>
+          <option value="個">個</option>
+          <option value="瓶">瓶</option>
+          <option value="支">支</option>
+          <option value="份">份</option>
+        </select>
+      </div>
+      <!-- 儲存 -->
+      <button
+        class="save-btn"
+        (click)="saveMaterial()">
+        儲存物資
+      </button>
+    </div>
+  }
+  <!-- 新增物資按鈕 -->
+  @if (!isAddingMaterial) {
+    <button
+      class="add-btn"
+      (click)="startAddingMaterial()">
+      ＋ 新增物資
+    </button>
+  }
+</section>

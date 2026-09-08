@@ -1,0 +1,18 @@
+<!-- 圖片預覽視窗 -->
+<div class="image-modal-backdrop" (click)="close()">
+  <div class="image-modal" (click)="$event.stopPropagation()">
+    <div class="image-modal-header">
+      <span class="image-modal-title"> {{ imageName }} </span>
+
+      <button type="button" class="image-modal-close" (click)="close()">✕</button>
+    </div>
+
+    <div class="image-modal-content">
+      <img [src]="image" [alt]="imageName" class="image-modal-image" />
+    </div>
+
+    <div class="image-modal-footer">
+      <button type="button" class="image-modal-close-btn" (click)="close()">關閉</button>
+    </div>
+  </div>
+</div>

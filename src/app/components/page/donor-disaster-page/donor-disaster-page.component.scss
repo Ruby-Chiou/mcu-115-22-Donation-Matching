@@ -1,0 +1,84 @@
+.donor-disaster-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px;
+  box-sizing: border-box;
+}
+.request-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.switch-button {
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.switch-button.active {
+  border-bottom-color: #005bac;
+  color: #005bac;
+}
+.switch-divider {
+  color: #94a3b8;
+  font-size: 1.5rem;
+}
+.right-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+.filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.filter-button:hover {
+  color: #005bac;
+}
+.filter-icon {
+  width: 22px;
+  height: 22px;
+}
+.filter-label-text {
+  color: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.map-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.map-button:hover {
+  color: #005bac;
+}
+.needs-section {
+  margin-bottom: 60px;
+}
+.needs-section > h1 {
+  margin: 0 0 1.5rem;
+  color: #005bac;
+  font-size: 2rem;
+}
+

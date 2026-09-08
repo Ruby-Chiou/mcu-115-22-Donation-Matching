@@ -1,0 +1,109 @@
+.admin-dashboard-container {
+  padding: 24px;
+  max-width: 1350px; // 放大容器寬度
+  margin: 0 auto;
+
+  h1 {
+    font-size: 28px;
+    margin-bottom: 6px;
+    color: var(--color-text-main);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .section-group {
+    margin-bottom: 28px;
+
+    h2 {
+      font-size: 20px;
+      border-bottom: 1px solid var(--border-default);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      color: var(--color-text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .section-icon {
+        color: var(--color-brand-primary);
+        font-size: 24px;
+      }
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+
+      .nav-card {
+        background: var(--color-white);
+        border: 1px solid var(--border-default);
+        border-radius: var(--border-radius-main);
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          background: var(--bg-layer-1);
+          border-color: var(--color-brand-primary);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        h3 {
+          font-size: 18px; // 放大字體
+          margin: 0 0 6px 0;
+          color: var(--color-brand-primary);
+          font-weight: 600;
+        }
+
+        p {
+          font-size: 15px; // 放大字體
+          color: var(--color-text-muted);
+          margin: 0 0 10px 0;
+          line-height: 1.4;
+        }
+
+        .path-tag {
+          font-size: 13px;
+          background: var(--bg-layer-0);
+          color: var(--color-text-muted);
+          padding: 3px 6px;
+          border-radius: 4px;
+          font-family: monospace;
+          border: 1px solid var(--border-default);
+        }
+      }
+    }
+  }
+}
+
+/* ==========================================
+   📌 未來 RWD 響應式擴充管道 (保留區)
+   未來如果要做平板或手機，直接取消下方註解並調整即可
+   ========================================== */
+
+/* 平板尺寸 (例如寬度小於 1024px 時，改為一列 3 個) */
+/*
+@media (max-width: 1024px) {
+  .admin-dashboard-container .section-group .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+*/
+
+/* 手機尺寸 (例如寬度小於 768px 時，改為一列 1 或 2 個) */
+/*
+@media (max-width: 768px) {
+  .admin-dashboard-container .section-group .card-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+*/

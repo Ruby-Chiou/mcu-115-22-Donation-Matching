@@ -1,0 +1,78 @@
+/* =========================
+   刪除確認 Modal 樣式（完全比照新增/編輯頁）
+========================= */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background-color: #ffffff;
+  width: 420px;
+  padding: 35px 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  h2 {
+    margin: 0 0 15px 0;
+    color: var(--color-brand-primary, #0056b3);
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 25px 0;
+    font-size: 16px;
+    color: #333333;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+
+  button {
+    min-width: 100px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #ffffff;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .cancel-btn {
+    background-color: #64b5f6;
+    color: #1565c0;
+
+    &:hover {
+      background-color: #42a5f5;
+    }
+  }
+
+  .confirm-btn {
+    background-color: #d32f2f;
+    color: white;
+
+    &:hover {
+      background-color: #b71c1c;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-export type UserRole = 'DONOR' | 'AGENCY' | 'ADMIN';
+export type UserRole = 'GUEST' | 'DONOR' | 'AGENCY' | 'ADMIN';
 
 export interface UserBase {
   uid: string; // 唯一使用者ID (未來串Google登入時的唯一碼)

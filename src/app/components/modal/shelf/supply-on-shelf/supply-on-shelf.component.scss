@@ -1,0 +1,84 @@
+/* =========================
+   無法重新上架提示框
+   ========================= */
+
+.on-shelf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.on-shelf-modal {
+  width: 460px;
+  max-width: calc(100% - 40px);
+
+  padding: 28px 30px;
+
+  background: #fff;
+  border-radius: 16px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+
+  text-align: center;
+
+  h2 {
+    margin: 0 0 20px;
+    font-size: 22px;
+    color: #333;
+  }
+
+  p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #555;
+  }
+
+  .warning-text {
+    color: #555;
+
+    .hidden-status {
+      color: #d32f2f;
+      font-weight: 700;
+    }
+  }
+}
+
+/* =========================
+   確定按鈕
+   ========================= */
+
+.on-shelf-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  margin-top: 25px;
+
+  button {
+    min-width: 90px;
+    padding: 7px 12px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: #1565c0;
+    color: #fff;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}

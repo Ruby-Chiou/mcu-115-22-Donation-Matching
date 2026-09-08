@@ -1,0 +1,184 @@
+<div class="donor-disaster-page">
+
+  <!-- 災害救助類型切換 -->
+  <nav
+    class="request-switcher"
+    aria-label="災害救助類型">
+
+    <button
+      type="button"
+      class="switch-button"
+      [class.active]="activeType() === 'material'"
+      [attr.aria-selected]="activeType() === 'material'"
+      (click)="selectType('material')">
+      物資捐助
+    </button>
+
+    <span
+      class="switch-divider"
+      aria-hidden="true">
+      |
+    </span>
+
+    <button
+      type="button"
+      class="switch-button"
+      [class.active]="activeType() === 'volunteer'"
+      [attr.aria-selected]="activeType() === 'volunteer'"
+      (click)="selectType('volunteer')">
+      志工需求
+    </button>
+
+    <!-- 右側地圖 -->
+    <div class="right-actions">
+
+      <button
+        type="button"
+        class="switch-button map-button"
+        aria-label="前往災害救助地圖"
+        (click)="goToMap()">
+
+        <span aria-hidden="true">
+          <span class="material-symbols-outlined">
+            map
+          </span>
+        </span>
+        地圖
+      </button>
+
+    </div>
+
+  </nav>
+
+
+  <!-- ==================== -->
+  <!-- 物資捐助 -->
+  <!-- ==================== -->
+
+  @if (activeType() === 'material') {
+
+    <section
+      class="needs-section"
+      aria-labelledby="material-heading">
+
+      @if (disasterData().isOpen) {
+
+        <h1 id="material-heading">
+          物資捐助
+        </h1>
+
+      }
+
+
+      <!-- 篩選區 -->
+      <div class="filter-area">
+
+        <!-- 篩選按鈕 -->
+        <button
+          type="button"
+          class="filter-button"
+          (click)="showSupplyFilter = !showSupplyFilter"
+          title="開啟物資條件篩選">
+
+          <svg
+            class="filter-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2">
+
+            <polygon
+              points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3">
+            </polygon>
+           <line x1="15" y1="11" x2="21" y2="11"></line>
+          <line x1="17" y1="15" x2="21" y2="15"></line>
+          <line x1="19" y1="19" x2="21" y2="19"></line>
+          </svg>
+          <span>
+            篩選
+          </span>
+          <!-- 展開 / 收合 -->
+          <span class="filter-arrow">
+            {{ showSupplyFilter ? '▲' : '▼' }}
+          </span>
+        </button>
+        <!-- 物資篩選元件 -->
+        @if (showSupplyFilter) {
+          <app-donor-disaster-supply-filter
+            [filters]="materialFilters"
+            (filtersChange)="materialFilters = $event">
+          </app-donor-disaster-supply-filter>
+        }
+      </div>
+      <!-- 物資需求卡片 -->
+      <app-donor-disaster-card-list
+        type="material"
+        [filters]="materialFilters">
+      </app-donor-disaster-card-list>
+    </section>
+  }
+ <!-- ==================== -->
+  <!-- 志工需求 -->
+  <!-- ==================== -->
+  @else {
+    <section
+      class="needs-section"
+      aria-labelledby="volunteer-heading">
+
+      <h1 id="volunteer-heading">
+        志工需求
+      </h1>
+      <!-- 志工篩選 -->
+    <div class="filter-area">
+      <button
+        type="button"
+        class="filter-button"
+        (click)="showVolunteerFilter = !showVolunteerFilter"
+        title="開啟志工條件篩選">
+        <svg
+          class="filter-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2">
+          <polygon
+            points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3">
+          </polygon>
+
+          <line x1="15" y1="11" x2="21" y2="11"></line>
+          <line x1="17" y1="15" x2="21" y2="15"></line>
+          <line x1="19" y1="19" x2="21" y2="19"></line>
+        </svg>
+        <span>
+          篩選
+        </span>
+        <!-- 展開 / 收合 -->
+        <span class="filter-arrow">
+          {{ showVolunteerFilter ? '▲' : '▼' }}
+        </span>
+
+      </button>
+
+
+      <!-- 志工篩選元件 -->
+      @if (showVolunteerFilter) {
+
+        <app-donor-disaster-volunteer-filter
+          [filters]="volunteerFilters"
+          (filtersChange)="volunteerFilters = $event">
+        </app-donor-disaster-volunteer-filter>
+
+      }
+
+    </div>
+      <!-- 志工需求卡片 -->
+      <app-donor-disaster-card-list
+        type="volunteer"
+        [filters]="volunteerFilters">
+      </app-donor-disaster-card-list>
+
+    </section>
+
+  }
+
+</div>

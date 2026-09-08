@@ -1,1 +1,24 @@
-<p>register works!</p>
+<section class="register-shell">
+  <!-- 1. 尚未選擇身分時，顯示身分選擇器 -->
+  <ng-container *ngIf="showRoleModal; else formView">
+    <div class="role-page">
+      <app-role-selector
+        title="請選擇註冊身份"
+        description="捐助者可進行捐贈；受助者為社福團體與機構。"
+        (roleSelected)="selectRole($event)"
+      >
+      </app-role-selector>
+    </div>
+  </ng-container>
+
+  <!-- 2. 選擇身分後，載入對應的子元件 -->
+  <ng-template #formView>
+    <div class="form-card">
+      <!-- 捐助者註冊獨立元件 -->
+      <app-donor-register *ngIf="!isAgency" (backToRoleSelection)="backToRoleSelection()"> </app-donor-register>
+
+      <!-- 受助機構註冊獨立元件 -->
+      <app-agency-register *ngIf="isAgency" (backToRoleSelection)="backToRoleSelection()"> </app-agency-register>
+    </div>
+  </ng-template>
+</section>

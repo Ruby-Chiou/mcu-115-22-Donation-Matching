@@ -1,0 +1,135 @@
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-icon-btn {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  padding: 0;
+
+  background: #bbdefb;
+  color: var(--primary);
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  &:hover {
+    background: #90caf9;
+    transform: scale(1.05);
+  }
+
+  .sort-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.custom-dropdown {
+  position: relative;
+
+  .dropdown-trigger {
+    height: 36px;
+    min-width: 148px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+    padding: 0 16px;
+
+    border: 1.5px solid #90caf9;
+    border-radius: 18px;
+
+    background: #fff;
+    color: var(--text);
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+      border-color: var(--primary);
+      background: #f4f8ff;
+    }
+
+    .arrow-icon {
+      width: 7px;
+      height: 7px;
+
+      display: inline-block;
+
+      border-right: 2px solid var(--primary);
+      border-bottom: 2px solid var(--primary);
+
+      transform: rotate(45deg);
+      margin-top: -3px;
+
+      flex-shrink: 0;
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+
+    top: calc(100% + 6px);
+    left: 0;
+
+    z-index: 100;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 6px;
+
+    border: 1px solid #e3f2fd;
+    border-radius: 14px;
+
+    background: #fff;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+    .dropdown-item {
+      padding: 9px 16px;
+
+      border-radius: 10px;
+
+      color: var(--text);
+
+      font-size: 15px;
+      font-weight: 500;
+
+      white-space: nowrap;
+
+      cursor: pointer;
+
+      text-align: center;
+
+      &:hover {
+        background: #e3f2fd;
+        color: var(--primary);
+      }
+
+      &.selected {
+        background: var(--primary);
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+  }
+}

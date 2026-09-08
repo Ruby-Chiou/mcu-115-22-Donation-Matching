@@ -1,0 +1,23 @@
+<div class="search-section">
+
+  <div class="search-box">
+
+    <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+
+    <input
+      type="text"
+      [(ngModel)]="keyword"
+      placeholder="搜尋物資名稱、機構名稱、地點"
+      (keyup.enter)="search()"
+    >
+
+    <button
+      class="search-btn"
+      (click)="search()"
+    >
+      搜尋
+    </button>
+
+  </div>
+
+</div>
