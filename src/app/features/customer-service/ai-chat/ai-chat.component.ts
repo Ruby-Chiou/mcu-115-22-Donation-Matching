@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiChatService } from '../../../core/services/ai-chat.service.service';
@@ -72,68 +72,76 @@ export class AiChatComponent {
     return '';
   }
 
+  activeFaqRole = signal<'donor' | 'recipient'>('donor');
+  changeFaqRole(role: 'donor' | 'recipient') {
+  this.activeFaqRole.set(role);
+  this.expandedFaqId = null;
+}
+
   sendMessage(): void {
-    const text = this.message.trim();
+  const text = this.message.trim();
 
-    if (!text || this.isLoading) {
-      return;
-    }
-
-    console.log('準備送出訊息：', text);
-
-    this.messages = [
-      ...this.messages,
-      {
-        sender: 'user',
-        content: text,
-      },
-    ];
-
-    this.message = '';
-    this.errorMessage = '';
-    this.isLoading = true;
-    this.cdr.detectChanges();
-
-    this.assistantApi.chat(text, this.currentRole).subscribe({
-      next: (response) => {
-        console.log('收到後端回覆：', response);
-
-        const answer = this.extractAssistantReply(response);
-
-        this.messages = [
-          ...this.messages,
-          {
-            sender: 'assistant',
-            content: answer || '抱歉，目前沒有取得有效回覆。',
-          },
-        ];
-
-        this.isLoading = false;
-        this.cdr.detectChanges();
-
-        console.log('已停止 loading：', this.isLoading);
-        console.log('messages 陣列：', this.messages);
-      },
-      error: (error) => {
-        console.error('AI 客服 API 呼叫失敗：', error);
-
-        this.errorMessage = '目前無法連線至 AI 客服，請稍後再試。';
-
-        this.messages = [
-          ...this.messages,
-          {
-            sender: 'assistant',
-            content: '抱歉，AI 客服目前暫時無法使用，請稍後再試。',
-          },
-        ];
-
-        this.isLoading = false;
-        this.cdr.detectChanges();
-
-        console.log('錯誤後已停止 loading：', this.isLoading);
-      },
-    });
+  if (!text || this.isLoading) {
+    return;
   }
+
+  console.log('準備送出訊息：', text);
+
+  const history = this.messages.slice(-6);
+
+  this.messages = [
+    ...this.messages,
+    {
+      sender: 'user',
+      content: text,
+    },
+  ];
+
+  this.message = '';
+  this.errorMessage = '';
+  this.isLoading = true;
+  this.cdr.detectChanges();
+
+  this.assistantApi.chat(text, this.currentRole, history).subscribe({
+    next: (response) => {
+      console.log('收到後端回覆：', response);
+
+      const answer = this.extractAssistantReply(response);
+
+      this.messages = [
+        ...this.messages,
+        {
+          sender: 'assistant',
+          content: answer || '抱歉，目前沒有取得有效回覆。',
+        },
+      ];
+
+      this.isLoading = false;
+      this.cdr.detectChanges();
+
+      console.log('已停止 loading：', this.isLoading);
+      console.log('messages 陣列：', this.messages);
+    },
+    error: (error) => {
+      console.error('AI 客服 API 呼叫失敗：', error);
+
+      this.errorMessage = '目前無法連線至 AI 客服，請稍後再試。';
+
+      this.messages = [
+        ...this.messages,
+        {
+          sender: 'assistant',
+          content: '抱歉，AI 客服目前暫時無法使用，請稍後再試。',
+        },
+      ];
+
+      this.isLoading = false;
+      this.cdr.detectChanges();
+
+      console.log('錯誤後已停止 loading：', this.isLoading);
+    },
+  });
+}
 
   onKeydown(event: Event): void {
     const keyboardEvent = event as KeyboardEvent;

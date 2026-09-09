@@ -1,6 +1,11 @@
+/* =====================
+   頁面外層
+===================== */
 .ai-chat-page {
   min-height: calc(100vh - 80px);
-  padding: 42px 32px;
+  padding: 20px 28px 32px;
+  box-sizing: border-box;
+  overflow: visible;
   background: #f6f8fa;
 }
 
@@ -8,47 +13,39 @@
    頁面標題
 ===================== */
 .page-header {
-  width: min(1260px, 100%);
-  margin: 0 auto 30px;
-}
+  width: min(1250px, 100%);
+  margin: 0 auto 16px;
 
-.page-header h1 {
-  margin: 0 0 10px;
-  color: #1f2937;
-  font-size: 32px;
-  font-weight: 700;
-}
+  h1 {
+    margin: 0 0 5px;
+    color: #1f2937;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
 
-.page-header p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 15px;
+  p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+  }
 }
 
 /* =====================
-   主容器
+   主容器：固定於畫面
 ===================== */
 .support-container {
-  display: grid;
+   display: grid;
   grid-template-columns: clamp(340px, 35%, 460px) minmax(0, 1fr);
-
-  width: min(1300px, 100%);
-  min-height: 920px;
-
-  /*
-    左右欄共用同一高度。
-    160px 預留給上方導覽、頁面 padding、頁面標題等空間。
-  */
+  width: min(1250px, 100%);
+  min-height: 630px;
   height: calc(100vh - 160px);
-
   margin: 0 auto;
-
   overflow: hidden;
-
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
-
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
 }
 
@@ -58,81 +55,88 @@
 .faq-panel {
   display: flex;
   flex-direction: column;
-
   min-width: 0;
   min-height: 0;
-  height: 100%;
-
-  padding: 32px 26px;
-  box-sizing: border-box;
-
+  padding: 22px 20px;
   overflow: hidden;
-
   background: #f9fafb;
   border-right: 1px solid #e5e7eb;
 }
 
 .panel-title {
-  margin-bottom: 26px;
+  flex-shrink: 0;
+  margin-bottom: 16px;
 
   h2 {
-    margin: 0 0 8px;
-
+    margin: 0 0 4px;
     color: #1f2937;
-
-    font-size: 22px;
+    font-size: 20px;
+    line-height: 1.3;
   }
 
   p {
     margin: 0;
-
     color: #6b7280;
-
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 1.5;
   }
 }
 
-/* FAQ 區塊標題 */
-.faq-section {
-  margin-bottom: 24px;
-}
-
-.faq-section-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  margin: 0 0 14px;
-
-  font-size: 19px;
-  font-weight: 720;
-
-  padding: 10px 14px;
-
+/* 捐助者／受助者 Tab */
+.faq-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  flex-shrink: 0;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 4px;
+  background: #eef2f7;
   border-radius: 10px;
 }
 
-.donor-title {
-  color: #1e40af;
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+.faq-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 8px;
+  color: #64748b;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  transition: 0.2s;
+
+  &:hover {
+    color: #334155;
+    background: rgba(255, 255, 255, 0.68);
+  }
+
+  &.active-donor {
+    color: #1d4ed8;
+    background: #fff;
+    box-shadow: 0 2px 7px rgba(37, 99, 235, 0.16);
+  }
+
+  &.active-recipient {
+    color: #047857;
+    background: #fff;
+    box-shadow: 0 2px 7px rgba(5, 150, 105, 0.16);
+  }
 }
 
-.recipient-title {
-  color: #065f46;
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-}
-
-.section-icon {
-  font-size: 18px;
-}
-
-/* FAQ 問題清單：只讓這區能上下滾動 */
-.faq-list-wrapper {
-  max-height: 260px;
-  overflow-y: scroll;
-
+/* 左側只有問題清單會捲動 */
+.faq-scroll-area {
+  flex: 1;
+  min-height: 0;
   padding-right: 6px;
   margin-right: -6px;
+  overflow-y: auto;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -152,60 +156,51 @@
   }
 }
 
-/* FAQ 列表 */
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 
-/* 捐助者問題樣式 */
-.donor-item {
-  border-left: 4px solid #3b82f6;
-
-  &:hover {
-    border-color: #2563eb;
-    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.15);
-  }
-
-  .faq-icon {
-    background: #eff6ff;
-    color: #2563eb;
-  }
-
-  strong {
-    color: #1e40af;
-  }
-}
-
-/* 受助者問題樣式 */
-.recipient-item {
-  border-left: 4px solid #10b981;
-
-  &:hover {
-    border-color: #059669;
-    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.15);
-  }
-
-  .faq-icon {
-    background: #ecfdf5;
-    color: #059669;
-  }
-
-  strong {
-    color: #065f46;
-  }
-}
-
-/* FAQ下滑解答 */
 .faq-entry {
   overflow: hidden;
 }
 
-/* 保留原本 faq-item 樣式，補充以下內容 */
 .faq-item {
+  display: flex;
   align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 11px;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  background: #fff;
   border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &.is-open {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+
+    .faq-arrow {
+      transform: rotate(180deg);
+    }
+  }
+
+  strong {
+    display: block;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    transition: color 0.2s;
+  }
 }
 
 .faq-content {
@@ -214,189 +209,120 @@
   min-width: 0;
 }
 
-.faq-description {
-  display: block;
-
-  margin-top: 4px;
-
-  color: #9ca3af;
-  font-size: 12px;
-  line-height: 1.5;
+.faq-icon {
+  display: flex;
+  flex: 0 0 24px;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 50%;
 }
 
 .faq-arrow {
-  flex-shrink: 0;
-
+  flex: 0 0 auto;
   color: #94a3b8;
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
-
   transition: transform 0.25s ease;
 }
 
-.faq-item.is-open .faq-arrow {
-  transform: rotate(180deg);
+/* 捐助者 FAQ */
+.donor-item {
+  border-left: 3px solid #3b82f6;
+
+  .faq-icon {
+    color: #2563eb;
+    background: #eff6ff;
+  }
+
+  strong {
+    color: #1e40af;
+  }
+
+  &:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.13);
+  }
 }
 
-/* 點開問題時，讓問題卡片與答案連在一起 */
-.faq-item.is-open {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+/* 受助者 FAQ */
+.recipient-item {
+  border-left: 3px solid #10b981;
+
+  .faq-icon {
+    color: #059669;
+    background: #ecfdf5;
+  }
+
+  strong {
+    color: #065f46;
+  }
+
+  &:hover {
+    border-color: #059669;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.13);
+  }
 }
 
+/* FAQ 展開答案 */
 .faq-answer {
-  padding: 12px 16px 14px 30px;
-
-  background: #ffffff;
-
+  padding: 9px 12px 11px 25px;
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-top: 0;
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
-
   animation: faqSlideDown 0.22s ease-out;
+
+  ol {
+    margin: 0;
+    padding-left: 16px;
+  }
+
+  li {
+    margin-bottom: 4px;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.55;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
-.faq-answer ol {
-  margin: 0;
-  padding-left: 18px;
-}
-
-.faq-answer li {
-  margin-bottom: 7px;
-
-  color: #4b5563;
-  font-size: 15px;
-  line-height: 1.65;
-}
-
-.faq-answer li:last-child {
-  margin-bottom: 0;
-}
-
-/* 捐助者展開答案：藍色左邊線 */
 .donor-answer {
   border-left: 3px solid #3b82f6;
 }
 
-/* 受助者展開答案：綠色左邊線 */
 .recipient-answer {
   border-left: 3px solid #10b981;
 }
 
-@keyframes faqSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* FAQ 項目通用樣式 */
-.faq-item {
-  display: flex;
-
-  align-items: flex-start;
-
-  gap: 14px;
-
-  width: 100%;
-
-  padding: 16px;
-
-  text-align: left;
-
-  cursor: pointer;
-
-  background: #ffffff;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-
-  transition: 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-}
-
-.faq-icon {
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  width: 28px;
-  height: 28px;
-
-  flex-shrink: 0;
-
-  font-size: 15px;
-  font-weight: 700;
-
-  border-radius: 50%;
-
-  transition: 0.2s;
-}
-
-.faq-item strong {
-  display: block;
-
-  margin-bottom: 5px;
-
-  font-size: 17px;
-
-  transition: 0.2s;
-}
-
-.faq-item p {
-  margin: 0;
-
-  font-size: 13px;
-
-  line-height: 1.6;
-
-  color: #9ca3af;
-
-  transition: 0.2s;
-}
-
-.faq-item:hover p {
-  color: #6b7280;
-}
-
-/* 聯絡管理員 */
+/* 左側底部聯絡提示 */
 .contact-admin {
   flex-shrink: 0;
-
-  margin-top: auto;
-  padding: 20px 0 0;
-
-  color: #6b7280;
-
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid #e5e7eb;
-}
 
-.contact-admin span {
-  display: block;
+  span {
+    display: block;
+    margin-bottom: 5px;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 650;
+  }
 
-  margin-bottom: 8px;
-
-  color: #374151;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.contact-admin p {
-  margin: 0;
-
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.7;
+  p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.55;
+  }
 }
 
 /* =====================
@@ -405,88 +331,72 @@
 .chat-panel {
   display: flex;
   flex-direction: column;
-
   min-width: 0;
   min-height: 0;
-  height: 100%;
+  overflow: hidden;
+  background: #fff;
 }
 
-/* Header */
+/* 右側固定標題 */
 .chat-header {
   display: flex;
-
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
-
-  padding: 26px 32px;
-
+  min-height: 72px;
+  padding: 14px 24px;
   border-bottom: 1px solid #e5e7eb;
+
+  p {
+    margin: 4px 0 0;
+    color: #9ca3af;
+    font-size: 12px;
+    line-height: 1.5;
+  }
 }
 
 .chat-title {
   display: flex;
-
   align-items: center;
+  gap: 9px;
 
-  gap: 11px;
-}
-
-.chat-title h2 {
-  margin: 0;
-
-  color: #1f2937;
-
-  font-size: 22px;
-}
-
-.chat-header p {
-  margin: 8px 0 0;
-
-  color: #9ca3af;
-
-  font-size: 14px;
+  h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 19px;
+    line-height: 1.3;
+  }
 }
 
 .ai-indicator {
-  width: 11px;
-  height: 11px;
-
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
   background: #22c55e;
-
   border-radius: 50%;
 }
 
 .role-badge {
-  padding: 8px 14px;
-
+  flex-shrink: 0;
+  padding: 6px 10px;
   color: #2563eb;
-
-  font-size: 14px;
-
+  font-size: 12px;
+  line-height: 1.2;
   background: #eff6ff;
-
-  border-radius: 22px;
+  border-radius: 999px;
 }
 
-/* =====================
-   訊息區
-===================== */
+/* 右側只有訊息區會捲動 */
 .chat-messages {
   display: flex;
   flex: 1;
   flex-direction: column;
-
+  gap: 14px;
   min-width: 0;
   min-height: 0;
-
-  gap: 18px;
-
-  padding: 32px;
-  box-sizing: border-box;
-
+  padding: 24px;
   overflow-y: auto;
-
-  background: #ffffff;
+  background: #fff;
 
   &::-webkit-scrollbar {
     width: 7px;
@@ -508,262 +418,211 @@
 
 .message-row {
   display: flex;
+  min-width: 0;
+
+  &.assistant-row {
+    justify-content: flex-start;
+  }
+
+  &.user-row {
+    justify-content: flex-end;
+  }
 }
 
-.assistant-row {
-  justify-content: flex-start;
-}
-
-.user-row {
-  justify-content: flex-end;
-}
-
-/* 訊息泡泡 */
 .message-bubble {
-  max-width: 75%;
-
-  padding: 14px 18px;
-
-  font-size: 15px;
-
-  line-height: 1.8;
-
+  max-width: min(75%, 620px);
+  padding: 11px 15px;
+  font-size: 14px;
+  line-height: 1.65;
   white-space: pre-wrap;
   word-break: break-word;
+  border-radius: 12px;
 
-  border-radius: 14px;
+  &.assistant-message {
+    color: #374151;
+    background: #f3f4f6;
+    border-bottom-left-radius: 4px;
+  }
+
+  &.user-message {
+    color: #fff;
+    background: #2563eb;
+    border-bottom-right-radius: 4px;
+  }
 }
 
-.assistant-message {
-  color: #374151;
-
-  background: #f3f4f6;
-
-  border-bottom-left-radius: 4px;
-}
-
-.user-message {
-  color: #ffffff;
-
-  background: #2563eb;
-
-  border-bottom-right-radius: 4px;
-}
-
-/* Loading */
+/* AI 回應中的 Loading 點 */
 .loading-message {
   display: flex;
-
-  gap: 6px;
-
   align-items: center;
+  gap: 6px;
+  min-width: 58px;
+  padding: 14px;
 
-  min-width: 65px;
+  span {
+    width: 6px;
+    height: 6px;
+    background: #9ca3af;
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
 
-  padding: 17px;
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
 }
 
-.loading-message span {
-  width: 7px;
-  height: 7px;
-
-  background: #9ca3af;
-
-  border-radius: 50%;
-
-  animation: typing 1.2s infinite;
-}
-
-.loading-message span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.loading-message span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-/* =====================
-   Welcome
-===================== */
+/* 初始歡迎內容 */
 .welcome-message {
   display: flex;
-
   flex: 1;
-
   flex-direction: column;
-
   justify-content: center;
-
-  max-width: 560px;
-
+  width: min(100%, 520px);
   margin: auto;
+  transform: translateY(-16px);
+
+  h3 {
+    margin: 0 0 8px;
+    color: #1f2937;
+    font-size: 24px;
+    line-height: 1.35;
+  }
+
+  p {
+    margin: 0 0 20px;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.7;
+  }
 }
 
 .welcome-line {
-  width: 42px;
-  height: 5px;
-
-  margin-bottom: 20px;
-
+  width: 36px;
+  height: 4px;
+  margin-bottom: 16px;
   background: #2563eb;
-
-  border-radius: 12px;
+  border-radius: 999px;
 }
 
-.welcome-message h3 {
-  margin: 0 0 12px;
-
-  color: #1f2937;
-
-  font-size: 26px;
-}
-
-.welcome-message p {
-  margin: 0 0 28px;
-
-  color: #6b7280;
-
-  font-size: 15px;
-
-  line-height: 1.9;
-}
-
-/* 建議問題 */
 .suggestion-list {
   display: flex;
-
   flex-wrap: wrap;
+  gap: 8px;
 
-  gap: 12px;
+  button {
+    padding: 8px 12px;
+    color: #4b5563;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.35;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: 0.2s;
+
+    &:hover {
+      color: #2563eb;
+      background: #eff6ff;
+      border-color: #2563eb;
+    }
+  }
 }
 
-.suggestion-list button {
-  padding: 11px 16px;
-
-  color: #4b5563;
-
-  font-size: 14px;
-
-  cursor: pointer;
-
-  background: #ffffff;
-
-  border: 1px solid #e5e7eb;
-
-  border-radius: 10px;
-
-  transition: 0.2s;
-}
-
-.suggestion-list button:hover {
-  color: #2563eb;
-
-  border-color: #2563eb;
-
-  background: #eff6ff;
-}
-
-/* =====================
-   Error
-===================== */
+/* 錯誤訊息 */
 .error-message {
-  padding: 14px 32px;
-
+  flex-shrink: 0;
+  padding: 10px 24px;
   color: #b91c1c;
-
-  font-size: 14px;
-
+  font-size: 13px;
   background: #fef2f2;
-
   border-top: 1px solid #fee2e2;
 }
 
-/* =====================
-   Input
-===================== */
+/* 右側固定輸入區 */
 .chat-input-area {
   display: flex;
-
-  gap: 14px;
-
-  padding: 20px 32px;
-
-  background: #ffffff;
-
+  flex-shrink: 0;
+  align-items: stretch;
+  gap: 10px;
+  padding: 14px 24px;
+  background: #fff;
   border-top: 1px solid #e5e7eb;
-}
 
-.chat-input-area textarea {
-  flex: 1;
+  textarea {
+    flex: 1;
+    min-height: 42px;
+    padding: 10px 12px;
+    resize: none;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    outline: none;
 
-  min-height: 40px;
+    &:focus {
+      background: #fff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+  }
 
-  padding: 14px 16px;
+  button {
+    min-width: 60px;
+    padding: 0 16px;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #2563eb;
+    border: 0;
+    border-radius: 9px;
+    transition: 0.2s;
 
-  resize: none;
+    &:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
 
-  font: inherit;
-
-  font-size: 15px;
-
-  background: #f9fafb;
-
-  border: 1px solid #d1d5db;
-
-  border-radius: 10px;
-
-  outline: none;
-}
-
-.chat-input-area textarea:focus {
-  background: #ffffff;
-
-  border-color: #2563eb;
-
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-}
-
-.chat-input-area button {
-  padding: 0 26px;
-
-  color: #ffffff;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  background: #2563eb;
-
-  border: none;
-
-  border-radius: 10px;
-
-  transition: 0.2s;
-}
-
-.chat-input-area button:hover:not(:disabled) {
-  background: #1d4ed8;
-}
-
-.chat-input-area button:disabled {
-  cursor: not-allowed;
-
-  opacity: 0.5;
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
 }
 
 /* =====================
-   Animation
+   動畫
 ===================== */
+@keyframes faqSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes typing {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     opacity: 0.4;
     transform: translateY(0);
   }
 
   30% {
     opacity: 1;
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
 }
-
