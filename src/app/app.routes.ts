@@ -193,6 +193,17 @@ export const routes: Routes = [
     loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
   },
 
+  //6.客服
+  {
+    path: 'customer-service/ai-chat',
+    loadComponent: () => import('./features/customer-service/ai-chat/ai-chat.component').then((m) => m.AiChatComponent),
+  },
+  {
+    path: 'customer-service/faq',
+    loadComponent: () => import('./features/customer-service/faq/faq.component').then((m) => m.FAQComponent),
+  },
+
+
   // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回大廳
   { path: '**', redirectTo: 'home' },
 ];
