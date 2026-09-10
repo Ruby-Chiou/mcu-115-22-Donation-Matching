@@ -30,7 +30,7 @@ export class HeaderComponent {
       name: '客服中心',
       link: '/Customer-Service-Center',
       sub: [
-        { name: '常見問題', link: '/faq' },
+        { name: '常見問題', link: '/customer-service/faq' },
         { name: 'AI 客服', link: '/customer-service/ai-chat' },
         { name: '真人客服', link: '/human-chat' },
       ],

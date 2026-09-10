@@ -1,0 +1,391 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: calc(100dvh - 70px);
+  overflow: visible;
+  background: #fff;
+}
+
+.customer-service-page {
+  width: 100%;
+  min-height: calc(100dvh - 70px);
+}
+
+/* FAQ 整體頁面 */
+.faq-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100dvh - 70px);
+  padding: 0 60px 24px;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+/* 標題 */
+.panel-title {
+  flex-shrink: 0;
+  padding: 12px 0 18px;
+}
+
+.panel-title h2 {
+  margin: 0 0 6px;
+  color: #1f2937;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.panel-title p {
+  margin: 0;
+  color: #8a94a3;
+  font-size: 13px;
+}
+
+/* 分類按鈕與搜尋框 */
+.faq-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 600px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* 左側三個分類按鈕區 */
+.faq-tabs {
+  display: flex;
+  width: calc(100% - 260px);
+  padding: 4px;
+  box-sizing: border-box;
+  background: #f3f5f7;
+  border-radius: 10px;
+}
+
+.faq-tab {
+  flex: 1;
+  padding: 10px 8px;
+  color: #697586;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.faq-tab span {
+  display: none;
+}
+
+.faq-tab:hover {
+  color: #374151;
+  background: #fff;
+}
+
+.faq-tab.active-general {
+  color: #2563eb;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.faq-tab.active-donor {
+  color: #16805b;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.faq-tab.active-recipient {
+  color: #d97706;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* 右側搜尋區 */
+.faq-search {
+  position: relative;
+  flex: 0 0 300px;
+  width: 300px;
+}
+
+.faq-search input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px 0 36px;
+  box-sizing: border-box;
+  color: #374151;
+  font-size: 13px;
+  background: #f3f5f7;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.faq-search input::placeholder {
+  color: #9ca3af;
+}
+
+.faq-search input:focus {
+  background: #fff;
+  border-color: #d1d5db;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+}
+
+.faq-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  z-index: 1;
+  color: #9ca3af;
+  font-size: 14px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* FAQ 清單中間可用區域 */
+.faq-scroll-area {
+  flex: none;
+  padding: 0;
+  overflow: visible;
+  background: #fff;
+}
+
+/* FAQ 清單 */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 16px;
+}
+
+.faq-empty-state {
+  margin: 24px 0;
+  color: #8a94a3;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* FAQ 單項 */
+.faq-entry {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e6e9ed;
+  border-radius: 10px;
+  transition: box-shadow 0.2s ease;
+}
+
+.faq-entry:has(.faq-answer) {
+  box-shadow: 0 3px 12px rgba(31, 41, 55, 0.05);
+}
+
+/* 問題按鈕 */
+.faq-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 58px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  text-align: left;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.faq-item:hover {
+  background: #f8fafc;
+}
+
+/* 問號圖示 */
+.faq-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-right: 12px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f1f5f9;
+  border-radius: 7px;
+}
+
+.general-item.is-open .faq-icon {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.donor-item.is-open .faq-icon {
+  color: #16805b;
+  background: #ecfdf5;
+}
+
+.recipient-item.is-open .faq-icon {
+  color: #d97706;
+  background: #fff7ed;
+}
+
+/* 問題文字 */
+.faq-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.faq-content strong {
+  display: block;
+  overflow: hidden;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 展開箭頭 */
+.faq-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-left: 12px;
+  color: #9ca3af;
+  font-size: 17px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.faq-item.is-open .faq-arrow {
+  color: #64748b;
+  transform: rotate(180deg);
+}
+
+/* 展開後的答案 */
+.faq-answer {
+  padding: 14px 20px 16px 56px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+  background: #fafbfc;
+  border-top: 1px solid #edf0f2;
+}
+
+.general-answer {
+  border-left: 3px solid #3b82f6;
+}
+
+.donor-answer {
+  border-left: 3px solid #22a06b;
+}
+
+.recipient-answer {
+  border-left: 3px solid #f59e0b;
+}
+
+.faq-answer ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.faq-answer li {
+  margin-bottom: 5px;
+  padding-left: 3px;
+}
+
+.faq-answer li:last-child {
+  margin-bottom: 0;
+}
+
+/* FAQ 區塊底部的聯絡管理員 */
+.contact-admin {
+  margin: 16px 0 0;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  background: #f8fafc;
+  border: 1px solid #e7ebef;
+  border-radius: 10px;
+}
+
+.contact-admin span {
+  display: block;
+  margin-bottom: 5px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.contact-admin p {
+  margin: 0;
+  color: #8a94a3;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* 平板 */
+@media (max-width: 800px) {
+  .faq-panel {
+    padding: 0 24px 20px;
+  }
+
+  .faq-search {
+    flex-basis: 190px;
+    width: 190px;
+  }
+}
+
+/* 手機 */
+@media (max-width: 600px) {
+  :host {
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .faq-panel {
+    min-height: 100dvh;
+    padding: 0 16px 16px;
+    overflow: visible;
+  }
+
+  .panel-title {
+    padding-top: 20px;
+  }
+
+  .faq-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .faq-tabs,
+  .faq-search {
+    width: 100%;
+  }
+
+  .faq-search {
+    flex: none;
+  }
+
+  .faq-tab {
+    padding: 9px 4px;
+    font-size: 12px;
+  }
+
+  .faq-scroll-area {
+    flex: none;
+    overflow: visible;
+  }
+
+  .faq-answer {
+    padding-left: 42px;
+  }
+
+  .contact-admin {
+    margin-top: 12px;
+  }
+}
