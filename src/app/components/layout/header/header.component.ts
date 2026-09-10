@@ -16,7 +16,7 @@ export class HeaderComponent {
         { name: '日常捐助', link: '/donor/daily' },
         { name: '災害救助', link: '/donor/disaster' },
         { name: '捐助地圖', link: '/daily/locations' },
-        { name: '捐助感謝', link: '/thanks-wall' },
+        { name: '捐助感謝', link: '/thank-you-wall' },
       ],
     },
     {

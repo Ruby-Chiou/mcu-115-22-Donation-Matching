@@ -1,7 +1,7 @@
-// ==========================================
+
 // 3. 首頁主要區塊
 // 左右比例：7：3
-// ==========================================
+
 .lobby-grid {
   display: flex;
   max-width: 1200px;
@@ -117,7 +117,7 @@
 
     background-color: var(--bg-layer-2);
     border-radius: var(--border-radius-main);
-    padding: 30px 20px;
+    padding: 40px 20px;
 
     border: 1px solid var(--border-default);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
@@ -125,12 +125,12 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 15px;
+    gap: 35px;
 
 
-    // ==========================================
+
     // 每一列
-    // ==========================================
+
     .sidebar-row {
       flex: 1;
 
@@ -147,9 +147,9 @@
     }
 
 
-    // ==========================================
+
     // 左側說明文字
-    // ==========================================
+
     .row-title {
       flex: 1;
 
@@ -160,9 +160,9 @@
     }
 
 
-    // ==========================================
+
     // 圓形功能按鈕
-    // ==========================================
+
     .circle-button {
       width: 88px;
       height: 88px;
@@ -196,9 +196,9 @@
     }
   }
 }
-// ==========================================
+
 // 平台公告
-// ==========================================
+
 .platform-announcements {
   max-width: 1200px;
   margin: 30px auto 50px;
@@ -259,9 +259,9 @@
     }
   }
 }
-// ==========================================
+
 // 平台公告
-// ==========================================
+
 .platform-announcements {
   max-width: 1200px;
   margin: 30px auto 50px;
@@ -307,7 +307,7 @@
     display: flex;
     align-items: center;
 
-    min-height: 55px;
+    min-height: 45px;
     padding: 8px 0;
 
     border-bottom: 2px dotted #cbd5df;
@@ -330,5 +330,164 @@
       line-height: 1.6;
       color: var(--color-text-main);
     }
+  }
+}
+
+// 為什麼我們要做這個平台
+
+.about-platform {
+  width: 100%;
+  max-width: none;
+
+  margin: 30px 0 0;
+
+  background-color: #eaf4f8;
+
+  padding: 40px 50px 45px;
+
+  box-sizing: border-box;
+}
+
+
+
+// 標題
+
+.about-title {
+  max-width: 1400px;
+  margin: 0 auto 35px;
+
+  text-align: center;
+
+  color: var(--color-text-main);
+
+  font-size: 30px;
+  font-weight: 600;
+}
+
+
+
+// 內容主要區域
+
+.about-content {
+  position: relative;
+
+  width: 100%;
+  max-width: 1400px;
+  min-height: 420px;
+
+  margin: 0 auto;
+}
+
+
+
+// 中間手繪圖片
+
+.about-image {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 80%;
+  max-width: 1000px;
+
+  z-index: 1;
+
+  img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    object-fit: contain;
+  }
+}
+
+
+
+// 左下理念文字
+
+.about-message {
+
+  position: absolute;
+
+  left: 0;
+  bottom: 35px;
+
+  width: 30%;
+
+  z-index: 2;
+
+  p {
+    margin: 0;
+
+    color: var(--color-brand-primary);
+
+    font-size: 20px;
+    line-height: 1.65;
+    font-weight: 500;
+  }
+}
+
+
+
+// 右上平台介紹
+
+.about-introduction {
+  .second-line {
+  display: inline-block;
+  margin-left: 3em;
+}
+  position: absolute;
+
+  position: absolute;
+
+  top: 20px;
+  right: 0;
+
+  width: 28%;
+
+  z-index: 2;
+
+  p {
+    margin: 0;
+
+    color: var(--color-brand-primary);
+
+    font-size: 20px;
+    line-height: 1.7;
+    font-weight: 500;
+  }
+}
+
+
+
+// 了解更多
+
+.about-link {
+  position: absolute;
+
+  right: 0;
+  bottom: 10px;
+
+  z-index: 2;
+
+  color: var(--color-brand-primary);
+
+  font-size: 20px;
+  font-weight: 500;
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    color: var(--color-text-main);
+
+    transform: translateX(4px);
   }
 }
