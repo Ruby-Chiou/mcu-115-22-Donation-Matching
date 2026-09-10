@@ -1,6 +1,6 @@
 .featured-card {
   overflow: hidden;
-  height: 590px;
+  height: 610px;
   background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 10px;
@@ -77,9 +77,9 @@
 
 .detail-btn {
   display: block;
-  margin-top: auto;
-  width: 100%;
-  padding: 6px 10px;
+  margin: 0px 15px 15px;
+  width: calc(100% - 30px);
+  padding: 8px 10px;
   border: none;
   border-radius: 5px;
   background: #e68a3a;

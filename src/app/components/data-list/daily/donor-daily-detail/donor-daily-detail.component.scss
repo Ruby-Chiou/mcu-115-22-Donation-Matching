@@ -17,6 +17,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
+
 /* 下方獨立留言區塊 */
 .comment-section {
   width: 100%;
@@ -30,7 +31,6 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
-/* 上方主詳情區塊保留頂部返回按鈕留白 */
 .detail-info {
   margin-top: 30px;
   margin-bottom: 30px;
@@ -38,11 +38,28 @@
 }
 
 .detail-page {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 30px;
 }
 
+/* 返回按鈕 */
+.back-btn {
+  position: absolute;
+  top: -45px;
+  left: 0;
+  border: none;
+  background: none;
+  padding: 0;
+  color: #666;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  color: #333;
+}
 /* 左邊圖片 */
 .detail-image {
   position: relative;
@@ -120,22 +137,6 @@
   box-sizing: border-box;
 }
 
-/* 返回按鈕 */
-.back-btn {
-  position: absolute;
-  top: -45px;
-  left: 0;
-  border: none;
-  background: none;
-  padding: 0;
-  color: #666;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.back-btn:hover {
-  color: #333;
-}
 
 /* 標題 */
 .detail-content h2 {
