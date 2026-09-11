@@ -1,6 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { NgClass } from '@angular/common';
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 
@@ -8,7 +8,7 @@ import { DisasterControlService } from '../../../../core/services/disaster-contr
 
 @Component({
   selector: 'app-donor-disaster-card',
-  imports: [],
+  imports: [NgClass],
   templateUrl: './donor-disaster-card.component.html',
   styleUrl: './donor-disaster-card.component.scss',
 })
