@@ -1,9 +1,7 @@
 <div class="supply-form-page">
   <div class="form-container">
-    <!-- =================================================
-         捐贈表單
-         submitted = false 才顯示
-    ================================================= -->
+    <!-- 捐贈表單
+         submitted = false 才顯示-->
     @if (!submitted) {
       <!-- 標題 -->
       <div class="form-header">
@@ -34,9 +32,7 @@
           <span>自動填入帳戶資料</span>
         </label>
       </div>
-      <!-- =================================================
-           表單
-      ================================================= -->
+      <!-- 表單-->
       <form (ngSubmit)="submitForm(supplyForm)" #supplyForm="ngForm" [class.form-submitted]="formSubmitted">
         <!-- 姓名 -->
         <div class="form-group">
@@ -150,9 +146,50 @@
           </div>
             </div>
           </div>
+          @if (demand?.receiveMethod?.['寄送'] && demand?.receiveMethod?.['面交']) {
+ <div class="section-title">
+          <span>2</span>
+          捐贈方式
+        </div>
+            <div class="form-group">
+
+    <label>
+      請選擇捐贈方式
+      <span>*</span>
+    </label>
+
+    <div class="radio-group">
+      <label class="radio-option">
+        <input
+          type="radio"
+          name="donationMethod"
+          value="寄送"
+          [(ngModel)]="donationMethod"
+          required
+          class="no-error-border"
+        >
+        <span>寄送</span>
+      </label>
+
+      <label class="radio-option">
+        <input
+          type="radio"
+          name="donationMethod"
+          value="面交"
+          [(ngModel)]="donationMethod"
+          required
+          class="no-error-border"
+        >
+        <span>面交</span>
+      </label>
+    </div>
+  </div>
+}
         <!--收據-->
         <div class="section-title">
-          <span>2</span>
+           <span>
+    {{ (demand?.receiveMethod?.['寄送'] && demand?.receiveMethod?.['面交']) ? 3 : 2 }}
+  </span>
           捐贈收據
         </div>
         <div class="form-group">
@@ -213,7 +250,9 @@
         }
         <!-- 感謝狀-->
         <div class="section-title">
-          <span>3</span>
+           <span>
+    {{ (demand?.receiveMethod?.['寄送'] && demand?.receiveMethod?.['面交']) ? 4 : 3 }}
+  </span>
           感謝狀
         </div>
         <div class="form-group">
@@ -238,7 +277,9 @@
         </div>
         <!-- 其他資訊 -->
         <div class="section-title">
-          <span>4</span>
+        <span>
+    {{ (demand?.receiveMethod?.['寄送'] && demand?.receiveMethod?.['面交']) ? 5 : 4 }}
+  </span>
           其他資訊
         </div>
         <div class="form-group">
