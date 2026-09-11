@@ -108,6 +108,7 @@
         ></textarea>
       </div>
 
+      <!-- 類別 -->
       <label class="label-row">
         類別
         <span class="required">*</span>
@@ -304,7 +305,14 @@
           <label class="label-row align-title"> 其它物資需求狀態 </label>
 
           <div class="custom-condition-list">
-            <div class="custom-condition-row" *ngFor="let condition of demand.customConditions; let j = index; trackBy: trackByIndex">
+            <div
+              class="custom-condition-row"
+              *ngFor="
+                let condition of demand.customConditions;
+                let j = index;
+                trackBy: trackByIndex
+              "
+            >
               <input
                 class="custom-condition-input"
                 maxlength="100"
@@ -373,17 +381,35 @@
 
       <div class="status-box">
         <label>
-          <input type="radio" [name]="'status' + i" value="上架" [(ngModel)]="demand.status" />
+          <input
+            type="radio"
+            [name]="'status' + i"
+            value="上架"
+            [checked]="demand.status === '上架'"
+            (change)="onStatusSelect(demand, '上架')"
+          />
           上架
         </label>
 
         <label>
-          <input type="radio" [name]="'status' + i" value="隱藏" [(ngModel)]="demand.status" />
+          <input
+            type="radio"
+            [name]="'status' + i"
+            value="隱藏"
+            [checked]="demand.status === '隱藏'"
+            (change)="onStatusSelect(demand, '隱藏')"
+          />
           隱藏
         </label>
 
         <label>
-          <input type="radio" [name]="'status' + i" value="下架" [(ngModel)]="demand.status" />
+          <input
+            type="radio"
+            [name]="'status' + i"
+            value="下架"
+            [checked]="demand.status === '下架'"
+            (change)="onStatusSelect(demand, '下架')"
+          />
           下架
         </label>
       </div>
@@ -434,7 +460,9 @@
             <button
               type="button"
               class="different-btn"
-              [ngClass]="{ active: demand.contactTimeDifferent === false }"
+              [ngClass]="{
+                active: demand.contactTimeDifferent === false
+              }"
               (click)="setContactTimeDifferent(demand, false)"
             >
               否
@@ -443,7 +471,9 @@
             <button
               type="button"
               class="different-btn"
-              [ngClass]="{ active: demand.contactTimeDifferent === true }"
+              [ngClass]="{
+                active: demand.contactTimeDifferent === true
+              }"
               (click)="setContactTimeDifferent(demand, true)"
             >
               是
@@ -557,3 +587,14 @@
   [imageName]="previewImageName"
   (closed)="closeImagePreview()"
 ></app-supply-image-preview>
+
+<!-- 手動下架確認視窗 -->
+<app-supply-off-shelf
+  *ngIf="showOffShelfWarning"
+  (closed)="cancelManualOffShelf()"
+  (hide)="hideInsteadOfOffShelf()"
+  (confirmed)="confirmManualOffShelf()"
+></app-supply-off-shelf>
+
+<!-- 已下架無法重新上架提示 -->
+<app-supply-on-shelf *ngIf="showOnShelfWarning" (closed)="closeOnShelfWarning()" (confirmed)="closeOnShelfWarning()"></app-supply-on-shelf>

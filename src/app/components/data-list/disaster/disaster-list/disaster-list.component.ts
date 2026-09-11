@@ -246,6 +246,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
       )
       .subscribe((data) => {
         this.demands = data.map((item) => {
+          // 先檢查是否需要自然下架
+          item = this.checkNaturalOffShelf(item);
+
           let currentStatus: DisplayStatus = '已上架';
 
           if (item.status === '上架') {
@@ -281,6 +284,30 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
         // 強制 Angular 立即更新畫面
         this.cdr.detectChanges();
       });
+  }
+
+  // 檢查是否已達到預計下架日期
+  private checkNaturalOffShelf(item: DisasterDemand): DisasterDemand {
+    if (item.status !== '上架') {
+      return item;
+    }
+
+    if (!item.expectedOffShelfAt) {
+      return item;
+    }
+
+    const now = new Date();
+    const expectedOffShelfAt = new Date(item.expectedOffShelfAt);
+
+    if (now >= expectedOffShelfAt) {
+      item.status = '下架';
+      item.offShelfReason = 'natural';
+
+      // 同步更新 Service 中的資料
+      this.disasterDemandService.updateDemand(item);
+    }
+
+    return item;
   }
 
   // 搜尋
@@ -587,7 +614,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
     // 已下架 → 禁止重新上架
-    if (newStatus === '已上架' && originalItem?.status === '下架') {
+    if (newStatus === '已上架' && originalItem?.status === '下架' && originalItem?.offShelfReason === 'manual') {
       // 保持列表顯示「已下架」
       item.displayStatus = '已下架';
 
@@ -622,6 +649,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
     // 狀態改成下架
     item.status = '下架';
+
+    // 記錄這次是「手動下架」
+    item.offShelfReason = 'manual';
 
     // 記錄實際手動下架時間
     item.expectedOffShelfAt = now.toISOString();
@@ -664,6 +694,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
     // 改成隱藏
     item.status = '隱藏';
+    item.offShelfReason = undefined;
 
     item.displayStatus = '隱藏中';
 
@@ -733,15 +764,12 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     // 上架
     if (status === '上架') {
       // 手動下架後禁止重新上架
-      if (originalStatus === '下架') {
+      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
         item.displayStatus = '已下架';
-
         this.showOnShelfWarning = true;
-
         return;
       }
 
-      // 原本不是上架
       // → 現在重新上架
       if (originalStatus !== '上架') {
         item.publishedAt = now.toISOString();
@@ -752,7 +780,6 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
         }
       }
 
-      // 原本就是上架
       // → 保留原本上架日期
       else if (originalItem?.publishedAt) {
         item.publishedAt = originalItem.publishedAt;
@@ -764,6 +791,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
       }
 
       item.status = '上架';
+
+      // 重新上架後，清除之前的下架原因
+      item.offShelfReason = undefined;
 
       item.displayStatus = '已上架';
 

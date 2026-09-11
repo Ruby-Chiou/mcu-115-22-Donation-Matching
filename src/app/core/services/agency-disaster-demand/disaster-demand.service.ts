@@ -27,7 +27,7 @@ export class DisasterDemandService {
       },
       customConditions: ['保存期限至少六個月'],
       priority: '非常緊急',
-      status: '上架',
+      status: '隱藏',
       remaining: 320,
       address: '宜蘭縣災害物資集中收受中心',
       phone: '039123456',
@@ -39,8 +39,6 @@ export class DisasterDemandService {
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
       imageFileNames: ['測試圖1'],
       createdAt: '2026-08-20T09:00:00',
-      publishedAt: '2026-08-20T09:00:00',
-      expectedOffShelfAt: '2026-08-27T09:00:00',
     },
 
     {
@@ -62,7 +60,7 @@ export class DisasterDemandService {
       },
       customConditions: ['低鹽、低油、適合長者食用'],
       priority: '緊急',
-      status: '上架',
+      status: '隱藏',
       remaining: 180,
       address: '宜蘭縣災害物資集中收受中心',
       phone: '039234567',
@@ -74,13 +72,12 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '食品請確認保存期限及外包裝完整。',
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'
+      image: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
       ],
       imageFileNames: ['測試圖2'],
       createdAt: '2026-08-21T10:30:00',
-      publishedAt: '2026-08-21T10:30:00',
-      expectedOffShelfAt: '2026-09-04T10:30:00',
     },
 
     {
@@ -114,12 +111,13 @@ export class DisasterDemandService {
       weekendAfternoon: true,
       weekendEvening: false,
       note: '成人男女外套皆可。',
-      image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
+      image: [
+        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
         'https://media.etmall.com.tw/nximg/007837/7837541/7837541_xxl.jpg?t=22437616813',
         'https://img.pchome.com.tw/cs/items/DEBLNNA900GOLU1/000001_1695453034.jpg?',
         'https://img.pchome.com.tw/cs/items/DEBLU1A900JDAHV/i010005_1761118380.jpg',
         'https://img.pchome.com.tw/cs/items/DEBLNNA900GOZIM/000001_1700106052.jpg?width=640',
-        'https://img.91app.com/webapi/imagesV3/Original/SalePage/9271978/5/639008613314930000?quality=30&v=1 '
+        'https://img.91app.com/webapi/imagesV3/Original/SalePage/9271978/5/639008613314930000?quality=30&v=1 ',
       ],
       imageFileNames: ['測試圖3'],
       createdAt: '2026-08-22T08:30:00',
@@ -146,7 +144,8 @@ export class DisasterDemandService {
       },
       customConditions: ['可接受輕微使用痕跡', '不可有霉味', '不可受潮'],
       priority: '非常緊急',
-      status: '上架',
+      status: '下架',
+      offShelfReason: 'manual',
       remaining: 210,
       address: '宜蘭縣羅東鎮臨時避難中心',
       phone: '039456789',
@@ -164,8 +163,8 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖1', '測試圖2'],
       createdAt: '2026-08-23T11:00:00',
-      publishedAt: '2026-08-23T11:00:00',
-      expectedOffShelfAt: '2026-08-30T11:00:00',
+      publishedAt: '2026-09-08T11:00:00',
+      expectedOffShelfAt: '2026-09-15T11:00:00',
     },
 
     {
@@ -187,7 +186,8 @@ export class DisasterDemandService {
       },
       customConditions: ['需有清楚保存期限', '包裝需完整'],
       priority: '非常緊急',
-      status: '上架',
+      status: '下架',
+      offShelfReason: 'natural',
       remaining: 38,
       address: '宜蘭縣醫療物資集中收受站',
       phone: '039567890',
@@ -225,7 +225,7 @@ export class DisasterDemandService {
       },
       customConditions: ['M號優先', '需有獨立包裝'],
       priority: '緊急',
-      status: '上架',
+      status: '隱藏',
       remaining: 47,
       address: '宜蘭縣長者照護物資站',
       phone: '039678901',
@@ -243,8 +243,6 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖1', '測試圖3'],
       createdAt: '2026-08-24T13:00:00',
-      publishedAt: '2026-08-24T13:00:00',
-      expectedOffShelfAt: '2026-09-07T13:00:00',
     },
 
     {
@@ -266,7 +264,7 @@ export class DisasterDemandService {
       },
       customConditions: ['酒精成分需清楚標示', '不可有明顯乾涸'],
       priority: '緊急',
-      status: '上架',
+      status: '隱藏',
       remaining: 290,
       address: '宜蘭縣災後清潔物資站',
       phone: '039789012',
@@ -282,8 +280,6 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖1', '測試圖2', '測試圖3'],
       createdAt: '2026-08-24T14:00:00',
-      publishedAt: '2026-08-24T14:00:00',
-      expectedOffShelfAt: '2026-09-07T14:00:00',
     },
 
     {
@@ -305,7 +301,8 @@ export class DisasterDemandService {
       },
       customConditions: ['M號優先', '需適合嬰幼兒肌膚使用'],
       priority: '非常緊急',
-      status: '上架',
+      status: '下架',
+      offShelfReason: 'manual',
       remaining: 56,
       address: '宜蘭縣嬰幼兒臨時照護中心',
       phone: '039890123',
@@ -317,8 +314,8 @@ export class DisasterDemandService {
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
       imageFileNames: ['測試圖2'],
       createdAt: '2026-08-25T08:00:00',
-      publishedAt: '2026-08-25T08:00:00',
-      expectedOffShelfAt: '2026-09-01T08:00:00',
+      publishedAt: '2026-09-08T08:00:00',
+      expectedOffShelfAt: '2026-09-15T08:00:00',
     },
 
     {
@@ -340,7 +337,7 @@ export class DisasterDemandService {
       },
       customConditions: ['L號優先'],
       priority: '緊急',
-      status: '隱藏',
+      status: '上架',
       remaining: 150,
       address: '宜蘭縣長者照護物資站',
       phone: '039901234',
@@ -355,6 +352,8 @@ export class DisasterDemandService {
       image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?'],
       imageFileNames: ['測試圖3'],
       createdAt: '2026-08-18T09:00:00',
+      publishedAt: '2026-08-18T09:00:00',
+      expectedOffShelfAt: '2026-09-01T09:00:00',
     },
 
     {
@@ -376,7 +375,7 @@ export class DisasterDemandService {
       },
       customConditions: ['日用與夜用皆可', '獨立包裝優先'],
       priority: '緊急',
-      status: '上架',
+      status: '隱藏',
       remaining: 62,
       address: '宜蘭縣婦女物資收受站',
       phone: '039012345',
@@ -394,8 +393,6 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖1', '測試圖2'],
       createdAt: '2026-08-25T09:00:00',
-      publishedAt: '2026-08-25T09:00:00',
-      expectedOffShelfAt: '2026-09-08T09:00:00',
     },
 
     {
@@ -458,7 +455,8 @@ export class DisasterDemandService {
       },
       customConditions: ['需附電池', '可接受輕微外觀刮痕'],
       priority: '非常緊急',
-      status: '上架',
+      status: '下架',
+      offShelfReason: 'manual',
       remaining: 90,
       address: '宜蘭縣災害防災物資站',
       phone: '039234678',
@@ -476,8 +474,8 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖1', '測試圖3'],
       createdAt: '2026-08-25T10:00:00',
-      publishedAt: '2026-08-25T10:00:00',
-      expectedOffShelfAt: '2026-09-01T10:00:00',
+      publishedAt: '2026-09-08T10:00:00',
+      expectedOffShelfAt: '2026-09-15T10:00:00',
     },
 
     {
@@ -538,7 +536,7 @@ export class DisasterDemandService {
       },
       customConditions: ['需確認點火功能正常', '不可有瓦斯洩漏問題'],
       priority: '緊急',
-      status: '上架',
+      status: '隱藏',
       remaining: 31,
       address: '宜蘭縣災害生活物資站',
       phone: '039456789',
@@ -553,8 +551,6 @@ export class DisasterDemandService {
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
       imageFileNames: ['測試圖1'],
       createdAt: '2026-08-24T16:00:00',
-      publishedAt: '2026-08-24T16:00:00',
-      expectedOffShelfAt: '2026-09-07T16:00:00',
     },
 
     {
@@ -576,7 +572,7 @@ export class DisasterDemandService {
       },
       customConditions: ['需具防水功能', '配件需完整', '可接受輕微使用痕跡', '不可有破洞', '不可嚴重發霉'],
       priority: '非常緊急',
-      status: '上架',
+      status: '隱藏',
       remaining: 18,
       address: '宜蘭縣災民臨時安置中心',
       phone: '039567890',
@@ -591,8 +587,6 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖2', '測試圖3'],
       createdAt: '2026-08-25T11:00:00',
-      publishedAt: '2026-08-25T11:00:00',
-      expectedOffShelfAt: '2026-09-01T11:00:00',
     },
 
     {
@@ -614,7 +608,7 @@ export class DisasterDemandService {
       },
       customConditions: ['可接受正常使用痕跡'],
       priority: '普通',
-      status: '隱藏',
+      status: '上架',
       remaining: 60,
       address: '宜蘭縣臨時收容行政中心',
       phone: '039678901',
@@ -632,6 +626,8 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖1', '測試圖2'],
       createdAt: '2026-08-19T10:00:00',
+      publishedAt: '2026-08-19T10:00:00',
+      expectedOffShelfAt: '2026-09-18T10:00:00',
     },
 
     {
@@ -653,7 +649,8 @@ export class DisasterDemandService {
       },
       customConditions: ['保存期限至少六個月', '不可有罐體膨脹'],
       priority: '普通',
-      status: '上架',
+      status: '下架',
+      offShelfReason: 'manual',
       remaining: 400,
       address: '宜蘭縣災害食品物資站',
       phone: '039789012',
@@ -668,8 +665,8 @@ export class DisasterDemandService {
       image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?'],
       imageFileNames: ['測試圖3'],
       createdAt: '2026-08-25T11:30:00',
-      publishedAt: '2026-08-25T11:30:00',
-      expectedOffShelfAt: '2026-09-24T11:30:00',
+      publishedAt: '2026-09-08T11:30:00',
+      expectedOffShelfAt: '2026-10-08T11:30:00',
     },
 
     {
@@ -730,6 +727,7 @@ export class DisasterDemandService {
       customConditions: ['醫療耗材需有完整標示'],
       priority: '非常緊急',
       status: '下架',
+      offShelfReason: 'manual',
       remaining: 0,
       address: '宜蘭縣醫療物資集中收受站',
       phone: '039012678',
@@ -747,8 +745,8 @@ export class DisasterDemandService {
       ],
       imageFileNames: ['測試圖2', '測試圖3'],
       createdAt: '2026-08-18T08:00:00',
-      publishedAt: '2026-08-18T08:00:00',
-      expectedOffShelfAt: '2026-08-25T13:00:00',
+      publishedAt: '2026-09-08T08:00:00',
+      expectedOffShelfAt: '2026-09-15T08:00:00',
     },
 
     {
@@ -766,7 +764,7 @@ export class DisasterDemandService {
         二手: '接受',
         有擦痕: '接受',
         過期: '不接受',
-        毀損: '不接受',
+        毀損: '接受',
       },
       customConditions: ['手套需成雙', '工具需可正常使用', '可接受輕微外觀痕跡'],
       priority: '緊急',
