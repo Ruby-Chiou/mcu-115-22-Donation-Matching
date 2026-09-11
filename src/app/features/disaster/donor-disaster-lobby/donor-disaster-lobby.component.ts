@@ -54,7 +54,6 @@ export class DonorDisasterLobbyComponent implements AfterViewInit {
     },
   ];
 
-
   // 宣告一個專門存放計時器的變數
   private autoSlideTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -102,7 +101,7 @@ export class DonorDisasterLobbyComponent implements AfterViewInit {
       highlight: '高雄美濃地震，震央位於台灣高雄市美濃區，芮氏規模達6.6。造成117人死亡，其中115人在台南市永康區維冠金龍大樓，551人受傷。',
     },
   ];
-   protected readonly disasterIndex = signal(0);
+  protected readonly disasterIndex = signal(0);
   protected readonly disasterNews = computed(() => this.newsList[this.disasterIndex()]);
 
   protected readonly volunteerList = [
@@ -129,34 +128,36 @@ export class DonorDisasterLobbyComponent implements AfterViewInit {
     },
   ];
 
-
   ngAfterViewInit(): void {
-  this.map = L.map('disaster-map');
+    this.map = L.map('disaster-map');
 
-  L.tileLayer(
-    'https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}',
-    {
+    L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
       attribution: '國土測繪中心',
+    }).addTo(this.map);
+
+    // 一開啟就顯示 Marker
+    this.showMarkers(this.volunteerList, '志工需求');
+
+    // 自動調整地圖範圍，讓所有 Marker 都看得到
+    const bounds = L.latLngBounds(this.volunteerList.map((item) => [item.lat, item.lng] as [number, number]));
+
+    this.map.fitBounds(bounds, {
+      padding: [50, 50],
+    });
+
+    setTimeout(() => {
+      this.map.invalidateSize();
+    }, 500);
+  }
+
+  protected selectType(event: Event): void {
+    const type = (event.target as HTMLSelectElement).value;
+    if (type === 'volunteer') {
+      this.showMarkers(this.volunteerList, '目前需要志工');
+    } else {
+      this.clearMarkers();
     }
-  ).addTo(this.map);
-
-  // 一開啟就顯示 Marker
-  this.showMarkers(this.volunteerList, '志工需求');
-
-  // 自動調整地圖範圍，讓所有 Marker 都看得到
-  const bounds = L.latLngBounds(
-    this.volunteerList.map(item => [item.lat, item.lng] as [number, number])
-  );
-
-  this.map.fitBounds(bounds, {
-    padding: [50, 50]
-  });
-
-  setTimeout(() => {
-    this.map.invalidateSize();
-  }, 500);
-}
-
+  }
 
   private showMarkers(items: typeof this.volunteerList, title: string): void {
     this.clearMarkers();
@@ -176,5 +177,4 @@ export class DonorDisasterLobbyComponent implements AfterViewInit {
     this.currentMarkers.forEach((marker) => this.map.removeLayer(marker));
     this.currentMarkers = [];
   }
-
 }
