@@ -1,0 +1,162 @@
+<!-- faq-panel.component.html -->
+<div class="customer-service-page">
+  <aside class="faq-panel">
+    <div class="panel-title">
+      <h1>FAQ</h1>
+      <p>快速找到您需要的協助</p>
+    </div>
+
+    <!-- 分類按鈕 + 搜尋列 -->
+    <div class="faq-controls">
+      <div class="faq-tabs" role="tablist" aria-label="常見問題分類">
+        <button type="button" class="faq-tab" [class.active-general]="activeFaqRole() === 'general'" (click)="changeFaqRole('general')">
+          一般問題
+        </button>
+        <button type="button" class="faq-tab" [class.active-donor]="activeFaqRole() === 'donor'" (click)="changeFaqRole('donor')">
+          捐助者
+        </button>
+        <button
+          type="button"
+          class="faq-tab"
+          [class.active-recipient]="activeFaqRole() === 'recipient'"
+          (click)="changeFaqRole('recipient')"
+        >
+          受助者
+        </button>
+      </div>
+
+      <!-- 搜尋框 -->
+      <div class="faq-search">
+      <i class="fa-solid fa-magnifying-glass faq-search-icon"></i>
+        <input
+          type="text"
+          placeholder="搜尋問題..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearch($event)"
+          aria-label="搜尋常見問題"
+        />
+      </div>
+    </div>
+
+    <!-- 可捲動 FAQ 內容 -->
+    <div class="faq-scroll-area">
+      <!-- 一般問題 -->
+      @if (activeFaqRole() === 'general') {
+      <div class="faq-list">
+        @for (faq of filteredGeneralFaqs; track faq.id) {
+        <div class="faq-entry">
+          <button
+            type="button"
+            class="faq-item general-item"
+            [class.is-open]="expandedFaqId === faq.id"
+            (click)="toggleFaq(faq.id)"
+            [attr.aria-expanded]="expandedFaqId === faq.id"
+          >
+            <span class="faq-icon">?</span>
+
+            <span class="faq-content">
+              <strong>{{ faq.question }}</strong>
+            </span>
+
+            <span class="faq-arrow" aria-hidden="true">⌄</span>
+          </button>
+
+          @if (expandedFaqId === faq.id) {
+          <div class="faq-answer general-answer">
+            <ol>
+              @for (step of faq.answer; track $index) {
+              <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      @if (filteredGeneralFaqs.length === 0) {
+      <p class="faq-empty-state">找不到符合的問題。</p>
+      } }
+
+      <!-- 捐助者問題 -->
+      @if (activeFaqRole() === 'donor') {
+      <div class="faq-list">
+        @for (faq of filteredDonorFaqs; track faq.id) {
+        <div class="faq-entry">
+          <button
+            type="button"
+            class="faq-item donor-item"
+            [class.is-open]="expandedFaqId === faq.id"
+            (click)="toggleFaq(faq.id)"
+            [attr.aria-expanded]="expandedFaqId === faq.id"
+          >
+            <span class="faq-icon">?</span>
+
+            <span class="faq-content">
+              <strong>{{ faq.question }}</strong>
+            </span>
+
+            <span class="faq-arrow" aria-hidden="true">⌄</span>
+          </button>
+
+          @if (expandedFaqId === faq.id) {
+          <div class="faq-answer donor-answer">
+            <ol>
+              @for (step of faq.answer; track $index) {
+              <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      @if (filteredDonorFaqs.length === 0) {
+      <p class="faq-empty-state">找不到符合的問題。</p>
+      } }
+
+      <!-- 受助者問題 -->
+      @if (activeFaqRole() === 'recipient') {
+      <div class="faq-list">
+        @for (faq of filteredRecipientFaqs; track faq.id) {
+        <div class="faq-entry">
+          <button
+            type="button"
+            class="faq-item recipient-item"
+            [class.is-open]="expandedFaqId === faq.id"
+            (click)="toggleFaq(faq.id)"
+            [attr.aria-expanded]="expandedFaqId === faq.id"
+          >
+            <span class="faq-icon">?</span>
+
+            <span class="faq-content">
+              <strong>{{ faq.question }}</strong>
+            </span>
+
+            <span class="faq-arrow" aria-hidden="true">⌄</span>
+          </button>
+
+          @if (expandedFaqId === faq.id) {
+          <div class="faq-answer recipient-answer">
+            <ol>
+              @for (step of faq.answer; track $index) {
+              <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      @if (filteredRecipientFaqs.length === 0) {
+      <p class="faq-empty-state">找不到符合的問題。</p>
+      } }
+    </div>
+
+    <!-- 固定在左側底部 -->
+    <div class="contact-admin">
+      <span>需要其他協助？</span>
+      <p>若常見問題無法解決您的疑問，您可以前往 AI 智慧客服尋求協助，或聯絡管理員。</p>
+    </div>
+  </aside>
+</div>
+

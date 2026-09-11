@@ -1,0 +1,23 @@
+<div class="container">
+
+  <div class="sidebar">
+    <h1>捐助地圖</h1>
+    <h2>日常捐助列表</h2>
+
+    <select
+      class="location-select"
+      (change)="selectCity($event)"
+    >
+      <option value="">請選擇縣市</option>
+
+      @for(city of cityList; track city.name) {
+        <option [value]="city.name">
+          {{ city.name }}
+        </option>
+      }
+    </select>
+  </div>
+
+  <div id="map"></div>
+
+</div>

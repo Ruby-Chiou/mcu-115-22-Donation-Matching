@@ -1,0 +1,77 @@
+<!-- ai-chat.component.html -->
+<section class="ai-chat-page">
+  <div class="support-container">
+    <!-- 右側 AI 客服 -->
+    <section class="chat-panel">
+      <!-- AI Header -->
+      <div class="chat-header">
+        <div>
+          <div class="chat-title">
+            <span class="ai-indicator"></span>
+            <h2>AI 智慧客服</h2>
+          </div>
+
+          <p>線上為您提供平台使用與服務相關協助</p>
+        </div>
+
+        <span class="role-badge"> {{ currentRole }} </span>
+      </div>
+
+      <!-- 訊息區 -->
+      <div class="chat-messages">
+        @if (messages.length === 0) {
+
+        <div class="welcome-message">
+          <h3>您好，有什麼可以協助您的嗎？</h3>
+
+          <p>您可以詢問平台功能、捐助流程、物資申請或其他服務相關問題。</p>
+
+          <div class="suggestion-list">
+            <button type="button" (click)="message = '我忘記密碼了，如何重設？'">我忘記密碼了，如何重設？</button>
+
+            <button type="button" (click)="message = '這個流程太複雜了，我不會用！'">這個流程太複雜了，我不會用！</button>
+          </div>
+        </div>
+
+        } @for (item of messages; track $index) {
+
+        <div class="message-row" [class.user-row]="item.sender === 'user'" [class.assistant-row]="item.sender === 'assistant'">
+          <div class="message-bubble" [class.user-message]="item.sender === 'user'" [class.assistant-message]="item.sender === 'assistant'">
+            {{ item.content }}
+          </div>
+        </div>
+
+        } @if (isLoading) {
+
+        <div class="message-row assistant-row">
+          <div class="message-bubble assistant-message loading-message">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        }
+      </div>
+
+      <!-- 錯誤訊息 -->
+      @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      <!-- 輸入區 -->
+      <form class="chat-input-area" (ngSubmit)="sendMessage()">
+        <textarea
+          name="message"
+          [(ngModel)]="message"
+          (keydown)="onKeydown($event)"
+          [disabled]="isLoading"
+          placeholder="輸入您的問題..."
+          rows="2"
+        ></textarea>
+
+        <button type="submit" [disabled]="isLoading || !message.trim()" aria-label="送出訊息">送出</button>
+      </form>
+    </section>
+  </div>
+</section>

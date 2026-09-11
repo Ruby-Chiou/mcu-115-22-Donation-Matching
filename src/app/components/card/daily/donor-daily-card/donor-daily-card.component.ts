@@ -42,4 +42,20 @@ export class DonorDailyCardComponent {
 
     return match ? match[1] : address;
   }
+  currentImageIndex = 0;
+  previousImage(event: Event): void {
+    event.stopPropagation();
+
+    if (!this.demand?.image?.length) return;
+
+    this.currentImageIndex = this.currentImageIndex === 0 ? this.demand.image.length - 1 : this.currentImageIndex - 1;
+  }
+
+  nextImage(event: Event): void {
+    event.stopPropagation();
+
+    if (!this.demand?.image?.length) return;
+
+    this.currentImageIndex = (this.currentImageIndex + 1) % this.demand.image.length;
+  }
 }

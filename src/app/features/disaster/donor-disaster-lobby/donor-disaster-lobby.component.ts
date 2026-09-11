@@ -54,95 +54,6 @@ export class DonorDisasterLobbyComponent implements AfterViewInit {
     },
   ];
 
-  protected readonly disasterIndex = signal(0);
-  protected readonly disasterNews = computed(() => this.newsList[this.disasterIndex()]);
-
-  protected readonly volunteerList = [
-    {
-      name: '花蓮縣光復鄉衛生所',
-      location: '📍花蓮縣光復鄉大馬村中學街158號',
-      lat: 23.671898,
-      lng: 121.425941,
-      needs: ['物資搬運', '環境清潔', '災民陪伴'],
-    },
-    {
-      name: '花蓮縣立光復國民中學',
-      location: '📍花蓮縣光復鄉大馬村林森路200號',
-      lat: 23.670939,
-      lng: 121.426511,
-      needs: ['物資整理', '物資搬運'],
-    },
-    {
-      name: '花蓮縣鳳林鎮長橋國民小學',
-      location: '📍花蓮縣鳳林鎮長橋里長橋路2號',
-      lat: 23.709583,
-      lng: 121.419539,
-      needs: ['災民服務', '物資發放', '環境整理'],
-    },
-  ];
-
-  protected readonly donationList = [
-    {
-      name: '花蓮縣光復鄉衛生所',
-      location: '📍花蓮縣光復鄉大馬村中學街158號',
-      lat: 23.671898,
-      lng: 121.425941,
-      needs: ['飲用水', '泡麵', '罐頭食品'],
-    },
-    {
-      name: '花蓮縣光復鄉西南社區發展協會',
-      location: '📍花蓮縣光復鄉南富村建國路二段111號',
-      lat: 23.658455,
-      lng: 121.449389,
-      needs: ['奶粉', '尿布', '衛生用品'],
-    },
-    {
-      name: '大進國小災民收容所',
-      location: '📍花蓮縣光復鄉大進村糖廠街2號',
-      lat: 23.654699,
-      lng: 121.419135,
-      needs: ['礦泉水', '乾糧', '清潔用品'],
-    },
-  ];
-
-  ngAfterViewInit(): void {
-    this.map = L.map('disaster-map').setView([23.7, 120.9], 7);
-    L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-      attribution: '國土測繪中心',
-    }).addTo(this.map);
-    setTimeout(() => this.map.invalidateSize(), 500);
-  }
-
-  protected selectType(event: Event): void {
-    const type = (event.target as HTMLSelectElement).value;
-    if (type === 'volunteer') {
-      this.showMarkers(this.volunteerList, '目前需要志工');
-    } else if (type === 'donation') {
-      this.showMarkers(this.donationList, '目前需要捐助');
-    } else {
-      this.clearMarkers();
-    }
-  }
-
-  private showMarkers(items: typeof this.volunteerList, title: string): void {
-    this.clearMarkers();
-    items.forEach((item) => {
-      const marker = L.marker([item.lat, item.lng]).addTo(this.map).bindPopup(`
-        <b>${item.name}</b><br><br>
-        <b>${item.location}</b><br><br>
-        <b>${title}</b><br><br>
-        <b>需要：</b><br>
-        ・${item.needs.join('<br>・')}
-      `);
-      this.currentMarkers.push(marker);
-    });
-  }
-
-  private clearMarkers(): void {
-    this.currentMarkers.forEach((marker) => this.map.removeLayer(marker));
-    this.currentMarkers = [];
-  }
-
   // 宣告一個專門存放計時器的變數
   private autoSlideTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -190,4 +101,80 @@ export class DonorDisasterLobbyComponent implements AfterViewInit {
       highlight: '高雄美濃地震，震央位於台灣高雄市美濃區，芮氏規模達6.6。造成117人死亡，其中115人在台南市永康區維冠金龍大樓，551人受傷。',
     },
   ];
+  protected readonly disasterIndex = signal(0);
+  protected readonly disasterNews = computed(() => this.newsList[this.disasterIndex()]);
+
+  protected readonly volunteerList = [
+    {
+      name: '花蓮縣光復鄉衛生所',
+      location: '📍花蓮縣光復鄉大馬村中學街158號',
+      lat: 23.671898,
+      lng: 121.425941,
+      needs: ['物資搬運', '環境清潔', '災民陪伴'],
+    },
+    {
+      name: '花蓮縣立光復國民中學',
+      location: '📍花蓮縣光復鄉大馬村林森路200號',
+      lat: 23.670939,
+      lng: 121.426511,
+      needs: ['物資整理', '物資搬運'],
+    },
+    {
+      name: '花蓮縣鳳林鎮長橋國民小學',
+      location: '📍花蓮縣鳳林鎮長橋里長橋路2號',
+      lat: 23.709583,
+      lng: 121.419539,
+      needs: ['災民服務', '物資發放', '環境整理'],
+    },
+  ];
+
+  ngAfterViewInit(): void {
+    this.map = L.map('disaster-map');
+
+    L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
+      attribution: '國土測繪中心',
+    }).addTo(this.map);
+
+    // 一開啟就顯示 Marker
+    this.showMarkers(this.volunteerList, '志工需求');
+
+    // 自動調整地圖範圍，讓所有 Marker 都看得到
+    const bounds = L.latLngBounds(this.volunteerList.map((item) => [item.lat, item.lng] as [number, number]));
+
+    this.map.fitBounds(bounds, {
+      padding: [50, 50],
+    });
+
+    setTimeout(() => {
+      this.map.invalidateSize();
+    }, 500);
+  }
+
+  protected selectType(event: Event): void {
+    const type = (event.target as HTMLSelectElement).value;
+    if (type === 'volunteer') {
+      this.showMarkers(this.volunteerList, '目前需要志工');
+    } else {
+      this.clearMarkers();
+    }
+  }
+
+  private showMarkers(items: typeof this.volunteerList, title: string): void {
+    this.clearMarkers();
+    items.forEach((item) => {
+      const marker = L.marker([item.lat, item.lng]).addTo(this.map).bindPopup(`
+        <b>${item.name}</b><br><br>
+        <b>${item.location}</b><br><br>
+        <b>${title}</b><br><br>
+        <b>需要：</b><br>
+        ・${item.needs.join('<br>・')}
+      `);
+      this.currentMarkers.push(marker);
+    });
+  }
+
+  private clearMarkers(): void {
+    this.currentMarkers.forEach((marker) => this.map.removeLayer(marker));
+    this.currentMarkers = [];
+  }
 }

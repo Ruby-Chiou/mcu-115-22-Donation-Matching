@@ -2,31 +2,76 @@
   width: 100%;
   overflow-x: hidden;
 }
-
 .title {
   text-align: center;
   color: #005BAC;
 }
-
 .disaster-announcement {
   max-width: 1250px;
+  height: 70px;
   margin: 0 auto 30px;
   padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
   border-left: 5px solid #005bac;
   background: #eff6ff;
   color: var(--color-text-main);
+  overflow: hidden;
 }
-
 .disaster-announcement h2 {
-  margin: 0 0 8px;
+  flex-shrink: 0;
+  margin: 0;
+  padding-right: 20px;
   color: #005bac;
   font-size: 20px;
+  background: #eff6ff;
+  z-index: 2;
 }
-
-.disaster-announcement p {
+.announcement-marquee {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  /*左側漸淡公告文字靠近「災害救助公告」時開始消失   */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 25%,
+    black 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 25%,
+    black 100%
+  );
+}
+.disaster-announcement .marquee {
   margin: 0;
   line-height: 1.7;
-
+}
+.disaster-announcement .marquee span {
+  display: inline-block;
+  animation: announcement-marquee 14s linear infinite;
+}
+.disaster-announcement .scheduled-close {
+  color: var(--color-text-muted);
+  font-size: 24px;
+}
+@keyframes announcement-marquee {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .disaster-announcement .marquee span {
+    padding-left: 0;
+    animation: none;
+  }
 }
 
 .disaster-announcement .scheduled-close {
