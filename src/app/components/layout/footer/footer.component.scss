@@ -15,8 +15,13 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 
   z-index: 900;
-
   overflow: hidden;
+
+  transition: top 0.3s ease;
+
+  &.marquee-top {
+    top: 0;
+  }
 
   .thanks-track {
     width: 100%;
