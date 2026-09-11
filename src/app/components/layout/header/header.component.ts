@@ -10,12 +10,13 @@ import { RouterLink } from '@angular/router';
 export class HeaderComponent {
   navItems = [
     {
-      name: '日常捐助',
+      name: '捐助專區',
       link: '/donor',
       sub: [
-        { name: '更多需求', link: '/donor/daily' },
+        { name: '日常捐助', link: '/donor/daily' },
+        { name: '災害救助', link: '/donor/disaster' },
         { name: '捐助地圖', link: '/daily/locations' },
-        { name: '捐助感謝', link: '/thanks-wall' },
+        { name: '捐助感謝', link: '/thank-you-wall' },
       ],
     },
     {

@@ -86,6 +86,14 @@ export const routes: Routes = [
         (m) => m.DonorDisasterSupplyFormComponent
       ),
   },
+  //感謝牆與黑名單
+  {
+  path: 'thank-you-wall',
+  loadComponent: () =>
+    import('./features/thank-you-wall/thank-you-wall.component').then(
+      (m) => m.ThankYouWallComponent
+    ),
+},
   // 4. 社福機構模組 (機構端)
   // 4.1 社福團體儀錶板
   {
