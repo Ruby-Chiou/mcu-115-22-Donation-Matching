@@ -47,46 +47,31 @@
       </button>
 
     </div>
-
   </nav>
-
-
-  <!-- ==================== -->
   <!-- 物資捐助 -->
-  <!-- ==================== -->
-
   @if (activeType() === 'material') {
-
     <section
       class="needs-section"
       aria-labelledby="material-heading">
-
       @if (disasterData().isOpen) {
-
         <h1 id="material-heading">
           物資捐助
         </h1>
-
       }
-
-
       <!-- 篩選區 -->
       <div class="filter-area">
-
         <!-- 篩選按鈕 -->
         <button
           type="button"
           class="filter-button"
           (click)="showSupplyFilter = !showSupplyFilter"
           title="開啟物資條件篩選">
-
           <svg
             class="filter-icon"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2">
-
             <polygon
               points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3">
             </polygon>

@@ -15,30 +15,19 @@
           type="button"
           class="close-btn"
           (click)="closeDisaster()">
-
           關閉災害救助
-
         </button>
-
       } @else {
-
         <button
           type="button"
           class="open-btn"
           (click)="openDisaster()">
-
           開啟災害救助
-
         </button>
-
       }
-
     </div>
-
   </div>
-
 </section>
-
 <section class="schedule-card">
   <h2>預約關閉災害捐助</h2>
   @if (disasterData().scheduledCloseAt) {
@@ -99,11 +88,7 @@
       (click)="startEditing()">
       編輯災害資訊
     </button>
-
-
   }
-
-
   @if (isEditing) {
     <div class="edit-area">
       <div class="form-group">

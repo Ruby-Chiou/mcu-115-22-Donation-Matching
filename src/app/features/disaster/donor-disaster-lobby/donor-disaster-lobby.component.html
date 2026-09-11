@@ -2,8 +2,11 @@
 @if (disasterData().announcement || disasterData().scheduledCloseAt) {
   <section class="disaster-announcement" aria-labelledby="announcement-title">
     <h2 id="announcement-title">災害救助公告</h2>
+     <div class="announcement-marquee">
     @if (disasterData().announcement) {
-      <p>{{ disasterData().announcement }}</p>
+      <p class="marquee">
+          <span>{{ disasterData().announcement }}</span>
+        </p>
     }
     @if (disasterData().scheduledCloseAt) {
       <p class="scheduled-close marquee" role="status">
@@ -12,6 +15,7 @@
         </span>
       </p>
     }
+    </div>
   </section>
 }
 <div class="title-row">
