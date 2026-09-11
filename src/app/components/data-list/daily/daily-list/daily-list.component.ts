@@ -272,6 +272,9 @@ export class DailyListComponent implements OnInit, AfterViewInit {
       )
       .subscribe((data) => {
         this.demands = data.map((item) => {
+          // 先檢查是否已達到預計下架日期
+          item = this.checkNaturalOffShelf(item);
+
           let currentStatus: DailyDisplayStatus = '已上架';
 
           if (item.status === '上架') {
@@ -309,6 +312,35 @@ export class DailyListComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       });
+  }
+
+  // 檢查是否已達到預計下架日期
+  private checkNaturalOffShelf(item: DailyDemand): DailyDemand {
+    // 只有目前是「上架」才需要檢查
+    if (item.status !== '上架') {
+      return item;
+    }
+
+    // 沒有預計下架日期，不處理
+    if (!item.expectedOffShelfAt) {
+      return item;
+    }
+
+    const now = new Date();
+    const expectedOffShelfAt = new Date(item.expectedOffShelfAt);
+
+    // 已經到達或超過預計下架日期
+    if (now >= expectedOffShelfAt) {
+      item.status = '下架';
+
+      // 記錄為「自然下架」
+      item.offShelfReason = 'natural';
+
+      // 同步更新 Service
+      this.dailyDemandService.updateDemand(item);
+    }
+
+    return item;
   }
 
   // 搜尋
@@ -579,82 +611,105 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   // 修改狀態
   changeStatus(item: DailyListItem, newStatus: DailyDisplayStatus): void {
     const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+
     const originalStatus = originalItem?.status;
 
-    // 1. 已下架嘗試重新上架 -> 保持「已下架」，跳出無法重新上架提示
+    // 1. 選擇「已上架」
     if (newStatus === '已上架') {
-      if (originalStatus === '下架') {
+      // 只有「手動下架」才禁止重新上架
+      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
         item.status = '下架';
         item.displayStatus = '已下架';
 
-        // 強制重刷陣列中的物件，讓 Angular 偵測到變更並還原選單顯示
+        // 還原下拉選單
         this.refreshItemReference(item);
 
+        // 顯示無法重新上架提示
         this.showOnShelfWarning = true;
         return;
       }
 
-      // 非下架狀態正常上架
+      // 自然下架可以重新上架
       const now = new Date();
+
       item.publishedAt = now.toISOString();
 
       if (!item.createdAt) {
         item.createdAt = now.toISOString();
       }
 
+      // 重新計算預計下架日期
       item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+
       item.status = '上架';
+
+      // 重新上架後，清除之前的下架原因
+      item.offShelfReason = undefined;
+
       item.displayStatus = '已上架';
 
       item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+
       item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
+
       item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
       this.dailyDemandService.updateDemand(item);
       this.refreshItemReference(item);
+
       return;
     }
 
-    // 2. 嘗試改為「已下架」 -> 保持原顯示狀態，跳出確認視窗
+    // 2. 選擇「已下架」
     if (newStatus === '已下架') {
+      // 已經是下架狀態，就維持下架
       if (originalStatus === '下架') {
         item.status = '下架';
         item.displayStatus = '已下架';
+
         this.refreshItemReference(item);
         return;
       }
 
-      // 保持目前的顯示狀態不變，等待使用者於 Modal 點擊確認
+      // 尚未下架，先顯示確認 Modal
       this.pendingOffShelfItem = item;
 
-      // 還原選單顯示為點擊前的狀態（否則選單會卡在已下架）
       this.refreshItemReference(item);
 
       this.showOffShelfWarning = true;
+
       return;
     }
 
-    // 3. 隱藏中
+    // 3. 選擇「隱藏中」
     if (newStatus === '隱藏中') {
-      if (originalStatus === '下架') {
-        // 已下架不能改成隱藏中，保持已下架
+      // 手動下架後不能改回隱藏
+      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
         item.status = '下架';
         item.displayStatus = '已下架';
+
         this.refreshItemReference(item);
         return;
       }
 
       item.status = '隱藏';
       item.displayStatus = '隱藏中';
+
+      // 隱藏後清除上架相關資料
       item.publishedAt = undefined;
       item.expectedOffShelfAt = undefined;
 
+      // 隱藏不是下架，因此清除下架原因
+      item.offShelfReason = undefined;
+
       item.displayPublishedAt = '尚未上架';
       item.displayOffShelfAt = '—';
+
       item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
       this.dailyDemandService.updateDemand(item);
       this.refreshItemReference(item);
+
       return;
     }
   }
@@ -662,16 +717,19 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   // 輔助函式：同步更新主資料與分頁陣列中的參考，觸發 DOM 重新繪製
   private refreshItemReference(item: DailyListItem): void {
     const demandIndex = this.demands.findIndex((d) => d.serialNo === item.serialNo);
+
     if (demandIndex !== -1) {
       this.demands[demandIndex] = { ...item };
     }
 
     const filteredIndex = this.filteredDemands.findIndex((d) => d.serialNo === item.serialNo);
+
     if (filteredIndex !== -1) {
       this.filteredDemands[filteredIndex] = { ...item };
     }
 
     const pagedIndex = this.pagedDemands.findIndex((d) => d.serialNo === item.serialNo);
+
     if (pagedIndex !== -1) {
       this.pagedDemands[pagedIndex] = { ...item };
     }
@@ -714,6 +772,9 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     item.status = '下架';
     item.displayStatus = '已下架';
 
+    // 記錄這次是「手動下架」
+    item.offShelfReason = 'manual';
+
     // 記錄實際下架時間
     item.expectedOffShelfAt = now.toISOString();
 
@@ -755,6 +816,8 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     // 選擇隱藏後才真正變成隱藏中
     item.status = '隱藏';
     item.displayStatus = '隱藏中';
+
+    item.offShelfReason = undefined;
 
     item.publishedAt = undefined;
     item.expectedOffShelfAt = undefined;
