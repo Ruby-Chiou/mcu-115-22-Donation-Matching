@@ -1,0 +1,308 @@
+/* =====================
+   頁面外層
+===================== */
+.ai-chat-page {
+  min-height: calc(100vh - 80px);
+  padding: 20px 28px 32px;
+  box-sizing: border-box;
+  overflow: visible;
+  background: #f6f8fa;
+}
+
+/* =====================
+   主容器：固定於畫面
+===================== */
+.support-container {
+   display: grid;
+  width: min(1000px, 100%);
+  min-height: 630px;
+  height: calc(100vh - 160px);
+  margin: 0 auto;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* =====================
+   AI Chat 右側
+===================== */
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* 右側固定標題 */
+.chat-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e5e7eb;
+
+  p {
+    margin: 4px 0 0;
+    color: #9ca3af;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+}
+
+.chat-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 19px;
+    line-height: 1.3;
+  }
+}
+
+.ai-indicator {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+  background: #22c55e;
+  border-radius: 50%;
+}
+
+.role-badge {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  color: #2563eb;
+  font-size: 12px;
+  line-height: 1.2;
+  background: #eff6ff;
+  border-radius: 999px;
+}
+
+/* 右側只有訊息區會捲動 */
+.chat-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+  padding: 24px;
+  overflow-y: auto;
+  background: #fff;
+
+  &::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+
+    &:hover {
+      background: #9ca3af;
+    }
+  }
+}
+
+.message-row {
+  display: flex;
+  min-width: 0;
+
+  &.assistant-row {
+    justify-content: flex-start;
+  }
+
+  &.user-row {
+    justify-content: flex-end;
+  }
+}
+
+.message-bubble {
+  max-width: min(75%, 620px);
+  padding: 11px 15px;
+  font-size: 14px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: 12px;
+
+  &.assistant-message {
+    color: #374151;
+    background: #f3f4f6;
+    border-bottom-left-radius: 4px;
+  }
+
+  &.user-message {
+    color: #fff;
+    background: #2563eb;
+    border-bottom-right-radius: 4px;
+  }
+}
+
+/* AI 回應中的 Loading 點 */
+.loading-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 58px;
+  padding: 14px;
+
+  span {
+    width: 6px;
+    height: 6px;
+    background: #9ca3af;
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+}
+
+/* 初始歡迎內容 */
+.welcome-message {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  width: min(100%, 520px);
+  margin: auto;
+  transform: translateY(-16px);
+
+  h3 {
+    margin: 0 0 8px;
+    color: #1f2937;
+    font-size: 24px;
+    line-height: 1.35;
+  }
+
+  p {
+    margin: 0 0 20px;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+}
+
+.suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  button {
+    padding: 8px 12px;
+    color: #4b5563;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.35;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: 0.2s;
+
+    &:hover {
+      color: #2563eb;
+      background: #eff6ff;
+      border-color: #2563eb;
+    }
+  }
+}
+
+/* 錯誤訊息 */
+.error-message {
+  flex-shrink: 0;
+  padding: 10px 24px;
+  color: #b91c1c;
+  font-size: 13px;
+  background: #fef2f2;
+  border-top: 1px solid #fee2e2;
+}
+
+/* 右側固定輸入區 */
+.chat-input-area {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+  gap: 10px;
+  padding: 14px 24px;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+
+  textarea {
+    flex: 1;
+    min-height: 42px;
+    padding: 10px 12px;
+    resize: none;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    outline: none;
+
+    &:focus {
+      background: #fff;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+  }
+
+  button {
+    min-width: 60px;
+    padding: 0 16px;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #2563eb;
+    border: 0;
+    border-radius: 9px;
+    transition: 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #1d4ed8;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+}
+
+/* =====================
+   動畫
+===================== */
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}

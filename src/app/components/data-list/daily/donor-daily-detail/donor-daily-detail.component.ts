@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
+import { SupplyDetailCarouselComponent } from '../../../carousel/supply-detail-carousel/supply-detail-carousel.component';
 
 interface Comment {
   user: string;
@@ -14,7 +15,7 @@ interface Comment {
 @Component({
   selector: 'app-donor-daily-detail',
   standalone: true,
-  imports: [RouterLink, CommonModule, RouterModule,FormsModule],
+  imports: [RouterLink, CommonModule, RouterModule,FormsModule, SupplyDetailCarouselComponent],
   templateUrl: './donor-daily-detail.component.html',
   styleUrl: './donor-daily-detail.component.scss',
 })
@@ -111,25 +112,6 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   }
 
   // =========================
-  // 取得服務對象文字
-  // =========================
-  getServiceTargets(): string {
-    if (!this.demand?.serviceTargets) {
-      return '';
-    }
-
-    const targets = [];
-
-    for (const [key, value] of Object.entries(this.demand.serviceTargets)) {
-      if (value) {
-        targets.push(key);
-      }
-    }
-
-    return targets.join('、') || '無';
-  }
-
-  // =========================
   // 判斷是否有自訂狀態
   // =========================
   hasCustomConditions(): boolean {
@@ -175,17 +157,17 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   // 物資狀態要求
   // =========================
   getConditions(): string {
-    const conditions = this.demand?.conditions;
+  const conditions = this.demand?.conditions;
 
-    if (!conditions) {
-      return '無';
-    }
-
-    return Object.entries(conditions)
-      .filter(([_, value]) => value)
-      .map(([key, value]) => `${key}：${value}`)
-      .join('、');
+  if (!conditions) {
+    return '無';
   }
+
+  return Object.entries(conditions)
+    .filter(([_, value]) => value)
+    .map(([key, value]) => `${key}：${value}`)
+    .join('\n');
+}
   // =========================
   // 留言
   // =========================

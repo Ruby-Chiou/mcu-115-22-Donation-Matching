@@ -1,7 +1,7 @@
 @if (demand) {
 <div class="detail-info">
   <div class="detail-page">
-    <button class="back-btn" routerLink="/donor/daily">← 返回</button>
+    <button class="back-btn" routerLink="/donor/daily"><i class="fa-solid fa-arrow-left-long"></i>   返回</button>
 
     <!-- 左邊圖片 -->
     <div class="detail-image">
@@ -9,13 +9,9 @@
       <span class="tag priority-tag" [ngClass]="getPriorityClass(demand.priority)"> {{ demand.priority }} </span>
 
       <!-- 圖片 -->
-      <img
-        [src]="
-            demand.image?.[currentImageIndex]
-            || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-          "
-        [alt]="demand.item || '物資圖片'"
-      />
+      <app-supply-detail-carousel
+  [images]="demand.image ?? ['https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img']">
+</app-supply-detail-carousel>
       <!-- 圓點 -->
       <div class="image-dots" *ngIf="(demand.image?.length ?? 0) > 1">
         <span *ngFor="let image of demand.image; let i = index" [class.active]="i === currentImageIndex" (click)="goToImage(i)"></span>
@@ -38,10 +34,11 @@
         <h3>接收方</h3>
         <p>{{ demand.recipient }}</p>
       </div>
+      <button class="contact-btn" [routerLink]="['/donor/daily/form', demand.serialNo]">我要捐助</button>
     </div>
   </div>
 
-  <div class="quantity-row">
+  <div class="quantity-row amount-description-row">
     <h4>數量描述</h4>
     <p class="description">{{ demand.amountDescription || '無' }}</p>
   </div>
@@ -68,13 +65,14 @@
 
   <div class="quantity-row">
     <h4>需求對象</h4>
-    <p class="description">{{ getServiceTargets() }}</p>
+    <p class="description">{{ demand.serviceTargetDescription}}</p>
   </div>
 
   <div class="quantity-row">
     <h4>物資狀態要求</h4>
     <p class="description">{{ getConditions() }}</p>
   </div>
+
 
   <div class="quantity-row">
     <h4>其他物品狀態</h4>

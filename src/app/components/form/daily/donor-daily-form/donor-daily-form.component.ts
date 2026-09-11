@@ -13,6 +13,7 @@ import { DailyDemandService } from '../../../../core/services/agency-daily-deman
   styleUrl: './donor-daily-form.component.scss',
 })
 export class DonorDailyFormComponent {
+  donationMethod: '寄送' | '面交' | '' = '';
   demand?: DailyDemand;
   private readonly demandId: number;
 

@@ -70,41 +70,62 @@ export class DonorDailyCardListComponent {
     this.updatePagedDemands();
   }
 
-  private applyFilters(): void {
-    const filter = this.activeFilter;
+ private applyFilters(): void {
+  const filter = this.activeFilter;
 
-    this.dailyDemands = this.allDailyDemands.filter((item) => {
-      //搜尋
-      const matchesSearch =
-        !this.searchKeyword ||
-        item.item.toLowerCase().includes(this.searchKeyword) ||
-        item.recipient.toLowerCase().includes(this.searchKeyword) ||
-        item.address.toLowerCase().includes(this.searchKeyword);
+  this.dailyDemands = this.allDailyDemands.filter((item) => {
 
-      // 類別
-      const matchesCategory = filter.categories.length === 0 || filter.categories.includes(item.category);
+    // 搜尋
+    const matchesSearch =
+      !this.searchKeyword ||
+      item.item.toLowerCase().includes(this.searchKeyword) ||
+      item.recipient.toLowerCase().includes(this.searchKeyword) ||
+      item.address.toLowerCase().includes(this.searchKeyword);
 
-      //服務對象
-      const matchesTarget =
-        filter.targets.length === 0 || filter.targets.some((target) => item.serviceTargets?.[target as keyof typeof item.serviceTargets]);
+    // 類別
+    const matchesCategory =
+      filter.categories.length === 0 ||
+      filter.categories.includes(item.category);
 
-      // 縣市
-      const matchesRegion = filter.regions.length === 0 || filter.regions.some((region) => item.address?.includes(region));
+    // 服務對象
+    const matchesTarget =
+      filter.targets.length === 0 ||
+      filter.targets.some((target) =>
+        item.serviceTargets?.includes(target)
+      );
 
-      //接收方式
-      const matchesReceiveMethod =
-        filter.receiveMethods.length === 0 ||
-        filter.receiveMethods.some((method) => item.receiveMethod?.[method as keyof typeof item.receiveMethod]);
+    // 縣市
+    const matchesRegion =
+      filter.regions.length === 0 ||
+      filter.regions.some((region) =>
+        item.address?.includes(region)
+      );
 
-      //優先程度
-      const matchesPriority = filter.priorities.length === 0 || filter.priorities.includes(item.priority);
+    // 接收方式
+    const matchesReceiveMethod =
+      filter.receiveMethods.length === 0 ||
+      filter.receiveMethods.some((method) =>
+        item.receiveMethod?.[method as keyof typeof item.receiveMethod]
+      );
 
-      return matchesSearch && matchesCategory && matchesTarget && matchesRegion && matchesReceiveMethod && matchesPriority;
-    });
+    // 優先程度
+    const matchesPriority =
+      filter.priorities.length === 0 ||
+      filter.priorities.includes(item.priority);
 
-    this.currentPage = 1;
-    this.updatePagedDemands();
-  }
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesTarget &&
+      matchesRegion &&
+      matchesReceiveMethod &&
+      matchesPriority
+    );
+  });
+
+  this.currentPage = 1;
+  this.updatePagedDemands();
+}
   private updatePagedDemands(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     this.pagedDailyDemands = this.dailyDemands.slice(startIndex, startIndex + this.pageSize);

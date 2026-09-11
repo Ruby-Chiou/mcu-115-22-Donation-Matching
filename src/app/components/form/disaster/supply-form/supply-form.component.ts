@@ -4,12 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
+import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
+import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 import { DisasterDemand, ConditionStatus } from '../../../../models/agency/disaster-demand';
 
 @Component({
   selector: 'app-supply-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent, SupplyOffShelfComponent, SupplyOnShelfComponent],
   templateUrl: './supply-form.component.html',
   styleUrls: [
     './supply-form-A.component.scss',
@@ -22,6 +24,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
   submitted = false;
   imageFiles: File[] = [];
+
   // 圖片預覽
   showImagePreview = false;
   previewImage = '';
@@ -48,6 +51,21 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
   fromDetail = false;
   listNumber?: number;
+
+  // 手動下架確認視窗
+  showOffShelfWarning = false;
+
+  // 手動下架後重新上架警告視窗
+  showOnShelfWarning = false;
+
+  // 編輯前原本的狀態
+  private originalStatus: DisasterDemand['status'] = '隱藏';
+
+  // 編輯前原本的下架原因
+  private originalOffShelfReason: DisasterDemand['offShelfReason'] | undefined;
+
+  // 暫存使用者想選擇的狀態
+  private pendingStatus: DisasterDemand['status'] | undefined;
 
   @ViewChild('itemInput') itemInput!: ElementRef;
   @ViewChild('amountInput') amountInput!: ElementRef;
@@ -121,6 +139,10 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       const data = this.disasterDemandService.getDemands().find((item) => item.serialNo === serialNo);
 
       if (data) {
+        // 記錄編輯前的原始狀態
+        this.originalStatus = data.status ?? '隱藏';
+        this.originalOffShelfReason = data.offShelfReason;
+
         this.demand = {
           ...data,
           status: data.status ?? '上架',
@@ -159,6 +181,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         Promise.all(
           (data.image ?? []).map((image, index) => {
             const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+
             return this.base64ToFile(image, fileName);
           })
         ).then((files) => {
@@ -206,6 +229,112 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
   setContactTimeDifferent(different: boolean) {
     this.demand.contactTimeDifferent = different;
+  }
+
+  // 狀態選擇
+  onStatusSelect(newStatus: DisasterDemand['status']): void {
+    // 新增模式不需要處理原本手動下架的限制
+    if (!this.isEditMode) {
+      this.demand.status = newStatus;
+
+      if (newStatus === '隱藏') {
+        this.demand.publishedAt = undefined;
+        this.demand.expectedOffShelfAt = undefined;
+        this.demand.offShelfReason = undefined;
+      }
+
+      return;
+    }
+
+    // 手動下架時嘗試重新上架
+    const wasManualOffShelf = this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
+
+    const currentlyManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
+
+    if (newStatus === '上架' && (wasManualOffShelf || currentlyManualOffShelf)) {
+      this.demand.status = '下架';
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    // 上架時選擇下架
+    if (newStatus === '下架') {
+      if (this.demand.status === '下架') {
+        return;
+      }
+
+      this.pendingStatus = '下架';
+      this.demand.status = this.originalStatus;
+      this.showOffShelfWarning = true;
+
+      return;
+    }
+
+    // 選擇隱藏
+    if (newStatus === '隱藏') {
+      this.demand.status = '隱藏';
+
+      this.demand.publishedAt = undefined;
+      this.demand.expectedOffShelfAt = undefined;
+      this.demand.offShelfReason = undefined;
+
+      this.pendingStatus = undefined;
+
+      return;
+    }
+
+    // 選擇上架
+    if (newStatus === '上架') {
+      this.demand.status = '上架';
+
+      this.pendingStatus = undefined;
+
+      return;
+    }
+  }
+
+  // 使用者取消手動下架
+  cancelManualOffShelf(): void {
+    this.showOffShelfWarning = false;
+    this.pendingStatus = undefined;
+
+    this.demand.status = this.originalStatus;
+  }
+
+  // 使用者選擇改為隱藏
+  hideInsteadOfOffShelf(): void {
+    this.showOffShelfWarning = false;
+    this.pendingStatus = undefined;
+
+    this.demand.status = '隱藏';
+
+    this.demand.publishedAt = undefined;
+    this.demand.expectedOffShelfAt = undefined;
+    this.demand.offShelfReason = undefined;
+  }
+
+  // 使用者確認手動下架
+  confirmManualOffShelf(): void {
+    this.showOffShelfWarning = false;
+    this.pendingStatus = undefined;
+
+    const now = new Date();
+
+    this.demand.status = '下架';
+
+    // 設定手動下架原因
+    this.demand.offShelfReason = 'manual';
+
+    // 記錄實際手動下架時間
+    this.demand.expectedOffShelfAt = now.toISOString();
+  }
+
+  // 關閉無法重新上架視窗
+  closeOnShelfWarning(): void {
+    this.showOnShelfWarning = false;
+
+    this.demand.status = '下架';
   }
 
   save() {
@@ -275,8 +404,8 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     const conditionLabels: (keyof DisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
 
-    // 接受物資需求狀態
-    // 只有有設定 ✔ / ✘ 才加入
+    // 處理接受物資需求狀態
+    // 只有有設定接受或不接受才加入
     conditionLabels.forEach((key) => {
       const status = this.demand.conditions[key];
 
@@ -287,7 +416,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // 其它物資需求狀態
+    // 處理其它物資需求狀態
     // 只加入有填寫的內容
     this.demand.customConditions.forEach((condition) => {
       const value = condition.trim();
@@ -297,33 +426,80 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // 最後全部合併成資料庫的單一欄位
+    // 將所有狀態合併成資料庫的單一欄位
     this.demand.conditionDescription = conditionParts.join('、');
 
+    // 編輯模式
     if (this.isEditMode) {
-      const originalStatus = this.disasterDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo)?.status;
+      const originalItem = this.disasterDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
 
-      const originalPublishedAt = this.demand.publishedAt;
+      const originalStatus = originalItem?.status;
+      const originalOffShelfReason = originalItem?.offShelfReason;
+
+      const originalPublishedAt = originalItem?.publishedAt;
+
       const now = new Date();
 
+      // 判斷原本是否為手動下架
+      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+
+      const isCurrentManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
+
+      // 手動下架禁止重新上架
+      if (this.demand.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
+        alert('此需求為使用者主動下架，無法重新上架。');
+
+        this.demand.status = '下架';
+
+        return;
+      }
+
+      // 處理上架狀態
       if (this.demand.status === '上架') {
+        // 原本不是上架時重新設定上架日期
         if (originalStatus !== '上架') {
           this.demand.publishedAt = now.toISOString();
+
           if (!this.demand.createdAt) {
             this.demand.createdAt = now.toISOString();
           }
         } else if (originalPublishedAt) {
+          // 原本已上架時保留原本上架日期
           this.demand.publishedAt = originalPublishedAt;
         }
+
         if (this.demand.publishedAt) {
+          // 依照優先度重新計算預計下架日期
           this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(this.demand.publishedAt), this.demand.priority);
         }
-      } else if (this.demand.status === '隱藏') {
+
+        // 重新上架後清除之前的下架原因
+        this.demand.offShelfReason = undefined;
+      }
+
+      // 處理隱藏狀態
+      else if (this.demand.status === '隱藏') {
+        // 隱藏後視為尚未上架
         this.demand.publishedAt = undefined;
         this.demand.expectedOffShelfAt = undefined;
-      } else if (this.demand.status === '下架') {
-        this.demand.expectedOffShelfAt = now.toISOString();
+
+        // 隱藏不是手動下架
+        this.demand.offShelfReason = undefined;
       }
+
+      // 處理下架狀態
+      else if (this.demand.status === '下架') {
+        // 原本手動下架或這次確認下架時保留原本的下架時間
+        if (!this.demand.offShelfReason) {
+          this.demand.offShelfReason = 'manual';
+        }
+
+        if (!this.demand.expectedOffShelfAt) {
+          this.demand.expectedOffShelfAt = now.toISOString();
+        }
+      }
+
+      // 更新資料
       this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
@@ -335,24 +511,31 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       } else {
         this.router.navigate(['/agency/disaster']);
       }
-    } else {
-      // 按下「發布需求」的時間
+    }
+
+    // 新增模式
+    else {
+      // 按下發布需求的時間
       const createdDate = new Date();
 
-      // 創建日期：記錄按下發布的日期
+      // 記錄發布日期
       this.demand.createdAt = createdDate.toISOString();
 
-      // 如果新增時選擇「上架」
+      // 新增時選擇上架
       if (this.demand.status === '上架') {
-        // 上架日期 = 發布日期
+        // 上架日期等於發布日期
         this.demand.publishedAt = createdDate.toISOString();
 
         // 計算預計下架日期
         this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, this.demand.priority);
+
+        // 新增上架不應該有下架原因
+        this.demand.offShelfReason = undefined;
       } else {
-        // 隱藏：尚未上架
+        // 隱藏時尚未上架
         this.demand.publishedAt = undefined;
         this.demand.expectedOffShelfAt = undefined;
+        this.demand.offShelfReason = undefined;
       }
 
       this.disasterDemandService.addDemand(this.demand);
@@ -361,12 +544,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // 新增自訂條件
   addCustomCondition() {
     if (this.demand.customConditions.length < 5) {
       this.demand.customConditions.push('');
     }
   }
 
+  // 移除自訂條件
   removeCustomCondition(index: number) {
     this.demand.customConditions.splice(index, 1);
 
@@ -374,6 +559,8 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       this.demand.customConditions.push('');
     }
   }
+
+  // 計算預計下架日期
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DisasterDemand['priority']): string {
     const offShelfDate = new Date(publishedDate);
 
@@ -394,10 +581,12 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     return offShelfDate.toISOString();
   }
 
+  // 追蹤自訂條件索引
   trackByIndex(index: number): number {
     return index;
   }
 
+  // 切換物資狀態
   toggleCondition(key: keyof DisasterDemand['conditions']) {
     const current = this.demand.conditions[key];
 
@@ -410,6 +599,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // 取得物資狀態圖示
   getConditionIcon(status: '接受' | '不接受' | '') {
     if (status === '接受') {
       return '✔';
@@ -422,17 +612,19 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     return '―';
   }
 
+  // 處理剩餘需求數量變更
   onRemainingChange() {
     if (this.demand.remaining !== null && this.demand.remaining !== undefined) {
       this.demand.remaining = Number(this.demand.remaining);
 
-      // 剩餘需求不可超過需求數量
+      // 限制剩餘需求不可超過需求數量
       if (this.demand.amount !== null && this.demand.remaining > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
       }
     }
   }
 
+  // 限制數字欄位長度
   limitNumberLength(event: Event, field: 'amount' | 'remaining') {
     const input = event.target as HTMLInputElement;
 
@@ -462,6 +654,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // 限制文字欄位長度
   limitTextLength(
     event: Event,
     field: 'item' | 'unit' | 'amountDescription' | 'reason' | 'description' | 'brand' | 'address' | 'phone' | 'note',
@@ -476,6 +669,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     this.demand[field] = input.value;
   }
 
+  // 限制自訂條件欄位長度
   limitCustomConditionLength(event: Event, index: number) {
     const input = event.target as HTMLInputElement;
 
@@ -486,6 +680,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     this.demand.customConditions[index] = input.value;
   }
 
+  // 選擇圖片
   onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
 
@@ -495,14 +690,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     const file = input.files[0];
 
-    // 最多 5 張
+    // 限制最多五張圖片
     if (this.imageFiles.length >= 5) {
       alert('最多只能上傳 5 張圖片');
       input.value = '';
       return;
     }
 
-    // 限制 5MB
+    // 限制圖片大小為五 MB
     if (file.size > 5 * 1024 * 1024) {
       alert('圖片大小不可超過 5MB');
       input.value = '';
@@ -525,15 +720,17 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       }
 
       this.demand.image.push(reader.result as string);
+
       this.demand.imageFileNames.push(file.name);
     };
 
     reader.readAsDataURL(file);
 
-    // 清空 input
+    // 清空圖片輸入欄位
     input.value = '';
   }
 
+  // 移除圖片
   removeImage(index: number) {
     this.imageFiles.splice(index, 1);
 
@@ -546,11 +743,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // 開啟圖片預覽
   openImagePreview(image: string, imageName: string): void {
     this.previewImage = image;
     this.previewImageName = imageName;
     this.showImagePreview = true;
   }
+
+  // 關閉圖片預覽
   closeImagePreview(): void {
     this.showImagePreview = false;
     this.previewImage = '';
