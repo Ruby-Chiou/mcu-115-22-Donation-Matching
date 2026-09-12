@@ -98,6 +98,8 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     priority: '普通',
     status: '隱藏',
     address: '',
+    latitude: undefined,
+    longitude: undefined,
     phone: '',
     note: '',
     brand: '',
@@ -231,6 +233,30 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     this.demand.contactTimeDifferent = different;
   }
 
+  // 判斷目前需求是否為手動下架
+  isManualOffShelf(): boolean {
+    return this.isEditMode && this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
+  }
+
+  // 點擊公開狀態
+  onStatusClick(event: MouseEvent, newStatus: DisasterDemand['status']): void {
+    // 手動下架的需求不能重新上架
+    if (newStatus === '上架' && this.isManualOffShelf()) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // 強制維持下架
+      this.demand.status = '下架';
+
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    // 其他狀態交給原本的狀態處理
+    this.onStatusSelect(newStatus);
+  }
+
   // 狀態選擇
   onStatusSelect(newStatus: DisasterDemand['status']): void {
     // 新增模式不需要處理原本手動下架的限制
@@ -247,13 +273,19 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
 
     // 手動下架時嘗試重新上架
+    // 判斷原本是否為手動下架
     const wasManualOffShelf = this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
 
     const currentlyManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
 
-    if (newStatus === '上架' && (wasManualOffShelf || currentlyManualOffShelf)) {
-      this.demand.status = '下架';
-      this.showOnShelfWarning = true;
+    // 手動下架的需求固定維持下架
+    if (wasManualOffShelf || currentlyManualOffShelf) {
+      if (newStatus === '上架') {
+        this.demand.status = '下架';
+        this.showOnShelfWarning = true;
+      } else {
+        this.demand.status = '下架';
+      }
 
       return;
     }
@@ -334,10 +366,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   closeOnShelfWarning(): void {
     this.showOnShelfWarning = false;
 
-    this.demand.status = '下架';
+    // 手動下架永遠維持下架
+    if (this.isManualOffShelf()) {
+      this.demand.status = '下架';
+      this.demand.offShelfReason = 'manual';
+    }
   }
 
-  save() {
+  async save() {
     this.submitted = true;
 
     if (

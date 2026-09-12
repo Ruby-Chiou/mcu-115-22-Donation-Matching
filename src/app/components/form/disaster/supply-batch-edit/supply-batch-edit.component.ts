@@ -83,6 +83,8 @@ export class SupplyBatchEditComponent implements OnInit {
     if (data) {
       this.editDemands = JSON.parse(data).map((item: any) => ({
         ...item,
+        latitude: item.latitude,
+        longitude: item.longitude,
 
         conditions: item.conditions ?? {
           全新: '',
@@ -178,6 +180,39 @@ export class SupplyBatchEditComponent implements OnInit {
   selectCategory(demand: EditableDisasterDemand, category: NonNullable<EditableDisasterDemand['category']>) {
     demand.category = category;
     demand.categoryDropdownOpen = false;
+  }
+
+  // 判斷目前需求是否為手動下架
+  isManualOffShelf(demand: EditableDisasterDemand): boolean {
+    const originalItem = this.service.getDemands().find((item) => item.serialNo === demand.serialNo);
+
+    const originalStatus = originalItem?.status ?? demand.status;
+    const originalOffShelfReason = originalItem?.offShelfReason;
+
+    return originalStatus === '下架' && originalOffShelfReason === 'manual';
+  }
+
+  // 點擊公開狀態
+  onStatusClick(event: MouseEvent, demand: EditableDisasterDemand, newStatus: EditableDisasterDemand['status']): void {
+    // 手動下架的需求不能重新上架
+    if (newStatus === '上架' && this.isManualOffShelf(demand)) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // 強制維持下架
+      demand.status = '下架';
+      demand.offShelfReason = 'manual';
+
+      // 記錄目前正在處理的資料
+      this.pendingStatusDemand = demand;
+
+      // 顯示無法重新上架 Modal
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    this.onStatusSelect(demand, newStatus);
   }
 
   // 處理批次編輯的狀態選擇
@@ -322,7 +357,9 @@ export class SupplyBatchEditComponent implements OnInit {
       return;
     }
 
+    // 手動下架永遠維持下架
     demand.status = '下架';
+    demand.offShelfReason = 'manual';
   }
 
   // 限制剩餘需求最高只能填到需求數量
@@ -460,7 +497,7 @@ export class SupplyBatchEditComponent implements OnInit {
   }
 
   // 儲存全部資料
-  saveAll() {
+  async saveAll() {
     // 清除舊錯誤並檢查必填欄位
     this.editDemands.forEach((item) => {
       item.itemError = false;

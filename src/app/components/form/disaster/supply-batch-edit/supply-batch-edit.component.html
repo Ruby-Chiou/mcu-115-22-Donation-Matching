@@ -380,34 +380,39 @@
       </label>
 
       <div class="status-box">
-        <label>
+        <!-- 上架 -->
+        <label (click)="onStatusClick($event, demand, '上架')" [class.disabled-status]="isManualOffShelf(demand)">
           <input
             type="radio"
             [name]="'status' + i"
             value="上架"
             [checked]="demand.status === '上架'"
-            (change)="onStatusSelect(demand, '上架')"
+            [disabled]="isManualOffShelf(demand)"
           />
           上架
         </label>
 
-        <label>
+        <!-- 隱藏 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)">
           <input
             type="radio"
             [name]="'status' + i"
             value="隱藏"
             [checked]="demand.status === '隱藏'"
+            [disabled]="isManualOffShelf(demand)"
             (change)="onStatusSelect(demand, '隱藏')"
           />
           隱藏
         </label>
 
-        <label>
+        <!-- 下架 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)">
           <input
             type="radio"
             [name]="'status' + i"
             value="下架"
             [checked]="demand.status === '下架'"
+            [disabled]="isManualOffShelf(demand)"
             (change)="onStatusSelect(demand, '下架')"
           />
           下架
