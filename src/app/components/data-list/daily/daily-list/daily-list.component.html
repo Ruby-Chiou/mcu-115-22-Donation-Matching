@@ -199,14 +199,22 @@
 
             <!-- 留言區 -->
             <td class="message-column">
+              <!-- 已上架：顯示留言數，而且可以點進去 -->
               <a
+                *ngIf="item.status === '上架'"
                 [routerLink]="[
-                  '/donor/daily/detail',
-                  item.serialNo
-                ]"
+      '/donor/daily/detail',
+      item.serialNo
+    ]"
               >
                 {{ item.messageCount || 0 }}
               </a>
+
+              <!-- 隱藏中：留言數固定顯示 0，不可以點 -->
+              <span *ngIf="item.status === '隱藏'"> 0 </span>
+
+              <!-- 已下架：保留原本留言數，但不可以點 -->
+              <span *ngIf="item.status === '下架'"> {{ item.messageCount || 0 }} </span>
             </td>
 
             <!-- 操作 -->

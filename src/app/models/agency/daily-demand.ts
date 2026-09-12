@@ -90,6 +90,8 @@ export interface DailyDemand {
   receiveMethod: DailyReceiveMethod;
   recipient: string; // 收件人
   address: string; // 接收物資地址
+  latitude?: number; // 接收物資地址緯度
+  longitude?: number; // 接收物資地址經度
   phone: string; // 聯絡電話
 
   // 聯絡時間：平日

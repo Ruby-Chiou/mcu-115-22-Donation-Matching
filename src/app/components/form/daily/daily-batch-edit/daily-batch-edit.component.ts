@@ -5,11 +5,13 @@ import { Router } from '@angular/router';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { EditableDailyDemand } from '../../../../models/agency/daily-demand';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
+import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
+import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 
 @Component({
   selector: 'app-daily-batch-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, SupplyImagePreviewComponent],
+  imports: [CommonModule, FormsModule, SupplyImagePreviewComponent, SupplyOffShelfComponent, SupplyOnShelfComponent],
   templateUrl: './daily-batch-edit.component.html',
   styleUrls: [
     './daily-batch-edit-A.component.scss',
@@ -21,9 +23,20 @@ import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply
 export class DailyBatchEditComponent implements OnInit {
   editDemands: EditableDailyDemand[] = [];
 
-  // =========================
+  // 每一筆需求編輯前的原始狀態
+  private originalStatusMap: { [serialNo: number]: EditableDailyDemand['status'] } = {};
+  private originalOffShelfReasonMap: {
+    [serialNo: number]: EditableDailyDemand['offShelfReason'] | undefined;
+  } = {};
+
+  // 下架確認視窗
+  showOffShelfWarning = false;
+  showOnShelfWarning = false;
+
+  // 目前正在處理哪一筆需求
+  pendingDemand: EditableDailyDemand | null = null;
+
   // 圖片
-  // =========================
   imageFiles: { [serialNo: number]: File[] } = {};
   imagePreviewUrls: { [serialNo: number]: string[] } = {};
 
@@ -58,9 +71,7 @@ export class DailyBatchEditComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  // =========================
   // 初始化
-  // =========================
   ngOnInit() {
     const data = localStorage.getItem('editDemands');
 
@@ -68,21 +79,11 @@ export class DailyBatchEditComponent implements OnInit {
       this.editDemands = JSON.parse(data).map((item: any) => ({
         ...item,
 
-        // =========================
         // 服務對象
-        // =========================
-        // 資料庫現在使用陣列：
-        // ['老人', '孩童', '貧困']
-        //
-        // 如果舊資料還是物件格式，這裡也會轉成陣列，
-        // 避免舊的 localStorage 資料造成錯誤。
         serviceTargets: this.convertServiceTargets(item.serviceTargets),
-
         customServiceTargets: item.customServiceTargets?.length ? item.customServiceTargets : [''],
 
-        // =========================
         // 接受物資狀態
-        // =========================
         conditions: item.conditions || {
           全新: '',
           二手: '',
@@ -93,9 +94,7 @@ export class DailyBatchEditComponent implements OnInit {
 
         customConditions: item.customConditions?.length ? item.customConditions : [''],
 
-        // =========================
         // 基本資料
-        // =========================
         unit: item.unit || '',
         amountDescription: item.amountDescription || '',
         status: item.status ?? '隱藏',
@@ -114,6 +113,8 @@ export class DailyBatchEditComponent implements OnInit {
 
         recipient: item.recipient ?? '',
         address: item.address ?? '',
+        latitude: item.latitude,
+        longitude: item.longitude,
         phone: item.phone ?? '',
 
         // =========================
@@ -157,6 +158,15 @@ export class DailyBatchEditComponent implements OnInit {
       }));
 
       // =========================
+      // 記錄每一筆編輯前的原始狀態
+      // =========================
+      this.editDemands.forEach((item) => {
+        this.originalStatusMap[item.serialNo] = item.status ?? '隱藏';
+
+        this.originalOffShelfReasonMap[item.serialNo] = item.offShelfReason;
+      });
+
+      // =========================
       // 載入圖片
       // =========================
       this.editDemands.forEach((item) => {
@@ -180,6 +190,171 @@ export class DailyBatchEditComponent implements OnInit {
     }
 
     console.log('批次修改資料:', this.editDemands);
+  }
+
+  // 判斷是否為使用者手動下架
+  isManualOffShelf(demand: EditableDailyDemand): boolean {
+    return demand.status === '下架' && demand.offShelfReason === 'manual';
+  }
+
+  // 點擊公開狀態
+  onStatusClick(event: MouseEvent, demand: EditableDailyDemand, newStatus: EditableDailyDemand['status']): void {
+    // 手動下架的需求，不允許重新上架
+    if (newStatus === '上架' && this.isManualOffShelf(demand)) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // 強制維持下架
+      demand.status = '下架';
+
+      // 顯示「無法重新上架」視窗
+      this.pendingDemand = demand;
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    this.onStatusSelect(demand, newStatus);
+  }
+
+  // 公開狀態切換
+  onStatusSelect(demand: EditableDailyDemand, newStatus: EditableDailyDemand['status']): void {
+    // 判斷原本是不是手動下架
+    const wasManualOffShelf =
+      this.originalStatusMap[demand.serialNo] === '下架' && this.originalOffShelfReasonMap[demand.serialNo] === 'manual';
+
+    // 判斷目前是不是手動下架
+    const currentlyManualOffShelf = demand.status === '下架' && demand.offShelfReason === 'manual';
+
+    // 手動下架的需求固定維持下架
+    if (wasManualOffShelf || currentlyManualOffShelf) {
+      // 點擊上架 → 顯示無法重新上架
+      if (newStatus === '上架') {
+        demand.status = '下架';
+
+        this.pendingDemand = demand;
+        this.showOnShelfWarning = true;
+
+        return;
+      }
+
+      // 隱藏、下架都不能改
+      demand.status = '下架';
+
+      return;
+    }
+
+    // 選擇「上架」
+    if (newStatus === '上架') {
+      // 自然下架可以重新上架
+      demand.status = '上架';
+
+      return;
+    }
+
+    // 選擇「隱藏」
+    if (newStatus === '隱藏') {
+      demand.status = '隱藏';
+
+      demand.publishedAt = undefined;
+      demand.expectedOffShelfAt = undefined;
+      demand.offShelfReason = undefined;
+
+      return;
+    }
+
+    // 選擇「下架」
+    if (newStatus === '下架') {
+      // 已經是下架，不需要再次確認
+      if (demand.status === '下架') {
+        return;
+      }
+
+      this.pendingDemand = demand;
+
+      // 暫時恢復編輯前原本的狀態
+      demand.status = this.originalStatusMap[demand.serialNo] ?? '隱藏';
+
+      this.showOffShelfWarning = true;
+
+      return;
+    }
+  }
+
+  // =========================================================
+  // 取消手動下架
+  // =========================================================
+  cancelManualOffShelf(): void {
+    if (!this.pendingDemand) {
+      this.showOffShelfWarning = false;
+      return;
+    }
+
+    const demand = this.pendingDemand;
+
+    demand.status = this.originalStatusMap[demand.serialNo] ?? '隱藏';
+
+    demand.offShelfReason = this.originalOffShelfReasonMap[demand.serialNo];
+
+    this.showOffShelfWarning = false;
+    this.pendingDemand = null;
+  }
+
+  // =========================================================
+  // 選擇「隱藏」而不是下架
+  // =========================================================
+  hideInsteadOfOffShelf(): void {
+    if (!this.pendingDemand) {
+      this.showOffShelfWarning = false;
+      return;
+    }
+
+    const demand = this.pendingDemand;
+
+    demand.status = '隱藏';
+
+    demand.publishedAt = undefined;
+    demand.expectedOffShelfAt = undefined;
+    demand.offShelfReason = undefined;
+
+    this.showOffShelfWarning = false;
+    this.pendingDemand = null;
+  }
+
+  // =========================================================
+  // 確認手動下架
+  // =========================================================
+  confirmManualOffShelf(): void {
+    if (!this.pendingDemand) {
+      this.showOffShelfWarning = false;
+      return;
+    }
+
+    const demand = this.pendingDemand;
+
+    const now = new Date();
+
+    demand.status = '下架';
+
+    // 使用者主動下架
+    demand.offShelfReason = 'manual';
+
+    demand.expectedOffShelfAt = now.toISOString();
+
+    this.showOffShelfWarning = false;
+    this.pendingDemand = null;
+  }
+
+  // 關閉「無法重新上架」視窗
+  closeOnShelfWarning(): void {
+    this.showOnShelfWarning = false;
+
+    if (this.pendingDemand) {
+      this.pendingDemand.status = '下架';
+      this.pendingDemand.offShelfReason = 'manual';
+    }
+
+    this.pendingDemand = null;
   }
 
   // =========================================================
@@ -512,13 +687,30 @@ export class DailyBatchEditComponent implements OnInit {
     return result.join('、');
   }
 
-  // =========================
+  // 計算預計下架日期
+  calculateExpectedOffShelfDate(publishedDate: Date, priority: EditableDailyDemand['priority']): string {
+    const offShelfDate = new Date(publishedDate);
+
+    switch (priority) {
+      case '普通':
+        offShelfDate.setDate(offShelfDate.getDate() + 60);
+        break;
+
+      case '緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 30);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 14);
+        break;
+    }
+
+    return offShelfDate.toISOString();
+  }
+
   // 批次儲存
-  // =========================
   async saveAll() {
-    // =========================
     // 第一階段：驗證所有資料
-    // =========================
     this.editDemands.forEach((item) => {
       item.itemError = false;
       item.amountError = false;
@@ -621,6 +813,29 @@ export class DailyBatchEditComponent implements OnInit {
     }
 
     // =========================
+    // 檢查手動下架是否重新上架
+    // =========================
+    const invalidManualOffShelf = this.editDemands.find((item) => {
+      const originalStatus = this.originalStatusMap[item.serialNo];
+
+      const originalOffShelfReason = this.originalOffShelfReasonMap[item.serialNo];
+
+      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+
+      const isCurrentManualOffShelf = item.status === '下架' && item.offShelfReason === 'manual';
+
+      return item.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf);
+    });
+
+    if (invalidManualOffShelf) {
+      alert(`需求 A${invalidManualOffShelf.serialNo} 為使用者主動下架，無法重新上架。`);
+
+      invalidManualOffShelf.status = '下架';
+
+      return;
+    }
+
+    // =========================
     // 初始化 conditions
     // =========================
     this.editDemands.forEach((item) => {
@@ -670,17 +885,92 @@ export class DailyBatchEditComponent implements OnInit {
       item.conditionDescription = this.buildConditionDescription(item);
 
       // =========================
-      // 建立日期
+      // 公開狀態處理
       // =========================
-      if ((item.status === '上架' || item.status === '下架') && !item.createdAt) {
-        item.createdAt = new Date().toISOString();
+      const originalStatus = this.originalStatusMap[item.serialNo] ?? item.status;
+
+      const originalOffShelfReason = this.originalOffShelfReasonMap[item.serialNo];
+
+      const now = new Date();
+
+      // =========================
+      // 判斷原本是不是手動下架
+      // =========================
+      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+
+      // =========================
+      // 判斷目前是不是手動下架
+      // =========================
+      const isCurrentManualOffShelf = item.status === '下架' && item.offShelfReason === 'manual';
+
+      // =========================
+      // 手動下架後，不允許重新上架
+      // =========================
+      if (item.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
+        alert(`需求 A${item.serialNo} 為使用者主動下架，無法重新上架。`);
+
+        item.status = '下架';
+
+        return;
       }
 
       // =========================
-      // 隱藏 = 尚未發布
+      // 上架
       // =========================
-      if (item.status === '隱藏') {
-        item.createdAt = undefined;
+      if (item.status === '上架') {
+        // 原本不是上架
+        if (originalStatus !== '上架') {
+          item.publishedAt = now.toISOString();
+
+          if (!item.createdAt) {
+            item.createdAt = now.toISOString();
+          }
+        }
+        // 原本就是上架
+        else if (item.publishedAt) {
+          // 保留原本上架時間
+          item.publishedAt = item.publishedAt;
+        }
+
+        // 如果沒有建立時間才補建立時間
+        if (!item.createdAt) {
+          item.createdAt = now.toISOString();
+        }
+
+        // 日常需求：
+        // 普通 60 天
+        // 緊急 30 天
+        // 非常緊急 14 天
+        if (item.publishedAt) {
+          item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+        }
+
+        // 自然下架重新上架後，清除下架原因
+        item.offShelfReason = undefined;
+      }
+
+      // =========================
+      // 隱藏
+      // =========================
+      else if (item.status === '隱藏') {
+        item.publishedAt = undefined;
+        item.expectedOffShelfAt = undefined;
+        item.offShelfReason = undefined;
+      }
+
+      // =========================
+      // 下架
+      // =========================
+      else if (item.status === '下架') {
+        // 沒有原因時，預設為使用者手動下架
+        if (!item.offShelfReason) {
+          item.offShelfReason = 'manual';
+        }
+
+        // 沒有下架時間時補上現在時間
+        if (!item.expectedOffShelfAt) {
+          item.expectedOffShelfAt = now.toISOString();
+        }
       }
 
       // =========================
