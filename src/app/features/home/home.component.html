@@ -2,7 +2,10 @@
 
   <!-- 左側：最新消息 -->
   <section class="main-content">
-    <h3 class="section-title">最新消息</h3>
+    <h3 class="section-title">
+  <i class="fa-solid fa-newspaper"></i>
+  <span>最新消息</span>
+</h3>
 
     <div class="news-card">
       <div class="card-image">
@@ -30,48 +33,56 @@
   <!-- 右側：快速導覽 -->
   <aside class="right-sidebar">
 
-    <!-- 第一列 -->
-    <div class="sidebar-row">
-      <span class="row-title">我要捐物</span>
+  <!-- 我要捐物 -->
+  <div class="sidebar-row">
+    <span class="row-title">我要捐物</span>
 
-      <a routerLink="/donor/daily" class="circle-button">
-  日常<br />捐助
+    <div class="sidebar-buttons">
+      <a routerLink="/donor/daily" class="sidebar-button">
+        日常捐助
       </a>
 
-      <a href="#" class="circle-button" (click)="goToDisaster($event)">
-        災害<br />救助
-      </a>
-    </div>
-
-
-    <!-- 第二列 -->
-    <div class="sidebar-row">
-      <span class="row-title">認識我們</span>
-
-      <a href="#" class="circle-button">
-        平台<br />介紹
-      </a>
-
-      <a href="#" class="circle-button">
-        聯絡<br />我們
+      <a
+        href="#"
+        class="sidebar-button"
+        (click)="goToDisaster($event)"
+      >
+        災害救助
       </a>
     </div>
+  </div>
 
+  <!-- 認識我們 -->
+  <div class="sidebar-row">
+    <span class="row-title">認識我們</span>
 
-    <!-- 第三列 -->
-    <div class="sidebar-row">
-      <span class="row-title">更多問題</span>
-
-      <a href="#" class="circle-button">
-        常見<br />問題
+    <div class="sidebar-buttons">
+      <a routerLink="/intro" class="sidebar-button">
+        平台導覽
       </a>
 
-      <a href="#" class="circle-button">
-        AI<br />客服
+      <a routerLink="/about-us" class="sidebar-button">
+        關於我們
       </a>
     </div>
+  </div>
 
-  </aside>
+  <!-- 更多問題 -->
+  <div class="sidebar-row">
+    <span class="row-title">更多問題</span>
+
+    <div class="sidebar-buttons">
+      <a routerLink="/customer-service/faq" class="sidebar-button">
+        常見問題
+      </a>
+
+      <a routerLink="/customer-service/ai-chat" class="sidebar-button">
+        AI客服
+      </a>
+    </div>
+  </div>
+
+</aside>
 
 </div>
 
