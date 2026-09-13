@@ -11,6 +11,7 @@ export interface VolunteerDemand {
   createdAt?: string; // 建立時間
   publishedAt?: string; // 上架時間
   expectedOffShelfAt?: string; // 預計下架時間
+  offShelfReason?: 'manual' | 'natural';
 
   // 志工基本資訊
   type: string; // 志工類型

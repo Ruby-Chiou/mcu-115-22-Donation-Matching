@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
+import { VolunteerOffShelfComponent } from '../../../modal/shelf/volunteer-off-shelf/volunteer-off-shelf.component';
+import { VolunteerOnShelfComponent } from '../../../modal/shelf/volunteer-on-shelf/volunteer-on-shelf.component';
 
 // 讓元件專用的 UI 表單介面繼承原始的 VolunteerDemand，並擴充驗證屬性
 export type VolunteerDemandItem = VolunteerDemand & {
@@ -21,12 +23,17 @@ export type VolunteerDemandItem = VolunteerDemand & {
 @Component({
   selector: 'app-volunteer-batch-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule], // 補上 CommonModule 以支援 *ngFor/*ngIf
+  imports: [CommonModule, FormsModule, VolunteerOffShelfComponent, VolunteerOnShelfComponent], // 補上 CommonModule 以支援 *ngFor/*ngIf
   templateUrl: './volunteer-batch-edit.component.html',
   styleUrl: './volunteer-batch-edit.component.scss',
 })
 export class VolunteerBatchEditComponent implements OnInit {
   editDemands: VolunteerDemandItem[] = [];
+
+  showOffShelfWarning = false;
+  showOnShelfWarning = false;
+
+  private pendingDemand: VolunteerDemandItem | null = null;
 
   constructor(
     private volunteerDemandService: VolunteerDemandService,
@@ -50,7 +57,10 @@ export class VolunteerBatchEditComponent implements OnInit {
     try {
       const selectedDemands: VolunteerDemand[] = JSON.parse(storedData);
 
-      this.editDemands = JSON.parse(JSON.stringify(selectedDemands));
+      this.editDemands = JSON.parse(JSON.stringify(selectedDemands)).map((demand: VolunteerDemandItem) => ({
+        ...demand,
+        status: demand.status ?? '上架',
+      }));
 
       console.log('批次編輯資料：', this.editDemands);
     } catch (error) {
@@ -59,6 +69,114 @@ export class VolunteerBatchEditComponent implements OnInit {
 
       this.router.navigate(['/agency/disaster']);
     }
+  }
+
+  isManualOffShelf(demand: VolunteerDemandItem): boolean {
+    return demand.status === '下架' && demand.offShelfReason === 'manual';
+  }
+
+  onStatusClick(event: MouseEvent, demand: VolunteerDemandItem): void {
+    if (this.isManualOffShelf(demand)) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.pendingDemand = demand;
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    this.onStatusSelect('上架', demand);
+  }
+
+  onStatusSelect(newStatus: VolunteerDemand['status'], demand: VolunteerDemandItem): void {
+    // 手動下架後不能重新上架
+    if (this.isManualOffShelf(demand)) {
+      if (newStatus === '上架') {
+        this.pendingDemand = demand;
+        demand.status = '下架';
+        this.showOnShelfWarning = true;
+      } else {
+        demand.status = '下架';
+      }
+
+      return;
+    }
+
+    // 下架 → 跳出確認視窗
+    if (newStatus === '下架') {
+      if (demand.status === '下架') {
+        return;
+      }
+
+      this.pendingDemand = demand;
+
+      // 先維持原本狀態，等使用者確認
+      this.showOffShelfWarning = true;
+
+      return;
+    }
+
+    // 隱藏
+    if (newStatus === '隱藏') {
+      demand.status = '隱藏';
+      demand.publishedAt = undefined;
+      demand.expectedOffShelfAt = undefined;
+      demand.offShelfReason = undefined;
+
+      return;
+    }
+
+    // 上架
+    if (newStatus === '上架') {
+      demand.status = '上架';
+      return;
+    }
+  }
+
+  cancelManualOffShelf(): void {
+    this.showOffShelfWarning = false;
+    this.pendingDemand = null;
+  }
+
+  hideInsteadOfOffShelf(): void {
+    if (!this.pendingDemand) {
+      return;
+    }
+
+    this.pendingDemand.status = '隱藏';
+    this.pendingDemand.publishedAt = undefined;
+    this.pendingDemand.expectedOffShelfAt = undefined;
+    this.pendingDemand.offShelfReason = undefined;
+
+    this.showOffShelfWarning = false;
+    this.pendingDemand = null;
+  }
+
+  confirmManualOffShelf(): void {
+    if (!this.pendingDemand) {
+      return;
+    }
+
+    const now = new Date();
+
+    this.pendingDemand.status = '下架';
+    this.pendingDemand.offShelfReason = 'manual';
+    this.pendingDemand.expectedOffShelfAt = now.toISOString();
+
+    this.showOffShelfWarning = false;
+    this.pendingDemand = null;
+  }
+
+  closeOnShelfWarning(): void {
+    this.showOnShelfWarning = false;
+
+    if (this.pendingDemand) {
+      this.pendingDemand.status = '下架';
+      this.pendingDemand.offShelfReason = 'manual';
+    }
+
+    this.pendingDemand = null;
   }
 
   saveAll(): void {
@@ -112,6 +230,46 @@ export class VolunteerBatchEditComponent implements OnInit {
       return;
     }
 
+    const now = new Date();
+
+    selectedDemands.forEach((demand) => {
+      // 手動下架不能重新上架
+      if (demand.status === '上架' && demand.offShelfReason === 'manual') {
+        demand.status = '下架';
+        alert('此需求為使用者主動下架，無法重新上架。');
+        return;
+      }
+
+      // 上架
+      if (demand.status === '上架') {
+        if (!demand.publishedAt) {
+          demand.publishedAt = now.toISOString();
+        }
+
+        demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(demand.publishedAt), demand.priority);
+
+        demand.offShelfReason = undefined;
+      }
+
+      // 隱藏
+      else if (demand.status === '隱藏') {
+        demand.publishedAt = undefined;
+        demand.expectedOffShelfAt = undefined;
+        demand.offShelfReason = undefined;
+      }
+
+      // 下架
+      else if (demand.status === '下架') {
+        if (!demand.offShelfReason) {
+          demand.offShelfReason = 'manual';
+        }
+
+        if (!demand.expectedOffShelfAt) {
+          demand.expectedOffShelfAt = now.toISOString();
+        }
+      }
+    });
+
     // 只處理勾選的資料
     const cleanDemands: VolunteerDemand[] = selectedDemands.map(
       ({
@@ -133,6 +291,26 @@ export class VolunteerBatchEditComponent implements OnInit {
     // 重新載入資料
     this.loadDataFromService();
     this.router.navigate(['/agency/disaster']);
+  }
+
+  calculateExpectedOffShelfDate(publishedDate: Date, priority: VolunteerDemand['priority']): string {
+    const offShelfDate = new Date(publishedDate);
+
+    switch (priority) {
+      case '普通':
+        offShelfDate.setDate(offShelfDate.getDate() + 14);
+        break;
+
+      case '緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 7);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 3);
+        break;
+    }
+
+    return offShelfDate.toISOString();
   }
 
   cancel(): void {

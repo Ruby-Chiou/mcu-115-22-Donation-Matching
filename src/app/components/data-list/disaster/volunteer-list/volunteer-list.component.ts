@@ -209,12 +209,12 @@ export class VolunteerListComponent {
           // 這裡加上 as VolunteerStatus
           displayStatus: displayStatus[item.status as VolunteerStatus],
 
-          displayCreatedAt:
-            item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
+          displayCreatedAt: new Date(item.createdAt!).toLocaleDateString('zh-TW'),
+          displayPublishedAt:
+            item.status === '隱藏' || !item.publishedAt ? '尚未發布' : new Date(item.publishedAt).toLocaleDateString('zh-TW'),
 
-          displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
-
-          displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+          displayOffShelfAt:
+            item.status === '隱藏' || !item.expectedOffShelfAt ? '—' : new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW'),
 
           category: item.type ?? '其他',
         };
@@ -223,7 +223,7 @@ export class VolunteerListComponent {
       this.applyFilters(false);
 
       this.isLoading = false;
-    }, 500);
+    }, 300);
   }
   // 搜尋
   onSearchChange(value: string) {
@@ -310,12 +310,22 @@ export class VolunteerListComponent {
 
       // 留言狀態
       if (this.selectedFilters.messageStatus.length > 0) {
+        // 留言篩選只套用在「已上架」
+        if (item.displayStatus !== '已上架') {
+          return false;
+        }
+
         const hasMsg = (item.messageCount || 0) > 0;
+
         const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
         const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
+
+        // 有回覆 → 留言數大於 0
         if (wantsReplied && !wantsNotReplied && !hasMsg) {
           return false;
         }
+
+        // 未回覆 → 留言數等於 0
         if (wantsNotReplied && !wantsReplied && hasMsg) {
           return false;
         }
@@ -529,7 +539,7 @@ export class VolunteerListComponent {
     item.displayOffShelfAt = now.toLocaleDateString('zh-TW');
 
     // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
     // 保留原本的建立日期
     // 建立日期已在前面處理
@@ -560,14 +570,14 @@ export class VolunteerListComponent {
     item.displayStatus = '隱藏中';
 
     // 隱藏後視為尚未上架
+    item.publishedAt = undefined;
     item.expectedOffShelfAt = undefined;
 
     item.displayPublishedAt = '尚未上架';
-
     item.displayOffShelfAt = '—';
 
     // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
     // 儲存
     this.VolunteerDemandService.updateDemand(item);
@@ -656,7 +666,7 @@ export class VolunteerListComponent {
 
       item.displayStatus = '已上架';
 
-      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未發布';
 
       item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
     }
@@ -678,7 +688,7 @@ export class VolunteerListComponent {
     }
 
     // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
     // 儲存
     this.VolunteerDemandService.updateDemand(item);
@@ -690,15 +700,15 @@ export class VolunteerListComponent {
 
     switch (priority) {
       case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-
-      case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 14);
         break;
 
-      case '非常緊急':
+      case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 7);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 3);
         break;
     }
 

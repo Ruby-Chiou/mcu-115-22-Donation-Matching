@@ -127,83 +127,94 @@
 
     <div class="form-group">
       <label> 公開狀態 <span>*</span> </label>
+
       <div class="status-box">
-        <label>
-          <input type="radio" name="status" value="上架" [(ngModel)]="demand.status" />
+        <!-- 上架 -->
+        <label (click)="onStatusClick($event, '上架')" [class.disabled-status]="isManualOffShelf()">
+          <input type="radio" name="status" [checked]="demand.status === '上架'" [disabled]="isManualOffShelf()" />
           上架
         </label>
-        <label>
-          <input type="radio" name="status" value="隱藏" [(ngModel)]="demand.status" />
+
+        <!-- 隱藏 -->
+        <label [class.disabled-status]="isManualOffShelf()">
+          <input
+            type="radio"
+            name="status"
+            [checked]="demand.status === '隱藏'"
+            [disabled]="isManualOffShelf()"
+            (change)="onStatusSelect('隱藏')"
+          />
           隱藏
         </label>
+
         <!-- 編輯模式才顯示下架 -->
-        <label *ngIf="isEditMode">
-          <input type="radio" name="status" value="下架" [(ngModel)]="demand.status" />
+        <label *ngIf="isEditMode" [class.disabled-status]="isManualOffShelf()">
+          <input
+            type="radio"
+            name="status"
+            [checked]="demand.status === '下架'"
+            [disabled]="isManualOffShelf()"
+            (change)="onStatusSelect('下架')"
+          />
           下架
         </label>
       </div>
+    </div>
+    <!-- 聯絡人 -->
+    <div class="form-group">
+      <label
+        >聯絡人 <span>*</span>
+        <span class="word-count"> {{ demand.contact.length || 0 }}/20 </span>
+      </label>
+      <input
+        type="text"
+        placeholder="請輸入聯絡人姓名"
+        maxlength="20"
+        [(ngModel)]="demand.contact"
+        [class.invalid-field]="isInvalid('contact')"
+      />
+    </div>
 
-      <!-- 聯絡人 -->
-      <div class="form-group">
-        <label
-          >聯絡人 <span>*</span>
-          <span class="word-count"> {{ demand.contact.length || 0 }}/20 </span>
-        </label>
-        <input
-          type="text"
-          placeholder="請輸入聯絡人姓名"
-          maxlength="20"
-          [(ngModel)]="demand.contact"
-          [class.invalid-field]="isInvalid('contact')"
-        />
-      </div>
+    <!-- 聯絡電話 -->
+    <div class="form-group">
+      <label
+        >聯絡電話 <span>*</span>
+        <span class="word-count"> {{ demand.phone.length || 0 }}/10 </span>
+      </label>
+      <input type="tel" placeholder="請輸入聯絡電話" maxlength="10" [(ngModel)]="demand.phone" [class.invalid-field]="isInvalid('phone')" />
+    </div>
 
-      <!-- 聯絡電話 -->
-      <div class="form-group">
-        <label
-          >聯絡電話 <span>*</span>
-          <span class="word-count"> {{ demand.phone.length || 0 }}/10 </span>
-        </label>
-        <input
-          type="tel"
-          placeholder="請輸入聯絡電話"
-          maxlength="10"
-          [(ngModel)]="demand.phone"
-          [class.invalid-field]="isInvalid('phone')"
-        />
-      </div>
-
-      <!-- 其他說明 -->
-      <div class="note-section">
-        <label class="label-row">
-          其他說明（備註）
-          <span class="word-count"> {{ demand.note?.length || 0 }}/300 </span>
-        </label>
-        <textarea
-          class="note-textarea"
-          maxlength="300"
-          [(ngModel)]="demand.note"
-          [placeholder]="isEditMode ? '請編輯其他說明' : '請輸入其他說明'"
-        ></textarea>
-      </div>
+    <!-- 其他說明 -->
+    <div class="note-section">
+      <label class="label-row">
+        其他說明（備註）
+        <span class="word-count"> {{ demand.note?.length || 0 }}/300 </span>
+      </label>
+      <textarea
+        class="note-textarea"
+        maxlength="300"
+        [(ngModel)]="demand.note"
+        [placeholder]="isEditMode ? '請編輯其他說明' : '請輸入其他說明'"
+      ></textarea>
     </div>
   </div>
-
-  <div class="success-modal-backdrop" *ngIf="showSuccessModal">
-    <section class="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-modal-title">
-      <div class="success-modal-icon" aria-hidden="true">✓</div>
-      <h2 id="success-modal-title">操作完成</h2>
-      <p>{{ successMessage }}</p>
-      <button type="button" class="success-modal-button" (click)="closeSuccessModal()">返回需求列表</button>
-    </section>
-  </div>
-
-  <!-- 右下角按鈕 -->
-  <div class="form-actions">
-    <button type="button" class="cancel-btn" (click)="onCancel()">取消</button>
-    <button type="button" class="publish-btn" (click)="onPublish()">{{ isEditMode ? '儲存' : '發布需求' }}</button>
-  </div>
 </div>
+
+<div class="success-modal-backdrop" *ngIf="showSuccessModal">
+  <section class="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-modal-title">
+    <div class="success-modal-icon" aria-hidden="true">✓</div>
+    <h2 id="success-modal-title">操作完成</h2>
+    <p>{{ successMessage }}</p>
+    <button type="button" class="success-modal-button" (click)="closeSuccessModal()">返回需求列表</button>
+  </section>
+</div>
+
+<!-- 右下角按鈕 -->
+<div class="form-actions">
+  <button type="button" class="cancel-btn" (click)="onCancel()">取消</button>
+  <button type="button" class="publish-btn" (click)="onPublish()">{{ isEditMode ? '儲存' : '發布需求' }}</button>
+</div>
+
 <div class="cancel-modal-backdrop" *ngIf="showCancelModal" role="presentation" (click)="closeCancelModal()">
   <section class="cancel-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title" (click)="$event.stopPropagation()">
     <div class="cancel-modal-icon" aria-hidden="true">!</div>
@@ -215,3 +226,17 @@
     </div>
   </section>
 </div>
+
+<!-- 手動上/下架確認視窗 -->
+<app-volunteer-off-shelf
+  *ngIf="showOffShelfWarning"
+  (closed)="cancelManualOffShelf()"
+  (hide)="hideInsteadOfOffShelf()"
+  (confirmed)="confirmManualOffShelf()"
+></app-volunteer-off-shelf>
+
+<app-volunteer-on-shelf
+  *ngIf="showOnShelfWarning"
+  (closed)="closeOnShelfWarning()"
+  (confirmed)="closeOnShelfWarning()"
+></app-volunteer-on-shelf>
