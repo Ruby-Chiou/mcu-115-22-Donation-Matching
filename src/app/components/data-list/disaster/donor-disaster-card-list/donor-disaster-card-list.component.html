@@ -1,9 +1,13 @@
 <div class="card-list">
-  @if (disasterData().isOpen && type === 'material') { @for (demand of paginatedDemands; track demand.serialNo) {
-  <app-donor-disaster-card type="material" [demand]="demand" [demandId]="demand.serialNo"> </app-donor-disaster-card>
-
+  @if (isLoading) {
+  <div class="loading-container" role="status" aria-live="polite">
+    <div class="loading-spinner"></div>
+    <p>資料載入中，請稍候...</p>
+  </div>
+  } @else if (disasterData().isOpen && type === 'material') { @for ( demand of paginatedDemands; track demand.serialNo ) {
+  <app-donor-disaster-card type="material" [demand]="demand" [demandId]="demand.serialNo"></app-donor-disaster-card>
   }
-  <!-- 共用分頁按鈕元件 -->
+
   <app-pagination
     [pageSize]="pageSize"
     [currentPage]="currentPage"
@@ -11,11 +15,10 @@
     [pageNumbers]="pageNumbers"
     (pageChange)="goToPage($event)"
   ></app-pagination>
-
-  } @else if (disasterData().isOpen && type === 'volunteer') { @for (volunteer of paginatedVolunteers; track volunteer.serialNo) {
-  <app-donor-disaster-card type="volunteer" [volunteer]="volunteer"> </app-donor-disaster-card>
+  } @else if ( disasterData().isOpen && type === 'volunteer' ) { @for ( volunteer of paginatedVolunteers; track volunteer.serialNo ) {
+  <app-donor-disaster-card type="volunteer" [volunteer]="volunteer"></app-donor-disaster-card>
   }
-  <!-- 共用分頁按鈕元件 -->
+
   <app-pagination
     [pageSize]="pageSize"
     [currentPage]="currentPage"
@@ -23,6 +26,5 @@
     [pageNumbers]="pageNumbers"
     (pageChange)="goToPage($event)"
   ></app-pagination>
-
   }
 </div>

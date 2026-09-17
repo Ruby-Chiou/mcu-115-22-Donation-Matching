@@ -1,4 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { DonorDisasterCardComponent } from '../../../card/disaster/donor-disaster-card/donor-disaster-card.component';
 import { PaginationComponent } from '../../../pagination/pagination.component';
@@ -31,7 +34,7 @@ export type DisasterFilters = MaterialFilters | VolunteerFilters;
   templateUrl: './donor-disaster-card-list.component.html',
   styleUrl: './donor-disaster-card-list.component.scss',
 })
-export class DonorDisasterCardListComponent implements OnInit {
+export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
   @Input() type: 'material' | 'volunteer' = 'material';
 
   @Input() filters: DisasterFilters = {
@@ -47,6 +50,9 @@ export class DonorDisasterCardListComponent implements OnInit {
 
   currentPage = 1;
   pageSize = 8;
+  isLoading = true;
+
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private readonly disasterDemandService: DisasterDemandService,
@@ -57,17 +63,39 @@ export class DonorDisasterCardListComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.isLoading = true;
+
+    this.disasterDemandService.demandChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (this.type === 'material') {
+        void this.loadDemands();
+      }
+    });
+
     await Promise.all([this.disasterDemandService.waitUntilLoaded(), this.volunteerDemandService.waitUntilLoaded()]);
 
-    this.loadDemands();
+    await this.loadDemands();
   }
 
-  private loadDemands(): void {
-    this.demands = this.disasterDemandService.getDemands().filter((demand) => demand.status === '上架');
+  private async loadDemands(): Promise<void> {
+    this.isLoading = true;
 
-    this.volunteers = this.volunteerDemandService.getVolunteers().filter((volunteer) => volunteer.status === '上架');
+    try {
+      await Promise.all([this.disasterDemandService.reload(), this.volunteerDemandService.reload()]);
 
-    this.currentPage = 1;
+      this.demands = this.disasterDemandService.getDemands().filter((demand) => demand.status === '上架');
+
+      this.volunteers = this.volunteerDemandService.getVolunteers().filter((volunteer) => volunteer.status === '上架');
+
+      this.currentPage = 1;
+    } catch (error) {
+      console.error('載入捐贈需求失敗：', error);
+
+      this.demands = [];
+      this.volunteers = [];
+      this.currentPage = 1;
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   get filteredDemands(): DisasterDemand[] {
@@ -105,10 +133,6 @@ export class DonorDisasterCardListComponent implements OnInit {
     });
   }
 
-  onPageChange(page: number): void {
-    this.currentPage = page;
-  }
-
   get paginatedDemands(): DisasterDemand[] {
     const start = (this.currentPage - 1) * this.pageSize;
 
@@ -134,11 +158,20 @@ export class DonorDisasterCardListComponent implements OnInit {
       {
         length: this.totalPages,
       },
-      (_, i) => i + 1
+      (_, index) => index + 1
     );
   }
 
   goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+
     this.currentPage = page;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
