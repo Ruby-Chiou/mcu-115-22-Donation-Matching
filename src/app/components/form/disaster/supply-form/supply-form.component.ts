@@ -337,7 +337,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     this.demand.status = '下架';
   }
 
-  save() {
+  async save(): Promise<void> {
     this.submitted = true;
 
     if (
@@ -500,7 +500,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       }
 
       // 更新資料
-      this.disasterDemandService.updateDemand(this.demand);
+      await this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
         this.router.navigate(['/agency/supply-detail', this.demand.serialNo], {
@@ -538,7 +538,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         this.demand.offShelfReason = undefined;
       }
 
-      this.disasterDemandService.addDemand(this.demand);
+      await this.disasterDemandService.addDemand(this.demand);
 
       this.router.navigate(['/agency/disaster']);
     }

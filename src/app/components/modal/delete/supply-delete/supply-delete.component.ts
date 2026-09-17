@@ -33,15 +33,24 @@ export class SupplyDeleteComponent {
   }
 
   // 確定刪除
-  confirmDelete() {
-    this.demandIds.forEach((serialNo) => {
-      if (this.demandType === 'daily') {
-        this.dailyService.deleteDemand(serialNo);
-      } else {
-        this.disasterService.deleteDemand(serialNo);
-      }
-    });
+  async confirmDelete(): Promise<void> {
+  if (this.demandIds.length === 0) {
+    return;
+  }
+
+  try {
+    for (const serialNo of this.demandIds) {
+      await this.disasterService.deleteDemand(
+        serialNo
+      );
+    }
 
     this.deleted.emit();
+  } catch (error) {
+    console.error(
+      '刪除物資需求失敗：',
+      error
+    );
   }
+}
 }

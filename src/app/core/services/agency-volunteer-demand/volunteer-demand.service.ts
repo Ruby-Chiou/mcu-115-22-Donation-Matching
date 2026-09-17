@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
 import { VolunteerDemand } from '../../../models/agency/volunteer-demand';
 
@@ -34,6 +35,10 @@ export class VolunteerDemandService {
   private selectedDemands: VolunteerDemand[] = [];
 
   private loadingPromise: Promise<void>;
+
+  private readonly demandChangedSubject = new Subject<void>();
+
+  readonly demandChanged$ = this.demandChangedSubject.asObservable();
 
   constructor(private readonly supabaseService: SupabaseService) {
     this.loadingPromise = this.loadFromSupabase();
@@ -129,12 +134,9 @@ export class VolunteerDemandService {
   /**
    * 給志工卡片列表使用
    */
-getVolunteers(): VolunteerDemand[] {
-  return this.demands.filter(
-    (demand) =>
-      demand.status === '上架'
-  );
-}
+  getVolunteers(): VolunteerDemand[] {
+    return this.demands.filter((demand) => demand.status === '上架');
+  }
 
   /**
    * 取得單筆需求
@@ -167,6 +169,7 @@ getVolunteers(): VolunteerDemand[] {
     const newDemand = this.mapRowToDemand(data as VolunteerDemandRow);
 
     this.demands.push(newDemand);
+    this.demandChangedSubject.next();
   }
 
   /**
@@ -195,6 +198,8 @@ getVolunteers(): VolunteerDemand[] {
     if (index !== -1) {
       this.demands[index] = savedDemand;
     }
+
+    this.demandChangedSubject.next();
   }
 
   /**
@@ -210,6 +215,7 @@ getVolunteers(): VolunteerDemand[] {
     }
 
     this.demands = this.demands.filter((item) => item.serialNo !== id);
+    this.demandChangedSubject.next();
   }
 
   /**

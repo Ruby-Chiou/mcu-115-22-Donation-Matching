@@ -118,7 +118,7 @@ export class VolunteerFormComponent implements OnInit {
   }
 
   // 儲存 / 發布
-  onPublish(): void {
+  async onPublish(): Promise<void> {
     // 清除之前錯誤
     this.invalidFields = [];
 
@@ -180,7 +180,7 @@ export class VolunteerFormComponent implements OnInit {
       status: this.demand.status,
       messageCount: 0,
     };
-    this.volunteerDemandService.addDemand(newDemand);
+    await this.volunteerDemandService.addDemand(newDemand);
     console.log('新增志工需求：', newDemand);
     this.successMessage = '志工需求發布成功！';
     this.showSuccessModal = true;
