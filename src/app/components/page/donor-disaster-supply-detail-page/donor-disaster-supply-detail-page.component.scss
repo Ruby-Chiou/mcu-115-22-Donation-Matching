@@ -311,50 +311,25 @@
 }
 /*物資緊急程度 */
 .urgency {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: inline-block;
   margin-bottom: 18px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 13px;
   font-weight: 600;
+  line-height: 1.2;
 }
 /* 緊急物資 */
 .urgency.very-urgent {
-  background: #ffe3d5;
-  color: #a92e1f;
+  background: #d32f2f;
 }
 .urgency.urgent {
-  background: #ffe5e5;
-  color: #e53935;
+  background: #f57c00;
 }
 /* 一般物資 */
 .urgency.normal {
-  background: #fff1eb;
-  color: #ff6b35;
-}
-.urgency-icon {
-  font-size: 10px;
-}
-/* 物資緊急程度*/
-.urgency {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-}
-/* 緊急 */
-.urgency.urgent {
-  background: #fff0ed;
-  color: #e53935;
-}
-.urgency-icon {
-  font-size:20px;
+  background: #999999;
 }
 .condition-content {
   display: flex;
