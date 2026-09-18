@@ -47,21 +47,35 @@ export class DonorDisasterCardComponent {
       return;
     }
 
-    if (this.type !== 'material') {
-      return;
-    }
-
-    const id = this.demand?.id;
-
-    if (id == null) {
-      console.error('災害物資缺少資料庫 id：', this.demand);
-
-      return;
-    }
-
     this.showDetail = false;
 
-    void this.router.navigate(['/donor/disaster/supply/detail', id]);
+    if (this.type === 'material') {
+      const id = this.demand?.id;
+
+      console.log('[災害物資] 前往詳細頁資料庫 id：', id);
+
+      if (id == null) {
+        console.error('災害物資缺少資料庫 id：', this.demand);
+
+        return;
+      }
+
+      void this.router.navigate(['/donor/disaster/supply/detail', id]);
+
+      return;
+    }
+
+    const id = this.volunteer?.id;
+
+    console.log('[災害志工] 前往詳細頁資料庫 id：', id);
+
+    if (id == null) {
+      console.error('災害志工缺少資料庫 id：', this.volunteer);
+
+      return;
+    }
+
+    void this.router.navigate(['/donor/disaster/volunteer/detail', id]);
   }
 
   closeDetail(event?: Event): void {

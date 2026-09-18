@@ -26,6 +26,7 @@ export class VolunteerFormComponent implements OnInit {
   invalidFields: string[] = [];
   // 志工需求資料
   demand: VolunteerDemand = {
+    id: 0,
     serialNo: 0,
     type: '',
     people: null,

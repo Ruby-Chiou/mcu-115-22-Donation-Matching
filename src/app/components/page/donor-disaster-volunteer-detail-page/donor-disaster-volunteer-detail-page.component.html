@@ -1,3 +1,9 @@
+@if (isLoading) {
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>資料載入中，請稍候...</p>
+  </div>
+} @else if (volunteer) {
 <div class="detail-page">
   <!-- 返回需求清單 -->
   <button type="button" class="back-button" (click)="goBackToList()">← 返回需求清單</button>
@@ -12,7 +18,7 @@
     <!-- 右邊：志工資訊 -->
     <div class="detail-info">
       <!-- 志工類型 -->
-      <h2>{{ volunteer.type }}</h2>
+      <h2>{{ volunteer?.type }}</h2>
       <!-- 優先程度 -->
       <div
         class="urgency"
@@ -156,3 +162,18 @@
     </div>
   </div>
 </div>
+} @else {
+  <div class="loading-state empty-state">
+    <p>
+      {{ loadError || '找不到此筆志工需求。' }}
+    </p>
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBackToList()"
+    >
+      ← 返回需求清單
+    </button>
+  </div>
+}

@@ -6,6 +6,7 @@ export type DisplayVolunteerStatus = '已上架' | '隱藏中' | '已下架';
 
 // 志工需求資料
 export interface VolunteerDemand {
+  id: number;
   // 基本資料與時間戳記
   serialNo: number; // 編號
   createdAt?: string; // 建立時間

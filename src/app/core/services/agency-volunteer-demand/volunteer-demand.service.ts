@@ -83,6 +83,7 @@ export class VolunteerDemandService {
    */
   private mapRowToDemand(row: VolunteerDemandRow): VolunteerDemand {
     return {
+      id: Number(row.id),
       serialNo: Number(row.serialNo ?? 0),
       type: row.type ?? '',
       people: row.people ?? 0,
@@ -138,6 +139,28 @@ export class VolunteerDemandService {
    */
   getVolunteers(): VolunteerDemand[] {
     return this.demands.filter((demand) => demand.status === '上架');
+  }
+
+  async getVolunteerByDatabaseId(id: number): Promise<VolunteerDemand | undefined> {
+    console.log('[志工詳細頁] 準備查詢資料庫 id：', id);
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('id', id).maybeSingle();
+
+    console.log('[志工詳細頁] Supabase data：', data);
+
+    console.log('[志工詳細頁] Supabase error：', error);
+
+    if (error) {
+      console.error('讀取單筆志工需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      return undefined;
+    }
+
+    return this.mapRowToDemand(data as VolunteerDemandRow);
   }
 
   /**
