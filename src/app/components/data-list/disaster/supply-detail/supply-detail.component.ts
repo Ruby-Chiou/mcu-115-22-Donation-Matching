@@ -28,20 +28,21 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
-    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+  async ngOnInit(): Promise<void> {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
+    try {
+      const demand = await this.service.getDemandById(id);
 
-    this.demand = this.service.getDemandBySerialNo(serialNo);
+      if (!demand) {
+        console.error('找不到災害物資需求，id：', id);
 
-    if (this.demand) {
-      this.demand.remaining ??= this.demand.amount ?? 0;
-
-      // 只有資料庫有 conditionDescription 時才進行解析
-      if (this.demand.conditionDescription?.trim()) {
-        this.parseConditionDescription();
+        return;
       }
+
+      this.demand = demand;
+    } catch (error) {
+      console.error('載入災害物資需求失敗：', error);
     }
   }
 

@@ -366,3 +366,71 @@
 .condition-item {
   white-space: nowrap;
 }
+.loading-state {
+  min-height: 360px;
+  width: 100%;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+
+  padding: 40px 20px;
+  background-color: #fbfbfd;
+  color: #666;
+  font-size: 18px;
+  text-align: center;
+}
+
+.loading-state p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.loading-spinner {
+  width: 52px;
+  height: 52px;
+  box-sizing: border-box;
+
+  border: 5px solid #e4f2fc;
+  border-top-color: #1685da;
+  border-right-color: #1685da;
+
+  border-radius: 50%;
+
+  animation: disaster-loading-spin 0.85s linear infinite;
+}
+
+@keyframes disaster-loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state {
+  color: #555;
+}
+
+.empty-state .back-button {
+  margin-top: 8px;
+  padding: 10px 22px;
+
+  border: none;
+  border-radius: 6px;
+
+  background-color: #1477bd;
+  color: #fff;
+
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.empty-state .back-button:hover {
+  background-color: #0d609b;
+}

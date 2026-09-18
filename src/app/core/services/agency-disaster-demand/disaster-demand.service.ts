@@ -215,56 +215,49 @@ export class DisasterDemandService {
     return from(this.reload().then(() => [...this.demands]));
   }
 
-  getDemandBySerialNo(serialNo: number): DisasterDemand | undefined {
-    return this.demands.find((demand) => demand.serialNo === serialNo);
+  async getDemandById(id: number): Promise<DisasterDemand | undefined> {
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('id', id).maybeSingle();
+
+    if (error) {
+      console.error('讀取單筆災害物資需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      return undefined;
+    }
+
+    return this.mapRowToDemand(data as DisasterDemandRow);
   }
+  async updateDemand(updatedDemand: DisasterDemand): Promise<void> {
+    if (updatedDemand.id == null) {
+      throw new Error(`找不到資料庫 id，無法更新災害物資：${updatedDemand.serialNo}`);
+    }
 
-  async updateDemand(
-  updatedDemand: DisasterDemand
-): Promise<void> {
-  if (updatedDemand.id == null) {
-    throw new Error(
-      `找不到資料庫 id，無法更新災害物資：${updatedDemand.serialNo}`
-    );
-  }
+    const row = this.demandToRow(updatedDemand);
 
-  const row =
-    this.demandToRow(updatedDemand);
-
-  const { data, error } =
-    await this.supabaseService.client
+    const { data, error } = await this.supabaseService.client
       .from(this.tableName)
       .update(row)
       .eq('id', updatedDemand.id)
       .select('*')
       .single();
 
-  if (error) {
-    console.error(
-      '修改災害物資需求失敗：',
-      error
-    );
+    if (error) {
+      console.error('修改災害物資需求失敗：', error);
 
-    throw error;
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error(`找不到更新後的災害物資：id=${updatedDemand.id}`);
+    }
+
+    const savedDemand = this.mapRowToDemand(data as DisasterDemandRow);
+
+    this.demands = this.demands.map((item) => (item.id === savedDemand.id ? savedDemand : item));
   }
-
-  if (!data) {
-    throw new Error(
-      `找不到更新後的災害物資：id=${updatedDemand.id}`
-    );
-  }
-
-  const savedDemand =
-    this.mapRowToDemand(
-      data as DisasterDemandRow
-    );
-
-  this.demands = this.demands.map((item) =>
-    item.id === savedDemand.id
-      ? savedDemand
-      : item
-  );
-}
   private getNextSerialNo(): number {
     if (this.demands.length === 0) {
       return 1;
@@ -273,51 +266,29 @@ export class DisasterDemandService {
     return Math.max(...this.demands.map((item) => item.serialNo)) + 1;
   }
 
-    async deleteDemand(
-    serialNo: number
-  ): Promise<void> {
-    const item = this.demands.find(
-      (demand) =>
-        demand.serialNo === serialNo
-    );
+  async deleteDemand(serialNo: number): Promise<void> {
+    const item = this.demands.find((demand) => demand.serialNo === serialNo);
 
     if (!item) {
-      throw new Error(
-        `找不到要刪除的災害物資。serialNo：${serialNo}`
-      );
+      throw new Error(`找不到要刪除的災害物資。serialNo：${serialNo}`);
     }
 
     if (item.id == null) {
-      throw new Error(
-        `找不到資料庫 id，無法刪除災害物資。serialNo：${serialNo}`
-      );
+      throw new Error(`找不到資料庫 id，無法刪除災害物資。serialNo：${serialNo}`);
     }
 
-    const { data, error } =
-      await this.supabaseService.client
-        .from(this.tableName)
-        .delete()
-        .eq('id', item.id)
-        .select('id');
+    const { data, error } = await this.supabaseService.client.from(this.tableName).delete().eq('id', item.id).select('id');
 
     if (error) {
-      console.error(
-        '刪除災害物資需求失敗：',
-        error
-      );
+      console.error('刪除災害物資需求失敗：', error);
 
       throw error;
     }
 
     if (!data || data.length === 0) {
-      throw new Error(
-        `找不到或沒有權限刪除災害物資。id：${item.id}`
-      );
+      throw new Error(`找不到或沒有權限刪除災害物資。id：${item.id}`);
     }
 
-    this.demands = this.demands.filter(
-      (demand) =>
-        demand.id !== item.id
-    );
+    this.demands = this.demands.filter((demand) => demand.id !== item.id);
   }
 }
