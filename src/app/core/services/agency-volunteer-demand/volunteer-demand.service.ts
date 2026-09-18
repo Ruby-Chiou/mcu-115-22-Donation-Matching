@@ -7,6 +7,7 @@ import { SupabaseService } from '../supabase.service';
 
 interface VolunteerDemandRow {
   id: number | string;
+  serialNo: number | null;
   type: string | null;
   people: number | null;
   location: string | null;
@@ -82,7 +83,7 @@ export class VolunteerDemandService {
    */
   private mapRowToDemand(row: VolunteerDemandRow): VolunteerDemand {
     return {
-      serialNo: Number(row.id),
+      serialNo: Number(row.serialNo ?? 0),
       type: row.type ?? '',
       people: row.people ?? 0,
       location: row.location ?? '',
@@ -106,6 +107,7 @@ export class VolunteerDemandService {
    */
   private demandToRow(demand: VolunteerDemand): Omit<VolunteerDemandRow, 'id'> {
     return {
+      serialNo: demand.serialNo,
       type: demand.type,
       people: demand.people,
       location: demand.location,

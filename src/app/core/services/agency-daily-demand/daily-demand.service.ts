@@ -11,6 +11,7 @@ import { SupabaseService } from '../supabase.service';
 
 interface DailyDemandRow {
   id: number;
+
   createdAt: string;
   publishedAt: string | null;
   expectedOffShelfAt: string | null;
@@ -41,7 +42,7 @@ interface DailyDemandRow {
   note: string | null;
 
   imageFileNames: unknown;
-  serialNo: number | string | null;
+  serialNo: number | null;
   image: unknown;
 
   contactTimeWeekday: boolean;
