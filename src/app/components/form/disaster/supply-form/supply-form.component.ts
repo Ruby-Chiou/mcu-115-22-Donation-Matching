@@ -285,7 +285,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
 
     // 手動下架時嘗試重新上架
-    // 判斷原本是否為手動下架
     const wasManualOffShelf = this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
 
     const currentlyManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
@@ -385,43 +384,182 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // =========================================================
   // 使用 Nominatim 將地址轉換成經緯度
+  //
+  // 第一階段：
+  // 完整地址
+  //
+  // 第二階段：
+  // 如果完整地址找不到，就改搜尋道路
+  //
+  // 例如：
+  // 台北市中正區重慶南路一段122號
+  // ↓
+  // 重慶南路一段
+  // =========================================================
   async getCoordinatesFromAddress(address: string): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
 
-    // 原本的城市／國家設定維持不變
+    const originalAddress = address.trim();
+
+    if (!originalAddress) {
+      return false;
+    }
+
+    // =========================================================
+    // 第一階段：搜尋完整地址
+    // =========================================================
     const params = {
-      q: `${address}, Taiwan`,
+      // 原本的城市 / 國家寫法保持不變
+      q: `${originalAddress}, Taiwan`,
       format: 'jsonv2',
       limit: '1',
       countrycodes: 'tw',
     };
 
     try {
-      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+      console.log('================================');
+      console.log('第一階段：搜尋完整地址');
+      console.log('搜尋地址：', originalAddress);
 
-      if (!results || results.length === 0) {
+      const results = await firstValueFrom(
+        this.http.get<NominatimSearchResult[]>(url, {
+          params,
+        })
+      );
+
+      console.log('Nominatim 完整地址回傳結果：', results);
+
+      if (results && results.length > 0) {
+        const result = results[0];
+
+        const latitude = Number(result.lat);
+        const longitude = Number(result.lon);
+
+        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+          this.demand.latitude = latitude;
+          this.demand.longitude = longitude;
+
+          console.log('完整地址定位成功');
+          console.log('地址：', originalAddress);
+          console.log('緯度：', latitude);
+          console.log('經度：', longitude);
+          console.log('找到的位置：', result.display_name);
+          console.log('================================');
+
+          return true;
+        }
+      }
+
+      console.warn('完整地址找不到，準備搜尋道路。');
+    } catch (error) {
+      console.error('完整地址搜尋失敗，準備搜尋道路：', error);
+    }
+
+    // =========================================================
+    // 第二階段：搜尋道路
+    // =========================================================
+
+    // 臺 → 台
+    let roadAddress = originalAddress.replace(/臺/g, '台');
+
+    // 移除門牌號碼
+    //
+    // 例如：
+    // 台北市中正區重慶南路一段122號
+    // ↓
+    // 台北市中正區重慶南路一段
+    //
+    // 也支援：
+    // 122-1號
+    // 122號之1
+    roadAddress = roadAddress.replace(/\d+(?:-\d+)?號.*$/, '');
+
+    roadAddress = roadAddress.trim();
+
+    // 移除縣市名稱
+    //
+    // 台北市中正區重慶南路一段
+    // ↓
+    // 中正區重慶南路一段
+    //
+    // 宜蘭縣宜蘭市○○路
+    // ↓
+    // 宜蘭市○○路
+    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+    // 移除區／鄉／鎮／市
+    //
+    // 中正區重慶南路一段
+    // ↓
+    // 重慶南路一段
+    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+    roadAddress = roadAddress.trim();
+
+    console.log('第二階段：搜尋道路');
+    console.log('道路名稱：', roadAddress);
+
+    if (!roadAddress) {
+      console.warn('無法從地址取得道路名稱：', originalAddress);
+      console.log('================================');
+
+      return false;
+    }
+
+    const roadParams = {
+      // 原本的城市 / 國家寫法保持不變
+      q: `${roadAddress}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      const roadResults = await firstValueFrom(
+        this.http.get<NominatimSearchResult[]>(url, {
+          params: roadParams,
+        })
+      );
+
+      console.log('Nominatim 道路搜尋回傳結果：', roadResults);
+
+      if (!roadResults || roadResults.length === 0) {
+        console.warn('連道路也找不到：', roadAddress);
+        console.log('================================');
+
         return false;
       }
 
-      const result = results[0];
+      const roadResult = roadResults[0];
 
-      this.demand.latitude = Number(result.lat);
-      this.demand.longitude = Number(result.lon);
+      const latitude = Number(roadResult.lat);
+      const longitude = Number(roadResult.lon);
 
-      // 確認經緯度真的有成功取得
-      if (!Number.isFinite(this.demand.latitude) || !Number.isFinite(this.demand.longitude)) {
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        console.warn('道路回傳的經緯度無效：', roadResult);
+        console.log('================================');
+
         return false;
       }
 
-      console.log('地址：', address);
-      console.log('轉換後緯度：', this.demand.latitude);
-      console.log('轉換後經度：', this.demand.longitude);
-      console.log('Nominatim 找到的位置：', result.display_name);
+      // 使用道路座標
+      this.demand.latitude = latitude;
+      this.demand.longitude = longitude;
+
+      console.log('道路定位成功');
+      console.log('原始地址：', originalAddress);
+      console.log('搜尋道路：', roadAddress);
+      console.log('緯度：', latitude);
+      console.log('經度：', longitude);
+      console.log('找到的位置：', roadResult.display_name);
+      console.log('================================');
 
       return true;
     } catch (error) {
-      console.error('地址轉換經緯度失敗：', error);
+      console.error('道路搜尋失敗：', error);
+      console.log('================================');
 
       return false;
     }
@@ -481,11 +619,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // 將地址轉換成經緯度
+    // =========================================================
+    // 地址 → 經緯度
+    // =========================================================
     const addressSuccess = await this.getCoordinatesFromAddress(this.demand.address);
 
     if (!addressSuccess) {
       alert('無法找到此地址的位置，請確認地址是否正確。');
+
       return;
     }
 
@@ -503,7 +644,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     const conditionLabels: (keyof DisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
 
     // 處理接受物資需求狀態
-    // 只有有設定接受或不接受才加入
     conditionLabels.forEach((key) => {
       const status = this.demand.conditions[key];
 
@@ -515,7 +655,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     });
 
     // 處理其它物資需求狀態
-    // 只加入有填寫的內容
     this.demand.customConditions.forEach((condition) => {
       const value = condition.trim();
 
@@ -532,6 +671,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       const originalItem = this.disasterDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
 
       const originalStatus = originalItem?.status;
+
       const originalOffShelfReason = originalItem?.offShelfReason;
 
       const originalPublishedAt = originalItem?.publishedAt;
@@ -577,17 +717,15 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
       // 處理隱藏狀態
       else if (this.demand.status === '隱藏') {
-        // 隱藏後視為尚未上架
         this.demand.publishedAt = undefined;
+
         this.demand.expectedOffShelfAt = undefined;
 
-        // 隱藏不是手動下架
         this.demand.offShelfReason = undefined;
       }
 
       // 處理下架狀態
       else if (this.demand.status === '下架') {
-        // 原本手動下架或這次確認下架時保留原本的下架時間
         if (!this.demand.offShelfReason) {
           this.demand.offShelfReason = 'manual';
         }
@@ -613,7 +751,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     // 新增模式
     else {
-      // 按下發布需求的時間
       const createdDate = new Date();
 
       // 記錄發布日期
@@ -621,18 +758,16 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
       // 新增時選擇上架
       if (this.demand.status === '上架') {
-        // 上架日期等於發布日期
         this.demand.publishedAt = createdDate.toISOString();
 
-        // 計算預計下架日期
         this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, this.demand.priority);
 
-        // 新增上架不應該有下架原因
         this.demand.offShelfReason = undefined;
       } else {
-        // 隱藏時尚未上架
         this.demand.publishedAt = undefined;
+
         this.demand.expectedOffShelfAt = undefined;
+
         this.demand.offShelfReason = undefined;
       }
 
@@ -792,14 +927,18 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     // 限制最多五張圖片
     if (this.imageFiles.length >= 5) {
       alert('最多只能上傳 5 張圖片');
+
       input.value = '';
+
       return;
     }
 
     // 限制圖片大小為五 MB
     if (file.size > 5 * 1024 * 1024) {
       alert('圖片大小不可超過 5MB');
+
       input.value = '';
+
       return;
     }
 
