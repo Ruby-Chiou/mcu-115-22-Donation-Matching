@@ -6,6 +6,15 @@ import { VolunteerDemandService } from '../../../../core/services/agency-volunte
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 import { VolunteerOnShelfComponent } from '../../../modal/shelf/volunteer-on-shelf/volunteer-on-shelf.component';
 import { VolunteerOffShelfComponent } from '../../../modal/shelf/volunteer-off-shelf/volunteer-off-shelf.component';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+
+// Nominatim 回傳資料格式
+interface NominatimSearchResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
 
 @Component({
   selector: 'app-volunteer-form',
@@ -17,8 +26,10 @@ import { VolunteerOffShelfComponent } from '../../../modal/shelf/volunteer-off-s
 export class VolunteerFormComponent implements OnInit {
   // 是否為編輯模式
   isEditMode: boolean = false;
+
   // 是否顯示取消編輯確認視窗
   showCancelModal = false;
+
   // 是否顯示儲存成功視窗
   showSuccessModal = false;
   successMessage = '';
@@ -40,14 +51,18 @@ export class VolunteerFormComponent implements OnInit {
 
   // 編輯中的需求 ID
   editId: number | null = null;
+
   // 有錯誤的欄位
   invalidFields: string[] = [];
+
   // 志工需求資料
   demand: VolunteerDemand = {
     serialNo: 0,
     type: '',
     people: null,
     location: '',
+    latitude: undefined,
+    longitude: undefined,
     condition: '',
     workContent: '',
     reason: '',
@@ -65,7 +80,8 @@ export class VolunteerFormComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private volunteerDemandService: VolunteerDemandService
+    private volunteerDemandService: VolunteerDemandService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -80,10 +96,65 @@ export class VolunteerFormComponent implements OnInit {
     }
   }
 
+  // ==========================================
+  // 地址轉換成經緯度
+  // ==========================================
+
+  async getCoordinatesFromAddress(location: string, demand: VolunteerDemand): Promise<boolean> {
+    const url = 'https://nominatim.openstreetmap.org/search';
+
+    // 原本城市碼不變
+    const params = {
+      q: `${location}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+
+      // 找不到地址
+      if (!results || results.length === 0) {
+        return false;
+      }
+
+      const result = results[0];
+
+      const latitude = Number(result.lat);
+      const longitude = Number(result.lon);
+
+      // 確認經緯度是有效數字
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return false;
+      }
+
+      // 寫入需求資料
+      demand.latitude = latitude;
+      demand.longitude = longitude;
+
+      // 開發測試用
+      console.log('地址：', location.trim());
+      console.log('轉換後緯度：', demand.latitude);
+      console.log('轉換後經度：', demand.longitude);
+      console.log('Nominatim 找到的位置：', result.display_name);
+
+      return true;
+    } catch (error) {
+      console.error('地址轉換經緯度失敗：', error);
+      return false;
+    }
+  }
+
+  // ==========================================
   // 載入要編輯的資料
+  // ==========================================
+
   loadEditDemand(id: number): void {
     const demands = this.volunteerDemandService.getDemands();
+
     const target = demands.find((demand) => demand.serialNo === id);
+
     if (!target) {
       alert('找不到這筆志工需求');
       this.router.navigate(['/agency/disaster']);
@@ -101,17 +172,25 @@ export class VolunteerFormComponent implements OnInit {
       publishedAt: target.publishedAt,
       expectedOffShelfAt: target.expectedOffShelfAt,
       offShelfReason: target.offShelfReason,
+      latitude: target.latitude,
+      longitude: target.longitude,
     };
 
     console.log('目前編輯資料：', this.demand);
   }
 
+  // ==========================================
   // 判斷目前需求是否為手動下架
+  // ==========================================
+
   isManualOffShelf(): boolean {
     return this.isEditMode && this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
   }
 
+  // ==========================================
   // 點擊公開狀態
+  // ==========================================
+
   onStatusClick(event: MouseEvent, newStatus: VolunteerDemand['status']): void {
     // 手動下架的需求不能重新上架
     if (newStatus === '上架' && this.isManualOffShelf()) {
@@ -130,7 +209,10 @@ export class VolunteerFormComponent implements OnInit {
     this.onStatusSelect(newStatus);
   }
 
+  // ==========================================
   // 狀態選擇
+  // ==========================================
+
   onStatusSelect(newStatus: VolunteerDemand['status']): void {
     // 新增模式不需要處理原本手動下架的限制
     if (!this.isEditMode) {
@@ -198,7 +280,10 @@ export class VolunteerFormComponent implements OnInit {
     }
   }
 
+  // ==========================================
   // 使用者取消手動下架
+  // ==========================================
+
   cancelManualOffShelf(): void {
     this.showOffShelfWarning = false;
     this.pendingStatus = undefined;
@@ -206,7 +291,10 @@ export class VolunteerFormComponent implements OnInit {
     this.demand.status = this.originalStatus;
   }
 
+  // ==========================================
   // 使用者選擇改為隱藏
+  // ==========================================
+
   hideInsteadOfOffShelf(): void {
     this.showOffShelfWarning = false;
     this.pendingStatus = undefined;
@@ -218,7 +306,10 @@ export class VolunteerFormComponent implements OnInit {
     this.demand.offShelfReason = undefined;
   }
 
+  // ==========================================
   // 使用者確認手動下架
+  // ==========================================
+
   confirmManualOffShelf(): void {
     this.showOffShelfWarning = false;
     this.pendingStatus = undefined;
@@ -234,7 +325,10 @@ export class VolunteerFormComponent implements OnInit {
     this.demand.expectedOffShelfAt = now.toISOString();
   }
 
+  // ==========================================
   // 關閉無法重新上架視窗
+  // ==========================================
+
   closeOnShelfWarning(): void {
     this.showOnShelfWarning = false;
 
@@ -245,10 +339,14 @@ export class VolunteerFormComponent implements OnInit {
     }
   }
 
-  // 判斷欄位是否需要紅框
+  // ==========================================
+  // 人數限制
+  // ==========================================
+
   limitPeopleInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const people = Number(input.value);
+
     if (people > 500) {
       input.value = '500';
       this.demand.people = 500;
@@ -260,37 +358,56 @@ export class VolunteerFormComponent implements OnInit {
       this.demand.people = null;
       return;
     }
+
     const people = Number(value);
+
     this.demand.people = Number.isNaN(people) ? null : Math.min(500, Math.max(1, people));
   }
+
+  // ==========================================
+  // 判斷欄位是否需要紅框
+  // ==========================================
+
   isInvalid(field: string): boolean {
     if (!this.invalidFields.includes(field)) {
       return false;
     }
+
     switch (field) {
       case 'type':
         return !this.demand.type;
+
       case 'people':
         return !this.demand.people || this.demand.people < 1 || this.demand.people > 500;
+
       case 'location':
         return !this.demand.location.trim();
+
       case 'condition':
         return !this.demand.condition.trim();
+
       case 'workContent':
         return !this.demand.workContent.trim();
+
       case 'reason':
         return !this.demand.reason.trim();
+
       case 'contact':
         return !this.demand.contact.trim();
+
       case 'phone':
         return !this.demand.phone.trim();
+
       default:
         return false;
     }
   }
 
+  // ==========================================
   // 儲存 / 發布
-  onPublish(): void {
+  // ==========================================
+
+  async onPublish(): Promise<void> {
     // 清除之前錯誤
     this.invalidFields = [];
 
@@ -298,24 +415,31 @@ export class VolunteerFormComponent implements OnInit {
     if (!this.demand.type) {
       this.invalidFields.push('type');
     }
+
     if (!this.demand.people || this.demand.people < 1 || this.demand.people > 500) {
       this.invalidFields.push('people');
     }
+
     if (!this.demand.location.trim()) {
       this.invalidFields.push('location');
     }
+
     if (!this.demand.condition.trim()) {
       this.invalidFields.push('condition');
     }
+
     if (!this.demand.workContent.trim()) {
       this.invalidFields.push('workContent');
     }
+
     if (!this.demand.reason.trim()) {
       this.invalidFields.push('reason');
     }
+
     if (!this.demand.contact.trim()) {
       this.invalidFields.push('contact');
     }
+
     if (!this.demand.phone.trim()) {
       this.invalidFields.push('phone');
     }
@@ -324,19 +448,35 @@ export class VolunteerFormComponent implements OnInit {
     if (this.invalidFields.length > 0) {
       setTimeout(() => {
         const firstInvalid = document.querySelector('.invalid-field') as HTMLElement;
+
         if (firstInvalid) {
           firstInvalid.scrollIntoView({
             behavior: 'smooth',
             block: 'center',
           });
+
           firstInvalid.focus();
         }
       }, 0);
+
       return;
     }
 
+    // ==========================================
+    // 地址轉換經緯度
+    // ==========================================
+
+    const addressSuccess = await this.getCoordinatesFromAddress(this.demand.location, this.demand);
+
+    if (!addressSuccess) {
+      alert('無法找到此地址的位置，請確認地址是否正確。');
+      return;
+    }
+
+    // ==========================================
     // 編輯模式
-    // 編輯模式
+    // ==========================================
+
     if (this.isEditMode) {
       const originalItem = this.volunteerDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
 
@@ -411,12 +551,16 @@ export class VolunteerFormComponent implements OnInit {
       console.log('修改後的志工需求：', this.demand);
 
       this.successMessage = '志工需求修改成功！';
+
       this.showSuccessModal = true;
 
       return;
     }
 
+    // ==========================================
     // 新增模式
+    // ==========================================
+
     const createdDate = new Date();
 
     const newDemand: VolunteerDemand = {
@@ -449,16 +593,26 @@ export class VolunteerFormComponent implements OnInit {
     console.log('新增志工需求：', newDemand);
 
     this.successMessage = '志工需求發布成功！';
+
     this.showSuccessModal = true;
   }
 
+  // ==========================================
+  // 取得下一個需求編號
+  // ==========================================
+
   private getNextDemandId(): number {
     const demands = this.volunteerDemandService.getDemands();
+
     const maxId = demands.reduce((currentMax, demand) => Math.max(currentMax, demand.serialNo), 0);
+
     return maxId + 1;
   }
 
+  // ==========================================
   // 計算預計下架日期
+  // ==========================================
+
   calculateExpectedOffShelfDate(publishedDate: Date, priority: VolunteerDemand['priority']): string {
     const offShelfDate = new Date(publishedDate);
 
@@ -479,21 +633,28 @@ export class VolunteerFormComponent implements OnInit {
     return offShelfDate.toISOString();
   }
 
+  // ==========================================
   // 取消
+  // ==========================================
+
   onCancel(): void {
     if (this.isEditMode) {
       this.showCancelModal = true;
       return;
     }
+
     this.router.navigate(['/agency/disaster']);
   }
+
   closeCancelModal(): void {
     this.showCancelModal = false;
   }
+
   confirmCancel(): void {
     this.showCancelModal = false;
     this.router.navigate(['/agency/disaster']);
   }
+
   closeSuccessModal(): void {
     this.showSuccessModal = false;
     this.router.navigate(['/agency/disaster']);
