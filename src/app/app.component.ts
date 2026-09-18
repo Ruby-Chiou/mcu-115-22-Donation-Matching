@@ -1,6 +1,6 @@
 import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-
+import { ThanksMarqueeComponent } from './components/carousel/thanks-marquee/thanks-marquee.component';
 import { HeaderComponent } from './components/layout/header/header.component'; // 引入導覽列
 import { FooterComponent } from './components/layout/footer/footer.component';
 import { DisasterClosedModalService } from './core/services/disaster-closed-modal.service';
@@ -8,7 +8,7 @@ import { DisasterControlService } from './core/services/disaster-control.service
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent, FooterComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, ThanksMarqueeComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

@@ -19,16 +19,29 @@
     flex: 7;
     background-color: var(--bg-layer-1);
     border-radius: var(--border-radius-main);
-    padding: 30px;
+    padding: 30px 40px;
     border: 1px solid var(--border-default);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 
     .section-title {
-      font-size: 24px;
-      color: var(--color-text-main);
-      margin-top: 0;
-      margin-bottom: 25px;
-      font-weight: 600;
+      display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 26px;
+  color: var(--color-text-main);
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-weight: 600;
+
+  i {
+     color: var(--color-brand-primary);
+  font-size: 26px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transform: translateY(2px);
+  }
     }
 
 
@@ -117,7 +130,7 @@
 
     background-color: var(--bg-layer-2);
     border-radius: var(--border-radius-main);
-    padding: 40px 20px;
+    padding: 20px 20px;
 
     border: 1px solid var(--border-default);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
@@ -125,27 +138,27 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 35px;
+    gap: 10px;
 
 
 
     // 每一列
 
     .sidebar-row {
-      flex: 1;
+  flex: 1;
 
-      display: flex;
-      align-items: center;
-      gap: 12px;
+  display: flex;
+  align-items: center;
 
-      padding: 15px;
+  min-height: 115px;
 
-      background-color: var(--color-white);
-      border-radius: 25px;
+  padding: 1px 16px;
 
-      min-height: 100px;
-    }
+  background-color: var(--color-white);
+  border-radius: 25px;
 
+  box-sizing: border-box;
+}
 
 
     // 左側說明文字
@@ -161,104 +174,62 @@
 
 
 
-    // 圓形功能按鈕
 
-    .circle-button {
-      width: 88px;
-      height: 88px;
 
-      flex-shrink: 0;
+    // ==========================================
+// 右側按鈕區
+// ==========================================
+.sidebar-buttons {
+  width: 60%;
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-      border-radius: 50%;
 
-      background-color: var(--color-brand-primary);
-      color: var(--color-white);
+// ==========================================
+// 按鈕
+// ==========================================
+.sidebar-button {
+  text-decoration: none !important;
+  width: 100%;
+  min-height: 64px;
 
-      text-decoration: none;
-      text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-      font-size: 18px;
-      font-weight: 600;
-      line-height: 1.3;
+  padding: 10px 12px;
 
-      transition:
-        transform 0.2s ease,
-        background-color 0.2s ease;
+  border-radius: 18px;
 
-      &:hover {
-        transform: translateY(-3px) scale(1.15);
-        background-color: var(--color-brand-primary);
-      }
-    }
+  background-color: var(--color-brand-primary);
+  color: var(--color-white);
+
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.04);
+    background-color: #0b57b5;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+}
   }
 }
 
 // 平台公告
 
-.platform-announcements {
-  max-width: 1200px;
-  margin: 30px auto 50px;
-  border: 1px solid #333;
-  background-color: var(--color-white);
-  overflow: hidden;
 
-  // 上方「平台公告」標題列
-  .announcement-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    height: 55px;
-    padding: 0 20px;
-
-    background-color: var(--bg-layer-1);
-    border-bottom: 2px solid #333;
-
-    font-size: 24px;
-    font-weight: 500;
-    color: var(--color-text-main);
-
-    i {
-      font-size: 25px;
-    }
-  }
-
-  // 公告內容區
-  .announcement-list {
-    padding: 18px 22px 20px;
-  }
-
-  // 每一則公告
-  .announcement-item {
-    display: flex;
-    align-items: center;
-    min-height: 55px;
-    padding: 8px 0;
-
-    border-bottom: 3px dotted #333;
-
-    font-size: 16px;
-    color: var(--color-text-main);
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    .announcement-date {
-      flex: 0 0 75px;
-      font-weight: 600;
-    }
-
-    .announcement-text {
-      flex: 1;
-      line-height: 1.6;
-    }
-  }
-}
 
 // 平台公告
 
@@ -280,18 +251,18 @@
     gap: 12px;
 
     height: 55px;
-    padding: 0 20px;
+    padding: 0 40px;
 
     background-color: var(--bg-layer-1);
     border-bottom: 1px solid var(--border-default);
 
     color: var(--color-text-main);
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 600;
 
     i {
       color: var(--color-brand-primary);
-      font-size: 24px;
+      font-size: 26px;
     }
   }
 

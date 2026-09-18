@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
 
 @Component({
   selector: 'app-header',
@@ -8,6 +9,12 @@ import { RouterLink } from '@angular/router';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
+    isHeaderHidden = false;
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.isHeaderHidden = window.scrollY > 70;
+  }
   navItems = [
     {
       name: '捐助專區',
