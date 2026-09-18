@@ -1,12 +1,20 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../../models/agency/disaster-demand';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
+
+interface NominatimSearchResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
 
 @Component({
   selector: 'app-supply-batch-edit',
@@ -52,7 +60,8 @@ export class SupplyBatchEditComponent implements OnInit {
 
   constructor(
     private service: DisasterDemandService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   async base64ToFile(base64: string, fileName: string): Promise<File> {
@@ -83,6 +92,8 @@ export class SupplyBatchEditComponent implements OnInit {
     if (data) {
       this.editDemands = JSON.parse(data).map((item: any) => ({
         ...item,
+
+        // 經緯度
         latitude: item.latitude,
         longitude: item.longitude,
 
@@ -166,6 +177,55 @@ export class SupplyBatchEditComponent implements OnInit {
     console.log('批次修改資料:', this.editDemands);
   }
 
+  // =========================================================
+  // 地址轉換成經緯度
+  // =========================================================
+  async getCoordinatesFromAddress(address: string, demand: EditableDisasterDemand): Promise<boolean> {
+    const url = 'https://nominatim.openstreetmap.org/search';
+
+    const params = {
+      // 原本的城市 / 國家寫法保持不變
+      q: `${address}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+
+      // 沒有找到地址
+      if (!results || results.length === 0) {
+        return false;
+      }
+
+      const result = results[0];
+
+      const latitude = Number(result.lat);
+      const longitude = Number(result.lon);
+
+      // 檢查經緯度是否為有效數字
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return false;
+      }
+
+      // 寫回目前正在批次編輯的資料
+      demand.latitude = latitude;
+      demand.longitude = longitude;
+
+      console.log('地址：', address.trim());
+      console.log('轉換後緯度：', demand.latitude);
+      console.log('轉換後經度：', demand.longitude);
+      console.log('Nominatim 找到的位置：', result.display_name);
+
+      return true;
+    } catch (error) {
+      console.error('地址轉換經緯度失敗：', error);
+
+      return false;
+    }
+  }
+
   // 設定聯絡時間
   setContactTimeDifferent(demand: EditableDisasterDemand, different: boolean): void {
     demand.contactTimeDifferent = different;
@@ -187,6 +247,7 @@ export class SupplyBatchEditComponent implements OnInit {
     const originalItem = this.service.getDemands().find((item) => item.serialNo === demand.serialNo);
 
     const originalStatus = originalItem?.status ?? demand.status;
+
     const originalOffShelfReason = originalItem?.offShelfReason;
 
     return originalStatus === '下架' && originalOffShelfReason === 'manual';
@@ -366,7 +427,6 @@ export class SupplyBatchEditComponent implements OnInit {
   onRemainingChange(demand: any) {
     if (demand.amount !== undefined && demand.amount !== null && demand.amount !== '') {
       const maxAmount = Number(demand.amount);
-
       const currentRemaining = Number(demand.remaining);
 
       if (!isNaN(maxAmount) && !isNaN(currentRemaining)) {
@@ -423,7 +483,7 @@ export class SupplyBatchEditComponent implements OnInit {
       return;
     }
 
-    // 有選取文字時允許輸入，因為會取代選取內容
+    // 有選取文字時允許輸入
     const selectionLength = input.selectionEnd! - input.selectionStart!;
 
     // 已達最高字數且沒有選取任何文字時禁止輸入
@@ -496,7 +556,9 @@ export class SupplyBatchEditComponent implements OnInit {
     }
   }
 
+  // =========================================================
   // 儲存全部資料
+  // =========================================================
   async saveAll() {
     // 清除舊錯誤並檢查必填欄位
     this.editDemands.forEach((item) => {
@@ -611,8 +673,10 @@ export class SupplyBatchEditComponent implements OnInit {
       item.conditionDescription = conditionParts.join('、');
     });
 
+    // =====================================================
     // 儲存每一筆資料
-    this.editDemands.forEach((item) => {
+    // =====================================================
+    for (const item of this.editDemands) {
       // 清除空白自訂欄位
       item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
 
@@ -631,7 +695,9 @@ export class SupplyBatchEditComponent implements OnInit {
 
       const now = new Date();
 
+      // ===================================================
       // 處理上架狀態
+      // ===================================================
       if (item.status === '上架') {
         // 手動下架禁止重新上架
         if (originalStatus === '下架' && originalOffShelfReason === 'manual') {
@@ -651,7 +717,7 @@ export class SupplyBatchEditComponent implements OnInit {
             item.publishedAt = originalPublishedAt;
           }
 
-          return;
+          continue;
         }
 
         // 處理可以重新上架的資料
@@ -675,7 +741,9 @@ export class SupplyBatchEditComponent implements OnInit {
         item.offShelfReason = undefined;
       }
 
+      // ===================================================
       // 處理隱藏狀態
+      // ===================================================
       else if (item.status === '隱藏') {
         // 隱藏後視為尚未上架
         item.publishedAt = undefined;
@@ -686,7 +754,9 @@ export class SupplyBatchEditComponent implements OnInit {
         item.offShelfReason = undefined;
       }
 
+      // ===================================================
       // 處理下架狀態
+      // ===================================================
       else if (item.status === '下架') {
         // 儲存時不要重新產生下架時間
         if (!item.offShelfReason) {
@@ -704,9 +774,25 @@ export class SupplyBatchEditComponent implements OnInit {
         }
       }
 
+      // ===================================================
+      // 地址 → 經緯度
+      // ===================================================
+      const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
+
+      // 地址找不到就不儲存這一筆
+      if (!addressSuccess) {
+        alert(`需求編號 ${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
+
+        return;
+      }
+
+      console.log(`需求編號 ${item.serialNo} 經緯度：`, item.latitude, item.longitude);
+
+      // ===================================================
       // 更新 Service
+      // ===================================================
       this.service.updateDemand(item);
-    });
+    }
 
     // 清除批次編輯暫存資料
     localStorage.removeItem('editDemands');

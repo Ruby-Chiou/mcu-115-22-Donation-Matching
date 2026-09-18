@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
@@ -7,6 +8,13 @@ import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 import { DisasterDemand, ConditionStatus } from '../../../../models/agency/disaster-demand';
+import { firstValueFrom } from 'rxjs';
+
+interface NominatimSearchResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
 
 @Component({
   selector: 'app-supply-form',
@@ -125,13 +133,15 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     private disasterDemandService: DisasterDemandService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
     const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
+
     this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
 
     // 編輯模式
@@ -207,7 +217,9 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     const response = await fetch(base64);
     const blob = await response.blob();
 
-    return new File([blob], fileName, { type: blob.type });
+    return new File([blob], fileName, {
+      type: blob.type,
+    });
   }
 
   // 點擊類別下拉選單以外的地方時關閉
@@ -373,6 +385,48 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // 使用 Nominatim 將地址轉換成經緯度
+  async getCoordinatesFromAddress(address: string): Promise<boolean> {
+    const url = 'https://nominatim.openstreetmap.org/search';
+
+    // 原本的城市／國家設定維持不變
+    const params = {
+      q: `${address}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+
+      if (!results || results.length === 0) {
+        return false;
+      }
+
+      const result = results[0];
+
+      this.demand.latitude = Number(result.lat);
+      this.demand.longitude = Number(result.lon);
+
+      // 確認經緯度真的有成功取得
+      if (!Number.isFinite(this.demand.latitude) || !Number.isFinite(this.demand.longitude)) {
+        return false;
+      }
+
+      console.log('地址：', address);
+      console.log('轉換後緯度：', this.demand.latitude);
+      console.log('轉換後經度：', this.demand.longitude);
+      console.log('Nominatim 找到的位置：', result.display_name);
+
+      return true;
+    } catch (error) {
+      console.error('地址轉換經緯度失敗：', error);
+
+      return false;
+    }
+  }
+
   async save() {
     this.submitted = true;
 
@@ -424,6 +478,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         });
       }
 
+      return;
+    }
+
+    // 將地址轉換成經緯度
+    const addressSuccess = await this.getCoordinatesFromAddress(this.demand.address);
+
+    if (!addressSuccess) {
+      alert('無法找到此地址的位置，請確認地址是否正確。');
       return;
     }
 
@@ -683,6 +745,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     if (field === 'remaining') {
       if (value !== null && this.demand.amount !== null && value > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
+
         input.value = this.demand.amount.toString();
       } else {
         this.demand.remaining = value;
