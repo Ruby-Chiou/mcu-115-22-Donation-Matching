@@ -503,11 +503,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       await this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
-        this.router.navigate(['/agency/supply-detail', this.demand.serialNo], {
-          queryParams: {
-            number: this.listNumber,
-          },
-        });
+        this.router.navigate(['/agency/supply-detail', this.demand.id]);
       } else {
         this.router.navigate(['/agency/disaster']);
       }
