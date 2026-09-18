@@ -10,45 +10,46 @@
           感謝您的愛心，請填寫以下捐贈資料
         </p>
       </div>
-      <div class="material-image">
-        @if (demand) {
+      <div class="material-info">
+        <div class="material-image">
+          @if (demand) {
 
-          <!-- 優先度 -->
-          <span
-            class="tag priority-tag"
-            [ngClass]="getPriorityClass(demand.priority)"
-          >
-            {{ demand.priority }}
-          </span>
+            <!-- 優先度 -->
+            <span
+              class="tag priority-tag"
+              [ngClass]="getPriorityClass(demand.priority)"
+            >
+              {{ demand.priority }}
+            </span>
 
-          <!-- 圖片 -->
-          @if (demand.image && demand.image.length > 0) {
+            <!-- 圖片 -->
+            @if (demand.image && demand.image.length > 0) {
 
-            <img
-              [src]="
-                demand.image[0]
-                || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
-              "
-              [alt]="demand.item || '物資圖片'"
-            />
+              <img
+                [src]="
+                  demand.image[0]
+                  || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'
+                "
+                [alt]="demand.item || '物資圖片'"
+              />
+
+            } @else {
+
+              <div class="no-image">
+                尚未提供圖片
+              </div>
+
+            }
 
           } @else {
 
             <div class="no-image">
-              尚未提供圖片
+              載入中...
             </div>
 
           }
-
-        } @else {
-
-          <div class="no-image">
-            載入中...
-          </div>
-
-        }
-      </div>
-                <div class="material-text">
+        </div>
+        <div class="material-text">
           <span class="label">
             捐助物資
           </span>
@@ -58,10 +59,11 @@
           <p>
             接收地址：
             <strong>
-               {{ demand?.address }}
+              {{ demand?.address }}
             </strong>
           </p>
         </div>
+      </div>
       <div class="section-title-row">
         <div class="section-title">
           <span>1</span>
@@ -242,7 +244,7 @@
       <div class="success-page">
         <!-- 成功圖示 -->
         <div class="success-icon">
-          ✓
+          <i class="fa-solid fa-check"></i>
         </div>
         <h1>
           捐贈申請成功

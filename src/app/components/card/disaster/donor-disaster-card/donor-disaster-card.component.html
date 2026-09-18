@@ -18,7 +18,7 @@
             class="image-arrow previous"
             (click)="previousImage($event)"
           >
-            ‹
+            <i class="fa-solid fa-less-than"></i>
           </button>
         }
         <!-- 圖片 -->
@@ -42,7 +42,7 @@
             class="image-arrow next"
             (click)="nextImage($event)"
           >
-            ›
+            <i class="fa-solid fa-greater-than"></i>
           </button>
         }
       </div>
@@ -73,7 +73,7 @@
         [class.very-urgent]="volunteer?.priority === '非常緊急'"
         [class.normal]="volunteer?.priority === '普通'"
       >
-        ● {{ volunteer?.priority }}需求
+        {{ volunteer?.priority }}
       </div>
       <p class="organization">
         需求單位：
