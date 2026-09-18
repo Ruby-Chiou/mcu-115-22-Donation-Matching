@@ -61,7 +61,7 @@ export class VolunteerBatchEditComponent implements OnInit {
     }
   }
 
-  saveAll(): void {
+  async saveAll(): Promise<void> {
     // 找出有勾選的資料
     const selectedDemands = this.editDemands.filter((demand) => demand.selected);
 
@@ -129,10 +129,24 @@ export class VolunteerBatchEditComponent implements OnInit {
     );
 
     // 只更新勾選的資料
-    this.volunteerDemandService.updateBatchDemands(cleanDemands);
-    // 重新載入資料
-    this.loadDataFromService();
-    this.router.navigate(['/agency/disaster']);
+    try {
+      // 關鍵：等待所有志工需求資料更新完成。
+      await this.volunteerDemandService.updateBatchDemands(cleanDemands);
+
+      // 更新已完成，不需要再載入原本的 localStorage 暫存資料。
+      localStorage.removeItem('editVolunteerDemands');
+
+      // 確認資料庫寫入完成後，才回到志工需求列表。
+      await this.router.navigate(['/agency/disaster'], {
+        queryParams: {
+          refresh: Date.now(),
+        },
+      });
+    } catch (error) {
+      console.error('批次修改志工需求失敗：', error);
+
+      alert('批次修改失敗，請確認網路、Supabase 權限或資料格式。');
+    }
   }
 
   cancel(): void {

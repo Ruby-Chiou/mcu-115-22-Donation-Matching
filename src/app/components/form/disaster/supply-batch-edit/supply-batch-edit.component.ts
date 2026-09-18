@@ -460,223 +460,152 @@ export class SupplyBatchEditComponent implements OnInit {
   }
 
   // 儲存全部資料
-  saveAll() {
-    // 清除舊錯誤並檢查必填欄位
-    this.editDemands.forEach((item) => {
-      item.itemError = false;
-      item.amountError = false;
-      item.unitError = false;
-      item.reasonError = false;
-      item.descriptionError = false;
-      item.addressError = false;
-      item.phoneError = false;
-      item.remainingError = false;
+  async saveAll(): Promise<void>  {
+    // 儲存每一筆資料
+try {
+  for (const item of this.editDemands) {
+    // 清除空白自訂欄位
+    item.customConditions =
+      item.customConditions.filter(
+        (condition) =>
+          condition.trim() !== ''
+      );
 
-      item.categoryError = false;
-
-      if (!item.item) {
-        item.itemError = true;
-      }
-
-      if (!item.amount || isNaN(Number(item.amount))) {
-        item.amountError = true;
-      }
-
-      if (!item.unit || !item.unit.trim()) {
-        item.unitError = true;
-      }
-
-      if (item.remaining === undefined || item.remaining === null) {
-        item.remainingError = true;
-      }
-
-      if (Number(item.remaining) < 0) {
-        item.remainingError = true;
-      }
-
-      if (!item.reason) {
-        item.reasonError = true;
-      }
-
-      if (!item.description) {
-        item.descriptionError = true;
-      }
-
-      if (!item.category) {
-        item.categoryError = true;
-      }
-
-      if (!item.address) {
-        item.addressError = true;
-      }
-
-      if (!item.phone) {
-        item.phoneError = true;
-      }
-    });
-
-    // 判斷是否有錯誤
-    const invalid = this.editDemands.some(
-      (item) =>
-        item.itemError ||
-        item.amountError ||
-        item.unitError ||
-        item.reasonError ||
-        item.descriptionError ||
-        item.categoryError ||
-        item.addressError ||
-        item.phoneError ||
-        item.remainingError
-    );
-
-    if (invalid) {
-      this.scrollToFirstError();
-      return;
+    // 至少保留一個輸入框
+    if (item.customConditions.length === 0) {
+      item.customConditions.push('');
     }
 
-    // 整理物資狀態
-    this.editDemands.forEach((item) => {
-      if (!item.conditions) {
-        item.conditions = {
-          全新: '',
-          二手: '',
-          有擦痕: '',
-          過期: '',
-          毀損: '',
-        };
-      }
+    const originalItem =
+      this.service
+        .getDemands()
+        .find(
+          (demand) =>
+            demand.serialNo === item.serialNo
+        );
 
-      const conditionParts: string[] = [];
+    const originalStatus =
+      originalItem?.status;
 
-      const conditionLabels: (keyof EditableDisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
+    const originalOffShelfReason =
+      originalItem?.offShelfReason;
 
-      // 處理接受物資需求狀態
-      conditionLabels.forEach((key) => {
-        const status = item.conditions[key];
+    const originalPublishedAt =
+      originalItem?.publishedAt;
 
-        if (status === '接受') {
-          conditionParts.push(`${key}✔`);
-        } else if (status === '不接受') {
-          conditionParts.push(`${key}✘`);
-        }
-      });
+    const now = new Date();
 
-      // 處理其它物資需求狀態
-      item.customConditions.forEach((condition) => {
-        const value = condition.trim();
+    // 處理上架狀態
+    if (item.status === '上架') {
+      // 手動下架禁止重新上架
+      if (
+        originalStatus === '下架' &&
+        originalOffShelfReason === 'manual'
+      ) {
+        alert(
+          `需求編號 ${item.serialNo} 為使用者主動下架，無法重新上架。`
+        );
 
-        if (value) {
-          conditionParts.push(value);
-        }
-      });
+        item.status = '下架';
+        item.offShelfReason = 'manual';
 
-      // 合併成資料庫使用的單一欄位
-      item.conditionDescription = conditionParts.join('、');
-    });
-
-    // 儲存每一筆資料
-    this.editDemands.forEach((item) => {
-      // 清除空白自訂欄位
-      item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
-
-      // 至少保留一個輸入框
-      if (item.customConditions.length === 0) {
-        item.customConditions.push('');
-      }
-
-      const originalItem = this.service.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
-      const originalStatus = originalItem?.status;
-
-      const originalOffShelfReason = originalItem?.offShelfReason;
-
-      const originalPublishedAt = originalItem?.publishedAt;
-
-      const now = new Date();
-
-      // 處理上架狀態
-      if (item.status === '上架') {
-        // 手動下架禁止重新上架
-        if (originalStatus === '下架' && originalOffShelfReason === 'manual') {
-          alert(`需求編號 ${item.serialNo} 為使用者主動下架，無法重新上架。`);
-
-          item.status = '下架';
-
-          item.offShelfReason = 'manual';
-
-          // 保留原本手動下架時間
-          if (originalItem?.expectedOffShelfAt) {
-            item.expectedOffShelfAt = originalItem.expectedOffShelfAt;
-          }
-
-          // 保留原本上架日期
-          if (originalPublishedAt) {
-            item.publishedAt = originalPublishedAt;
-          }
-
-          return;
-        }
-
-        // 處理可以重新上架的資料
-        if (originalStatus !== '上架') {
-          item.publishedAt = now.toISOString();
-
-          if (!item.createdAt) {
-            item.createdAt = now.toISOString();
-          }
-        } else if (originalPublishedAt) {
-          // 原本已上架時保留原本上架日期
-          item.publishedAt = originalPublishedAt;
-        }
-
-        // 依照優先度重新計算預計下架日期
-        if (item.publishedAt) {
-          item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
-        }
-
-        // 重新上架後清除下架原因
-        item.offShelfReason = undefined;
-      }
-
-      // 處理隱藏狀態
-      else if (item.status === '隱藏') {
-        // 隱藏後視為尚未上架
-        item.publishedAt = undefined;
-
-        item.expectedOffShelfAt = undefined;
-
-        // 隱藏不是下架
-        item.offShelfReason = undefined;
-      }
-
-      // 處理下架狀態
-      else if (item.status === '下架') {
-        // 儲存時不要重新產生下架時間
-        if (!item.offShelfReason) {
-          item.offShelfReason = 'manual';
+        // 保留原本手動下架時間
+        if (originalItem?.expectedOffShelfAt) {
+          item.expectedOffShelfAt =
+            originalItem.expectedOffShelfAt;
         }
 
         // 保留原本上架日期
         if (originalPublishedAt) {
-          item.publishedAt = originalPublishedAt;
+          item.publishedAt =
+            originalPublishedAt;
         }
 
-        // 如果沒有下架時間才補上
-        if (!item.expectedOffShelfAt) {
-          item.expectedOffShelfAt = now.toISOString();
-        }
+        // 注意：這裡不能用 return，
+        // 否則整個 saveAll() 會直接結束。
+        // 改為跳過這一筆，繼續處理下一筆。
+        continue;
       }
 
-      // 更新 Service
-      this.service.updateDemand(item);
-    });
+      // 從隱藏／自動下架重新上架時，重新設定上架日期。
+      if (originalStatus !== '上架') {
+        item.publishedAt =
+          now.toISOString();
 
-    // 清除批次編輯暫存資料
-    localStorage.removeItem('editDemands');
+        if (!item.createdAt) {
+          item.createdAt =
+            now.toISOString();
+        }
+      } else if (originalPublishedAt) {
+        // 原本已上架，保留原上架日期。
+        item.publishedAt =
+          originalPublishedAt;
+      }
 
-    // 回到災害需求列表
-    this.router.navigate(['/agency/disaster']);
+      if (item.publishedAt) {
+        item.expectedOffShelfAt =
+          this.calculateExpectedOffShelfDate(
+            new Date(item.publishedAt),
+            item.priority
+          );
+      }
+
+      item.offShelfReason = undefined;
+    }
+
+    // 處理隱藏狀態
+    else if (item.status === '隱藏') {
+      item.publishedAt = undefined;
+      item.expectedOffShelfAt = undefined;
+      item.offShelfReason = undefined;
+    }
+
+    // 處理下架狀態
+    else if (item.status === '下架') {
+      if (!item.offShelfReason) {
+        item.offShelfReason = 'manual';
+      }
+
+      // 保留先前上架日期。
+      if (originalPublishedAt) {
+        item.publishedAt =
+          originalPublishedAt;
+      }
+
+      // 沒有下架時間才新增。
+      if (!item.expectedOffShelfAt) {
+        item.expectedOffShelfAt =
+          now.toISOString();
+      }
+    }
+
+    // 關鍵：等待這一筆確實更新到 Supabase。
+    await this.service.updateDemand(item);
   }
+
+  // 全部資料成功更新後，才清除暫存。
+  localStorage.removeItem('editDemands');
+
+  // 所有更新完成後才返回災害需求列表。
+  await this.router.navigate(
+    ['/agency/disaster'],
+    {
+      queryParams: {
+        refresh: Date.now(),
+      },
+    }
+  );
+} catch (error) {
+  console.error(
+    '批次修改災害物資需求失敗：',
+    error
+  );
+
+  alert(
+    '批次修改失敗，請確認網路、Supabase 權限或資料格式。'
+  );
+}
+}
 
   // 捲動到第一個錯誤位置
   scrollToFirstError() {
