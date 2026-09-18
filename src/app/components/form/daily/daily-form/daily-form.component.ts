@@ -413,46 +413,158 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   }
 
   // =========================================================
+  // 從完整地址取得道路名稱
+  // =========================================================
+  private extractRoadName(address: string): string {
+    let roadAddress = address.trim().replace(/臺/g, '台').replace(/\s+/g, '');
+
+    // 移除縣市名稱
+    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+    // 移除區、鄉、鎮、縣轄市名稱
+    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+    // 移除門牌號碼及後面的內容
+    roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
+
+    return roadAddress.trim();
+  }
+
+  // =========================================================
   // 地址 → 經緯度
   // =========================================================
   async getCoordinatesFromAddress(address: string): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
 
-    const params = {
-      // 原本城市碼／台灣設定維持不變
-      q: `${address}, Taiwan`,
+    const originalAddress = address.trim();
+
+    // =========================================================
+    // 第一階段：先搜尋完整地址
+    // =========================================================
+    const searchAddresses: string[] = [
+      originalAddress,
+      originalAddress.replace(/臺/g, '台'),
+      originalAddress.replace(/號$/, ''),
+      originalAddress.replace(/臺/g, '台').replace(/號$/, ''),
+      originalAddress.replace(/\s+/g, ''),
+      originalAddress.replace(/臺/g, '台').replace(/\s+/g, ''),
+      originalAddress.replace(/臺/g, '台').replace(/號$/, '').replace(/\s+/g, ''),
+    ];
+
+    const uniqueAddresses = [...new Set(searchAddresses.filter((item) => item.length > 0))];
+
+    console.log('Nominatim 將先嘗試搜尋完整地址：', uniqueAddresses);
+
+    for (const searchAddress of uniqueAddresses) {
+      const params = {
+        // 原城市碼／台灣設定維持不變
+        q: `${searchAddress}, Taiwan`,
+        format: 'jsonv2',
+        limit: '1',
+        countrycodes: 'tw',
+      };
+
+      try {
+        console.log('Nominatim 搜尋完整地址：', searchAddress);
+
+        const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+
+        console.log('Nominatim 回傳結果：', results);
+
+        if (!results || results.length === 0) {
+          continue;
+        }
+
+        const result = results[0];
+
+        const latitude = Number(result.lat);
+        const longitude = Number(result.lon);
+
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+          console.warn('完整地址回傳的經緯度無效：', result);
+          continue;
+        }
+
+        this.demand.latitude = latitude;
+        this.demand.longitude = longitude;
+
+        console.log('--------------------------------');
+        console.log('Nominatim 完整地址搜尋成功');
+        console.log('原始地址：', address);
+        console.log('成功搜尋：', searchAddress);
+        console.log('轉換後緯度：', latitude);
+        console.log('轉換後經度：', longitude);
+        console.log('Nominatim 找到的位置：', result.display_name);
+        console.log('--------------------------------');
+
+        return true;
+      } catch (error) {
+        console.error(`Nominatim 搜尋完整地址失敗：${searchAddress}`, error);
+
+        // 繼續嘗試下一種完整地址格式
+        continue;
+      }
+    }
+
+    // =========================================================
+    // 第二階段：完整地址找不到 → 搜尋道路名稱
+    // =========================================================
+    const roadAddress = this.extractRoadName(originalAddress);
+
+    if (!roadAddress) {
+      console.warn('無法從地址取得道路名稱：', originalAddress);
+
+      return false;
+    }
+
+    console.log('完整地址全部找不到，改搜尋道路名稱：', roadAddress);
+
+    const roadParams = {
+      // 原城市碼／台灣設定維持不變
+      q: `${roadAddress}, Taiwan`,
       format: 'jsonv2',
       limit: '1',
       countrycodes: 'tw',
     };
 
     try {
-      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+      const roadResults = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params: roadParams }));
 
-      if (!results || results.length === 0) {
+      console.log('Nominatim 道路搜尋結果：', roadResults);
+
+      if (!roadResults || roadResults.length === 0) {
+        console.warn('道路名稱也找不到：', roadAddress);
+
         return false;
       }
 
-      const result = results[0];
+      const roadResult = roadResults[0];
 
-      const latitude = Number(result.lat);
-      const longitude = Number(result.lon);
+      const latitude = Number(roadResult.lat);
+      const longitude = Number(roadResult.lon);
 
       if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        console.warn('道路回傳的經緯度無效：', roadResult);
+
         return false;
       }
 
+      // 將道路座標寫入需求資料
       this.demand.latitude = latitude;
       this.demand.longitude = longitude;
 
-      console.log('地址：', address.trim());
-      console.log('轉換後緯度：', this.demand.latitude);
-      console.log('轉換後經度：', this.demand.longitude);
-      console.log('Nominatim 找到的位置：', result.display_name);
+      console.log('--------------------------------');
+      console.log('Nominatim 道路搜尋成功');
+      console.log('原始地址：', address);
+      console.log('道路名稱：', roadAddress);
+      console.log('道路座標緯度：', latitude);
+      console.log('道路座標經度：', longitude);
+      console.log('Nominatim 找到的位置：', roadResult.display_name);
+      console.log('--------------------------------');
 
       return true;
     } catch (error) {
-      console.error('地址轉換經緯度失敗：', error);
+      console.error(`Nominatim 道路搜尋失敗：${roadAddress}`, error);
 
       return false;
     }
