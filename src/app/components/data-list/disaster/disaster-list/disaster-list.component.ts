@@ -422,16 +422,22 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
       // 留言狀態
       if (this.selectedFilters.messageStatus.length > 0) {
+        // 留言篩選只套用在「已上架」
+        if (item.displayStatus !== '已上架') {
+          return false;
+        }
+
         const hasMsg = (item.messageCount || 0) > 0;
 
         const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
-
         const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
 
+        // 有回覆 → 留言數大於 0
         if (wantsReplied && !wantsNotReplied && !hasMsg) {
           return false;
         }
 
+        // 未回覆 → 留言數等於 0
         if (wantsNotReplied && !wantsReplied && hasMsg) {
           return false;
         }
