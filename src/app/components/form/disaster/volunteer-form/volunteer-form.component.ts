@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -26,6 +26,10 @@ interface NominatimSearchResult {
 export class VolunteerFormComponent implements OnInit {
   // 是否為編輯模式
   isEditMode: boolean = false;
+
+  // 是否正在儲存／發布
+  // 防止使用者連續點擊發布按鈕
+  isSaving: boolean = false;
 
   // 是否顯示取消編輯確認視窗
   showCancelModal = false;
@@ -81,7 +85,8 @@ export class VolunteerFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private volunteerDemandService: VolunteerDemandService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -103,21 +108,108 @@ export class VolunteerFormComponent implements OnInit {
   async getCoordinatesFromAddress(location: string, demand: VolunteerDemand): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
 
-    // 原本城市碼不變
+    // ==========================================
+    // 第一步：搜尋完整地址
+    // ==========================================
+
+    const searchAddress = location.trim();
+
     const params = {
-      q: `${location}, Taiwan`,
+      // 原本城市碼／台灣設定維持不變
+      q: `${searchAddress}, Taiwan`,
       format: 'jsonv2',
       limit: '1',
       countrycodes: 'tw',
     };
 
     try {
-      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+      let results = await firstValueFrom(
+        this.http.get<NominatimSearchResult[]>(url, {
+          params,
+        })
+      );
 
-      // 找不到地址
+      // ==========================================
+      // 完整地址找不到
+      // → 第二步：改搜尋道路名稱
+      // ==========================================
+
       if (!results || results.length === 0) {
-        return false;
+        let roadAddress = searchAddress.replace(/臺/g, '台').replace(/\s+/g, '');
+
+        // 移除「市／縣」以前的內容
+        roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+        // 移除「區／鄉／鎮／市」以前的內容
+        roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+        // 移除門牌號碼
+        // 例如：
+        // 重慶南路一段122號
+        // → 重慶南路一段
+        roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
+
+        roadAddress = roadAddress.trim();
+
+        console.log('完整地址找不到，改搜尋道路：', roadAddress);
+
+        // 確認確實有道路名稱
+        if (!roadAddress) {
+          return false;
+        }
+
+        // ==========================================
+        // 使用道路名稱重新搜尋
+        // ==========================================
+
+        const roadParams = {
+          // 原本城市碼／台灣設定維持不變
+          q: `${roadAddress}, Taiwan`,
+          format: 'jsonv2',
+          limit: '1',
+          countrycodes: 'tw',
+        };
+
+        results = await firstValueFrom(
+          this.http.get<NominatimSearchResult[]>(url, {
+            params: roadParams,
+          })
+        );
+
+        // 道路也找不到
+        if (!results || results.length === 0) {
+          return false;
+        }
+
+        const result = results[0];
+
+        const latitude = Number(result.lat);
+        const longitude = Number(result.lon);
+
+        // 確認經緯度是有效數字
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+          return false;
+        }
+
+        // ==========================================
+        // 寫入需求資料
+        // ==========================================
+
+        demand.latitude = latitude;
+        demand.longitude = longitude;
+
+        console.log('完整地址：', searchAddress);
+        console.log('完整地址找不到，使用道路名稱：', roadAddress);
+        console.log('轉換後緯度：', demand.latitude);
+        console.log('轉換後經度：', demand.longitude);
+        console.log('Nominatim 找到的位置：', result.display_name);
+
+        return true;
       }
+
+      // ==========================================
+      // 完整地址搜尋成功
+      // ==========================================
 
       const result = results[0];
 
@@ -129,12 +221,14 @@ export class VolunteerFormComponent implements OnInit {
         return false;
       }
 
+      // ==========================================
       // 寫入需求資料
+      // ==========================================
+
       demand.latitude = latitude;
       demand.longitude = longitude;
 
-      // 開發測試用
-      console.log('地址：', location.trim());
+      console.log('地址：', searchAddress);
       console.log('轉換後緯度：', demand.latitude);
       console.log('轉換後經度：', demand.longitude);
       console.log('Nominatim 找到的位置：', result.display_name);
@@ -157,7 +251,7 @@ export class VolunteerFormComponent implements OnInit {
 
     if (!target) {
       alert('找不到這筆志工需求');
-      this.router.navigate(['/agency/disaster']);
+      this.router.navigate(['/agency/disaster'], { queryParams: { activeTab: 'volunteer' } });
       return;
     }
 
@@ -199,9 +293,7 @@ export class VolunteerFormComponent implements OnInit {
 
       // 強制維持下架
       this.demand.status = '下架';
-
       this.showOnShelfWarning = true;
-
       return;
     }
 
@@ -244,7 +336,10 @@ export class VolunteerFormComponent implements OnInit {
       return;
     }
 
+    // ==========================================
     // 上架時選擇下架
+    // ==========================================
+
     if (newStatus === '下架') {
       if (this.demand.status === '下架') {
         return;
@@ -257,23 +352,26 @@ export class VolunteerFormComponent implements OnInit {
       return;
     }
 
+    // ==========================================
     // 選擇隱藏
+    // ==========================================
+
     if (newStatus === '隱藏') {
       this.demand.status = '隱藏';
-
       this.demand.publishedAt = undefined;
       this.demand.expectedOffShelfAt = undefined;
       this.demand.offShelfReason = undefined;
-
       this.pendingStatus = undefined;
 
       return;
     }
 
+    // ==========================================
     // 選擇上架
+    // ==========================================
+
     if (newStatus === '上架') {
       this.demand.status = '上架';
-
       this.pendingStatus = undefined;
 
       return;
@@ -287,7 +385,6 @@ export class VolunteerFormComponent implements OnInit {
   cancelManualOffShelf(): void {
     this.showOffShelfWarning = false;
     this.pendingStatus = undefined;
-
     this.demand.status = this.originalStatus;
   }
 
@@ -300,7 +397,6 @@ export class VolunteerFormComponent implements OnInit {
     this.pendingStatus = undefined;
 
     this.demand.status = '隱藏';
-
     this.demand.publishedAt = undefined;
     this.demand.expectedOffShelfAt = undefined;
     this.demand.offShelfReason = undefined;
@@ -359,9 +455,17 @@ export class VolunteerFormComponent implements OnInit {
       return;
     }
 
-    const people = Number(value);
+    let people = Number(value);
 
-    this.demand.people = Number.isNaN(people) ? null : Math.min(500, Math.max(1, people));
+    if (Number.isNaN(people)) {
+      this.demand.people = null;
+    } else {
+      // 限制 1~500 之間
+      if (people > 500) people = 500;
+      if (people < 1) people = 1;
+
+      this.demand.people = people;
+    }
   }
 
   // ==========================================
@@ -408,193 +512,298 @@ export class VolunteerFormComponent implements OnInit {
   // ==========================================
 
   async onPublish(): Promise<void> {
-    // 清除之前錯誤
-    this.invalidFields = [];
+    // ==========================================
+    // 防止重複點擊
+    // ==========================================
 
-    // 必填欄位檢查
-    if (!this.demand.type) {
-      this.invalidFields.push('type');
-    }
-
-    if (!this.demand.people || this.demand.people < 1 || this.demand.people > 500) {
-      this.invalidFields.push('people');
-    }
-
-    if (!this.demand.location.trim()) {
-      this.invalidFields.push('location');
-    }
-
-    if (!this.demand.condition.trim()) {
-      this.invalidFields.push('condition');
-    }
-
-    if (!this.demand.workContent.trim()) {
-      this.invalidFields.push('workContent');
-    }
-
-    if (!this.demand.reason.trim()) {
-      this.invalidFields.push('reason');
-    }
-
-    if (!this.demand.contact.trim()) {
-      this.invalidFields.push('contact');
-    }
-
-    if (!this.demand.phone.trim()) {
-      this.invalidFields.push('phone');
-    }
-
-    // 有欄位錯誤
-    if (this.invalidFields.length > 0) {
-      setTimeout(() => {
-        const firstInvalid = document.querySelector('.invalid-field') as HTMLElement;
-
-        if (firstInvalid) {
-          firstInvalid.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          });
-
-          firstInvalid.focus();
-        }
-      }, 0);
-
+    if (this.isSaving) {
+      console.log('目前正在儲存，忽略這次點擊。');
       return;
     }
 
-    // ==========================================
-    // 地址轉換經緯度
-    // ==========================================
+    // 第一次點擊後立即鎖定
+    this.isSaving = true;
 
-    const addressSuccess = await this.getCoordinatesFromAddress(this.demand.location, this.demand);
+    // 讓畫面立即更新
+    this.cdr.detectChanges();
 
-    if (!addressSuccess) {
-      alert('無法找到此地址的位置，請確認地址是否正確。');
-      return;
-    }
+    try {
+      // ==========================================
+      // 清除之前錯誤
+      // ==========================================
 
-    // ==========================================
-    // 編輯模式
-    // ==========================================
+      this.invalidFields = [];
 
-    if (this.isEditMode) {
-      const originalItem = this.volunteerDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
+      // ==========================================
+      // 必填欄位檢查
+      // ==========================================
 
-      const originalStatus = originalItem?.status;
-      const originalOffShelfReason = originalItem?.offShelfReason;
-      const originalPublishedAt = originalItem?.publishedAt;
+      if (!this.demand.type) {
+        this.invalidFields.push('type');
+      }
 
-      const now = new Date();
+      if (!this.demand.people || this.demand.people < 1 || this.demand.people > 500) {
+        this.invalidFields.push('people');
+      }
 
-      // 判斷原本是否為手動下架
-      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+      if (!this.demand.location.trim()) {
+        this.invalidFields.push('location');
+      }
 
-      const isCurrentManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
+      if (!this.demand.condition.trim()) {
+        this.invalidFields.push('condition');
+      }
 
-      // 手動下架禁止重新上架
-      if (this.demand.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
-        alert('此需求為使用者主動下架，無法重新上架。');
+      if (!this.demand.workContent.trim()) {
+        this.invalidFields.push('workContent');
+      }
 
-        this.demand.status = '下架';
+      if (!this.demand.reason.trim()) {
+        this.invalidFields.push('reason');
+      }
+
+      if (!this.demand.contact.trim()) {
+        this.invalidFields.push('contact');
+      }
+
+      if (!this.demand.phone.trim()) {
+        this.invalidFields.push('phone');
+      }
+
+      // ==========================================
+      // 有欄位錯誤
+      // ==========================================
+
+      if (this.invalidFields.length > 0) {
+        setTimeout(() => {
+          const firstInvalid = document.querySelector('.invalid-field') as HTMLElement;
+
+          if (firstInvalid) {
+            firstInvalid.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            });
+
+            firstInvalid.focus();
+          }
+        }, 0);
+
+        // 驗證失敗，解除鎖定
+        this.isSaving = false;
+        this.cdr.detectChanges();
 
         return;
       }
 
-      // 處理上架狀態
-      if (this.demand.status === '上架') {
-        // 原本不是上架時重新設定上架日期
-        if (originalStatus !== '上架') {
-          this.demand.publishedAt = now.toISOString();
+      // ==========================================
+      // 地址轉換經緯度
+      // ==========================================
 
-          if (!this.demand.createdAt) {
-            this.demand.createdAt = now.toISOString();
+      console.log('開始將服務地點轉換成經緯度：');
+      console.log(this.demand.location);
+
+      const addressSuccess = await this.getCoordinatesFromAddress(this.demand.location, this.demand);
+
+      // ==========================================
+      // 地址找不到
+      // ==========================================
+
+      if (!addressSuccess) {
+        alert('無法找到此地址的位置，請確認地址是否正確。');
+
+        // API 失敗，解除鎖定，讓使用者可以重新操作
+        this.isSaving = false;
+        this.cdr.detectChanges();
+
+        return;
+      }
+
+      console.log('地址轉換成功：', this.demand.latitude, this.demand.longitude);
+
+      // ==========================================
+      // 編輯模式
+      // ==========================================
+
+      if (this.isEditMode) {
+        const originalItem = this.volunteerDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
+
+        const originalStatus = originalItem?.status;
+
+        const originalOffShelfReason = originalItem?.offShelfReason;
+
+        const originalPublishedAt = originalItem?.publishedAt;
+
+        const now = new Date();
+
+        // 判斷原本是否為手動下架
+        const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+
+        const isCurrentManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
+
+        // ==========================================
+        // 手動下架禁止重新上架
+        // ==========================================
+
+        if (this.demand.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
+          alert('此需求為使用者主動下架，無法重新上架。');
+
+          this.demand.status = '下架';
+
+          // 解除鎖定
+          this.isSaving = false;
+          this.cdr.detectChanges();
+
+          return;
+        }
+
+        // ==========================================
+        // 處理上架狀態
+        // ==========================================
+
+        if (this.demand.status === '上架') {
+          // 原本不是上架時重新設定上架日期
+          if (originalStatus !== '上架') {
+            this.demand.publishedAt = now.toISOString();
+
+            if (!this.demand.createdAt) {
+              this.demand.createdAt = now.toISOString();
+            }
+          } else if (originalPublishedAt) {
+            // 原本已上架時保留原本上架日期
+            this.demand.publishedAt = originalPublishedAt;
           }
-        } else if (originalPublishedAt) {
-          // 原本已上架時保留原本上架日期
-          this.demand.publishedAt = originalPublishedAt;
+
+          if (this.demand.publishedAt) {
+            // 依照優先度重新計算預計下架日期
+            this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(this.demand.publishedAt), this.demand.priority);
+          }
+
+          // 重新上架後清除之前的下架原因
+          this.demand.offShelfReason = undefined;
         }
 
-        if (this.demand.publishedAt) {
-          // 依照優先度重新計算預計下架日期
-          this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(this.demand.publishedAt), this.demand.priority);
+        // ==========================================
+        // 處理隱藏狀態
+        // ==========================================
+        else if (this.demand.status === '隱藏') {
+          this.demand.publishedAt = undefined;
+
+          this.demand.expectedOffShelfAt = undefined;
+
+          this.demand.offShelfReason = undefined;
         }
 
-        // 重新上架後清除之前的下架原因
-        this.demand.offShelfReason = undefined;
+        // ==========================================
+        // 處理下架狀態
+        // ==========================================
+        else if (this.demand.status === '下架') {
+          // 原本手動下架或這次確認下架
+          // 保留原本的下架原因
+          if (!this.demand.offShelfReason) {
+            this.demand.offShelfReason = 'manual';
+          }
+
+          if (!this.demand.expectedOffShelfAt) {
+            this.demand.expectedOffShelfAt = now.toISOString();
+          }
+        }
+
+        // ==========================================
+        // 更新資料
+        // ==========================================
+
+        this.volunteerDemandService.updateDemand(this.demand);
+
+        console.log('修改後的志工需求：', this.demand);
+
+        // ==========================================
+        // 顯示成功視窗
+        // ==========================================
+
+        this.successMessage = '志工需求修改成功！';
+
+        this.showSuccessModal = true;
+
+        // 成功後保持 isSaving = true
+        // 防止成功視窗關閉前再次儲存
+        this.cdr.detectChanges();
+
+        return;
       }
 
-      // 處理隱藏狀態
-      else if (this.demand.status === '隱藏') {
-        // 隱藏後視為尚未上架
-        this.demand.publishedAt = undefined;
-        this.demand.expectedOffShelfAt = undefined;
+      // ==========================================
+      // 新增模式
+      // ==========================================
 
-        // 隱藏不是手動下架
-        this.demand.offShelfReason = undefined;
+      const createdDate = new Date();
+
+      const newDemand: VolunteerDemand = {
+        ...this.demand,
+
+        serialNo: this.getNextDemandId(),
+
+        createdAt: createdDate.toISOString(),
+
+        status: this.demand.status,
+
+        messageCount: 0,
+
+        // 確保經緯度一起存入資料
+        latitude: this.demand.latitude,
+
+        longitude: this.demand.longitude,
+      };
+
+      // ==========================================
+      // 新增時選擇上架
+      // ==========================================
+
+      if (newDemand.status === '上架') {
+        // 上架日期等於發布日期
+        newDemand.publishedAt = createdDate.toISOString();
+
+        // 計算預計下架日期
+        newDemand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, newDemand.priority);
+
+        // 新增上架不應該有下架原因
+        newDemand.offShelfReason = undefined;
+      } else {
+        // 隱藏時尚未上架
+        newDemand.publishedAt = undefined;
+
+        newDemand.expectedOffShelfAt = undefined;
+
+        newDemand.offShelfReason = undefined;
       }
 
-      // 處理下架狀態
-      else if (this.demand.status === '下架') {
-        // 原本手動下架或這次確認下架時保留原本的下架時間
-        if (!this.demand.offShelfReason) {
-          this.demand.offShelfReason = 'manual';
-        }
+      // ==========================================
+      // 寫入資料
+      // ==========================================
 
-        if (!this.demand.expectedOffShelfAt) {
-          this.demand.expectedOffShelfAt = now.toISOString();
-        }
-      }
+      this.volunteerDemandService.addDemand(newDemand);
 
-      // 更新資料
-      this.volunteerDemandService.updateDemand(this.demand);
+      console.log('新增志工需求：', newDemand);
 
-      console.log('修改後的志工需求：', this.demand);
+      // ==========================================
+      // 顯示成功視窗
+      // ==========================================
 
-      this.successMessage = '志工需求修改成功！';
+      this.successMessage = '志工需求發布成功！';
 
       this.showSuccessModal = true;
 
-      return;
+      // 成功後保持 isSaving = true
+      // 防止再次點擊發布
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('發布／儲存志工需求失敗：', error);
+
+      alert('儲存失敗，請稍後再試。');
+
+      // 發生錯誤時才解除鎖定
+      this.isSaving = false;
+      this.cdr.detectChanges();
     }
-
-    // ==========================================
-    // 新增模式
-    // ==========================================
-
-    const createdDate = new Date();
-
-    const newDemand: VolunteerDemand = {
-      ...this.demand,
-      serialNo: this.getNextDemandId(),
-      createdAt: createdDate.toISOString(),
-      status: this.demand.status,
-      messageCount: 0,
-    };
-
-    // 新增時選擇上架
-    if (newDemand.status === '上架') {
-      // 上架日期等於發布日期
-      newDemand.publishedAt = createdDate.toISOString();
-
-      // 計算預計下架日期
-      newDemand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, newDemand.priority);
-
-      // 新增上架不應該有下架原因
-      newDemand.offShelfReason = undefined;
-    } else {
-      // 隱藏時尚未上架
-      newDemand.publishedAt = undefined;
-      newDemand.expectedOffShelfAt = undefined;
-      newDemand.offShelfReason = undefined;
-    }
-
-    this.volunteerDemandService.addDemand(newDemand);
-
-    console.log('新增志工需求：', newDemand);
-
-    this.successMessage = '志工需求發布成功！';
-
-    this.showSuccessModal = true;
   }
 
   // ==========================================
@@ -643,7 +852,7 @@ export class VolunteerFormComponent implements OnInit {
       return;
     }
 
-    this.router.navigate(['/agency/disaster']);
+    this.router.navigate(['/agency/disaster'], { queryParams: { activeTab: 'volunteer' } });
   }
 
   closeCancelModal(): void {
@@ -652,11 +861,17 @@ export class VolunteerFormComponent implements OnInit {
 
   confirmCancel(): void {
     this.showCancelModal = false;
-    this.router.navigate(['/agency/disaster']);
+
+    this.router.navigate(['/agency/disaster'], { queryParams: { activeTab: 'volunteer' } });
   }
+
+  // ==========================================
+  // 關閉成功視窗
+  // ==========================================
 
   closeSuccessModal(): void {
     this.showSuccessModal = false;
-    this.router.navigate(['/agency/disaster']);
+
+    this.router.navigate(['/agency/disaster'], { queryParams: { activeTab: 'volunteer' } });
   }
 }

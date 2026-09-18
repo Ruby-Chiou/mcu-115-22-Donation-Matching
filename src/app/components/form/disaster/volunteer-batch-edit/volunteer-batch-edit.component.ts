@@ -62,21 +62,105 @@ export class VolunteerBatchEditComponent implements OnInit {
   async getCoordinatesFromAddress(location: string, demand: VolunteerDemandItem): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
 
-    // 原本城市碼不變
+    // ==========================================
+    // 第一步：搜尋完整地址
+    // ==========================================
+
+    const searchAddress = location.trim();
+
     const params = {
-      q: `${location}, Taiwan`,
+      // 原本城市碼／台灣設定維持不變
+      q: `${searchAddress}, Taiwan`,
       format: 'jsonv2',
       limit: '1',
       countrycodes: 'tw',
     };
 
     try {
-      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+      let results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
 
-      // 找不到地址
+      // ==========================================
+      // 完整地址找不到
+      // → 第二步：改搜尋道路名稱
+      // ==========================================
+
       if (!results || results.length === 0) {
-        return false;
+        let roadAddress = searchAddress.replace(/臺/g, '台').replace(/\s+/g, '');
+
+        // 移除「市／縣」以前的內容
+        roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+        // 移除「區／鄉／鎮／市」以前的內容
+        roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+        // 移除門牌號碼
+        // 例如：
+        // 重慶南路一段122號
+        // → 重慶南路一段
+        roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
+
+        roadAddress = roadAddress.trim();
+
+        console.log(`需求編號 ${demand.serialNo} 完整地址找不到，改搜尋道路：`, roadAddress);
+
+        // 確認確實有道路名稱
+        if (!roadAddress) {
+          return false;
+        }
+
+        // ==========================================
+        // 使用道路名稱重新搜尋
+        // ==========================================
+
+        const roadParams = {
+          // 原本城市碼／台灣設定維持不變
+          q: `${roadAddress}, Taiwan`,
+          format: 'jsonv2',
+          limit: '1',
+          countrycodes: 'tw',
+        };
+
+        results = await firstValueFrom(
+          this.http.get<NominatimSearchResult[]>(url, {
+            params: roadParams,
+          })
+        );
+
+        // 道路也找不到
+        if (!results || results.length === 0) {
+          return false;
+        }
+
+        const result = results[0];
+
+        const latitude = Number(result.lat);
+        const longitude = Number(result.lon);
+
+        // 確認經緯度是有效數字
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+          return false;
+        }
+
+        // 寫入需求資料
+        demand.latitude = latitude;
+        demand.longitude = longitude;
+
+        console.log(`需求編號 ${demand.serialNo} 完整地址：`, searchAddress);
+
+        console.log(`需求編號 ${demand.serialNo} 使用道路名稱：`, roadAddress);
+
+        console.log(`需求編號 ${demand.serialNo} 緯度：`, demand.latitude);
+
+        console.log(`需求編號 ${demand.serialNo} 經度：`, demand.longitude);
+
+        console.log('Nominatim 找到的位置：', result.display_name);
+
+        return true;
       }
+
+      // ==========================================
+      // 完整地址搜尋成功
+      // ==========================================
 
       const result = results[0];
 
@@ -93,14 +177,17 @@ export class VolunteerBatchEditComponent implements OnInit {
       demand.longitude = longitude;
 
       // 開發測試用
-      console.log('地址：', location.trim());
-      console.log('轉換後緯度：', demand.latitude);
-      console.log('轉換後經度：', demand.longitude);
+      console.log(`需求編號 ${demand.serialNo} 地址：`, searchAddress);
+
+      console.log(`需求編號 ${demand.serialNo} 緯度：`, demand.latitude);
+
+      console.log(`需求編號 ${demand.serialNo} 經度：`, demand.longitude);
+
       console.log('Nominatim 找到的位置：', result.display_name);
 
       return true;
     } catch (error) {
-      console.error('地址轉換經緯度失敗：', error);
+      console.error(`需求編號 ${demand.serialNo} 地址轉換經緯度失敗：`, error);
 
       return false;
     }
@@ -213,6 +300,7 @@ export class VolunteerBatchEditComponent implements OnInit {
     // 上架
     if (newStatus === '上架') {
       demand.status = '上架';
+
       return;
     }
   }

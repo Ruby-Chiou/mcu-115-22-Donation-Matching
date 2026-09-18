@@ -28,8 +28,8 @@
 
     <!-- 需求人數 -->
     <div class="form-group">
-      <label
-        >需求人數 <span>*</span>
+      <label>
+        需求人數 <span>*</span>
         <span class="word-count"> {{ demand.people || 0 }}/500 </span>
       </label>
       <div class="input-row">
@@ -38,8 +38,7 @@
           placeholder="請輸入需求人數"
           min="1"
           max="500"
-          [ngModel]="demand.people"
-          (input)="limitPeopleInput($event)"
+          [(ngModel)]="demand.people"
           (ngModelChange)="setPeople($event)"
           [class.invalid-field]="isInvalid('people')"
         />
