@@ -15,7 +15,7 @@ interface Comment {
 @Component({
   selector: 'app-donor-daily-detail',
   standalone: true,
-  imports: [RouterLink, CommonModule, RouterModule,FormsModule, SupplyDetailCarouselComponent],
+  imports: [RouterLink, CommonModule, RouterModule, FormsModule, SupplyDetailCarouselComponent],
   templateUrl: './donor-daily-detail.component.html',
   styleUrl: './donor-daily-detail.component.scss',
 })
@@ -23,6 +23,8 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   demand?: DailyDemand;
   currentImageIndex = 0;
   private imageTimer?: ReturnType<typeof setInterval>;
+  isLoading = true;
+  loadError = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -30,26 +32,53 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef // 注入 ChangeDetectorRef 以強制觸發變更偵測
   ) {}
 
-  ngOnInit(): void {
-    // 訂閱 paramMap 確保路由參數改變時能正確更新
-    this.route.paramMap.subscribe((params) => {
-      const id = Number(params.get('id'));
-      this.loadDemandData(id);
-    });
+  async ngOnInit(): Promise<void> {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (!Number.isInteger(id) || id <= 0) {
+      this.loadError = '網址中的物資需求編號不正確。';
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    try {
+      await this.loadDemandData(id);
+
+      console.log('目前需求：', this.demand);
+      console.log('圖片數量：', this.demand?.image?.length);
+
+      if (!this.demand) {
+        this.loadError = '找不到此筆物資需求。';
+        return;
+      }
+    } catch (error) {
+      console.error('讀取物資需求資料失敗：', error);
+
+      this.loadError = '資料讀取失敗，請稍後再試。';
+    } finally {
+      this.isLoading = false;
+
+      // 非同步 Supabase 資料回來後，通知 Angular 更新畫面。
+      this.cdr.detectChanges();
+    }
   }
 
   // 載入資料並啟動輪播
-  private loadDemandData(id: number): void {
-    this.stopImageTimer(); // 重置前一個計時器
+  private async loadDemandData(id: number): Promise<void> {
+    this.stopImageTimer();
     this.currentImageIndex = 0;
 
-    // 取得需求資料
-    this.demand = this.dailyDemandService.getDemandById(id);
+    const demand = await this.dailyDemandService.getDemandById(id);
 
-    console.log('目前需求：', this.demand);
-    console.log('圖片數量：', this.demand?.image?.length);
+    console.log('目前需求：', demand);
+    console.log('圖片數量：', demand?.image?.length);
 
-    this.startImageTimer();
+    this.demand = demand;
+
+    if (this.demand?.image?.length) {
+      this.startImageTimer();
+    }
   }
 
   // 啟動輪播計時器
@@ -157,17 +186,17 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   // 物資狀態要求
   // =========================
   getConditions(): string {
-  const conditions = this.demand?.conditions;
+    const conditions = this.demand?.conditions;
 
-  if (!conditions) {
-    return '無';
+    if (!conditions) {
+      return '無';
+    }
+
+    return Object.entries(conditions)
+      .filter(([_, value]) => value)
+      .map(([key, value]) => `${key}：${value}`)
+      .join('\n');
   }
-
-  return Object.entries(conditions)
-    .filter(([_, value]) => value)
-    .map(([key, value]) => `${key}：${value}`)
-    .join('\n');
-}
   // =========================
   // 留言
   // =========================

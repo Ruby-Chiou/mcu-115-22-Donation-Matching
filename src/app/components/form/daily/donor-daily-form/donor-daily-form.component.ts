@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -12,7 +12,7 @@ import { DailyDemandService } from '../../../../core/services/agency-daily-deman
   templateUrl: './donor-daily-form.component.html',
   styleUrl: './donor-daily-form.component.scss',
 })
-export class DonorDailyFormComponent {
+export class DonorDailyFormComponent implements OnInit {
   donationMethod: '寄送' | '面交' | '' = '';
   demand?: DailyDemand;
   private readonly demandId: number;
@@ -23,14 +23,36 @@ export class DonorDailyFormComponent {
   previewImageName = '';
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private demandService: DailyDemandService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly demandService: DailyDemandService
   ) {
     this.demandId = Number(this.route.snapshot.paramMap.get('id'));
-    this.demand = this.demandService.getDemandById(this.demandId);
   }
 
+  async ngOnInit(): Promise<void> {
+    if (!Number.isInteger(this.demandId) || this.demandId <= 0) {
+      console.error('網址中的物資需求 id 不正確：', this.demandId);
+
+      return;
+    }
+
+    try {
+      this.demand = await this.demandService.getDemandById(this.demandId);
+
+      if (!this.demand) {
+        console.error('找不到這筆物資需求資料，id：', this.demandId);
+
+        return;
+      }
+
+      // 若希望捐贈者表單預先帶入需求資料，可在這裡設定。
+      // 例如：
+      // this.actualMaterial = this.demand.item;
+    } catch (error) {
+      console.error('讀取捐贈表單需求資料失敗：', error);
+    }
+  }
   cancelForm(): void {
     this.router.navigate(['/donor/daily/detail', this.demandId]);
   }

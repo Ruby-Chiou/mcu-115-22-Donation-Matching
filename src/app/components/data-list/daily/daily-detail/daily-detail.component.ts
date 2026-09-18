@@ -32,18 +32,38 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
-    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+  isLoading = true;
+  loadError = '';
 
-    this.demand = this.service.getDemandById(serialNo);
+  async ngOnInit(): Promise<void> {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.listNumber = this.demand?.serialNo;
+    if (!Number.isInteger(id) || id <= 0) {
+      this.isLoading = false;
+      this.loadError = '網址中的資料編號不正確。';
+      return;
+    }
 
-    if (this.demand) {
+    try {
+      this.demand = await this.service.getDemandById(id);
+
+      if (!this.demand) {
+        this.loadError = '找不到這筆日常物資需求資料。';
+        return;
+      }
+
+      this.listNumber = this.demand.serialNo;
+
       this.demand.remaining ??= this.demand.amount ?? 0;
       this.demand.customConditions ??= [];
       this.demand.customServiceTargets ??= [];
       this.demand.serviceTargets ??= [];
+    } catch (error) {
+      console.error('載入日常物資詳細資料失敗：', error);
+
+      this.loadError = '資料載入失敗，請確認網路、Supabase 連線或資料庫權限。';
+    } finally {
+      this.isLoading = false;
     }
   }
 
