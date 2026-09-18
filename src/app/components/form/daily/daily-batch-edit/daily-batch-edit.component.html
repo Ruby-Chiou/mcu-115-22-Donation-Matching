@@ -483,19 +483,40 @@
         <span class="required">*</span>
       </label>
 
+      <!-- 公開狀態 -->
+      <label class="label-row align-title">
+        公開狀態
+        <span class="required">*</span>
+      </label>
+
       <div class="status-box">
-        <label>
-          <input type="radio" [name]="'status' + i" value="上架" [(ngModel)]="demand.status" />
+        <!-- 上架 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)" (click)="onStatusClick($event, demand, '上架')">
+          <input type="radio" [name]="'status' + i" [checked]="demand.status === '上架'" [disabled]="isManualOffShelf(demand)" />
           上架
         </label>
 
-        <label>
-          <input type="radio" [name]="'status' + i" value="隱藏" [(ngModel)]="demand.status" />
+        <!-- 隱藏 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)">
+          <input
+            type="radio"
+            [name]="'status' + i"
+            [checked]="demand.status === '隱藏'"
+            [disabled]="isManualOffShelf(demand)"
+            (change)="onStatusSelect(demand, '隱藏')"
+          />
           隱藏
         </label>
 
-        <label>
-          <input type="radio" [name]="'status' + i" value="下架" [(ngModel)]="demand.status" />
+        <!-- 下架 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)">
+          <input
+            type="radio"
+            [name]="'status' + i"
+            [checked]="demand.status === '下架'"
+            [disabled]="isManualOffShelf(demand)"
+            (change)="onStatusSelect(demand, '下架')"
+          />
           下架
         </label>
       </div>
@@ -716,3 +737,14 @@
   [imageName]="previewImageName"
   (closed)="closeImagePreview()"
 ></app-supply-image-preview>
+
+<!-- 手動下架確認視窗 -->
+<app-supply-off-shelf
+  *ngIf="showOffShelfWarning"
+  (closed)="cancelManualOffShelf()"
+  (hide)="hideInsteadOfOffShelf()"
+  (confirmed)="confirmManualOffShelf()"
+></app-supply-off-shelf>
+
+<!-- 已下架無法重新上架提示 -->
+<app-supply-on-shelf *ngIf="showOnShelfWarning" (closed)="closeOnShelfWarning()" (confirmed)="closeOnShelfWarning()"></app-supply-on-shelf>

@@ -376,19 +376,33 @@
     </label>
 
     <div class="status-box">
-      <label>
-        <input type="radio" name="status" [checked]="demand.status === '上架'" (change)="onStatusSelect('上架')" />
+      <!-- 上架 -->
+      <label (click)="onStatusClick($event, '上架')" [class.disabled-status]="isManualOffShelf()">
+        <input type="radio" name="status" [checked]="demand.status === '上架'" [disabled]="isManualOffShelf()" />
         上架
       </label>
 
-      <label>
-        <input type="radio" name="status" [checked]="demand.status === '隱藏'" (change)="onStatusSelect('隱藏')" />
+      <!-- 隱藏 -->
+      <label [class.disabled-status]="isManualOffShelf()">
+        <input
+          type="radio"
+          name="status"
+          [checked]="demand.status === '隱藏'"
+          [disabled]="isManualOffShelf()"
+          (change)="onStatusSelect('隱藏')"
+        />
         隱藏
       </label>
 
       <!-- 編輯模式才顯示下架 -->
-      <label *ngIf="isEditMode">
-        <input type="radio" name="status" [checked]="demand.status === '下架'" (change)="onStatusSelect('下架')" />
+      <label *ngIf="isEditMode" [class.disabled-status]="isManualOffShelf()">
+        <input
+          type="radio"
+          name="status"
+          [checked]="demand.status === '下架'"
+          [disabled]="isManualOffShelf()"
+          (change)="onStatusSelect('下架')"
+        />
         下架
       </label>
     </div>

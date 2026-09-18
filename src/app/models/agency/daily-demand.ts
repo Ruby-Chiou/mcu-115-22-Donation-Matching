@@ -84,11 +84,14 @@ export interface DailyDemand {
   // 優先度與需求狀態
   priority: '普通' | '緊急' | '非常緊急'; // 緊急優先度
   status: '上架' | '隱藏' | '下架'; // 系統實際狀態
+  offShelfReason?: 'natural' | 'manual'; // 下架原因：自然下架 / 使用者手動下架
 
   // 接收方式
   receiveMethod: DailyReceiveMethod;
   recipient: string; // 收件人
   address: string; // 接收物資地址
+  latitude?: number; // 接收物資地址緯度
+  longitude?: number; // 接收物資地址經度
   phone: string; // 聯絡電話
 
   // 聯絡時間：平日

@@ -449,19 +449,33 @@
     </label>
 
     <div class="status-box">
-      <label>
-        <input type="radio" name="status" value="上架" [(ngModel)]="demand.status" />
+      <!-- 上架 -->
+      <label (click)="onStatusClick($event, '上架')" [class.disabled-status]="isManualOffShelf">
+        <input type="radio" name="status" [checked]="demand.status === '上架'" [disabled]="isManualOffShelf" />
         上架
       </label>
 
-      <label>
-        <input type="radio" name="status" value="隱藏" [(ngModel)]="demand.status" />
+      <!-- 隱藏 -->
+      <label [class.disabled-status]="isManualOffShelf">
+        <input
+          type="radio"
+          name="status"
+          [checked]="demand.status === '隱藏'"
+          [disabled]="isManualOffShelf"
+          (change)="onStatusSelect('隱藏')"
+        />
         隱藏
       </label>
 
-      <!-- 編輯模式才顯示下架 -->
-      <label *ngIf="isEditMode">
-        <input type="radio" name="status" value="下架" [(ngModel)]="demand.status" />
+      <!-- 下架 -->
+      <label *ngIf="isEditMode" [class.disabled-status]="isManualOffShelf">
+        <input
+          type="radio"
+          name="status"
+          [checked]="demand.status === '下架'"
+          [disabled]="isManualOffShelf"
+          (change)="onStatusSelect('下架')"
+        />
         下架
       </label>
     </div>
@@ -674,3 +688,14 @@
   [imageName]="previewImageName"
   (closed)="closeImagePreview()"
 ></app-supply-image-preview>
+
+<!-- 手動下架確認視窗 -->
+<app-supply-off-shelf
+  *ngIf="showOffShelfWarning"
+  (closed)="cancelManualOffShelf()"
+  (hide)="hideInsteadOfOffShelf()"
+  (confirmed)="confirmManualOffShelf()"
+></app-supply-off-shelf>
+
+<!-- 已下架無法重新上架提示 -->
+<app-supply-on-shelf *ngIf="showOnShelfWarning" (closed)="closeOnShelfWarning()" (confirmed)="closeOnShelfWarning()"></app-supply-on-shelf>

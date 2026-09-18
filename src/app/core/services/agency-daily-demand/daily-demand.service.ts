@@ -20,15 +20,13 @@ export class DailyDemandService {
       category: '食品與飲用水',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭縣弱勢家庭服務中心',
-      address: '宜蘭縣宜蘭市中山路二段100號',
+      address: '臺北市信義區市府路1號',
       phone: '03-9321001',
       note: '若一次提供超過20包，請事前聯絡機構安排收貨時間。',
       brand: '不限品牌',
-
       serviceTargets: ['貧困'],
       customServiceTargets: ['弱勢家庭'],
       serviceTargetDescription: '貧困、弱勢家庭',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -38,10 +36,9 @@ export class DailyDemandService {
       },
       customConditions: ['需為完整未拆封包裝', '保存期限至少6個月'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、需為完整未拆封包裝、保存期限至少6個月',
-
       status: '上架',
       remaining: 32,
-      messageCount: 3,
+      messageCount: 2,
       createdAt: '2026-08-01T09:30:00',
       publishedAt: '2026-08-02T10:00:00',
       expectedOffShelfAt: '2026-09-01T10:00:00',
@@ -73,15 +70,13 @@ export class DailyDemandService {
       category: '長者與身心障礙用品',
       receiveMethod: { 寄送: true, 面交: false },
       recipient: '蘭陽長期照顧服務協會',
-      address: '宜蘭縣羅東鎮公正路220號',
+      address: '新北市板橋區中山路一段161號',
       phone: '03-9542200',
       note: '尺寸以M、L、XL為主，寄送前請確認外箱標示清楚。',
       brand: '不限品牌',
-
       serviceTargets: ['老人', '身障'],
       customServiceTargets: [],
       serviceTargetDescription: '老人、身障',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -92,9 +87,12 @@ export class DailyDemandService {
       customConditions: ['必須為全新未拆封用品', '不可有受潮或異味'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、必須為全新未拆封用品、不可有受潮或異味',
 
-      status: '上架',
+      // 自然下架
+      status: '下架',
+      offShelfReason: 'natural',
+
       remaining: 18,
-      messageCount: 5,
+      messageCount: 2,
       createdAt: '2026-08-03T08:20:00',
       publishedAt: '2026-08-03T09:00:00',
       expectedOffShelfAt: '2026-08-17T09:00:00',
@@ -129,15 +127,13 @@ export class DailyDemandService {
       category: '嬰幼兒用品',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭兒少家庭支持中心',
-      address: '宜蘭縣宜蘭市健康路150號',
+      address: '桃園市桃園區縣府路1號',
       phone: '03-9351500',
       note: '不同年齡階段奶粉皆可，請提供品牌與適用年齡資訊。',
       brand: '不限品牌',
-
       serviceTargets: ['嬰幼兒', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '嬰幼兒、貧困',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -147,10 +143,9 @@ export class DailyDemandService {
       },
       customConditions: ['有效期限至少8個月', '不可為已開封奶粉'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、有效期限至少8個月、不可為已開封奶粉',
-
       status: '上架',
       remaining: 7,
-      messageCount: 1,
+      messageCount: 2,
       createdAt: '2026-08-05T10:00:00',
       publishedAt: '2026-08-05T11:00:00',
       expectedOffShelfAt: '2026-09-04T11:00:00',
@@ -182,15 +177,13 @@ export class DailyDemandService {
       category: '衣物與保暖用品',
       receiveMethod: { 寄送: false, 面交: true },
       recipient: '蘭陽弱勢家庭扶助協會',
-      address: '宜蘭縣羅東鎮民生路88號',
+      address: '新竹市東區中正路120號',
       phone: '03-9558800',
       note: '面交時間需事前電話確認，避免機構無人收件。',
       brand: '不限品牌',
-
       serviceTargets: ['孩童', '青少年', '貧困'],
       customServiceTargets: ['成人'],
       serviceTargetDescription: '孩童、青少年、貧困、成人',
-
       conditions: {
         全新: '接受',
         二手: '接受',
@@ -200,10 +193,9 @@ export class DailyDemandService {
       },
       customConditions: ['衣物需乾淨無明顯污漬', '不可有破損'],
       conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、衣物需乾淨無明顯污漬、不可有破損',
-
       status: '上架',
       remaining: 25,
-      messageCount: 0,
+      messageCount: 2,
       createdAt: '2026-08-07T13:00:00',
       publishedAt: '2026-08-08T09:30:00',
       expectedOffShelfAt: '2026-10-07T09:30:00',
@@ -238,15 +230,13 @@ export class DailyDemandService {
       category: '清潔與衛生用品',
       receiveMethod: { 寄送: true, 面交: false },
       recipient: '宜蘭家庭服務站',
-      address: '宜蘭縣礁溪鄉溫泉路66號',
+      address: '新竹縣竹北市光明六路10號',
       phone: '03-9886600',
       note: '液體洗衣精及洗衣粉皆可。',
       brand: '不限品牌',
-
       serviceTargets: ['貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '貧困',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -256,7 +246,6 @@ export class DailyDemandService {
       },
       customConditions: ['瓶身不可破損', '需為未使用商品'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、瓶身不可破損、需為未使用商品',
-
       status: '隱藏',
       remaining: 25,
       messageCount: 2,
@@ -291,15 +280,13 @@ export class DailyDemandService {
       category: '女性生理用品',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭女性支持中心',
-      address: '宜蘭縣宜蘭市女中路一段55號',
+      address: '苗栗縣苗栗市府前路1號',
       phone: '03-9325500',
       note: '請避免捐贈已拆封或單片包裝破損之用品。',
       brand: '不限品牌',
-
       serviceTargets: ['青少年', '貧困'],
       customServiceTargets: ['女性'],
       serviceTargetDescription: '青少年、貧困、女性',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -310,12 +297,15 @@ export class DailyDemandService {
       customConditions: ['必須全新未拆封', '包裝不可破損'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、必須全新未拆封、包裝不可破損',
 
-      status: '上架',
+      // 自然下架
+      status: '下架',
+      offShelfReason: 'natural',
+
       remaining: 66,
-      messageCount: 4,
-      createdAt: '2026-08-10T11:30:00',
-      publishedAt: '2026-08-10T13:00:00',
-      expectedOffShelfAt: '2026-09-09T13:00:00',
+      messageCount: 2,
+      createdAt: '2026-07-01T11:30:00',
+      publishedAt: '2026-08-01T13:00:00',
+      expectedOffShelfAt: '2026-08-31T13:00:00',
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
       imageFileNames: ['測試圖2'],
       contactTimeWeekday: true,
@@ -344,15 +334,13 @@ export class DailyDemandService {
       category: '寵物與動物用品',
       receiveMethod: { 寄送: true, 面交: false },
       recipient: '宜蘭毛孩家庭援助站',
-      address: '宜蘭縣冬山鄉冬山路三段120號',
+      address: '臺中市西屯區臺灣大道三段99號',
       phone: '03-9591200',
       note: '請在外箱標示犬用或貓用。',
       brand: '不限品牌',
-
       serviceTargets: ['貧困', '動物'],
       customServiceTargets: [],
       serviceTargetDescription: '貧困、動物',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -362,13 +350,12 @@ export class DailyDemandService {
       },
       customConditions: ['有效期限至少3個月'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、有效期限至少3個月',
-
-      status: '上架',
+      status: '隱藏',
       remaining: 9,
-      messageCount: 0,
+      messageCount: 2,
       createdAt: '2026-08-12T08:45:00',
-      publishedAt: '2026-08-12T10:00:00',
-      expectedOffShelfAt: '2026-10-11T10:00:00',
+      publishedAt: undefined,
+      expectedOffShelfAt: undefined,
       image: [
         'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
@@ -401,15 +388,13 @@ export class DailyDemandService {
       category: '醫療與照護用品',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭社會福利服務中心',
-      address: '宜蘭縣宜蘭市舊城南路30號',
+      address: '彰化縣彰化市中山路二段416號',
       phone: '03-9313000',
       note: '獨立包裝或整盒包裝皆可。',
       brand: '不限品牌',
-
       serviceTargets: ['身障', '重症照護'],
       customServiceTargets: ['一般服務對象', '工作人員'],
       serviceTargetDescription: '身障、重症照護、一般服務對象、工作人員',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -420,12 +405,20 @@ export class DailyDemandService {
       customConditions: ['全新未使用'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、全新未使用',
 
+      // 手動下架
       status: '下架',
+      offShelfReason: 'manual',
+
       remaining: 0,
-      messageCount: 8,
+      messageCount: 2,
       createdAt: '2026-07-01T09:00:00',
-      publishedAt: '2026-07-02T09:00:00',
-      expectedOffShelfAt: '2026-08-01T09:00:00',
+
+      // 手動下架：上架日期固定為 2026/09/08
+      publishedAt: '2026-09-08T09:00:00',
+
+      // 普通：上架 60 天
+      expectedOffShelfAt: '2026-11-07T09:00:00',
+
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
       imageFileNames: ['測試圖2'],
       contactTimeWeekday: true,
@@ -454,15 +447,13 @@ export class DailyDemandService {
       category: '清潔與衛生用品',
       receiveMethod: { 寄送: false, 面交: true },
       recipient: '羅東家庭支持服務站',
-      address: '宜蘭縣羅東鎮中正北路45號',
+      address: '南投縣南投市中興路660號',
       phone: '03-9544500',
       note: '面交請提前預約。',
       brand: '不限品牌',
-
       serviceTargets: ['孩童', '貧困'],
       customServiceTargets: ['成人'],
       serviceTargetDescription: '孩童、貧困、成人',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -472,13 +463,12 @@ export class DailyDemandService {
       },
       customConditions: ['瓶身完整無破損'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、瓶身完整無破損',
-
-      status: '上架',
+      status: '隱藏',
       remaining: 30,
-      messageCount: 1,
+      messageCount: 2,
       createdAt: '2026-08-15T14:20:00',
-      publishedAt: '2026-08-16T09:00:00',
-      expectedOffShelfAt: '2026-10-15T09:00:00',
+      publishedAt: undefined,
+      expectedOffShelfAt: undefined,
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
       imageFileNames: ['測試圖1'],
       contactTimeWeekday: true,
@@ -507,15 +497,13 @@ export class DailyDemandService {
       category: '其他',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭兒童學習支持中心',
-      address: '宜蘭縣宜蘭市民族路75號',
+      address: '雲林縣斗六市雲林路二段515號',
       phone: '03-9367500',
       note: '希望以國小學童尺寸為主。',
       brand: '不限品牌',
-
       serviceTargets: ['孩童', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '孩童、貧困',
-
       conditions: {
         全新: '接受',
         二手: '接受',
@@ -526,12 +514,20 @@ export class DailyDemandService {
       customConditions: ['拉鍊與背帶功能正常', '不可有嚴重破損'],
       conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、拉鍊與背帶功能正常、不可有嚴重破損',
 
-      status: '上架',
+      // 手動下架
+      status: '下架',
+      offShelfReason: 'manual',
+
       remaining: 5,
-      messageCount: 3,
+      messageCount: 2,
       createdAt: '2026-08-17T10:10:00',
-      publishedAt: '2026-08-17T11:00:00',
-      expectedOffShelfAt: '2026-09-16T11:00:00',
+
+      // 手動下架：上架日期固定為 2026/09/08
+      publishedAt: '2026-09-08T11:00:00',
+
+      // 緊急：上架 30 天
+      expectedOffShelfAt: '2026-10-08T11:00:00',
+
       image: [
         'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
@@ -563,15 +559,13 @@ export class DailyDemandService {
       category: '食品與飲用水',
       receiveMethod: { 寄送: true, 面交: false },
       recipient: '宜蘭緊急物資服務站',
-      address: '宜蘭縣五結鄉中興路80號',
+      address: '嘉義縣太保市祥和一路東段1號',
       phone: '03-9658000',
       note: '請勿捐贈已過期或即將到期食品。',
       brand: '不限品牌',
-
       serviceTargets: ['貧困'],
       customServiceTargets: ['急難家庭'],
       serviceTargetDescription: '貧困、急難家庭',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -582,13 +576,12 @@ export class DailyDemandService {
       customConditions: ['保存期限至少6個月', '罐身不得凹陷嚴重或生鏽'],
       conditionDescription:
         '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、保存期限至少6個月、罐身不得凹陷嚴重或生鏽',
-
-      status: '上架',
+      status: '隱藏',
       remaining: 46,
       messageCount: 2,
       createdAt: '2026-08-18T08:00:00',
-      publishedAt: '2026-08-18T09:00:00',
-      expectedOffShelfAt: '2026-10-17T09:00:00',
+      publishedAt: undefined,
+      expectedOffShelfAt: undefined,
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
       imageFileNames: ['測試圖2'],
       contactTimeWeekday: true,
@@ -617,15 +610,13 @@ export class DailyDemandService {
       category: '長者與身心障礙用品',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭長者照護支持站',
-      address: '宜蘭縣員山鄉員山路100號',
+      address: '嘉義市東區中山路199號',
       phone: '03-9221000',
       note: '不同口味皆可，特殊醫療用途產品請先聯繫確認。',
       brand: '不限品牌',
-
       serviceTargets: ['老人', '身障', '重症照護'],
       customServiceTargets: [],
       serviceTargetDescription: '老人、身障、重症照護',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -636,10 +627,13 @@ export class DailyDemandService {
       customConditions: ['有效期限至少6個月', '需為全新未開封'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、有效期限至少6個月、需為全新未開封',
 
-      status: '上架',
+      // 自然下架
+      status: '下架',
+      offShelfReason: 'natural',
+
       remaining: 3,
-      messageCount: 6,
-      createdAt: '2026-08-19T09:40:00',
+      messageCount: 2,
+      createdAt: '2026-07-19T09:40:00',
       publishedAt: '2026-08-19T10:00:00',
       expectedOffShelfAt: '2026-09-02T10:00:00',
       image: [
@@ -674,15 +668,13 @@ export class DailyDemandService {
       category: '清潔與衛生用品',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭社福物資中心',
-      address: '宜蘭縣宜蘭市泰山路120號',
+      address: '臺南市安平區永華路二段6號',
       phone: '03-9331200',
       note: '紙箱外觀若有輕微破損但商品完整仍可接受。',
       brand: '不限品牌',
-
       serviceTargets: ['老人', '孩童', '貧困'],
       customServiceTargets: ['一般家庭'],
       serviceTargetDescription: '老人、孩童、貧困、一般家庭',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -692,10 +684,9 @@ export class DailyDemandService {
       },
       customConditions: ['紙品需保持乾燥', '不可受潮'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、毀損：不接受、紙品需保持乾燥、不可受潮',
-
       status: '隱藏',
       remaining: 60,
-      messageCount: 0,
+      messageCount: 2,
       createdAt: '2026-08-20T13:15:00',
       publishedAt: undefined,
       expectedOffShelfAt: undefined,
@@ -727,15 +718,13 @@ export class DailyDemandService {
       category: '生活與炊事用品',
       receiveMethod: { 寄送: false, 面交: true },
       recipient: '宜蘭獨居長者關懷站',
-      address: '宜蘭縣三星鄉三星路二段35號',
+      address: '高雄市苓雅區四維三路2號',
       phone: '03-9893500',
       note: '二手用品需確認通電與自動斷電功能正常。',
       brand: '不限品牌',
-
       serviceTargets: ['老人', '貧困'],
       customServiceTargets: ['獨居長者'],
       serviceTargetDescription: '老人、貧困、獨居長者',
-
       conditions: {
         全新: '接受',
         二手: '接受',
@@ -746,12 +735,20 @@ export class DailyDemandService {
       customConditions: ['電源線不可破損', '加熱功能需正常'],
       conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、電源線不可破損、加熱功能需正常',
 
-      status: '上架',
+      // 手動下架
+      status: '下架',
+      offShelfReason: 'manual',
+
       remaining: 2,
       messageCount: 2,
       createdAt: '2026-08-21T08:30:00',
-      publishedAt: '2026-08-21T09:00:00',
-      expectedOffShelfAt: '2026-09-20T09:00:00',
+
+      // 手動下架：上架日期固定為 2026/09/08
+      publishedAt: '2026-09-08T09:00:00',
+
+      // 緊急：上架 30 天
+      expectedOffShelfAt: '2026-10-08T09:00:00',
+
       image: [
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
         'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
@@ -783,15 +780,13 @@ export class DailyDemandService {
       category: '醫療與照護用品',
       receiveMethod: { 寄送: true, 面交: false },
       recipient: '宜蘭兒童健康關懷中心',
-      address: '宜蘭縣羅東鎮中華路120號',
+      address: '屏東縣屏東市自由路527號',
       phone: '03-9561200',
       note: '希望為全新商品，刷毛需柔軟。',
       brand: '不限品牌',
-
       serviceTargets: ['孩童', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '孩童、貧困',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -801,13 +796,12 @@ export class DailyDemandService {
       },
       customConditions: ['全新未使用'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、毀損：不接受、全新未使用',
-
       status: '上架',
       remaining: 35,
-      messageCount: 0,
-      createdAt: '2026-08-22T10:00:00',
-      publishedAt: '2026-08-22T11:00:00',
-      expectedOffShelfAt: '2026-10-21T11:00:00',
+      messageCount: 2,
+      createdAt: '2026-07-22T10:00:00',
+      publishedAt: '2026-07-22T11:00:00',
+      expectedOffShelfAt: '2026-09-20T11:00:00',
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
       imageFileNames: ['測試圖1'],
       contactTimeWeekday: true,
@@ -836,15 +830,13 @@ export class DailyDemandService {
       category: '居住安置與修繕用品',
       receiveMethod: { 寄送: false, 面交: true },
       recipient: '宜蘭臨時安置服務中心',
-      address: '宜蘭縣壯圍鄉壯五路70號',
+      address: '臺東縣臺東市中山路276號',
       phone: '03-9387000',
       note: '體積較大，僅接受面交。',
       brand: '不限品牌',
-
       serviceTargets: ['貧困'],
       customServiceTargets: ['急難家庭', '臨時安置家庭'],
       serviceTargetDescription: '貧困、急難家庭、臨時安置家庭',
-
       conditions: {
         全新: '接受',
         二手: '接受',
@@ -854,13 +846,12 @@ export class DailyDemandService {
       },
       customConditions: ['不可有明顯異味', '不可有嚴重污漬或破損'],
       conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、不可有明顯異味、不可有嚴重污漬或破損',
-
-      status: '上架',
+      status: '隱藏',
       remaining: 4,
-      messageCount: 4,
+      messageCount: 2,
       createdAt: '2026-08-23T09:20:00',
-      publishedAt: '2026-08-23T10:00:00',
-      expectedOffShelfAt: '2026-09-22T10:00:00',
+      publishedAt: undefined,
+      expectedOffShelfAt: undefined,
       image: [
         'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
@@ -892,15 +883,13 @@ export class DailyDemandService {
       category: '衣物與保暖用品',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭弱勢家庭物資站',
-      address: '宜蘭縣宜蘭市康樂路90號',
+      address: '花蓮縣花蓮市府前路17號',
       phone: '03-9329000',
       note: '成人及兒童尺寸均有需求。',
       brand: '不限品牌',
-
       serviceTargets: ['老人', '孩童', '貧困'],
       customServiceTargets: ['成人'],
       serviceTargetDescription: '老人、孩童、貧困、成人',
-
       conditions: {
         全新: '接受',
         二手: '接受',
@@ -911,12 +900,20 @@ export class DailyDemandService {
       customConditions: ['不可破損', '需能正常防水'],
       conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、不可破損、需能正常防水',
 
+      // 手動下架
       status: '下架',
+      offShelfReason: 'manual',
+
       remaining: 0,
-      messageCount: 5,
+      messageCount: 2,
       createdAt: '2026-06-10T09:00:00',
-      publishedAt: '2026-06-10T10:00:00',
-      expectedOffShelfAt: '2026-07-10T10:00:00',
+
+      // 手動下架：上架日期固定為 2026/09/08
+      publishedAt: '2026-09-08T10:00:00',
+
+      // 普通：上架 60 天
+      expectedOffShelfAt: '2026-11-07T10:00:00',
+
       image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
       imageFileNames: ['測試圖2'],
       contactTimeWeekday: true,
@@ -945,15 +942,13 @@ export class DailyDemandService {
       category: '食品與飲用水',
       receiveMethod: { 寄送: true, 面交: false },
       recipient: '宜蘭長者營養支持站',
-      address: '宜蘭縣頭城鎮開蘭路150號',
+      address: '澎湖縣馬公市治平路32號',
       phone: '03-9771500',
       note: '原味或低糖口味皆可。',
       brand: '不限品牌',
-
       serviceTargets: ['老人', '貧困'],
       customServiceTargets: [],
       serviceTargetDescription: '老人、貧困',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -963,10 +958,9 @@ export class DailyDemandService {
       },
       customConditions: ['保存期限至少4個月'],
       conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、保存期限至少4個月',
-
       status: '上架',
       remaining: 22,
-      messageCount: 1,
+      messageCount: 2,
       createdAt: '2026-08-25T08:40:00',
       publishedAt: '2026-08-25T09:30:00',
       expectedOffShelfAt: '2026-10-24T09:30:00',
@@ -1001,15 +995,13 @@ export class DailyDemandService {
       category: '通訊與求救用品',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭弱勢青年支持中心',
-      address: '宜蘭縣羅東鎮興東路180號',
+      address: '金門縣金城鎮民生路60號',
       phone: '03-9571800',
       note: '二手商品需確認電池狀況正常，若有充電線也歡迎一併提供。',
       brand: '不限品牌',
-
       serviceTargets: ['青少年', '貧困'],
       customServiceTargets: ['弱勢成人'],
       serviceTargetDescription: '青少年、貧困、弱勢成人',
-
       conditions: {
         全新: '接受',
         二手: '接受',
@@ -1020,13 +1012,12 @@ export class DailyDemandService {
       customConditions: ['需能正常充電及放電', '外觀不可有嚴重破損', '不可有電池膨脹情況'],
       conditionDescription:
         '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、需能正常充電及放電、外觀不可有嚴重破損、不可有電池膨脹情況',
-
-      status: '上架',
+      status: '隱藏',
       remaining: 6,
-      messageCount: 7,
+      messageCount: 2,
       createdAt: '2026-08-27T11:00:00',
-      publishedAt: '2026-08-27T12:00:00',
-      expectedOffShelfAt: '2026-09-26T12:00:00',
+      publishedAt: undefined,
+      expectedOffShelfAt: undefined,
       image: [
         'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
@@ -1060,15 +1051,13 @@ export class DailyDemandService {
       category: '其他',
       receiveMethod: { 寄送: true, 面交: true },
       recipient: '宜蘭急難家庭支援中心',
-      address: '宜蘭縣宜蘭市中興路200號',
+      address: '連江縣南竿鄉介壽村76號',
       phone: '03-9362000',
       note: '此項需求內容較為彈性，若有大量物資或不同種類物資欲捐贈，請先聯絡機構確認，方便安排分類與配送。',
       brand: '不限品牌',
-
       serviceTargets: ['老人', '孩童', '青少年', '身障', '貧困'],
       customServiceTargets: ['急難家庭', '低收入戶', '弱勢家庭', '獨居長者'],
       serviceTargetDescription: '老人、孩童、青少年、身障、貧困、急難家庭、低收入戶、弱勢家庭、獨居長者',
-
       conditions: {
         全新: '接受',
         二手: '不接受',
@@ -1085,12 +1074,18 @@ export class DailyDemandService {
       conditionDescription:
         '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、食品需有清楚有效期限、所有用品需保持乾燥及完整、不可提供已開封或明顯損壞商品、若一次捐贈大量物資，請先聯繫機構',
 
-      status: '上架',
+      // 自然下架
+      status: '下架',
+      offShelfReason: 'natural',
+
       remaining: 11,
-      messageCount: 9,
+      messageCount: 2,
       createdAt: '2026-08-29T09:00:00',
-      publishedAt: '2026-08-29T10:00:00',
-      expectedOffShelfAt: '2026-09-12T10:00:00',
+
+      // 原本日期保留，因為這筆是自然下架
+      publishedAt: '2026-08-20T10:00:00',
+      expectedOffShelfAt: '2026-09-03T10:00:00',
+
       image: [
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',

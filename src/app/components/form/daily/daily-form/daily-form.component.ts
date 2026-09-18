@@ -1,15 +1,25 @@
 import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
+import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
+import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
+
+interface NominatimSearchResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
 
 @Component({
   selector: 'app-daily-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent, SupplyOffShelfComponent, SupplyOnShelfComponent],
   templateUrl: './daily-form.component.html',
   styleUrls: [
     './daily-form-A.component.scss',
@@ -24,21 +34,25 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   fromDetail = false;
   hasServiceTarget = true;
 
-  // =========================================================
-  // 固定需求對象
-  // 資料庫改成使用陣列，因此前端也改成 string[]
-  // =========================================================
+  private originalStatus: DailyDemand['status'] = '隱藏';
+  private originalOffShelfReason: DailyDemand['offShelfReason'] | undefined;
+  private pendingStatus: DailyDemand['status'] | undefined;
+
+  showOffShelfWarning = false;
+  showOnShelfWarning = false;
+
+  get isManualOffShelf(): boolean {
+    return this.isEditMode && this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
+  }
+
   serviceTargetOptions: string[] = ['老人', '嬰幼兒', '孩童', '青少年', '身障', '貧困', '重症照護', '動物', '無家者'];
 
-  // 圖片
   imageFiles: File[] = [];
 
-  // 圖片預覽
   showImagePreview = false;
   previewImage = '';
   previewImageName = '';
 
-  // 類別下拉選單
   categoryDropdownOpen = false;
 
   categoryOptions: NonNullable<DailyDemand['category']>[] = [
@@ -80,32 +94,20 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     contactTimeAfternoon: false,
     contactTimeEvening: false,
 
-    // 聯絡時間：是否分開設定平日、假日
     contactTimeSeparate: false,
 
-    // 平日時段
     contactTimeWeekdayMorning: false,
     contactTimeWeekdayAfternoon: false,
     contactTimeWeekdayEvening: false,
 
-    // 假日時段
     contactTimeWeekendMorning: false,
     contactTimeWeekendAfternoon: false,
     contactTimeWeekendEvening: false,
 
-    // =========================================================
-    // 服務對象
-    // 改成陣列，不再使用 boolean object
-    // =========================================================
     serviceTargets: [],
-
-    // 自訂需求對象維持原本陣列
     customServiceTargets: [''],
-
-    // 資料庫使用：合併後的需求對象
     serviceTargetDescription: '',
 
-    // 接受物資狀態
     conditions: {
       全新: '',
       二手: '',
@@ -115,8 +117,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     },
 
     customConditions: [''],
-
-    // 資料庫使用：合併後的物資需求狀態
     conditionDescription: '',
 
     priority: '普通',
@@ -129,6 +129,8 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     recipient: '',
     address: '',
+    latitude: undefined,
+    longitude: undefined,
     phone: '',
     note: '',
     brand: '',
@@ -139,12 +141,10 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     private dailyDemandService: DailyDemandService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {}
 
-  // =========================================================
-  // 點擊類別下拉選單以外的地方時關閉
-  // =========================================================
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -168,24 +168,14 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
 
-    // =========================================================
-    // 編輯模式
-    // =========================================================
     if (serialNo) {
       this.isEditMode = true;
 
       const data = this.dailyDemandService.getDemands().find((item) => item.serialNo === serialNo);
 
       if (data) {
-        // =====================================================
-        // 需求對象
-        //
-        // 新資料庫格式：
-        // serviceTargets: ['老人', '嬰幼兒', '身障']
-        //
-        // 這裡同時保留舊 boolean object 的相容處理，
-        // 避免你目前還沒全部改完的假資料直接爆錯。
-        // =====================================================
+        this.originalStatus = data.status ?? '隱藏';
+        this.originalOffShelfReason = data.offShelfReason;
 
         let serviceTargets: string[] = [];
 
@@ -201,6 +191,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
           ...data,
 
           status: data.status ?? '上架',
+
           remaining: data.remaining ?? null,
 
           receiveMethod:
@@ -213,42 +204,33 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
           recipient: data.recipient ?? '',
           address: data.address ?? '',
+          latitude: data.latitude,
+          longitude: data.longitude,
           phone: data.phone ?? '',
 
           image: [...(data.image ?? [])],
           imageFileNames: [...(data.imageFileNames ?? [])],
 
           contactTimeWeekday: data.contactTimeWeekday ?? false,
-
           contactTimeWeekend: data.contactTimeWeekend ?? false,
-
           contactTimeMorning: data.contactTimeMorning ?? false,
-
           contactTimeAfternoon: data.contactTimeAfternoon ?? false,
-
           contactTimeEvening: data.contactTimeEvening ?? false,
 
           contactTimeSeparate: data.contactTimeSeparate ?? false,
 
           contactTimeWeekdayMorning: data.contactTimeWeekdayMorning ?? false,
-
           contactTimeWeekdayAfternoon: data.contactTimeWeekdayAfternoon ?? false,
-
           contactTimeWeekdayEvening: data.contactTimeWeekdayEvening ?? false,
 
           contactTimeWeekendMorning: data.contactTimeWeekendMorning ?? false,
-
           contactTimeWeekendAfternoon: data.contactTimeWeekendAfternoon ?? false,
-
           contactTimeWeekendEvening: data.contactTimeWeekendEvening ?? false,
 
           serviceTargetDescription: data.serviceTargetDescription ?? '',
 
           conditionDescription: data.conditionDescription ?? '',
 
-          // ===================================================
-          // 需求對象改成陣列
-          // ===================================================
           serviceTargets: serviceTargets,
 
           customServiceTargets: data.customServiceTargets?.length ? [...data.customServiceTargets] : [''],
@@ -266,7 +248,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
           customConditions: data.customConditions?.length ? [...data.customConditions] : [''],
         };
 
-        // 載入原本已儲存的圖片
         this.imageFiles = [];
 
         Promise.all(
@@ -292,6 +273,116 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
+  onStatusClick(event: MouseEvent, newStatus: DailyDemand['status']): void {
+    if (newStatus === '上架' && this.isManualOffShelf) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.demand.status = '下架';
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    this.onStatusSelect(newStatus);
+  }
+
+  onStatusSelect(newStatus: DailyDemand['status']): void {
+    if (!this.isEditMode) {
+      this.demand.status = newStatus;
+
+      if (newStatus === '隱藏') {
+        this.demand.publishedAt = undefined;
+        this.demand.expectedOffShelfAt = undefined;
+        this.demand.offShelfReason = undefined;
+      }
+
+      return;
+    }
+
+    const wasManualOffShelf = this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
+
+    const currentlyManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
+
+    if (wasManualOffShelf || currentlyManualOffShelf) {
+      if (newStatus === '上架') {
+        this.demand.status = '下架';
+        this.showOnShelfWarning = true;
+      } else {
+        this.demand.status = '下架';
+      }
+
+      return;
+    }
+
+    if (newStatus === '下架') {
+      if (this.demand.status === '下架') {
+        return;
+      }
+
+      this.pendingStatus = '下架';
+      this.demand.status = this.originalStatus;
+      this.showOffShelfWarning = true;
+      return;
+    }
+
+    if (newStatus === '隱藏') {
+      this.demand.status = '隱藏';
+
+      this.demand.publishedAt = undefined;
+      this.demand.expectedOffShelfAt = undefined;
+      this.demand.offShelfReason = undefined;
+
+      this.pendingStatus = undefined;
+
+      return;
+    }
+
+    if (newStatus === '上架') {
+      this.demand.status = '上架';
+      this.pendingStatus = undefined;
+
+      return;
+    }
+  }
+
+  cancelManualOffShelf(): void {
+    this.showOffShelfWarning = false;
+    this.pendingStatus = undefined;
+    this.demand.status = this.originalStatus;
+  }
+
+  hideInsteadOfOffShelf(): void {
+    this.showOffShelfWarning = false;
+    this.pendingStatus = undefined;
+
+    this.demand.status = '隱藏';
+
+    this.demand.publishedAt = undefined;
+    this.demand.expectedOffShelfAt = undefined;
+    this.demand.offShelfReason = undefined;
+  }
+
+  confirmManualOffShelf(): void {
+    this.showOffShelfWarning = false;
+    this.pendingStatus = undefined;
+
+    const now = new Date();
+
+    this.demand.status = '下架';
+    this.demand.offShelfReason = 'manual';
+    this.demand.expectedOffShelfAt = now.toISOString();
+  }
+
+  closeOnShelfWarning(): void {
+    this.showOnShelfWarning = false;
+
+    if (this.isManualOffShelf) {
+      this.demand.status = '下架';
+      this.demand.offShelfReason = 'manual';
+    }
+  }
+
   async base64ToFile(base64: string, fileName: string): Promise<File> {
     const response = await fetch(base64);
     const blob = await response.blob();
@@ -301,30 +392,14 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // =========================================================
-  // 接收方式
-  // =========================================================
   get hasReceiveMethod(): boolean {
     return this.demand.receiveMethod['寄送'] || this.demand.receiveMethod['面交'];
   }
 
-  // =========================================================
-  // 需求對象
-  // =========================================================
-
-  /**
-   * 判斷需求對象是否已被選取
-   */
   isServiceTargetSelected(target: string): boolean {
     return this.demand.serviceTargets.includes(target);
   }
 
-  /**
-   * 點擊需求對象 checkbox
-   *
-   * 如果原本沒有 → 加入陣列
-   * 如果原本有 → 從陣列移除
-   */
   toggleServiceTarget(target: string): void {
     const index = this.demand.serviceTargets.indexOf(target);
 
@@ -334,21 +409,173 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       this.demand.serviceTargets.splice(index, 1);
     }
 
-    // 即時更新資料庫使用的合併欄位
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
+  }
+
+  // =========================================================
+  // 從完整地址取得道路名稱
+  // =========================================================
+  private extractRoadName(address: string): string {
+    let roadAddress = address.trim().replace(/臺/g, '台').replace(/\s+/g, '');
+
+    // 移除縣市名稱
+    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+    // 移除區、鄉、鎮、縣轄市名稱
+    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+    // 移除門牌號碼及後面的內容
+    roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
+
+    return roadAddress.trim();
+  }
+
+  // =========================================================
+  // 地址 → 經緯度
+  // =========================================================
+  async getCoordinatesFromAddress(address: string): Promise<boolean> {
+    const url = 'https://nominatim.openstreetmap.org/search';
+
+    const originalAddress = address.trim();
+
+    // =========================================================
+    // 第一階段：先搜尋完整地址
+    // =========================================================
+    const searchAddresses: string[] = [
+      originalAddress,
+      originalAddress.replace(/臺/g, '台'),
+      originalAddress.replace(/號$/, ''),
+      originalAddress.replace(/臺/g, '台').replace(/號$/, ''),
+      originalAddress.replace(/\s+/g, ''),
+      originalAddress.replace(/臺/g, '台').replace(/\s+/g, ''),
+      originalAddress.replace(/臺/g, '台').replace(/號$/, '').replace(/\s+/g, ''),
+    ];
+
+    const uniqueAddresses = [...new Set(searchAddresses.filter((item) => item.length > 0))];
+
+    console.log('Nominatim 將先嘗試搜尋完整地址：', uniqueAddresses);
+
+    for (const searchAddress of uniqueAddresses) {
+      const params = {
+        // 原城市碼／台灣設定維持不變
+        q: `${searchAddress}, Taiwan`,
+        format: 'jsonv2',
+        limit: '1',
+        countrycodes: 'tw',
+      };
+
+      try {
+        console.log('Nominatim 搜尋完整地址：', searchAddress);
+
+        const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+
+        console.log('Nominatim 回傳結果：', results);
+
+        if (!results || results.length === 0) {
+          continue;
+        }
+
+        const result = results[0];
+
+        const latitude = Number(result.lat);
+        const longitude = Number(result.lon);
+
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+          console.warn('完整地址回傳的經緯度無效：', result);
+          continue;
+        }
+
+        this.demand.latitude = latitude;
+        this.demand.longitude = longitude;
+
+        console.log('--------------------------------');
+        console.log('Nominatim 完整地址搜尋成功');
+        console.log('原始地址：', address);
+        console.log('成功搜尋：', searchAddress);
+        console.log('轉換後緯度：', latitude);
+        console.log('轉換後經度：', longitude);
+        console.log('Nominatim 找到的位置：', result.display_name);
+        console.log('--------------------------------');
+
+        return true;
+      } catch (error) {
+        console.error(`Nominatim 搜尋完整地址失敗：${searchAddress}`, error);
+
+        // 繼續嘗試下一種完整地址格式
+        continue;
+      }
+    }
+
+    // =========================================================
+    // 第二階段：完整地址找不到 → 搜尋道路名稱
+    // =========================================================
+    const roadAddress = this.extractRoadName(originalAddress);
+
+    if (!roadAddress) {
+      console.warn('無法從地址取得道路名稱：', originalAddress);
+
+      return false;
+    }
+
+    console.log('完整地址全部找不到，改搜尋道路名稱：', roadAddress);
+
+    const roadParams = {
+      // 原城市碼／台灣設定維持不變
+      q: `${roadAddress}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      const roadResults = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params: roadParams }));
+
+      console.log('Nominatim 道路搜尋結果：', roadResults);
+
+      if (!roadResults || roadResults.length === 0) {
+        console.warn('道路名稱也找不到：', roadAddress);
+
+        return false;
+      }
+
+      const roadResult = roadResults[0];
+
+      const latitude = Number(roadResult.lat);
+      const longitude = Number(roadResult.lon);
+
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        console.warn('道路回傳的經緯度無效：', roadResult);
+
+        return false;
+      }
+
+      // 將道路座標寫入需求資料
+      this.demand.latitude = latitude;
+      this.demand.longitude = longitude;
+
+      console.log('--------------------------------');
+      console.log('Nominatim 道路搜尋成功');
+      console.log('原始地址：', address);
+      console.log('道路名稱：', roadAddress);
+      console.log('道路座標緯度：', latitude);
+      console.log('道路座標經度：', longitude);
+      console.log('Nominatim 找到的位置：', roadResult.display_name);
+      console.log('--------------------------------');
+
+      return true;
+    } catch (error) {
+      console.error(`Nominatim 道路搜尋失敗：${roadAddress}`, error);
+
+      return false;
+    }
   }
 
   // =========================================================
   // 儲存
   // =========================================================
-  save() {
+  async save() {
     this.submitted = true;
 
-    // =======================================================
-    // 需求對象改成陣列後：
-    // 只要固定需求對象陣列有資料，或自訂需求對象有資料，
-    // 就代表至少有選擇一個需求對象。
-    // =======================================================
     this.hasServiceTarget = this.demand.serviceTargets.length > 0 || this.demand.customServiceTargets.some((target) => target.trim());
 
     const hasReceiveMethod = this.demand.receiveMethod.寄送 || this.demand.receiveMethod.面交;
@@ -363,7 +590,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       !this.demand.reason ||
       !this.demand.description ||
       invalidReceiveInfo ||
-      !this.demand.phone ||
       (this.isEditMode && (this.demand.remaining === null || this.demand.remaining === undefined))
     ) {
       if (!this.demand.item) {
@@ -421,24 +647,29 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // =======================================================
-    // 需求對象驗證
-    // =======================================================
     if (!this.hasServiceTarget) {
       this.scrollToServiceTarget();
       return;
     }
 
     // =======================================================
-    // 清除空白的自訂欄位
+    // 地址轉換經緯度
+    // =======================================================
+    const addressSuccess = await this.getCoordinatesFromAddress(this.demand.address);
+
+    if (!addressSuccess) {
+      alert('無法找到此地址的位置，請確認地址是否正確。');
+
+      return;
+    }
+
+    // =======================================================
+    // 清除空白自訂欄位
     // =======================================================
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
 
     this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
 
-    // =======================================================
-    // 保留至少一個輸入框
-    // =======================================================
     if (this.demand.customConditions.length === 0) {
       this.demand.customConditions.push('');
     }
@@ -447,9 +678,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       this.demand.customServiceTargets.push('');
     }
 
-    // =======================================================
-    // 建立資料庫使用的合併欄位
-    // =======================================================
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
 
     this.demand.conditionDescription = this.buildConditionDescription();
@@ -458,11 +686,25 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     // 編輯
     // =======================================================
     if (this.isEditMode) {
-      const originalStatus = this.dailyDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo)?.status;
+      const originalItem = this.dailyDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
 
-      const originalPublishedAt = this.demand.publishedAt;
+      const originalStatus = originalItem?.status;
+      const originalOffShelfReason = originalItem?.offShelfReason;
+      const originalPublishedAt = originalItem?.publishedAt;
 
       const now = new Date();
+
+      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+
+      const isCurrentManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
+
+      if (this.demand.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
+        alert('此需求為使用者主動下架，無法重新上架。');
+
+        this.demand.status = '下架';
+
+        return;
+      }
 
       if (this.demand.status === '上架') {
         if (originalStatus !== '上架') {
@@ -478,11 +720,20 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         if (this.demand.publishedAt) {
           this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(this.demand.publishedAt), this.demand.priority);
         }
+
+        this.demand.offShelfReason = undefined;
       } else if (this.demand.status === '隱藏') {
         this.demand.publishedAt = undefined;
         this.demand.expectedOffShelfAt = undefined;
+        this.demand.offShelfReason = undefined;
       } else if (this.demand.status === '下架') {
-        this.demand.expectedOffShelfAt = now.toISOString();
+        if (!this.demand.offShelfReason) {
+          this.demand.offShelfReason = 'manual';
+        }
+
+        if (!this.demand.expectedOffShelfAt) {
+          this.demand.expectedOffShelfAt = now.toISOString();
+        }
       }
 
       this.dailyDemandService.updateDemand(this.demand);
@@ -496,21 +747,20 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       // =====================================================
       // 新增
       // =====================================================
-
       const createdDate = new Date();
 
-      // 創建日期
       this.demand.createdAt = createdDate.toISOString();
 
-      // 如果新增時選擇「上架」
       if (this.demand.status === '上架') {
         this.demand.publishedAt = createdDate.toISOString();
 
         this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, this.demand.priority);
+
+        this.demand.offShelfReason = undefined;
       } else {
-        // 隱藏：尚未上架
         this.demand.publishedAt = undefined;
         this.demand.expectedOffShelfAt = undefined;
+        this.demand.offShelfReason = undefined;
       }
 
       this.dailyDemandService.addDemand(this.demand);
@@ -519,29 +769,15 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // =========================================================
-  // 整合需求對象
-  //
-  // 固定需求對象：
-  // ['老人', '嬰幼兒', '身障']
-  //
-  // 自訂需求對象：
-  // ['獨居者', '低收入戶']
-  //
-  // 最後：
-  // 老人、嬰幼兒、身障、獨居者、低收入戶
-  // =========================================================
   buildServiceTargetDescription(): string {
     const targets: string[] = [];
 
-    // 固定需求對象直接從陣列取得
     this.demand.serviceTargets.forEach((target) => {
       if (target.trim()) {
         targets.push(`${target}✓`);
       }
     });
 
-    // 自訂需求對象
     this.demand.customServiceTargets.forEach((target) => {
       const value = target.trim();
 
@@ -553,9 +789,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return targets.join('、');
   }
 
-  // =========================================================
-  // 整合物資需求狀態
-  // =========================================================
   buildConditionDescription(): string {
     const conditions = [
       {
@@ -601,9 +834,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return result.join('、');
   }
 
-  // =========================================================
-  // 自訂物資狀態
-  // =========================================================
   addCustomCondition() {
     if (this.demand.customConditions.length < 5) {
       this.demand.customConditions.push('');
@@ -622,9 +852,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     this.demand.conditionDescription = this.buildConditionDescription();
   }
 
-  // =========================================================
-  // 預計下架日期
-  // =========================================================
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DailyDemand['priority']): string {
     const offShelfDate = new Date(publishedDate);
 
@@ -645,9 +872,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return offShelfDate.toISOString();
   }
 
-  // =========================================================
-  // 自訂需求對象
-  // =========================================================
   addCustomServiceTarget() {
     if (this.demand.customServiceTargets.length < 5) {
       this.demand.customServiceTargets.push('');
@@ -661,7 +885,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       this.demand.customServiceTargets.push('');
     }
 
-    // 建立資料庫使用的合併欄位
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
 
     this.demand.conditionDescription = this.buildConditionDescription();
@@ -678,9 +901,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // =========================================================
-  // 物資狀態
-  // =========================================================
   toggleCondition(key: keyof DailyDemand['conditions']) {
     const current = this.demand.conditions[key];
 
@@ -705,35 +925,25 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return '―';
   }
 
-  // =========================================================
-  // 剩餘需求
-  // =========================================================
   onRemainingChange() {
     if (this.demand.remaining !== null && this.demand.remaining !== undefined) {
       this.demand.remaining = Number(this.demand.remaining);
 
-      // 剩餘需求不可超過需求數量
       if (this.demand.amount !== null && this.demand.remaining > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
       }
     }
   }
 
-  // =========================================================
-  // 數字長度限制
-  // =========================================================
   limitNumberLength(event: Event, field: 'amount' | 'remaining') {
     const input = event.target as HTMLInputElement;
 
-    // 只允許數字
     let value = input.value.replace(/[^0-9]/g, '');
 
-    // 最多 10 位
     if (value.length > 10) {
       value = value.substring(0, 10);
     }
 
-    // 同步回輸入框
     input.value = value;
 
     const numberValue = value ? Number(value) : null;
@@ -741,14 +951,12 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     if (field === 'amount') {
       this.demand.amount = numberValue;
 
-      // 新增時，剩餘需求預設等於需求數量
       if (!this.isEditMode) {
         this.demand.remaining = numberValue;
       }
     }
 
     if (field === 'remaining') {
-      // 不能超過需求數量
       if (numberValue !== null && this.demand.amount !== null && numberValue > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
 
@@ -759,9 +967,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // =========================================================
-  // 一般文字長度限制
-  // =========================================================
   limitTextLength(field: 'item' | 'amountDescription' | 'reason' | 'description' | 'brand' | 'note', maxLength: number) {
     const value = this.demand[field];
 
@@ -782,9 +987,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // =========================================================
-  // 自訂陣列文字長度限制
-  // =========================================================
   limitCustomArrayTextLength(field: 'customServiceTargets' | 'customConditions', index: number, maxLength: number) {
     const value = this.demand[field][index];
 
@@ -793,9 +995,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // =========================================================
-  // 圖片
-  // =========================================================
   onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
 
@@ -805,24 +1004,20 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     const file = input.files[0];
 
-    // 最多 5 張
     if (this.imageFiles.length >= 5) {
       alert('最多只能上傳 5 張圖片');
       input.value = '';
       return;
     }
 
-    // 限制 5MB
     if (file.size > 5 * 1024 * 1024) {
       alert('圖片大小不可超過 5MB');
       input.value = '';
       return;
     }
 
-    // 加入圖片清單
     this.imageFiles.push(file);
 
-    // 讀取圖片
     const reader = new FileReader();
 
     reader.onload = () => {
@@ -841,7 +1036,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     reader.readAsDataURL(file);
 
-    // 清空 input
     input.value = '';
   }
 

@@ -10,4 +10,10 @@ import { VolunteerListComponent } from '../../../components/data-list/disaster/v
   templateUrl: './agency-disaster-workspace.component.html',
   styleUrl: './agency-disaster-workspace.component.scss',
 })
-export class AgencyDisasterWorkspaceComponent {}
+export class AgencyDisasterWorkspaceComponent {
+  activeType: 'material' | 'volunteer' = 'material';
+
+  selectType(type: 'material' | 'volunteer'): void {
+    this.activeType = type;
+  }
+}
