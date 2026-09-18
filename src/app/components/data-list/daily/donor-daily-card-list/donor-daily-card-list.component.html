@@ -1,15 +1,25 @@
 <section class="featured-section">
-  <div class="featured-grid">
-    @for (item of pagedDailyDemands; track item.serialNo) {
-
-    <app-donor-daily-card [demand]="item" (view)="openDetail(item)"></app-donor-daily-card>
-
-    } @empty {
-
-    <div class="data-empty">無捐助資料</div>
-
-    }
-  </div>
+  @if (isLoading) {
+    <div class="data-loading">
+      載入中...
+    </div>
+  } @else {
+    <div class="featured-grid">
+      @for (
+        item of pagedDailyDemands;
+        track item.serialNo
+      ) {
+        <app-donor-daily-card
+          [demand]="item"
+          (view)="openDetail(item)">
+        </app-donor-daily-card>
+      } @empty {
+        <div class="data-empty">
+          無捐助資料
+        </div>
+      }
+    </div>
+  }
 </section>
 
 <app-pagination
@@ -17,5 +27,5 @@
   [currentPage]="currentPage"
   [totalPages]="totalPages"
   [pageNumbers]="pageNumbers"
-  (pageChange)="goToPage($event)"
-></app-pagination>
+  (pageChange)="goToPage($event)">
+</app-pagination>

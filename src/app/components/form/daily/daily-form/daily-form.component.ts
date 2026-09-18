@@ -341,7 +341,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   // =========================================================
   // 儲存
   // =========================================================
-  save() {
+  async save(): Promise<void> {
     this.submitted = true;
 
     // =======================================================
@@ -485,12 +485,22 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         this.demand.expectedOffShelfAt = now.toISOString();
       }
 
-      this.dailyDemandService.updateDemand(this.demand);
+      try {
+        await this.dailyDemandService.updateDemand(this.demand);
 
-      if (this.fromDetail) {
-        this.router.navigate(['/agency/daily-detail', this.demand.serialNo]);
-      } else {
-        this.router.navigate(['/agency/daily']);
+        if (this.fromDetail) {
+          await this.router.navigate(['/agency/daily-detail', this.demand.serialNo]);
+        } else {
+          await this.router.navigate(['/agency/daily'], {
+            queryParams: {
+              refresh: Date.now(),
+            },
+          });
+        }
+      } catch (error) {
+        console.error('修改日常物資需求失敗：', error);
+
+        alert('修改失敗，請稍後再試。');
       }
     } else {
       // =====================================================
@@ -513,9 +523,19 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         this.demand.expectedOffShelfAt = undefined;
       }
 
-      this.dailyDemandService.addDemand(this.demand);
+      try {
+        await this.dailyDemandService.addDemand(this.demand);
 
-      this.router.navigate(['/agency/daily']);
+        await this.router.navigate(['/agency/daily'], {
+          queryParams: {
+            refresh: Date.now(),
+          },
+        });
+      } catch (error) {
+        console.error('新增日常物資需求失敗：', error);
+
+        alert('新增失敗，請稍後再試。');
+      }
     }
   }
 

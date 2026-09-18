@@ -638,81 +638,74 @@ export class DailyBatchEditComponent implements OnInit {
     // =========================
     // 開始儲存
     // =========================
-    for (const item of this.editDemands) {
-      // =========================
-      // 清除空白自訂欄位
-      // =========================
-      item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
+    try {
+      for (const item of this.editDemands) {
+        // 清除空白自訂欄位
+        item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
 
-      item.customServiceTargets = item.customServiceTargets.filter((target) => target.trim() !== '');
+        item.customServiceTargets = item.customServiceTargets.filter((target) => target.trim() !== '');
 
-      // 至少保留一個輸入框
-      if (item.customConditions.length === 0) {
-        item.customConditions.push('');
+        // 至少保留一個輸入框
+        if (item.customConditions.length === 0) {
+          item.customConditions.push('');
+        }
+
+        if (item.customServiceTargets.length === 0) {
+          item.customServiceTargets.push('');
+        }
+
+        // 確保需求對象為陣列
+        if (!Array.isArray(item.serviceTargets)) {
+          item.serviceTargets = [];
+        }
+
+        // 建立資料庫使用的合併欄位
+        item.serviceTargetDescription = this.buildServiceTargetDescription(item);
+
+        item.conditionDescription = this.buildConditionDescription(item);
+
+        // 建立日期
+        if ((item.status === '上架' || item.status === '下架') && !item.createdAt) {
+          item.createdAt = new Date().toISOString();
+        }
+
+        // 隱藏中：取消公開上架資訊
+        if (item.status === '隱藏') {
+          item.publishedAt = undefined;
+          item.expectedOffShelfAt = undefined;
+        }
+
+        // 儲存圖片
+        const files = this.imageFiles[item.serialNo] ?? [];
+
+        item.image = [];
+        item.imageFileNames = [];
+
+        for (const file of files) {
+          const base64 = await this.fileToBase64(file);
+
+          item.image.push(base64);
+          item.imageFileNames.push(file.name);
+        }
+
+        // 關鍵：等待每一筆資料確實更新到 Supabase。
+        await this.service.updateDemand(item);
       }
 
-      if (item.customServiceTargets.length === 0) {
-        item.customServiceTargets.push('');
-      }
+      // 所有批次編輯資料成功寫入後才清掉暫存。
+      localStorage.removeItem('editDemands');
 
-      // =========================
-      // 確保需求對象為陣列
-      // =========================
-      if (!Array.isArray(item.serviceTargets)) {
-        item.serviceTargets = [];
-      }
+      // 最後才跳回列表，列表此時讀到的一定是最新資料。
+      await this.router.navigate(['/agency/daily'], {
+        queryParams: {
+          refresh: Date.now(),
+        },
+      });
+    } catch (error) {
+      console.error('批次修改日常物資需求失敗：', error);
 
-      // =========================
-      // 建立資料庫使用的合併欄位
-      // =========================
-      item.serviceTargetDescription = this.buildServiceTargetDescription(item);
-
-      item.conditionDescription = this.buildConditionDescription(item);
-
-      // =========================
-      // 建立日期
-      // =========================
-      if ((item.status === '上架' || item.status === '下架') && !item.createdAt) {
-        item.createdAt = new Date().toISOString();
-      }
-
-      // =========================
-      // 隱藏 = 尚未發布
-      // =========================
-      if (item.status === '隱藏') {
-        item.createdAt = undefined;
-      }
-
-      // =========================
-      // 儲存圖片
-      // =========================
-      const files = this.imageFiles[item.serialNo] || [];
-
-      item.image = [];
-      item.imageFileNames = [];
-
-      for (const file of files) {
-        const base64 = await this.fileToBase64(file);
-
-        item.image.push(base64);
-        item.imageFileNames.push(file.name);
-      }
-
-      // =========================
-      // 更新 Service
-      // =========================
-      this.service.updateDemand(item);
+      alert('批次修改失敗，請確認網路或 Supabase 權限後再試。');
     }
-
-    // =========================
-    // 清除批次編輯暫存
-    // =========================
-    localStorage.removeItem('editDemands');
-
-    // =========================
-    // 返回日常需求列表
-    // =========================
-    this.router.navigate(['/agency/daily']);
   }
 
   // =========================

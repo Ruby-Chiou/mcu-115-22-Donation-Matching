@@ -1,14 +1,7 @@
 import { Injectable } from '@angular/core';
-import {
-  Observable,
-  Subject,
-  from,
-} from 'rxjs';
+import { Observable, Subject, from } from 'rxjs';
 
-import {
-  DisasterDemand,
-  CreateDisasterDemand,
-} from '../../../models/agency/disaster-demand';
+import { DisasterDemand, CreateDisasterDemand } from '../../../models/agency/disaster-demand';
 
 import { SupabaseService } from '../supabase.service';
 
@@ -51,51 +44,35 @@ interface DisasterDemandRow {
   providedIn: 'root',
 })
 export class DisasterDemandService {
-  private readonly tableName =
-    'agency_disaster_supply_items';
+  private readonly tableName = 'agency_disaster_supply_items';
 
   private demands: DisasterDemand[] = [];
 
   private loadingPromise: Promise<void>;
 
-  private readonly demandChangedSubject =
-    new Subject<void>();
+  private readonly demandChangedSubject = new Subject<void>();
 
-  readonly demandChanged$ =
-    this.demandChangedSubject.asObservable();
+  readonly demandChanged$ = this.demandChangedSubject.asObservable();
 
-  constructor(
-    private readonly supabaseService: SupabaseService
-  ) {
-    this.loadingPromise =
-      this.loadFromSupabase();
+  constructor(private readonly supabaseService: SupabaseService) {
+    this.loadingPromise = this.loadFromSupabase();
   }
 
   private async loadFromSupabase(): Promise<void> {
-    const { data, error } =
-      await this.supabaseService.client
-        .from(this.tableName)
-        .select('*')
-        .order('serialNo', {
-          ascending: true,
-        })
-        .abortSignal(
-          AbortSignal.timeout(10000)
-        );
+    const { data, error } = await this.supabaseService.client
+      .from(this.tableName)
+      .select('*')
+      .order('serialNo', {
+        ascending: true,
+      })
+      .abortSignal(AbortSignal.timeout(10000));
 
     if (error) {
-      console.error(
-        '讀取災害物資需求失敗：',
-        error
-      );
+      console.error('讀取災害物資需求失敗：', error);
       throw error;
     }
 
-    this.demands = (data ?? []).map((row) =>
-      this.mapRowToDemand(
-        row as DisasterDemandRow
-      )
-    );
+    this.demands = (data ?? []).map((row) => this.mapRowToDemand(row as DisasterDemandRow));
   }
 
   async waitUntilLoaded(): Promise<void> {
@@ -103,140 +80,97 @@ export class DisasterDemandService {
   }
 
   async reload(): Promise<void> {
-    this.loadingPromise =
-      this.loadFromSupabase();
+    this.loadingPromise = this.loadFromSupabase();
 
     await this.loadingPromise;
   }
 
-  private mapRowToDemand(
-    row: DisasterDemandRow
-  ): DisasterDemand {
+  private mapRowToDemand(row: DisasterDemandRow): DisasterDemand {
+    const databaseId = Number(row.id);
+
     return {
+      id: databaseId,
       serialNo: Number(row.serialNo),
       createdAt: row.created_at ?? '',
       publishedAt: row.publishedAt ?? undefined,
-      expectedOffShelfAt:
-        row.expectedOffShelfAt ?? undefined,
+      expectedOffShelfAt: row.expectedOffShelfAt ?? undefined,
       item: row.item ?? '',
       amount: Number(row.amount ?? 0),
-      remaining:
-        row.remaining === null
-          ? undefined
-          : Number(row.remaining),
+      remaining: row.remaining === null ? undefined : Number(row.remaining),
       unit: row.unit ?? '',
-      amountDescription:
-        row.amountDescription ?? '',
+      amountDescription: row.amountDescription ?? '',
       category: (row.category ?? '') as DisasterDemand['category'],
       reason: row.reason ?? '',
       description: row.description ?? '',
       brand: row.brand ?? '',
       image: this.toStringArray(row.image),
-      imageFileNames: this.toStringArray(
-        row.imageFileNames
-      ),
-      conditions: this.toConditions(
-        row.conditionDescription
-      ),
+      imageFileNames: this.toStringArray(row.imageFileNames),
+      conditions: this.toConditions(row.conditionDescription),
       customConditions: [],
       priority: row.priority as DisasterDemand['priority'],
       status: row.status as DisasterDemand['status'],
       address: row.address ?? '',
       phone: row.phone ?? '',
-      contactTimeDifferent:
-        row.contactTimeDifferent ?? false,
-      contactTimeMorning:
-        row.contactTimeMorning ?? false,
-      contactTimeAfternoon:
-        row.contactTimeAfternoon ?? false,
-      contactTimeEvening:
-        row.contactTimeEvening ?? false,
-      weekdayMorning:
-        row.weekdayMorning ?? false,
-      weekdayAfternoon:
-        row.weekdayAfternoon ?? false,
-      weekdayEvening:
-        row.weekdayEvening ?? false,
-      weekendMorning:
-        row.weekendMorning ?? false,
-      weekendAfternoon:
-        row.weekendAfternoon ?? false,
-      weekendEvening:
-        row.weekendEvening ?? false,
+      contactTimeDifferent: row.contactTimeDifferent ?? false,
+      contactTimeMorning: row.contactTimeMorning ?? false,
+      contactTimeAfternoon: row.contactTimeAfternoon ?? false,
+      contactTimeEvening: row.contactTimeEvening ?? false,
+      weekdayMorning: row.weekdayMorning ?? false,
+      weekdayAfternoon: row.weekdayAfternoon ?? false,
+      weekdayEvening: row.weekdayEvening ?? false,
+      weekendMorning: row.weekendMorning ?? false,
+      weekendAfternoon: row.weekendAfternoon ?? false,
+      weekendEvening: row.weekendEvening ?? false,
       note: row.note ?? '',
     };
   }
 
-  private demandToRow(
-    demand: DisasterDemand
-  ): Omit<DisasterDemandRow, 'id'> {
+  private demandToRow(demand: DisasterDemand): Omit<DisasterDemandRow, 'id'> {
     return {
       serialNo: demand.serialNo,
       created_at: demand.createdAt || null,
       publishedAt: demand.publishedAt ?? null,
-      expectedOffShelfAt:
-        demand.expectedOffShelfAt ?? null,
+      expectedOffShelfAt: demand.expectedOffShelfAt ?? null,
       item: demand.item,
       amount: demand.amount,
       remaining: demand.remaining ?? null,
       unit: demand.unit,
-      amountDescription:
-        demand.amountDescription ?? null,
+      amountDescription: demand.amountDescription ?? null,
       category: demand.category,
       reason: demand.reason,
       description: demand.description,
       brand: demand.brand ?? null,
       image: demand.image ?? [],
       imageFileNames: demand.imageFileNames ?? [],
-      conditionDescription:
-        demand.conditions ?? {},
+      conditionDescription: demand.conditions ?? {},
       priority: demand.priority,
       status: demand.status,
       address: demand.address,
       phone: demand.phone,
-      contactTimeDifferent:
-        demand.contactTimeDifferent ?? false,
-      contactTimeMorning:
-        demand.contactTimeMorning ?? false,
-      contactTimeAfternoon:
-        demand.contactTimeAfternoon ?? false,
-      contactTimeEvening:
-        demand.contactTimeEvening ?? false,
-      weekdayMorning:
-        demand.weekdayMorning ?? false,
-      weekdayAfternoon:
-        demand.weekdayAfternoon ?? false,
-      weekdayEvening:
-        demand.weekdayEvening ?? false,
-      weekendMorning:
-        demand.weekendMorning ?? false,
-      weekendAfternoon:
-        demand.weekendAfternoon ?? false,
-      weekendEvening:
-        demand.weekendEvening ?? false,
+      contactTimeDifferent: demand.contactTimeDifferent ?? false,
+      contactTimeMorning: demand.contactTimeMorning ?? false,
+      contactTimeAfternoon: demand.contactTimeAfternoon ?? false,
+      contactTimeEvening: demand.contactTimeEvening ?? false,
+      weekdayMorning: demand.weekdayMorning ?? false,
+      weekdayAfternoon: demand.weekdayAfternoon ?? false,
+      weekdayEvening: demand.weekdayEvening ?? false,
+      weekendMorning: demand.weekendMorning ?? false,
+      weekendAfternoon: demand.weekendAfternoon ?? false,
+      weekendEvening: demand.weekendEvening ?? false,
       note: demand.note ?? '',
     };
   }
 
   private toStringArray(value: unknown): string[] {
     if (Array.isArray(value)) {
-      return value.filter(
-        (item): item is string =>
-          typeof item === 'string'
-      );
+      return value.filter((item): item is string => typeof item === 'string');
     }
 
     return [];
   }
 
-  private toConditions(
-    value: unknown
-  ): DisasterDemand['conditions'] {
-    if (
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value)
-    ) {
+  private toConditions(value: unknown): DisasterDemand['conditions'] {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
       return value as DisasterDemand['conditions'];
     }
 
@@ -249,9 +183,7 @@ export class DisasterDemandService {
     };
   }
 
-  async addDemand(
-    demand: CreateDisasterDemand
-  ): Promise<void> {
+  async addDemand(demand: CreateDisasterDemand): Promise<void> {
     await this.reload();
 
     const newDemand = {
@@ -261,30 +193,16 @@ export class DisasterDemandService {
 
     const row = this.demandToRow(newDemand);
 
-    const { data, error } =
-      await this.supabaseService.client
-        .from(this.tableName)
-        .insert(row)
-        .select('*')
-        .single();
+    const { data, error } = await this.supabaseService.client.from(this.tableName).insert(row).select('*').single();
 
     if (error) {
-      console.error(
-        '新增災害物資需求失敗：',
-        error
-      );
+      console.error('新增災害物資需求失敗：', error);
       throw error;
     }
 
-    const savedDemand =
-      this.mapRowToDemand(
-        data as DisasterDemandRow
-      );
+    const savedDemand = this.mapRowToDemand(data as DisasterDemandRow);
 
-    this.demands = [
-      ...this.demands,
-      savedDemand,
-    ];
+    this.demands = [...this.demands, savedDemand];
 
     this.demandChangedSubject.next();
   }
@@ -294,103 +212,112 @@ export class DisasterDemandService {
   }
 
   getDemandsFromServer(): Observable<DisasterDemand[]> {
-    return from(
-      this.reload().then(
-        () => [...this.demands]
-      )
-    );
+    return from(this.reload().then(() => [...this.demands]));
   }
 
-  getDemandBySerialNo(
-    serialNo: number
-  ): DisasterDemand | undefined {
-    return this.demands.find(
-      (demand) =>
-        demand.serialNo === serialNo
-    );
+  getDemandBySerialNo(serialNo: number): DisasterDemand | undefined {
+    return this.demands.find((demand) => demand.serialNo === serialNo);
   }
 
   async updateDemand(
-    updatedDemand: DisasterDemand
-  ): Promise<void> {
-    const row = this.demandToRow(updatedDemand);
-
-    const { data, error } =
-      await this.supabaseService.client
-        .from(this.tableName)
-        .update(row)
-        .eq('serialNo', updatedDemand.serialNo)
-        .select('*')
-        .single();
-
-    if (error) {
-      console.error(
-        '修改災害物資需求失敗：',
-        error
-      );
-      throw error;
-    }
-
-    const savedDemand =
-      this.mapRowToDemand(
-        data as DisasterDemandRow
-      );
-
-    this.demands = this.demands.map(
-      (item) =>
-        item.serialNo === savedDemand.serialNo
-          ? savedDemand
-          : item
+  updatedDemand: DisasterDemand
+): Promise<void> {
+  if (updatedDemand.id == null) {
+    throw new Error(
+      `找不到資料庫 id，無法更新災害物資：${updatedDemand.serialNo}`
     );
-
-    this.demandChangedSubject.next();
   }
 
- async deleteDemand(
-  serialNo: number
-): Promise<void> {
+  const row =
+    this.demandToRow(updatedDemand);
+
   const { data, error } =
     await this.supabaseService.client
       .from(this.tableName)
-      .delete()
-      .eq('serialNo', serialNo)
-      .select('serialNo');
+      .update(row)
+      .eq('id', updatedDemand.id)
+      .select('*')
+      .single();
 
   if (error) {
     console.error(
-      '刪除災害物資需求失敗：',
+      '修改災害物資需求失敗：',
       error
     );
 
     throw error;
   }
 
-  if (!data || data.length === 0) {
+  if (!data) {
     throw new Error(
-      `找不到要刪除的資料，serialNo：${serialNo}`
+      `找不到更新後的災害物資：id=${updatedDemand.id}`
     );
   }
 
-  this.demands = this.demands.filter(
-    (item) =>
-      item.serialNo !== serialNo
+  const savedDemand =
+    this.mapRowToDemand(
+      data as DisasterDemandRow
+    );
+
+  this.demands = this.demands.map((item) =>
+    item.id === savedDemand.id
+      ? savedDemand
+      : item
   );
-
-  this.demandChangedSubject.next();
 }
+  private getNextSerialNo(): number {
+    if (this.demands.length === 0) {
+      return 1;
+    }
 
-private getNextSerialNo(): number {
-  if (this.demands.length === 0) {
-    return 1;
+    return Math.max(...this.demands.map((item) => item.serialNo)) + 1;
   }
 
-  return (
-    Math.max(
-      ...this.demands.map(
-        (item) => item.serialNo
-      )
-    ) + 1
-  );
-}
+    async deleteDemand(
+    serialNo: number
+  ): Promise<void> {
+    const item = this.demands.find(
+      (demand) =>
+        demand.serialNo === serialNo
+    );
 
+    if (!item) {
+      throw new Error(
+        `找不到要刪除的災害物資。serialNo：${serialNo}`
+      );
+    }
+
+    if (item.id == null) {
+      throw new Error(
+        `找不到資料庫 id，無法刪除災害物資。serialNo：${serialNo}`
+      );
+    }
+
+    const { data, error } =
+      await this.supabaseService.client
+        .from(this.tableName)
+        .delete()
+        .eq('id', item.id)
+        .select('id');
+
+    if (error) {
+      console.error(
+        '刪除災害物資需求失敗：',
+        error
+      );
+
+      throw error;
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error(
+        `找不到或沒有權限刪除災害物資。id：${item.id}`
+      );
+    }
+
+    this.demands = this.demands.filter(
+      (demand) =>
+        demand.id !== item.id
+    );
+  }
 }
