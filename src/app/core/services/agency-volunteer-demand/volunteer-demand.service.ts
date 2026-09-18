@@ -81,10 +81,8 @@ export class VolunteerDemandService {
 
   private mapRowToDemand(row: VolunteerDemandRow): VolunteerDemand {
     return {
-      // 資料庫主鍵：所有 CRUD、詳細頁路由都使用它
       id: Number(row.id),
 
-      // 流水號：僅供畫面顯示
       serialNo: Number(row.serialNo ?? 0),
 
       type: row.type ?? '',
@@ -106,14 +104,15 @@ export class VolunteerDemandService {
       messageCount: row.messageCount ?? 0,
 
       createdAt: row.createdAt ?? '',
+
       publishedAt: row.publishedAt ?? '',
+
       expectedOffShelfAt: row.offShelfAt ?? '',
     };
   }
 
   private demandToRow(demand: VolunteerDemand): Omit<VolunteerDemandRow, 'id'> {
     return {
-      // 不傳 id，讓資料庫 insert 時自動產生主鍵
       serialNo: demand.serialNo,
 
       type: demand.type,
@@ -134,7 +133,9 @@ export class VolunteerDemandService {
       messageCount: demand.messageCount ?? null,
 
       createdAt: demand.createdAt || null,
+
       publishedAt: demand.publishedAt || null,
+
       offShelfAt: demand.expectedOffShelfAt || null,
     };
   }
@@ -152,33 +153,25 @@ export class VolunteerDemandService {
   }
 
   /**
-   * 從目前前端記憶體陣列依資料庫主鍵 id 查詢。
-   * 適合列表已經載入時使用；重整詳細頁時請用 getVolunteerByDatabaseId。
+   * 依資料庫主鍵 id 直接向 Supabase 取得單筆志工需求。
+   * 詳細頁、編輯頁與頁面重整都應呼叫此方法。
    */
-  getDemandById(id: number): VolunteerDemand | undefined {
-    return this.demands.find((demand) => demand.id === id);
-  }
+  async getDemandById(id: number): Promise<VolunteerDemand | undefined> {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[志工需求] 無效的資料庫 id：', id);
 
-  /**
-   * 舊名稱保留，避免其他元件立刻編譯失敗。
-   * 現在同樣改成以資料庫 id 查詢。
-   */
-  getVolunteerById(id: number): VolunteerDemand | undefined {
-    return this.getDemandById(id);
-  }
+      return undefined;
+    }
 
-  /**
-   * 直接從 Supabase 依資料庫主鍵 id 查詢。
-   * 詳細頁／編輯頁在手動重整後應使用此方法。
-   */
-  async getVolunteerByDatabaseId(id: number): Promise<VolunteerDemand | undefined> {
-    console.log('[志工需求] 查詢資料庫 id：', id);
+    console.log('[志工需求] 以資料庫 id 查詢：', id);
 
     const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('id', id).maybeSingle();
 
-    console.log('[志工需求] Supabase data：', data);
-
-    console.log('[志工需求] Supabase error：', error);
+    console.log('[志工需求] Supabase 查詢結果：', {
+      id,
+      data,
+      error,
+    });
 
     if (error) {
       console.error('讀取單筆志工需求失敗：', error);
@@ -187,6 +180,8 @@ export class VolunteerDemandService {
     }
 
     if (!data) {
+      console.warn('[志工需求] 找不到資料庫資料，id：', id);
+
       return undefined;
     }
 
@@ -203,7 +198,22 @@ export class VolunteerDemandService {
     return demand;
   }
 
-  async addDemand(demand: VolunteerDemand): Promise<void> {
+  /**
+   * 保留舊方法名稱，讓舊元件仍可使用；
+   * 現在也改為以資料庫 id 向 Supabase 查詢。
+   */
+  async getVolunteerById(id: number): Promise<VolunteerDemand | undefined> {
+    return this.getDemandById(id);
+  }
+
+  /**
+   * 保留舊方法名稱，讓現有詳細頁程式可直接使用。
+   */
+  async getVolunteerByDatabaseId(id: number): Promise<VolunteerDemand | undefined> {
+    return this.getDemandById(id);
+  }
+
+  async addDemand(demand: VolunteerDemand): Promise<VolunteerDemand> {
     const row = this.demandToRow(demand);
 
     const { data, error } = await this.supabaseService.client.from(this.tableName).insert(row).select('*').single();
@@ -219,10 +229,12 @@ export class VolunteerDemandService {
     this.demands = [...this.demands, newDemand];
 
     this.demandChangedSubject.next();
+
+    return newDemand;
   }
 
-  async updateDemand(updatedDemand: VolunteerDemand): Promise<void> {
-    if (updatedDemand.id == null || !Number.isFinite(updatedDemand.id)) {
+  async updateDemand(updatedDemand: VolunteerDemand): Promise<VolunteerDemand> {
+    if (updatedDemand.id == null || !Number.isInteger(Number(updatedDemand.id)) || Number(updatedDemand.id) <= 0) {
       throw new Error(`找不到資料庫 id，無法修改志工需求。serialNo：${updatedDemand.serialNo}`);
     }
 
@@ -250,6 +262,8 @@ export class VolunteerDemandService {
     this.demands = this.demands.map((item) => (item.id === savedDemand.id ? savedDemand : item));
 
     this.demandChangedSubject.next();
+
+    return savedDemand;
   }
 
   async deleteDemand(id: number): Promise<void> {

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,10 +44,11 @@ type VolunteerListItem = VolunteerDemand & {
   templateUrl: './volunteer-list.component.html',
   styleUrl: './volunteer-list.component.scss',
 })
-export class VolunteerListComponent implements OnInit, OnDestroy {
+export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy {
   demands: VolunteerListItem[] = [];
   filteredDemands: VolunteerListItem[] = [];
   pagedDemands: VolunteerListItem[] = [];
+
   private demandChangedSubscription?: Subscription;
 
   selectAll = false;
@@ -61,8 +62,9 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
   totalPages = 1;
   pageNumbers: number[] = [];
 
-  private readonly scrollPositionKey = 'agency-disaster-workspace-scroll';
-  private readonly pagePositionKey = 'agency-disaster-workspace-page';
+  private readonly scrollPositionKey = 'agency-volunteer-workspace-scroll';
+
+  private readonly pagePositionKey = 'agency-volunteer-workspace-page';
 
   selectedSort: SortType = 'id';
   sortAscending = true;
@@ -78,8 +80,11 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
   pendingOffShelfItem?: VolunteerListItem;
 
   statusOptions: DisplayVolunteerStatus[] = ['已上架', '隱藏中', '已下架'];
+
   priorityOptions: VolunteerDemand['priority'][] = ['普通', '緊急', '非常緊急'];
+
   typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資整理', '環境清潔', '醫療照護', '其他'];
+
   messageOptions = ['已回覆', '未回覆'];
 
   selectedFilters: VolunteerFilterState = {
@@ -92,16 +97,18 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly volunteerDemandService: VolunteerDemandService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
+
     this.demandChangedSubscription = this.volunteerDemandService.demandChanged$.subscribe(() => {
       void this.loadDemands();
     });
   }
 
   ngOnInit(): void {
-    const restoreListPosition = sessionStorage.getItem('restore-agency-disaster-list');
+    const restoreListPosition = sessionStorage.getItem('restore-agency-volunteer-list');
 
     if (restoreListPosition === 'true') {
       const savedPage = sessionStorage.getItem(this.pagePositionKey);
@@ -114,18 +121,16 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
         }
       }
 
-      sessionStorage.removeItem('restore-agency-disaster-list');
+      sessionStorage.removeItem('restore-agency-volunteer-list');
     } else {
       this.currentPage = 1;
+
       sessionStorage.removeItem(this.pagePositionKey);
+
       sessionStorage.removeItem(this.scrollPositionKey);
     }
 
     void this.loadDemands();
-  }
-
-  ngOnDestroy(): void {
-    this.demandChangedSubscription?.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -154,28 +159,45 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngOnDestroy(): void {
+    this.demandChangedSubscription?.unsubscribe();
+  }
+
   goToAddDemand(): void {
     this.router.navigate(['/agency/volunteer-form']);
   }
 
   goToDetail(id: number): void {
-    this.saveListPosition();
-    sessionStorage.setItem('restore-agency-disaster-list', 'true');
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[VolunteerListComponent] 無法前往詳細頁，資料庫 id 不正確：', id);
 
-    this.router.navigate(['/agency/volunteer-detail', id], {
-      queryParams: {
-        number: id,
-      },
-    });
+      return;
+    }
+
+    this.saveListPosition();
+
+    sessionStorage.setItem('restore-agency-volunteer-list', 'true');
+
+    this.router.navigate(['/agency/volunteer-detail', id]);
   }
 
   goToEdit(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[VolunteerListComponent] 無法前往編輯頁，資料庫 id 不正確：', id);
+
+      return;
+    }
+
     this.saveListPosition();
+
+    sessionStorage.setItem('restore-agency-volunteer-list', 'true');
+
     this.router.navigate(['/agency/volunteer-edit', id]);
   }
 
   saveListPosition(): void {
     sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
+
     sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
   }
 
@@ -188,7 +210,7 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     try {
-      await this.volunteerDemandService.waitUntilLoaded();
+      await this.volunteerDemandService.reload();
 
       const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
         上架: '已上架',
@@ -198,18 +220,31 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
       this.demands = this.volunteerDemandService.getDemands().map((item) => ({
         ...item,
+
         selected: false,
+
         displayStatus: displayStatus[item.status as VolunteerStatus],
+
         displayCreatedAt:
           item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
+
         displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+
         displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+
         category: item.type ?? '其他',
       }));
 
       this.applyFilters(false);
+    } catch (error) {
+      console.error('載入志工需求失敗：', error);
+
+      this.demands = [];
+      this.filteredDemands = [];
+      this.pagedDemands = [];
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -222,8 +257,11 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
     const scrollY = window.scrollY;
 
     this.selectedSort = event.selectedSort;
+
     this.sortAscending = event.sortAscending;
+
     this.userHasSorted = true;
+
     this.applySort();
 
     setTimeout(() => {
@@ -249,12 +287,16 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
     if (selectedItems.length === 0) {
       alert('請先選擇要修改的需求');
+
       return;
     }
 
     localStorage.setItem('editVolunteerDemands', JSON.stringify(selectedItems));
+
     this.saveListPosition();
-    sessionStorage.setItem('restore-agency-disaster-list', 'true');
+
+    sessionStorage.setItem('restore-agency-volunteer-list', 'true');
+
     this.router.navigate(['/agency/volunteer-batch-edit']);
   }
 
@@ -271,6 +313,7 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
       type: [],
       messageStatus: [],
     };
+
     this.applyFilters();
   }
 
@@ -278,9 +321,10 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
     this.filteredDemands = this.demands.filter((item) => {
       if (this.searchTerm && this.searchTerm.trim() !== '') {
         const term = this.searchTerm.trim().toLowerCase();
-        const matchItem = item.type ? item.type.toLowerCase().includes(term) : false;
 
-        if (!matchItem) {
+        const matchType = item.type ? item.type.toLowerCase().includes(term) : false;
+
+        if (!matchType) {
           return false;
         }
       }
@@ -298,15 +342,17 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
       }
 
       if (this.selectedFilters.messageStatus.length > 0) {
-        const hasMsg = (item.messageCount ?? 0) > 0;
+        const hasMessage = (item.messageCount ?? 0) > 0;
+
         const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
+
         const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
 
-        if (wantsReplied && !wantsNotReplied && !hasMsg) {
+        if (wantsReplied && !wantsNotReplied && !hasMessage) {
           return false;
         }
 
-        if (wantsNotReplied && !wantsReplied && hasMsg) {
+        if (wantsNotReplied && !wantsReplied && hasMessage) {
           return false;
         }
       }
@@ -349,13 +395,17 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
       if (this.selectedSort === 'publishedAt') {
         const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+
         const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+
         result = aTime - bTime;
       }
 
       if (this.selectedSort === 'expectedOffShelfAt') {
         const aTime = a.expectedOffShelfAt ? new Date(a.expectedOffShelfAt).getTime() : 0;
+
         const bTime = b.expectedOffShelfAt ? new Date(b.expectedOffShelfAt).getTime() : 0;
+
         result = aTime - bTime;
       }
 
@@ -380,10 +430,11 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
       {
         length: this.totalPages,
       },
-      (_, i) => i + 1
+      (_, index) => index + 1
     );
 
     const startIndex = (this.currentPage - 1) * this.pageSize;
+
     const endIndex = startIndex + this.pageSize;
 
     this.pagedDemands = [...this.filteredDemands.slice(startIndex, endIndex)];
@@ -399,15 +450,25 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
   }
 
   openDeleteModal(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[VolunteerListComponent] 無法刪除，資料庫 id 不正確：', id);
+
+      return;
+    }
+
     this.deleteIds = [id];
     this.deleteType = 'single';
     this.showDeleteModal = true;
   }
 
   openBatchDeleteModal(): void {
-    this.deleteIds = this.filteredDemands
-      .filter((item) => item.selected && item.serialNo !== undefined)
-      .map((item) => item.serialNo as number);
+    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => Number(item.id));
+
+    if (this.deleteIds.length === 0) {
+      alert('請先選擇要刪除的需求');
+
+      return;
+    }
 
     this.deleteType = 'batch';
     this.showDeleteModal = true;
@@ -427,11 +488,12 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
   changeStatus(item: VolunteerListItem, event: Event): void {
     const select = event.target as HTMLSelectElement;
+
     const newStatus = select.value as DisplayVolunteerStatus;
 
-    if (newStatus === '已下架') {
-      const originalItem = this.volunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+    const originalItem = this.volunteerDemandService.getDemands().find((demand) => demand.id === item.id);
 
+    if (newStatus === '已下架') {
       if (originalItem?.status === '上架') {
         item.displayStatus = '已上架';
       } else if (originalItem?.status === '隱藏') {
@@ -446,10 +508,9 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
       this.pendingOffShelfItem = item;
       this.showOffShelfWarning = true;
+
       return;
     }
-
-    const originalItem = this.volunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
     if (newStatus === '已上架' && originalItem?.status === '下架') {
       item.displayStatus = '已下架';
@@ -459,10 +520,12 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
       });
 
       this.showOnShelfWarning = true;
+
       return;
     }
 
     item.displayStatus = newStatus;
+
     void this.applyStatusChange(item);
   }
 
@@ -472,16 +535,22 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
     }
 
     const item = this.pendingOffShelfItem;
+
     const now = new Date();
 
     item.status = '下架';
+
     item.expectedOffShelfAt = now.toISOString();
+
     item.displayStatus = '已下架';
+
     item.displayOffShelfAt = now.toLocaleDateString('zh-TW');
+
     item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
     try {
       await this.volunteerDemandService.updateDemand(item);
+
       await this.loadDemands();
     } catch (error) {
       console.error('下架失敗：', error);
@@ -506,10 +575,12 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
     item.expectedOffShelfAt = undefined;
     item.displayPublishedAt = '尚未上架';
     item.displayOffShelfAt = '—';
+
     item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
     try {
       await this.volunteerDemandService.updateDemand(item);
+
       await this.loadDemands();
     } catch (error) {
       console.error('隱藏失敗：', error);
@@ -528,7 +599,7 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
   }
 
   private async applyStatusChange(item: VolunteerListItem): Promise<void> {
-    const originalItem = this.volunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+    const originalItem = this.volunteerDemandService.getDemands().find((demand) => demand.id === item.id);
 
     const originalStatus = originalItem?.status;
 
@@ -538,11 +609,14 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
       case '已上架':
         status = '上架';
         break;
+
       case '隱藏中':
         status = '隱藏';
         break;
+
       default:
         status = '上架';
+        break;
     }
 
     const now = new Date();
@@ -551,6 +625,7 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
       if (originalStatus === '下架') {
         item.displayStatus = '已下架';
         this.showOnShelfWarning = true;
+
         return;
       }
 
@@ -570,7 +645,9 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
       item.status = '上架';
       item.displayStatus = '已上架';
+
       item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+
       item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
     } else {
       item.status = '隱藏';
@@ -585,6 +662,7 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
 
     try {
       await this.volunteerDemandService.updateDemand(item);
+
       await this.loadDemands();
     } catch (error) {
       console.error('狀態更新失敗：', error);
@@ -598,9 +676,11 @@ export class VolunteerListComponent implements OnInit, OnDestroy {
       case '普通':
         offShelfDate.setDate(offShelfDate.getDate() + 30);
         break;
+
       case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 14);
         break;
+
       case '非常緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 7);
         break;
