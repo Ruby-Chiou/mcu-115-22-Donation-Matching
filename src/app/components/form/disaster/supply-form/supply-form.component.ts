@@ -126,69 +126,124 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
-    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
+
+    const id = Number(rawId);
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
-    this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
 
-    // 編輯模式
-    if (serialNo) {
-      this.isEditMode = true;
+    /*
+     * 新增頁沒有 id。
+     * 只有進入 /agency/supply-edit/:id 時，
+     * 才進行資料庫查詢與編輯模式初始化。
+     */
+    if (rawId === null) {
+      this.isEditMode = false;
 
-      const data = this.disasterDemandService.getDemands().find((item) => item.serialNo === serialNo);
+      this.listNumber = undefined;
 
-      if (data) {
-        // 記錄編輯前的原始狀態
-        this.originalStatus = data.status ?? '隱藏';
-        this.originalOffShelfReason = data.offShelfReason;
+      console.log('[SupplyFormComponent] 新增模式');
 
-        this.demand = {
-          ...data,
-          status: data.status ?? '上架',
-          remaining: data.remaining ?? null,
-          image: [...(data.image ?? [])],
-          imageFileNames: [...(data.imageFileNames ?? [])],
+      return;
+    }
 
-          contactTimeDifferent: data.contactTimeDifferent ?? false,
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[SupplyFormComponent] 編輯網址的資料庫 id 不正確：', rawId);
 
-          contactTimeMorning: data.contactTimeMorning ?? false,
-          contactTimeAfternoon: data.contactTimeAfternoon ?? false,
-          contactTimeEvening: data.contactTimeEvening ?? false,
+      this.router.navigate(['/agency/disaster']);
 
-          weekdayMorning: data.weekdayMorning ?? false,
-          weekdayAfternoon: data.weekdayAfternoon ?? false,
-          weekdayEvening: data.weekdayEvening ?? false,
+      return;
+    }
 
-          weekendMorning: data.weekendMorning ?? false,
-          weekendAfternoon: data.weekendAfternoon ?? false,
-          weekendEvening: data.weekendEvening ?? false,
+    this.isEditMode = true;
 
-          conditions: data.conditions ?? {
+    console.log('[SupplyFormComponent] 編輯模式，資料庫 id：', id);
+
+    try {
+      const data = await this.disasterDemandService.getDemandById(id);
+
+      if (!data) {
+        console.error('[SupplyFormComponent] 找不到要編輯的災害物資，id：', id);
+
+        this.router.navigate(['/agency/disaster']);
+
+        return;
+      }
+
+      this.listNumber = data.serialNo;
+
+      this.originalStatus = data.status ?? '隱藏';
+
+      this.originalOffShelfReason = data.offShelfReason;
+
+      this.demand = {
+        ...data,
+
+        status: data.status ?? '隱藏',
+
+        remaining: data.remaining ?? null,
+
+        image: [...(data.image ?? [])],
+
+        imageFileNames: [...(data.imageFileNames ?? [])],
+
+        conditions: {
+          ...(data.conditions ?? {
             全新: '',
             二手: '',
             有擦痕: '',
             過期: '',
             毀損: '',
-          },
+          }),
+        },
 
-          customConditions: data.customConditions?.length ? data.customConditions : [''],
-        };
+        customConditions: data.customConditions?.length ? [...data.customConditions] : [''],
 
-        // 載入原本已儲存的圖片
-        this.imageFiles = [];
+        contactTimeDifferent: data.contactTimeDifferent ?? false,
 
-        Promise.all(
-          (data.image ?? []).map((image, index) => {
-            const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+        contactTimeMorning: data.contactTimeMorning ?? false,
 
-            return this.base64ToFile(image, fileName);
-          })
-        ).then((files) => {
-          this.imageFiles = files;
-          this.cdr.detectChanges();
-        });
-      }
+        contactTimeAfternoon: data.contactTimeAfternoon ?? false,
+
+        contactTimeEvening: data.contactTimeEvening ?? false,
+
+        weekdayMorning: data.weekdayMorning ?? false,
+
+        weekdayAfternoon: data.weekdayAfternoon ?? false,
+
+        weekdayEvening: data.weekdayEvening ?? false,
+
+        weekendMorning: data.weekendMorning ?? false,
+
+        weekendAfternoon: data.weekendAfternoon ?? false,
+
+        weekendEvening: data.weekendEvening ?? false,
+      };
+
+      this.imageFiles = [];
+
+      const files = await Promise.all(
+        (data.image ?? []).map(async (image, index) => {
+          const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+
+          try {
+            return await this.base64ToFile(image, fileName);
+          } catch (error) {
+            console.warn('[SupplyFormComponent] 圖片無法轉 File，略過：', image, error);
+
+            return null;
+          }
+        })
+      );
+
+      this.imageFiles = files.filter((file): file is File => file !== null);
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('[SupplyFormComponent] 載入編輯資料失敗：', error);
+
+      this.router.navigate(['/agency/disaster']);
     }
   }
 
@@ -431,8 +486,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     // 編輯模式
     if (this.isEditMode) {
-      const originalItem = this.disasterDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
-
+      const originalItem = this.disasterDemandService.getDemands().find((item) => item.id === this.demand.id);
       const originalStatus = originalItem?.status;
       const originalOffShelfReason = originalItem?.offShelfReason;
 

@@ -151,7 +151,7 @@ export const routes: Routes = [
     loadComponent: () => import('./components/form/disaster/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
-    path: 'agency/supply-edit/:serialNo',
+    path: 'agency/supply-edit/:id',
     loadComponent: () => import('./components/form/disaster/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {

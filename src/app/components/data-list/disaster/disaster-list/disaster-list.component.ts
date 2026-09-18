@@ -179,10 +179,10 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/agency/supply-detail', id]);
   }
 
-  goToEdit(serialNo: number): void {
+  goToEdit(id: number): void {
     this.saveListPosition();
     sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-edit', serialNo]);
+    this.router.navigate(['/agency/supply-edit', id]);
   }
 
   saveListPosition(): void {
@@ -449,9 +449,8 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openBatchDeleteModal(): void {
-    this.deleteIds = this.filteredDemands
-      .filter((item) => item.selected && item.serialNo !== undefined)
-      .map((item) => item.serialNo as number);
+    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => item.id as number);
+
     this.deleteType = 'batch';
     this.showDeleteModal = true;
   }
@@ -471,8 +470,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     const select = event.target as HTMLSelectElement;
     const newStatus = select.value as DisplayStatus;
 
-    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
+    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
     if (newStatus === '已下架') {
       item.displayStatus = originalItem?.status === '上架' ? '已上架' : originalItem?.status === '下架' ? '已下架' : '隱藏中';
 
@@ -560,8 +558,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async applyStatusChange(item: DisasterListItem): Promise<void> {
-    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
+    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
     const originalStatus = originalItem?.status;
 
     let status: DisasterStatus = item.displayStatus === '已上架' ? '上架' : '隱藏';
