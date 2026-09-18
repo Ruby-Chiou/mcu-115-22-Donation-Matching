@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { catchError, filter, of, Subject, takeUntil, timeout } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { DailyDemand, DailyDisplayStatus } from '../../../../models/agency/daily-demand';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 
@@ -145,48 +145,37 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // 初始化
-ngOnInit(): void {
-  // 每次進入列表先顯示第一頁。
-  this.currentPage = 1;
+  ngOnInit(): void {
+    // 每次進入列表先顯示第一頁。
+    this.currentPage = 1;
 
-  // 不使用舊的 sessionStorage 頁碼。
-  sessionStorage.removeItem(
-    this.pagePositionKey
-  );
+    // 不使用舊的 sessionStorage 頁碼。
+    sessionStorage.removeItem(this.pagePositionKey);
 
-  // 第一次進入列表時讀取資料。
-  this.loadDemands();
+    // 第一次進入列表時讀取資料。
+    void this.loadDemands();
+    // 每次路由成功完成時都印出最後網址，
+    // 先用它確認真正的列表路由。
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event) => {
+        console.log('Router NavigationEnd：', event.urlAfterRedirects);
 
-  // 每次路由成功完成時都印出最後網址，
-  // 先用它確認真正的列表路由。
-  this.router.events
-    .pipe(
-      filter(
-        (event): event is NavigationEnd =>
-          event instanceof NavigationEnd
-      ),
-      takeUntil(this.destroy$)
-    )
-    .subscribe((event) => {
-      console.log(
-        'Router NavigationEnd：',
-        event.urlAfterRedirects
-      );
+        // 只要網址是 /agency/daily 開頭，
+        // 例如 /agency/daily 或 /agency/daily?refresh=1，
+        // 都重新讀取最新資料。
+        const url = event.urlAfterRedirects;
 
-      // 只要網址是 /agency/daily 開頭，
-      // 例如 /agency/daily 或 /agency/daily?refresh=1，
-      // 都重新讀取最新資料。
-      if (
-        event.urlAfterRedirects.startsWith(
-          '/agency/daily'
-        )
-      ) {
-        this.currentPage = 1;
+        if (url === '/agency/daily' || url.startsWith('/agency/daily?')) {
+          this.currentPage = 1;
 
-        this.loadDemands();
-      }
-    });
-}
+          void this.loadDemands();
+        }
+      });
+  }
   // 初始化後恢復捲動位置
   ngAfterViewInit(): void {
     const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
@@ -220,22 +209,30 @@ ngOnInit(): void {
   }
 
   // 查看詳細資料
-  goToDetail(serialNo: number): void {
+  goToDetail(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyListComponent] 無法前往詳細頁，資料庫 id 不正確：', id);
+
+      return;
+    }
+
     this.saveListPosition();
 
-    this.router.navigate(['/agency/daily-detail', serialNo], {
-      queryParams: {
-        number: serialNo,
-      },
-    });
+    this.router.navigate(['/agency/daily-detail', id]);
   }
 
   // 編輯
-  goToEdit(serialNo: number): void {
-    this.saveListPosition();
-    this.router.navigate(['/agency/daily-edit', serialNo]);
-  }
+  goToEdit(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyListComponent] 無法前往編輯頁，資料庫 id 不正確：', id);
 
+      return;
+    }
+
+    this.saveListPosition();
+
+    this.router.navigate(['/agency/daily-edit', id]);
+  }
   // 儲存列表位置
   saveListPosition(): void {
     sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
@@ -286,57 +283,69 @@ ngOnInit(): void {
   }
 
   // 讀取需求
-  loadDemands(): void {
+  async loadDemands(): Promise<void> {
+    if (this.isLoading) {
+      return;
+    }
+
     this.isLoading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
 
-    this.dailyDemandService
-      .getDemandsFromServer()
-      .pipe(
-        timeout(2000),
-        catchError(() => {
-          return of(this.dailyDemandService.getDemands());
-        })
-      )
-      .subscribe((data) => {
-        this.demands = data.map((item) => {
-          let currentStatus: DailyDisplayStatus = '已上架';
+    try {
+      await this.dailyDemandService.reload();
 
-          if (item.status === '上架') {
-            currentStatus = '已上架';
-          }
+      const data = this.dailyDemandService.getDemands();
 
-          if (item.status === '隱藏') {
-            currentStatus = '隱藏中';
-          }
+      this.demands = data.map((item) => {
+        let displayStatus: DailyDisplayStatus;
 
-          if (item.status === '下架') {
-            currentStatus = '已下架';
-          }
+        switch (item.status) {
+          case '上架':
+            displayStatus = '已上架';
+            break;
 
-          return {
-            ...item,
-            selected: false,
-            status: item.status,
-            displayStatus: currentStatus,
+          case '隱藏':
+            displayStatus = '隱藏中';
+            break;
 
-            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+          case '下架':
+            displayStatus = '已下架';
+            break;
 
-            displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+          default:
+            displayStatus = '隱藏中';
+            break;
+        }
 
-            displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+        return {
+          ...item,
+          selected: false,
+          displayStatus,
 
-            remaining: item.remaining ?? item.amount ?? 0,
+          displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
 
-            category: item.category ?? '其他',
-          };
-        });
+          displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
 
-        this.applyFilters(false);
+          displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
 
-        this.isLoading = false;
-        this.cdr.detectChanges();
+          remaining: item.remaining ?? item.amount ?? 0,
+
+          category: item.category ?? '其他',
+        };
       });
+
+      this.applyFilters(false);
+    } catch (error) {
+      console.error('載入日常需求失敗：', error);
+
+      this.demands = [];
+      this.filteredDemands = [];
+      this.pagedDemands = [];
+    } finally {
+      this.isLoading = false;
+
+      this.cdr.detectChanges();
+    }
   }
 
   // 搜尋
@@ -570,20 +579,25 @@ ngOnInit(): void {
   }
 
   // 單筆刪除
-  openDeleteModal(serialNo: number): void {
-    this.deleteIds = [serialNo];
+  openDeleteModal(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyListComponent] 無法刪除，資料庫 id 不正確：', id);
+
+      return;
+    }
+
+    this.deleteIds = [id];
     this.deleteType = 'single';
     this.showDeleteModal = true;
   }
 
   // 批次刪除
   openBatchDeleteModal(): void {
-    this.deleteIds = this.filteredDemands
-      .filter((item) => item.selected && item.serialNo !== undefined)
-      .map((item) => item.serialNo as number);
+    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => Number(item.id));
 
     if (this.deleteIds.length === 0) {
       alert('請先選擇要刪除的需求');
+
       return;
     }
 
@@ -597,16 +611,21 @@ ngOnInit(): void {
   }
 
   // 刪除完成
-  onDeleted(): void {
+  async onDeleted(): Promise<void> {
     this.showDeleteModal = false;
     this.deleteIds = [];
     this.selectAll = false;
-    this.loadDemands();
+
+    this.cdr.detectChanges();
+
+    await this.loadDemands();
+
+    this.cdr.detectChanges();
   }
 
   // 修改狀態
   async changeStatus(item: DailyListItem, newStatus: DailyDisplayStatus): Promise<void> {
-    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.id === item.id);
 
     const originalStatus = originalItem?.status;
 
@@ -737,17 +756,17 @@ ngOnInit(): void {
 
   // 輔助函式：同步更新主資料與分頁陣列中的參考，觸發 DOM 重新繪製
   private refreshItemReference(item: DailyListItem): void {
-    const demandIndex = this.demands.findIndex((d) => d.serialNo === item.serialNo);
+    const demandIndex = this.demands.findIndex((d) => d.id === item.id);
     if (demandIndex !== -1) {
       this.demands[demandIndex] = { ...item };
     }
 
-    const filteredIndex = this.filteredDemands.findIndex((d) => d.serialNo === item.serialNo);
+    const filteredIndex = this.filteredDemands.findIndex((d) => d.id === item.id);
     if (filteredIndex !== -1) {
       this.filteredDemands[filteredIndex] = { ...item };
     }
 
-    const pagedIndex = this.pagedDemands.findIndex((d) => d.serialNo === item.serialNo);
+    const pagedIndex = this.pagedDemands.findIndex((d) => d.id === item.id);
     if (pagedIndex !== -1) {
       this.pagedDemands[pagedIndex] = { ...item };
     }
@@ -782,7 +801,7 @@ ngOnInit(): void {
 
     const item = { ...this.pendingOffShelfItem };
 
-    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.id === item.id);
 
     const now = new Date();
 
@@ -807,22 +826,22 @@ ngOnInit(): void {
     }
 
     try {
-  await this.dailyDemandService.updateDemand(item);
+      await this.dailyDemandService.updateDemand(item);
 
-  this.refreshItemReference(item);
+      this.refreshItemReference(item);
 
-  this.closeOffShelfWarning();
+      this.closeOffShelfWarning();
 
-  this.cdr.detectChanges();
-} catch (error) {
-  console.error('下架更新失敗：', error);
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('下架更新失敗：', error);
 
-  alert('下架失敗，請稍後再試。');
+      alert('下架失敗，請稍後再試。');
 
-  this.closeOffShelfWarning();
+      this.closeOffShelfWarning();
 
-  this.loadDemands();
-}
+      this.loadDemands();
+    }
   }
 
   // 取消手動下架
@@ -853,22 +872,22 @@ ngOnInit(): void {
     item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
     try {
-  await this.dailyDemandService.updateDemand(item);
+      await this.dailyDemandService.updateDemand(item);
 
-  this.refreshItemReference(item);
+      this.refreshItemReference(item);
 
-  this.closeOffShelfWarning();
+      this.closeOffShelfWarning();
 
-  this.cdr.detectChanges();
-} catch (error) {
-  console.error('隱藏失敗：', error);
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('隱藏失敗：', error);
 
-  alert('隱藏失敗，請稍後再試。');
+      alert('隱藏失敗，請稍後再試。');
 
-  this.closeOffShelfWarning();
+      this.closeOffShelfWarning();
 
-  this.loadDemands();
-}
+      this.loadDemands();
+    }
   }
 
   // 關閉下架提示

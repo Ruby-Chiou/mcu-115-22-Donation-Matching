@@ -286,7 +286,7 @@ export class DailyDemandService {
 
     return this.mapRowToDemand(data as DailyDemandRow);
   }
-  
+
   async updateDemand(updatedDemand: DailyDemand): Promise<void> {
     if (updatedDemand.id == null) {
       throw new Error(`找不到資料庫 id，無法更新日常物資：serialNo=${updatedDemand.serialNo}`);
@@ -352,8 +352,12 @@ export class DailyDemandService {
     return savedDemand;
   }
 
-  async deleteDemand(serialNo: number): Promise<void> {
-    const { data, error } = await this.supabaseService.client.from(this.tableName).delete().eq('serialNo', serialNo).select('serialNo');
+  async deleteDemand(id: number): Promise<void> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error(`要刪除的日常物資需求 id 不正確：${id}`);
+    }
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).delete().eq('id', id).select('id');
 
     if (error) {
       console.error('刪除日常物資需求失敗：', error);
@@ -361,11 +365,19 @@ export class DailyDemandService {
       throw error;
     }
 
+    /*
+     * PostgREST / Supabase delete().select()
+     * 只有在資料真的被刪除時才會回傳資料。
+     */
     if (!data || data.length === 0) {
-      throw new Error(`找不到要刪除的日常物資需求，serialNo：${serialNo}`);
+      throw new Error(`找不到要刪除的日常物資需求，id：${id}`);
     }
 
-    this.demands = this.demands.filter((item) => item.serialNo !== serialNo);
+    this.demands = this.demands.filter((item) => item.id !== id);
+
+    console.log('[DailyDemandService] 日常物資需求已刪除：', {
+      id,
+    });
   }
 
   private getNextSerialNo(): number {

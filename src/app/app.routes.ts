@@ -118,11 +118,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/form/daily/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
   },
   {
-    path: 'agency/daily-edit/:serialNo',
+    path: 'agency/daily-edit/:id',
     loadComponent: () => import('./components/form/daily/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
   },
   {
-    path: 'agency/daily-detail/:serialNo',
+    path: 'agency/daily-detail/:id',
     loadComponent: () => import('./components/data-list/daily/daily-detail/daily-detail.component').then((m) => m.DailyDetailComponent),
   },
   {

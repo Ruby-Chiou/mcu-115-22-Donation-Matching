@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -27,68 +27,74 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   previewImageName = '';
 
   constructor(
-    private route: ActivatedRoute,
-    private service: DailyDemandService,
-    private router: Router
+    private readonly route: ActivatedRoute,
+    private readonly service: DailyDemandService,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   isLoading = true;
   loadError = '';
 
   async ngOnInit(): Promise<void> {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const rawId = this.route.snapshot.paramMap.get('id');
+
+    const id = Number(rawId);
+
+    console.log('[DailyDetailComponent] 取得路由資料庫 id：', {
+      rawId,
+      id,
+    });
 
     if (!Number.isInteger(id) || id <= 0) {
       this.isLoading = false;
+
       this.loadError = '網址中的資料編號不正確。';
+
+      this.cdr.detectChanges();
+
       return;
     }
 
     try {
-      this.demand = await this.service.getDemandById(id);
+      const loadedDemand = await this.service.getDemandById(id);
 
-      if (!this.demand) {
+      console.log('[DailyDetailComponent] Service 回傳資料：', loadedDemand);
+
+      if (!loadedDemand) {
         this.loadError = '找不到這筆日常物資需求資料。';
+
         return;
       }
 
+      this.demand = {
+        ...loadedDemand,
+
+        remaining: loadedDemand.remaining ?? loadedDemand.amount ?? 0,
+
+        customConditions: [...(loadedDemand.customConditions ?? [])],
+
+        customServiceTargets: [...(loadedDemand.customServiceTargets ?? [])],
+
+        serviceTargets: [...(loadedDemand.serviceTargets ?? [])],
+      };
+
       this.listNumber = this.demand.serialNo;
 
-      this.demand.remaining ??= this.demand.amount ?? 0;
-      this.demand.customConditions ??= [];
-      this.demand.customServiceTargets ??= [];
-      this.demand.serviceTargets ??= [];
+      console.log('[DailyDetailComponent] 已設定 this.demand：', this.demand);
     } catch (error) {
       console.error('載入日常物資詳細資料失敗：', error);
 
       this.loadError = '資料載入失敗，請確認網路、Supabase 連線或資料庫權限。';
     } finally {
       this.isLoading = false;
+
+      /*
+       * 讓 F5 後非同步 Supabase 查詢完成時，
+       * 立即更新 *ngIf 與詳細資料畫面。
+       */
+      this.cdr.detectChanges();
     }
-  }
-
-  getServiceTargetDescription(): string {
-    if (!this.demand) {
-      return '無';
-    }
-
-    const result: string[] = [];
-
-    (this.demand.serviceTargets || []).forEach((target) => {
-      const value = target.trim();
-      if (value) {
-        result.push(`${value}✓`);
-      }
-    });
-
-    (this.demand.customServiceTargets || []).forEach((target) => {
-      const value = target.trim();
-      if (value) {
-        result.push(value);
-      }
-    });
-
-    return result.length > 0 ? result.join('、') : '無';
   }
 
   getConditionDescription(): string {
@@ -163,7 +169,7 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   }
 
   getDeleteIds(): number[] {
-    return this.demand?.serialNo != null ? [this.demand.serialNo] : [];
+    return this.demand?.id != null ? [this.demand.id] : [];
   }
 
   getSelectedServiceTargets(): string {

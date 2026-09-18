@@ -163,123 +163,174 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     this.categoryDropdownOpen = false;
   }
 
-  ngOnInit() {
-    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
+
+    const id = Number(rawId);
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
 
-    // =========================================================
-    // 編輯模式
-    // =========================================================
-    if (serialNo) {
-      this.isEditMode = true;
+    console.log('[DailyFormComponent] 取得路由資料庫 id：', {
+      rawId,
+      id,
+    });
 
-      const data = this.dailyDemandService.getDemands().find((item) => item.serialNo === serialNo);
+    /*
+     * 新增頁：
+     * /agency/daily-form
+     */
+    if (rawId === null) {
+      this.isEditMode = false;
 
-      if (data) {
-        // =====================================================
-        // 需求對象
-        //
-        // 新資料庫格式：
-        // serviceTargets: ['老人', '嬰幼兒', '身障']
-        //
-        // 這裡同時保留舊 boolean object 的相容處理，
-        // 避免你目前還沒全部改完的假資料直接爆錯。
-        // =====================================================
+      console.log('[DailyFormComponent] 新增模式');
 
-        let serviceTargets: string[] = [];
+      return;
+    }
 
-        if (Array.isArray(data.serviceTargets)) {
-          serviceTargets = [...data.serviceTargets];
-        } else if (data.serviceTargets && typeof data.serviceTargets === 'object') {
-          serviceTargets = Object.entries(data.serviceTargets)
-            .filter(([, value]) => Boolean(value))
-            .map(([key]) => key);
-        }
+    /*
+     * 編輯頁：
+     * /agency/daily-edit/:id
+     */
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyFormComponent] 編輯網址的資料庫 id 不正確：', rawId);
 
-        this.demand = {
-          ...data,
+      this.router.navigate(['/agency/daily']);
 
-          status: data.status ?? '上架',
-          remaining: data.remaining ?? null,
+      return;
+    }
 
-          receiveMethod:
-            typeof data.receiveMethod === 'object'
-              ? { ...data.receiveMethod }
-              : {
-                  寄送: data.receiveMethod === '寄送',
-                  面交: data.receiveMethod === '面交',
-                },
+    this.isEditMode = true;
 
-          recipient: data.recipient ?? '',
-          address: data.address ?? '',
-          phone: data.phone ?? '',
+    console.log('[DailyFormComponent] 編輯模式，資料庫 id：', id);
 
-          image: [...(data.image ?? [])],
-          imageFileNames: [...(data.imageFileNames ?? [])],
+    try {
+      const data = await this.dailyDemandService.getDemandById(id);
 
-          contactTimeWeekday: data.contactTimeWeekday ?? false,
+      console.log('[DailyFormComponent] Service 回傳編輯資料：', data);
 
-          contactTimeWeekend: data.contactTimeWeekend ?? false,
+      if (!data) {
+        console.error('[DailyFormComponent] 找不到要編輯的日常需求，id：', id);
 
-          contactTimeMorning: data.contactTimeMorning ?? false,
+        this.router.navigate(['/agency/daily']);
 
-          contactTimeAfternoon: data.contactTimeAfternoon ?? false,
+        return;
+      }
 
-          contactTimeEvening: data.contactTimeEvening ?? false,
+      let serviceTargets: string[] = [];
 
-          contactTimeSeparate: data.contactTimeSeparate ?? false,
+      if (Array.isArray(data.serviceTargets)) {
+        serviceTargets = [...data.serviceTargets];
+      } else if (data.serviceTargets && typeof data.serviceTargets === 'object') {
+        serviceTargets = Object.entries(data.serviceTargets)
+          .filter(([, value]) => Boolean(value))
+          .map(([key]) => key);
+      }
 
-          contactTimeWeekdayMorning: data.contactTimeWeekdayMorning ?? false,
+      this.demand = {
+        ...data,
 
-          contactTimeWeekdayAfternoon: data.contactTimeWeekdayAfternoon ?? false,
+        status: data.status ?? '隱藏',
 
-          contactTimeWeekdayEvening: data.contactTimeWeekdayEvening ?? false,
+        remaining: data.remaining ?? null,
 
-          contactTimeWeekendMorning: data.contactTimeWeekendMorning ?? false,
-
-          contactTimeWeekendAfternoon: data.contactTimeWeekendAfternoon ?? false,
-
-          contactTimeWeekendEvening: data.contactTimeWeekendEvening ?? false,
-
-          serviceTargetDescription: data.serviceTargetDescription ?? '',
-
-          conditionDescription: data.conditionDescription ?? '',
-
-          // ===================================================
-          // 需求對象改成陣列
-          // ===================================================
-          serviceTargets: serviceTargets,
-
-          customServiceTargets: data.customServiceTargets?.length ? [...data.customServiceTargets] : [''],
-
-          conditions: data.conditions
-            ? { ...data.conditions }
+        receiveMethod:
+          data.receiveMethod && typeof data.receiveMethod === 'object'
+            ? {
+                ...data.receiveMethod,
+              }
             : {
-                全新: '',
-                二手: '',
-                有擦痕: '',
-                過期: '',
-                毀損: '',
+                寄送: false,
+                面交: false,
               },
 
-          customConditions: data.customConditions?.length ? [...data.customConditions] : [''],
-        };
+        recipient: data.recipient ?? '',
 
-        // 載入原本已儲存的圖片
-        this.imageFiles = [];
+        address: data.address ?? '',
 
-        Promise.all(
-          (data.image ?? []).map((image, index) => {
-            const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+        phone: data.phone ?? '',
 
-            return this.base64ToFile(image, fileName);
-          })
-        ).then((files) => {
-          this.imageFiles = files;
-          this.cdr.detectChanges();
-        });
-      }
+        image: [...(data.image ?? [])],
+
+        imageFileNames: [...(data.imageFileNames ?? [])],
+
+        contactTimeWeekday: data.contactTimeWeekday ?? false,
+
+        contactTimeWeekend: data.contactTimeWeekend ?? false,
+
+        contactTimeMorning: data.contactTimeMorning ?? false,
+
+        contactTimeAfternoon: data.contactTimeAfternoon ?? false,
+
+        contactTimeEvening: data.contactTimeEvening ?? false,
+
+        contactTimeSeparate: data.contactTimeSeparate ?? false,
+
+        contactTimeWeekdayMorning: data.contactTimeWeekdayMorning ?? false,
+
+        contactTimeWeekdayAfternoon: data.contactTimeWeekdayAfternoon ?? false,
+
+        contactTimeWeekdayEvening: data.contactTimeWeekdayEvening ?? false,
+
+        contactTimeWeekendMorning: data.contactTimeWeekendMorning ?? false,
+
+        contactTimeWeekendAfternoon: data.contactTimeWeekendAfternoon ?? false,
+
+        contactTimeWeekendEvening: data.contactTimeWeekendEvening ?? false,
+
+        serviceTargetDescription: data.serviceTargetDescription ?? '',
+
+        conditionDescription: data.conditionDescription ?? '',
+
+        serviceTargets,
+
+        customServiceTargets: data.customServiceTargets?.length ? [...data.customServiceTargets] : [''],
+
+        conditions: data.conditions
+          ? {
+              ...data.conditions,
+            }
+          : {
+              全新: '',
+              二手: '',
+              有擦痕: '',
+              過期: '',
+              毀損: '',
+            },
+
+        customConditions: data.customConditions?.length ? [...data.customConditions] : [''],
+      };
+
+      this.imageFiles = [];
+
+      /*
+       * 外部圖片可能遇到 CORS。
+       * 單張圖片失敗不能阻止整個表單載入。
+       */
+      const files = await Promise.all(
+        (data.image ?? []).map(async (image, index) => {
+          const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+
+          try {
+            return await this.base64ToFile(image, fileName);
+          } catch (error) {
+            console.warn('[DailyFormComponent] 圖片無法轉成 File，略過：', image, error);
+
+            return null;
+          }
+        })
+      );
+
+      this.imageFiles = files.filter((file): file is File => file !== null);
+
+      this.cdr.detectChanges();
+
+      console.log('[DailyFormComponent] 編輯資料已載入：', this.demand);
+    } catch (error) {
+      console.error('[DailyFormComponent] 載入日常編輯資料失敗：', error);
+
+      alert('載入日常需求失敗');
+
+      this.router.navigate(['/agency/daily']);
     }
   }
 
@@ -292,12 +343,23 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  async base64ToFile(base64: string, fileName: string): Promise<File> {
-    const response = await fetch(base64);
+  async base64ToFile(imageSource: string, fileName: string): Promise<File | null> {
+    if (!imageSource.startsWith('data:')) {
+      console.warn('[DailyFormComponent] 外部圖片不轉換為 File，保留原網址：', imageSource);
+
+      return null;
+    }
+
+    const response = await fetch(imageSource);
+
+    if (!response.ok) {
+      throw new Error(`圖片讀取失敗：${response.status}`);
+    }
+
     const blob = await response.blob();
 
     return new File([blob], fileName, {
-      type: blob.type,
+      type: blob.type || 'image/*',
     });
   }
 
@@ -458,7 +520,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     // 編輯
     // =======================================================
     if (this.isEditMode) {
-      const originalStatus = this.dailyDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo)?.status;
+      const originalStatus = this.dailyDemandService.getDemands().find((item) => item.id === this.demand.id)?.status;
 
       const originalPublishedAt = this.demand.publishedAt;
 
@@ -489,7 +551,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         await this.dailyDemandService.updateDemand(this.demand);
 
         if (this.fromDetail) {
-          await this.router.navigate(['/agency/daily-detail', this.demand.serialNo]);
+          await this.router.navigate(['/agency/daily-detail', this.demand.id]);
         } else {
           await this.router.navigate(['/agency/daily'], {
             queryParams: {

@@ -99,7 +99,7 @@ export class DonorDailyCardListComponent implements OnInit {
   }
 
   openDetail(item: DailyDemand): void {
-    this.router.navigate(['/donor/daily/detail', item.serialNo]);
+    this.router.navigate(['/donor/daily/detail', item.id]);
   }
 
   onSearch(keyword: string): void {
