@@ -1,9 +1,8 @@
-import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { timeout, catchError, of } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../models/agency/disaster-demand';
@@ -11,12 +10,19 @@ import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../model
 import { PaginationComponent } from '../../../pagination/pagination.component';
 import { SupplyLoadingComponent } from '../../../../components/loading/supply-loading/supply-loading.component';
 import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
-
 import { SupplySearchBarComponent } from '../../../search-bar/supply-search-bar/supply-search-bar.component';
 import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply-filter/supply-filter.component';
 import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
+
+type DisasterListItem = DisasterDemand & {
+  selected: boolean;
+  displayStatus: DisplayStatus;
+  displayCreatedAt: string;
+  displayPublishedAt: string;
+  displayOffShelfAt: string;
+};
 
 @Component({
   selector: 'app-disaster-list',
@@ -37,73 +43,37 @@ import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/s
   templateUrl: './disaster-list.component.html',
   styleUrls: ['./disaster-list-A.component.scss'],
 })
-export class DisasterListComponent implements OnInit, AfterViewInit {
-  demands: (DisasterDemand & {
-    selected: boolean;
-    displayStatus: DisplayStatus;
-    displayCreatedAt: string;
-    displayPublishedAt: string;
-    displayOffShelfAt: string;
-  })[] = [];
-
-  filteredDemands: (DisasterDemand & {
-    selected: boolean;
-    displayStatus: DisplayStatus;
-    displayCreatedAt: string;
-    displayPublishedAt: string;
-    displayOffShelfAt: string;
-  })[] = [];
-
-  pagedDemands: (DisasterDemand & {
-    selected: boolean;
-    displayStatus: DisplayStatus;
-    displayCreatedAt: string;
-    displayPublishedAt: string;
-    displayOffShelfAt: string;
-  })[] = [];
+export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
+  demands: DisasterListItem[] = [];
+  filteredDemands: DisasterListItem[] = [];
+  pagedDemands: DisasterListItem[] = [];
+  private demandChangedSubscription?: Subscription;
 
   selectAll = false;
   isRestoringScroll = false;
   isLoading = false;
-
-  // 搜尋
   searchTerm = '';
 
-  // 分頁
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
   pageNumbers: number[] = [];
 
-  // 保留列表位置
   private readonly scrollPositionKey = 'agency-disaster-workspace-scroll';
   private readonly pagePositionKey = 'agency-disaster-workspace-page';
 
-  // 排序
   selectedSort: SortType = 'serialNo';
   sortAscending = true;
   private userHasSorted = true;
 
-  // 刪除
   showDeleteModal = false;
   deleteIds: number[] = [];
   deleteType: 'single' | 'batch' = 'single';
 
-  // 手動下架提示
   showOffShelfWarning = false;
-
-  // 已下架無法重新上架提示
   showOnShelfWarning = false;
+  pendingOffShelfItem?: DisasterListItem;
 
-  pendingOffShelfItem?: DisasterDemand & {
-    selected: boolean;
-    displayStatus: DisplayStatus;
-    displayCreatedAt: string;
-    displayPublishedAt: string;
-    displayOffShelfAt: string;
-  };
-
-  // 篩選選項
   statusOptions: DisplayStatus[] = ['已上架', '隱藏中', '已下架'];
   priorityOptions: DisasterDemand['priority'][] = ['普通', '緊急', '非常緊急'];
   categoryOptions: NonNullable<DisasterDemand['category']>[] = [
@@ -121,7 +91,6 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     '居住安置與修繕用品',
     '其他',
   ];
-
   messageOptions = ['已回覆', '未回覆'];
 
   selectedFilters: SupplyFilterState = {
@@ -133,15 +102,17 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
   };
 
   constructor(
-    private disasterDemandService: DisasterDemandService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private readonly disasterDemandService: DisasterDemandService,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
+    this.demandChangedSubscription = this.disasterDemandService.demandChanged$.subscribe(() => {
+      void this.loadDemands();
+    });
   }
 
-  // 初始化
-  ngOnInit() {
+  ngOnInit(): void {
     const restoreListPosition = sessionStorage.getItem('restore-agency-disaster-list');
 
     if (restoreListPosition === 'true') {
@@ -149,26 +120,22 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
       if (savedPage) {
         const page = Number(savedPage);
-
         if (page >= 1) {
           this.currentPage = page;
         }
       }
 
-      // 只使用一次，避免重新進入列表又恢復舊頁數
       sessionStorage.removeItem('restore-agency-disaster-list');
     } else {
-      // 第一次進入列表 → 永遠從第 1 頁開始
       this.currentPage = 1;
-
-      // 清掉舊的位置資料
       sessionStorage.removeItem(this.pagePositionKey);
       sessionStorage.removeItem(this.scrollPositionKey);
     }
 
-    this.loadDemands();
+    void this.loadDemands();
   }
-  ngAfterViewInit() {
+
+  ngAfterViewInit(): void {
     const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
 
     if (!savedScroll) {
@@ -194,138 +161,119 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // 新增
-  goToAddDemand() {
+  ngOnDestroy(): void {
+    this.demandChangedSubscription?.unsubscribe();
+  }
+
+  goToAddDemand(): void {
     this.router.navigate(['/agency/supply-form']);
   }
 
-  // 查看
-  goToDetail(serialNo: number) {
-    this.saveListPosition();
-    sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-detail', serialNo], {
-      queryParams: {
-        number: serialNo,
-      },
-    });
+  goToDetail(id: number | undefined): void {
+    if (id == null || !Number.isInteger(Number(id))) {
+      console.error('無法前往災害物資詳細頁，資料庫 id 不正確：', id);
+
+      return;
+    }
+
+    this.router.navigate(['/agency/supply-detail', id]);
   }
 
-  // 編輯
-  goToEdit(serialNo: number) {
+  goToEdit(id: number): void {
     this.saveListPosition();
     sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-edit', serialNo]);
+    this.router.navigate(['/agency/supply-edit', id]);
   }
 
-  // 儲存列表位置
-  saveListPosition() {
+  saveListPosition(): void {
     sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
     sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
   }
 
   @HostListener('window:beforeunload')
-  saveScrollPosition() {
-    sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
-    sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
+  saveScrollPosition(): void {
+    this.saveListPosition();
   }
 
-  // 讀取需求
-  loadDemands() {
+  async loadDemands(): Promise<void> {
+    if (this.isLoading) {
+      return;
+    }
+
     this.isLoading = true;
-    this.cdr.detectChanges();
 
-    this.disasterDemandService
-      .getDemandsFromServer()
-      .pipe(
-        timeout(2000),
+    try {
+      await this.disasterDemandService.reload();
 
-        // API 超時或錯誤 → 使用假資料
-        catchError(() => {
-          return of(this.disasterDemandService.getDemands());
-        })
-      )
-      .subscribe((data) => {
-        this.demands = data.map((item) => {
-          // 先檢查是否需要自然下架
-          item = this.checkNaturalOffShelf(item);
+      const displayStatus: Record<DisasterStatus, DisplayStatus> = {
+        上架: '已上架',
+        隱藏: '隱藏中',
+        下架: '已下架',
+      };
 
-          let currentStatus: DisplayStatus = '已上架';
+      this.demands = this.disasterDemandService.getDemands().map((item) => {
+        const checkedItem = this.checkNaturalOffShelf(item);
 
-          if (item.status === '上架') {
-            currentStatus = '已上架';
-          }
-
-          if (item.status === '隱藏') {
-            currentStatus = '隱藏中';
-          }
-
-          if (item.status === '下架') {
-            currentStatus = '已下架';
-          }
-
-          return {
-            ...item,
-            selected: false,
-            status: item.status,
-            displayStatus: currentStatus,
-            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
-            displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
-            displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
-            remaining: item.remaining ?? item.amount ?? 0,
-            category: item.category ?? '其他',
-          };
-        });
-
-        this.applyFilters(false);
-
-        // API 成功 / timeout fallback 都會走到這裡
-        this.isLoading = false;
-
-        // 強制 Angular 立即更新畫面
-        this.cdr.detectChanges();
+        return {
+          ...checkedItem,
+          selected: false,
+          displayStatus: displayStatus[checkedItem.status],
+          displayCreatedAt: checkedItem.createdAt ? new Date(checkedItem.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+          displayPublishedAt: checkedItem.publishedAt ? new Date(checkedItem.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+          displayOffShelfAt: checkedItem.expectedOffShelfAt ? new Date(checkedItem.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+          remaining: checkedItem.remaining ?? checkedItem.amount ?? 0,
+          category: checkedItem.category ?? '其他',
+        };
       });
+
+      this.filteredDemands = [...this.demands];
+
+      this.currentPage = 1;
+
+      this.updatePagination();
+    } catch (error) {
+      console.error('載入物資需求失敗：', error);
+
+      this.demands = [];
+      this.filteredDemands = [];
+      this.pagedDemands = [];
+    } finally {
+      this.isLoading = false;
+
+      this.cdr.markForCheck();
+    }
   }
 
-  // 檢查是否已達到預計下架日期
   private checkNaturalOffShelf(item: DisasterDemand): DisasterDemand {
-    if (item.status !== '上架') {
+    if (item.status !== '上架' || !item.expectedOffShelfAt) {
       return item;
     }
 
-    if (!item.expectedOffShelfAt) {
+    if (new Date() < new Date(item.expectedOffShelfAt)) {
       return item;
     }
 
-    const now = new Date();
-    const expectedOffShelfAt = new Date(item.expectedOffShelfAt);
+    const updatedItem = {
+      ...item,
+      status: '下架' as DisasterStatus,
+      offShelfReason: 'natural' as const,
+    };
 
-    if (now >= expectedOffShelfAt) {
-      item.status = '下架';
-      item.offShelfReason = 'natural';
+    void this.disasterDemandService.updateDemand(updatedItem);
 
-      // 同步更新 Service 中的資料
-      this.disasterDemandService.updateDemand(item);
-    }
-
-    return item;
+    return updatedItem;
   }
 
-  // 搜尋
-  onSearchChange(value: string) {
+  onSearchChange(value: string): void {
     this.searchTerm = value;
     this.applyFilters();
   }
 
-  // 排序
-  onSortChange(event: { selectedSort: SortType; sortAscending: boolean }) {
+  onSortChange(event: { selectedSort: SortType; sortAscending: boolean }): void {
     const scrollY = window.scrollY;
-
     this.selectedSort = event.selectedSort;
-
     this.sortAscending = event.sortAscending;
-
     this.userHasSorted = true;
-
     this.applySort();
 
     setTimeout(() => {
@@ -336,19 +284,17 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  // 全選
-  toggleAll() {
+  toggleAll(): void {
     this.pagedDemands.forEach((item) => {
       item.selected = this.selectAll;
     });
   }
 
-  hasSelected() {
+  hasSelected(): boolean {
     return this.filteredDemands.some((item) => item.selected);
   }
 
-  // 批次編輯
-  editSelected() {
+  editSelected(): void {
     const selectedItems = this.filteredDemands.filter((item) => item.selected);
 
     if (selectedItems.length === 0) {
@@ -357,22 +303,17 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     }
 
     localStorage.setItem('editDemands', JSON.stringify(selectedItems));
-
     this.saveListPosition();
-
     sessionStorage.setItem('restore-agency-disaster-list', 'true');
-
     this.router.navigate(['/agency/supply-batch-edit']);
   }
 
-  // 篩選
-  onFilterApply(filters: SupplyFilterState) {
+  onFilterApply(filters: SupplyFilterState): void {
     this.selectedFilters = filters;
-
     this.applyFilters();
   }
 
-  resetFilters() {
+  resetFilters(): void {
     this.selectedFilters = {
       status: [],
       priority: [],
@@ -380,19 +321,14 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
       category: [],
       messageStatus: [],
     };
-
     this.applyFilters();
   }
 
-  // 套用篩選
-  applyFilters(resetPage: boolean = true) {
+  applyFilters(resetPage = true): void {
     this.filteredDemands = this.demands.filter((item) => {
-      // 關鍵字
       if (this.searchTerm && this.searchTerm.trim() !== '') {
         const term = this.searchTerm.trim().toLowerCase();
-
         const matchItem = item.item ? item.item.toLowerCase().includes(term) : false;
-
         const matchCategory = item.category ? item.category.toLowerCase().includes(term) : false;
 
         if (!matchItem && !matchCategory) {
@@ -400,27 +336,22 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
         }
       }
 
-      // 上架狀態
       if (this.selectedFilters.status.length > 0 && !this.selectedFilters.status.includes(item.displayStatus)) {
         return false;
       }
 
-      // 優先度
       if (this.selectedFilters.priority.length > 0 && !this.selectedFilters.priority.includes(item.priority)) {
         return false;
       }
 
-      // 剩餘數量
       if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) <= 0) {
         return false;
       }
 
-      // 類別
       if (this.selectedFilters.category.length > 0 && (!item.category || !this.selectedFilters.category.includes(item.category))) {
         return false;
       }
 
-      // 留言狀態
       if (this.selectedFilters.messageStatus.length > 0) {
         // 留言篩選只套用在「已上架」
         if (item.displayStatus !== '已上架') {
@@ -457,49 +388,30 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // 排序
-  applySort() {
-    this.filteredDemands.sort((a, b) => {
+  applySort(): void {
+    this.filteredDemands = [...this.filteredDemands].sort((a, b) => {
       let result = 0;
 
-      // 編號
       if (this.selectedSort === 'serialNo') {
         result = Number(a.serialNo ?? 0) - Number(b.serialNo ?? 0);
       }
 
-      // 建立日期
       if (this.selectedSort === 'createdAt') {
-        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-
-        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-
-        result = aTime - bTime;
+        result = new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime();
       }
 
-      // 上架日期
       if (this.selectedSort === 'publishedAt') {
-        const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-
-        const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-
-        result = aTime - bTime;
+        result = new Date(a.publishedAt ?? 0).getTime() - new Date(b.publishedAt ?? 0).getTime();
       }
 
-      // 預計下架日期
       if (this.selectedSort === 'expectedOffShelfAt') {
-        const aTime = a.expectedOffShelfAt ? new Date(a.expectedOffShelfAt).getTime() : 0;
-
-        const bTime = b.expectedOffShelfAt ? new Date(b.expectedOffShelfAt).getTime() : 0;
-
-        result = aTime - bTime;
+        result = new Date(a.expectedOffShelfAt ?? 0).getTime() - new Date(b.expectedOffShelfAt ?? 0).getTime();
       }
 
-      // 需求數量
       if (this.selectedSort === 'amount') {
         result = Number(a.amount ?? 0) - Number(b.amount ?? 0);
       }
 
-      // 剩餘需求
       if (this.selectedSort === 'remaining') {
         result = Number(a.remaining ?? 0) - Number(b.remaining ?? 0);
       }
@@ -510,8 +422,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
     this.updatePagination();
   }
 
-  // 分頁
-  updatePagination() {
+  updatePagination(): void {
     this.totalPages = Math.ceil(this.filteredDemands.length / this.pageSize) || 1;
 
     if (this.currentPage > this.totalPages) {
@@ -527,311 +438,173 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
 
     const startIndex = (this.currentPage - 1) * this.pageSize;
 
-    const endIndex = startIndex + this.pageSize;
-
-    this.pagedDemands = this.filteredDemands.slice(startIndex, endIndex);
+    this.pagedDemands = [...this.filteredDemands.slice(startIndex, startIndex + this.pageSize)];
 
     this.selectAll = this.pagedDemands.length > 0 && this.pagedDemands.every((item) => item.selected);
   }
 
-  goToPage(page: number) {
+  goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-
       this.updatePagination();
     }
   }
 
-  // 刪除
-  openDeleteModal(serialNo: number) {
+  openDeleteModal(serialNo: number): void {
     this.deleteIds = [serialNo];
-
     this.deleteType = 'single';
-
     this.showDeleteModal = true;
   }
 
-  openBatchDeleteModal() {
-    this.deleteIds = this.filteredDemands
-      .filter((item) => item.selected && item.serialNo !== undefined)
-      .map((item) => item.serialNo as number);
+  openBatchDeleteModal(): void {
+    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => item.id as number);
 
     this.deleteType = 'batch';
-
     this.showDeleteModal = true;
   }
 
-  closeDeleteModal() {
+  closeDeleteModal(): void {
     this.showDeleteModal = false;
   }
 
-  onDeleted() {
+  async onDeleted(): Promise<void> {
     this.showDeleteModal = false;
-
     this.deleteIds = [];
-
     this.selectAll = false;
-
-    this.loadDemands();
+    await this.loadDemands();
   }
 
-  // 修改狀態
-  changeStatus(
-    item: DisasterDemand & {
-      selected: boolean;
-      displayStatus: DisplayStatus;
-      displayCreatedAt: string;
-      displayPublishedAt: string;
-      displayOffShelfAt: string;
-    },
-    event: Event
-  ) {
+  changeStatus(item: DisasterListItem, event: Event): void {
     const select = event.target as HTMLSelectElement;
     const newStatus = select.value as DisplayStatus;
 
-    // 選擇「已下架」
+    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
     if (newStatus === '已下架') {
-      // 取得目前真正儲存的原始狀態
-      const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
-      // 暫存原本的顯示狀態
-      if (originalItem?.status === '上架') {
-        item.displayStatus = '已上架';
-      } else if (originalItem?.status === '隱藏') {
-        item.displayStatus = '隱藏中';
-      } else if (originalItem?.status === '下架') {
-        item.displayStatus = '已下架';
-      }
+      item.displayStatus = originalItem?.status === '上架' ? '已上架' : originalItem?.status === '下架' ? '已下架' : '隱藏中';
 
       setTimeout(() => {
         select.value = item.displayStatus;
       });
 
-      // 暫存等待確認的項目
       this.pendingOffShelfItem = item;
-
-      // 開啟下架確認視窗
       this.showOffShelfWarning = true;
-
       return;
     }
 
-    // 選擇「已上架」或「隱藏中」
-    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
-    // 已下架 → 禁止重新上架
-    if (newStatus === '已上架' && originalItem?.status === '下架' && originalItem?.offShelfReason === 'manual') {
-      // 保持列表顯示「已下架」
+    if (newStatus === '已上架' && originalItem?.status === '下架') {
       item.displayStatus = '已下架';
-
-      // 將 select 強制恢復成「已下架」
       setTimeout(() => {
         select.value = '已下架';
       });
-
-      // 顯示無法重新上架提示
       this.showOnShelfWarning = true;
-
       return;
     }
 
-    // 正常變更狀態
     item.displayStatus = newStatus;
-
-    this.applyStatusChange(item);
+    void this.applyStatusChange(item);
   }
 
-  // 確認手動下架
-  confirmManualOffShelf() {
+  async confirmManualOffShelf(): Promise<void> {
     if (!this.pendingOffShelfItem) {
       return;
     }
 
     const item = this.pendingOffShelfItem;
-
-    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
     const now = new Date();
 
-    // 狀態改成下架
     item.status = '下架';
-
-    // 記錄這次是「手動下架」
     item.offShelfReason = 'manual';
-
-    // 記錄實際手動下架時間
     item.expectedOffShelfAt = now.toISOString();
-
-    // 顯示狀態
     item.displayStatus = '已下架';
-
-    // 顯示下架日期
     item.displayOffShelfAt = now.toLocaleDateString('zh-TW');
 
-    // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-    // 保留原本的上架日期
-    if (originalItem?.publishedAt) {
-      item.publishedAt = originalItem.publishedAt;
-
-      item.displayPublishedAt = new Date(item.publishedAt).toLocaleDateString('zh-TW');
+    try {
+      await this.disasterDemandService.updateDemand(item);
+      await this.loadDemands();
+    } catch (error) {
+      console.error('下架失敗：', error);
+    } finally {
+      this.closeOffShelfWarning();
     }
+  }
 
-    // 儲存
-    this.disasterDemandService.updateDemand(item);
-
-    // 關閉提示框
+  cancelManualOffShelf(): void {
     this.closeOffShelfWarning();
   }
 
-  // 取消手動下架
-  cancelManualOffShelf() {
-    this.closeOffShelfWarning();
-  }
-
-  // 選擇「隱藏」
-  hideInsteadOfOffShelf() {
+  async hideInsteadOfOffShelf(): Promise<void> {
     if (!this.pendingOffShelfItem) {
       return;
     }
 
     const item = this.pendingOffShelfItem;
-
-    // 改成隱藏
     item.status = '隱藏';
     item.offShelfReason = undefined;
-
-    item.displayStatus = '隱藏中';
-
-    // 隱藏後視為尚未上架
     item.publishedAt = undefined;
-
     item.expectedOffShelfAt = undefined;
-
+    item.displayStatus = '隱藏中';
     item.displayPublishedAt = '尚未上架';
-
     item.displayOffShelfAt = '—';
 
-    // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-    // 儲存
-    this.disasterDemandService.updateDemand(item);
-
-    // 關閉提示框
-    this.closeOffShelfWarning();
+    try {
+      await this.disasterDemandService.updateDemand(item);
+      await this.loadDemands();
+    } catch (error) {
+      console.error('隱藏失敗：', error);
+    } finally {
+      this.closeOffShelfWarning();
+    }
   }
 
-  // 關閉手動下架提示
-  closeOffShelfWarning() {
+  closeOffShelfWarning(): void {
     this.showOffShelfWarning = false;
-
     this.pendingOffShelfItem = undefined;
   }
 
-  // 關閉無法重新上架提示
-  closeOnShelfWarning() {
+  closeOnShelfWarning(): void {
     this.showOnShelfWarning = false;
   }
 
-  // 實際處理狀態變更
-  private applyStatusChange(
-    item: DisasterDemand & {
-      selected: boolean;
-      displayStatus: DisplayStatus;
-      displayCreatedAt: string;
-      displayPublishedAt: string;
-      displayOffShelfAt: string;
-    }
-  ) {
-    // 取得原本儲存的資料
-    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
+  private async applyStatusChange(item: DisasterListItem): Promise<void> {
+    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
     const originalStatus = originalItem?.status;
 
-    let status: DisasterStatus;
-
-    switch (item.displayStatus) {
-      case '已上架':
-        status = '上架';
-        break;
-
-      case '隱藏中':
-        status = '隱藏';
-        break;
-
-      default:
-        status = '上架';
-    }
+    let status: DisasterStatus = item.displayStatus === '已上架' ? '上架' : '隱藏';
 
     const now = new Date();
 
-    // 上架
     if (status === '上架') {
-      // 手動下架後禁止重新上架
-      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
-        item.displayStatus = '已下架';
-        this.showOnShelfWarning = true;
-        return;
-      }
-
-      // → 現在重新上架
       if (originalStatus !== '上架') {
         item.publishedAt = now.toISOString();
-
-        // 建立日期只在建立時記錄
-        if (!item.createdAt) {
-          item.createdAt = now.toISOString();
-        }
+        item.createdAt ??= now.toISOString();
       }
 
-      // → 保留原本上架日期
-      else if (originalItem?.publishedAt) {
-        item.publishedAt = originalItem.publishedAt;
-      }
-
-      // 重新計算預計下架日期
       if (item.publishedAt) {
         item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
       }
 
       item.status = '上架';
-
-      // 重新上架後，清除之前的下架原因
       item.offShelfReason = undefined;
-
       item.displayStatus = '已上架';
-
       item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
-
       item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
-    }
-
-    // 隱藏
-    else if (status === '隱藏') {
+    } else {
       item.status = '隱藏';
-
-      // 隱藏後視為尚未上架
       item.publishedAt = undefined;
-
       item.expectedOffShelfAt = undefined;
-
       item.displayStatus = '隱藏中';
-
       item.displayPublishedAt = '尚未上架';
-
       item.displayOffShelfAt = '—';
     }
 
-    // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-    // 儲存
-    this.disasterDemandService.updateDemand(item);
+    try {
+      await this.disasterDemandService.updateDemand(item);
+      await this.loadDemands();
+    } catch (error) {
+      console.error('狀態更新失敗：', error);
+    }
   }
 
-  // 預計下架日期
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DisasterDemand['priority']): string {
     const offShelfDate = new Date(publishedDate);
 
@@ -839,11 +612,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit {
       case '普通':
         offShelfDate.setDate(offShelfDate.getDate() + 30);
         break;
-
       case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 14);
         break;
-
       case '非常緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 7);
         break;

@@ -11,6 +11,7 @@ export interface DisasterConditions {
 
 // 急難救助需求資料
 export interface DisasterDemand {
+  id?: number;
   // 基本資料
   serialNo: number; // 編號
   createdAt?: string; // 建立時間

@@ -1,7 +1,6 @@
 <div class="container">
   <!-- 資料載入完成後才顯示列表 -->
   <app-supply-loading *ngIf="isLoading"></app-supply-loading>
-
   <ng-container *ngIf="!isLoading">
     <!-- 頂部按鈕區 -->
     <div class="top-action-bar">
@@ -110,8 +109,8 @@
 
           <td class="operation-column">
             <div class="operation-flex">
-              <button (click)="goToDetail(item.serialNo!)">查看</button>
-              <button (click)="goToEdit(item.serialNo!)">編輯</button>
+              <button (click)="goToDetail(item.id!)">查看</button>
+              <button (click)="goToEdit(item.id!)">編輯</button>
               <button class="delete-btn" (click)="openDeleteModal(item.serialNo!)">刪除</button>
               <select
                 [value]="item.displayStatus"

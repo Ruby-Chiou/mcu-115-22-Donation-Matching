@@ -19,6 +19,7 @@ export interface DailyReceiveMethod {
 
 // 日常需求資料
 export interface DailyDemand {
+  id?: number;
   serialNo: number; // 編號
   createdAt?: string; // 建立日期
   publishedAt?: string; // 上架日期

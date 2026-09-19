@@ -221,13 +221,13 @@
             <td class="operation-column">
               <div class="operation-flex">
                 <!-- 查看 -->
-                <button (click)="goToDetail(item.serialNo!)">查看</button>
+                <button (click)="goToDetail(item.id!)">查看</button>
 
                 <!-- 編輯 -->
-                <button (click)="goToEdit(item.serialNo!)">編輯</button>
+                <button (click)="goToEdit(item.id!)">編輯</button>
 
                 <!-- 刪除 -->
-                <button class="delete-btn" (click)="openDeleteModal(item.serialNo!)">刪除</button>
+                <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
 
                 <!-- 狀態下拉選單 -->
                 <select
@@ -269,7 +269,7 @@
   <app-supply-delete
     *ngIf="showDeleteModal"
     [demandIds]="deleteIds"
-    [deleteType]="'batch'"
+    [deleteType]="deleteType"
     [demandType]="'daily'"
     (closed)="closeDeleteModal()"
     (deleted)="onDeleted()"

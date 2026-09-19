@@ -559,157 +559,85 @@ export class SupplyBatchEditComponent implements OnInit {
   // =========================================================
   // 儲存全部資料
   // =========================================================
-  async saveAll() {
-    // 清除舊錯誤並檢查必填欄位
-    this.editDemands.forEach((item) => {
-      item.itemError = false;
-      item.amountError = false;
-      item.unitError = false;
-      item.reasonError = false;
-      item.descriptionError = false;
-      item.addressError = false;
-      item.phoneError = false;
-      item.remainingError = false;
+  async saveAll(): Promise<void> {
+    try {
+      // 儲存每一筆資料
+      for (const item of this.editDemands) {
+        // 清除空白自訂欄位
+        item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
 
-      item.categoryError = false;
-
-      if (!item.item) {
-        item.itemError = true;
-      }
-
-      if (!item.amount || isNaN(Number(item.amount))) {
-        item.amountError = true;
-      }
-
-      if (!item.unit || !item.unit.trim()) {
-        item.unitError = true;
-      }
-
-      if (item.remaining === undefined || item.remaining === null) {
-        item.remainingError = true;
-      }
-
-      if (Number(item.remaining) < 0) {
-        item.remainingError = true;
-      }
-
-      if (!item.reason) {
-        item.reasonError = true;
-      }
-
-      if (!item.description) {
-        item.descriptionError = true;
-      }
-
-      if (!item.category) {
-        item.categoryError = true;
-      }
-
-      if (!item.address) {
-        item.addressError = true;
-      }
-
-      if (!item.phone) {
-        item.phoneError = true;
-      }
-    });
-
-    // 判斷是否有錯誤
-    const invalid = this.editDemands.some(
-      (item) =>
-        item.itemError ||
-        item.amountError ||
-        item.unitError ||
-        item.reasonError ||
-        item.descriptionError ||
-        item.categoryError ||
-        item.addressError ||
-        item.phoneError ||
-        item.remainingError
-    );
-
-    if (invalid) {
-      this.scrollToFirstError();
-      return;
-    }
-
-    // 整理物資狀態
-    this.editDemands.forEach((item) => {
-      if (!item.conditions) {
-        item.conditions = {
-          全新: '',
-          二手: '',
-          有擦痕: '',
-          過期: '',
-          毀損: '',
-        };
-      }
-
-      const conditionParts: string[] = [];
-
-      const conditionLabels: (keyof EditableDisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
-
-      // 處理接受物資需求狀態
-      conditionLabels.forEach((key) => {
-        const status = item.conditions[key];
-
-        if (status === '接受') {
-          conditionParts.push(`${key}✔`);
-        } else if (status === '不接受') {
-          conditionParts.push(`${key}✘`);
+        // 至少保留一個輸入框
+        if (item.customConditions.length === 0) {
+          item.customConditions.push('');
         }
-      });
 
-      // 處理其它物資需求狀態
-      item.customConditions.forEach((condition) => {
-        const value = condition.trim();
+        const originalItem = this.service.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
-        if (value) {
-          conditionParts.push(value);
+        const originalStatus = originalItem?.status;
+        const originalOffShelfReason = originalItem?.offShelfReason;
+        const originalPublishedAt = originalItem?.publishedAt;
+        const now = new Date();
+
+        // ===================================================
+        // 處理上架狀態
+        // ===================================================
+        if (item.status === '上架') {
+          // 手動下架禁止重新上架
+          if (originalStatus === '下架' && originalOffShelfReason === 'manual') {
+            alert(`需求編號 ${item.serialNo} 為使用者主動下架，無法重新上架。`);
+
+            item.status = '下架';
+            item.offShelfReason = 'manual';
+
+            // 保留原本手動下架時間
+            if (originalItem?.expectedOffShelfAt) {
+              item.expectedOffShelfAt = originalItem.expectedOffShelfAt;
+            }
+
+            // 保留原本上架日期
+            if (originalPublishedAt) {
+              item.publishedAt = originalPublishedAt;
+            }
+
+            continue;
+          }
+
+          // 處理可以重新上架的資料
+          if (originalStatus !== '上架') {
+            item.publishedAt = now.toISOString();
+
+            if (!item.createdAt) {
+              item.createdAt = now.toISOString();
+            }
+          } else if (originalPublishedAt) {
+            // 原本已上架時保留原本上架日期
+            item.publishedAt = originalPublishedAt;
+          }
+
+          // 依照優先度重新計算預計下架日期
+          if (item.publishedAt) {
+            item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+          }
+
+          // 重新上架後清除下架原因
+          item.offShelfReason = undefined;
         }
-      });
 
-      // 合併成資料庫使用的單一欄位
-      item.conditionDescription = conditionParts.join('、');
-    });
+        // ===================================================
+        // 處理隱藏狀態
+        // ===================================================
+        else if (item.status === '隱藏') {
+          item.publishedAt = undefined;
+          item.expectedOffShelfAt = undefined;
+          item.offShelfReason = undefined;
+        }
 
-    // =====================================================
-    // 儲存每一筆資料
-    // =====================================================
-    for (const item of this.editDemands) {
-      // 清除空白自訂欄位
-      item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
-
-      // 至少保留一個輸入框
-      if (item.customConditions.length === 0) {
-        item.customConditions.push('');
-      }
-
-      const originalItem = this.service.getDemands().find((demand) => demand.serialNo === item.serialNo);
-
-      const originalStatus = originalItem?.status;
-
-      const originalOffShelfReason = originalItem?.offShelfReason;
-
-      const originalPublishedAt = originalItem?.publishedAt;
-
-      const now = new Date();
-
-      // ===================================================
-      // 處理上架狀態
-      // ===================================================
-      if (item.status === '上架') {
-        // 手動下架禁止重新上架
-        if (originalStatus === '下架' && originalOffShelfReason === 'manual') {
-          alert(`需求編號 ${item.serialNo} 為使用者主動下架，無法重新上架。`);
-
-          item.status = '下架';
-
-          item.offShelfReason = 'manual';
-
-          // 保留原本手動下架時間
-          if (originalItem?.expectedOffShelfAt) {
-            item.expectedOffShelfAt = originalItem.expectedOffShelfAt;
+        // ===================================================
+        // 處理下架狀態
+        // ===================================================
+        else if (item.status === '下架') {
+          if (!item.offShelfReason) {
+            item.offShelfReason = 'manual';
           }
 
           // 保留原本上架日期
@@ -717,165 +645,55 @@ export class SupplyBatchEditComponent implements OnInit {
             item.publishedAt = originalPublishedAt;
           }
 
-          continue;
-        }
-
-        // 處理可以重新上架的資料
-        if (originalStatus !== '上架') {
-          item.publishedAt = now.toISOString();
-
-          if (!item.createdAt) {
-            item.createdAt = now.toISOString();
+          // 沒有下架時間才新增
+          if (!item.expectedOffShelfAt) {
+            item.expectedOffShelfAt = now.toISOString();
           }
-        } else if (originalPublishedAt) {
-          // 原本已上架時保留原本上架日期
-          item.publishedAt = originalPublishedAt;
         }
 
-        // 依照優先度重新計算預計下架日期
-        if (item.publishedAt) {
-          item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+        // ===================================================
+        // 地址 → 經緯度
+        // ===================================================
+        const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
+
+        // 地址找不到就不儲存這一筆
+        if (!addressSuccess) {
+          alert(`需求編號 ${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
+          return;
         }
 
-        // 重新上架後清除下架原因
-        item.offShelfReason = undefined;
+        console.log(`需求編號 ${item.serialNo} 經緯度：`, item.latitude, item.longitude);
+
+        // ===================================================
+        // 更新 Service (等待確實寫入 Supabase)
+        // ===================================================
+        await this.service.updateDemand(item);
       }
 
-      // ===================================================
-      // 處理隱藏狀態
-      // ===================================================
-      else if (item.status === '隱藏') {
-        // 隱藏後視為尚未上架
-        item.publishedAt = undefined;
+      // 全部資料成功更新後，才清除暫存
+      localStorage.removeItem('editDemands');
 
-        item.expectedOffShelfAt = undefined;
-
-        // 隱藏不是下架
-        item.offShelfReason = undefined;
-      }
-
-      // ===================================================
-      // 處理下架狀態
-      // ===================================================
-      else if (item.status === '下架') {
-        // 儲存時不要重新產生下架時間
-        if (!item.offShelfReason) {
-          item.offShelfReason = 'manual';
-        }
-
-        // 保留原本上架日期
-        if (originalPublishedAt) {
-          item.publishedAt = originalPublishedAt;
-        }
-
-        // 如果沒有下架時間才補上
-        if (!item.expectedOffShelfAt) {
-          item.expectedOffShelfAt = now.toISOString();
-        }
-      }
-
-      // ===================================================
-      // 地址 → 經緯度
-      // ===================================================
-      const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
-
-      // 地址找不到就不儲存這一筆
-      if (!addressSuccess) {
-        alert(`需求編號 ${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
-
-        return;
-      }
-
-      console.log(`需求編號 ${item.serialNo} 經緯度：`, item.latitude, item.longitude);
-
-      // ===================================================
-      // 更新 Service
-      // ===================================================
-      this.service.updateDemand(item);
-    }
-
-    // 清除批次編輯暫存資料
-    localStorage.removeItem('editDemands');
-
-    // 回到災害需求列表
-    this.router.navigate(['/agency/disaster']);
-  }
-
-  // 捲動到第一個錯誤位置
-  scrollToFirstError() {
-    setTimeout(() => {
-      const firstErrorElement = document.querySelector('.invalid, .invalid-box') as HTMLElement | null;
-
-      if (firstErrorElement) {
-        const top = firstErrorElement.getBoundingClientRect().top + window.scrollY - 120;
-
-        window.scrollTo({
-          top,
-          behavior: 'smooth',
-        });
-      }
-    }, 100);
-  }
-
-  // 切換接受物資狀態
-  toggleCondition(demand: EditableDisasterDemand, key: keyof EditableDisasterDemand['conditions']) {
-    const current = demand.conditions[key];
-
-    if (current === '') {
-      demand.conditions[key] = '接受';
-    } else if (current === '接受') {
-      demand.conditions[key] = '不接受';
-    } else {
-      demand.conditions[key] = '';
+      // 所有更新完成後才返回災害需求列表
+      await this.router.navigate(['/agency/disaster'], {
+        queryParams: {
+          refresh: Date.now(),
+        },
+      });
+    } catch (error) {
+      console.error('批次修改災害物資需求失敗：', error);
+      alert('批次修改失敗，請確認網路、Supabase 權限或資料格式。');
     }
   }
 
-  // 顯示接受物資狀態圖示
-  getConditionIcon(status: '接受' | '不接受' | '') {
-    if (status === '接受') {
-      return '✔';
+  // 依照優先度計算預計下架日期
+  calculateExpectedOffShelfDate(publishedDate: Date, priority?: string): string | undefined {
+    if (!publishedDate || isNaN(publishedDate.getTime())) {
+      return undefined;
     }
 
-    if (status === '不接受') {
-      return '✘';
-    }
-
-    return '―';
-  }
-
-  // 新增其他物資狀態
-  addCustomCondition(demand: any) {
-    if (demand.customConditions.length < 5) {
-      demand.customConditions.push('');
-    }
-  }
-
-  // 移除其他物資狀態
-  removeCustomCondition(demand: EditableDisasterDemand, index: number) {
-    demand.customConditions.splice(index, 1);
-
-    if (demand.customConditions.length === 0) {
-      demand.customConditions.push('');
-    }
-  }
-
-  // 計算預計下架日期
-  calculateExpectedOffShelfDate(publishedDate: Date, priority: EditableDisasterDemand['priority']): string {
+    const daysToAdd = priority === '緊急' ? 3 : 7; // 範例：緊急優先度 3 天，一般 7 天（可依你的業務邏輯調整）
     const offShelfDate = new Date(publishedDate);
-
-    switch (priority) {
-      case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-
-      case '緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 14);
-        break;
-
-      case '非常緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 7);
-        break;
-    }
+    offShelfDate.setDate(offShelfDate.getDate() + daysToAdd);
 
     return offShelfDate.toISOString();
   }
@@ -904,5 +722,35 @@ export class SupplyBatchEditComponent implements OnInit {
     localStorage.removeItem('editDemands');
 
     this.router.navigate(['/agency/disaster']);
+  }
+  // 切換勾選狀態 (例如: 全新、二手、有擦痕、過期、毀損)
+  toggleCondition(demand: any, conditionKey: string): void {
+    if (!demand.conditions) {
+      demand.conditions = {};
+    }
+    // 假設狀態是在 boolean 之間切換
+    demand.conditions[conditionKey] = !demand.conditions[conditionKey];
+  }
+
+  // 取得狀態對應的圖示或顯示符號
+  // 取得狀態對應的圖示或顯示符號
+  getConditionIcon(value: any): string {
+    return value ? '✔' : '';
+  }
+
+  // 新增自訂條件
+  addCustomCondition(demand: any): void {
+    if (!demand.customConditions) {
+      demand.customConditions = [];
+    }
+    // 預設新增一筆空白或提示字串，依你的表單互動為主
+    demand.customConditions.push('');
+  }
+
+  // 移除自訂條件
+  removeCustomCondition(demand: any, index: number): void {
+    if (demand && demand.customConditions) {
+      demand.customConditions.splice(index, 1);
+    }
   }
 }

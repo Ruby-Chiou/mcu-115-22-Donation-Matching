@@ -753,235 +753,223 @@ export class DailyBatchEditComponent implements OnInit {
   // =========================================================
   // 批次儲存
   // =========================================================
+  // =========================================================
+  // 批次儲存
+  // =========================================================
   async saveAll() {
-    // 第一階段：驗證所有資料
-    this.editDemands.forEach((item) => {
-      item.itemError = false;
-      item.amountError = false;
-      item.unitError = false;
-      item.reasonError = false;
-      item.descriptionError = false;
-      item.phoneError = false;
-      item.remainingError = false;
-      item.categoryError = false;
-      item.serviceTargetError = false;
-      item.invalidReceiveInfo = false;
+    try {
+      // 第一階段：驗證所有資料
+      this.editDemands.forEach((item) => {
+        item.itemError = false;
+        item.amountError = false;
+        item.unitError = false;
+        item.reasonError = false;
+        item.descriptionError = false;
+        item.phoneError = false;
+        item.remainingError = false;
+        item.categoryError = false;
+        item.serviceTargetError = false;
+        item.invalidReceiveInfo = false;
 
-      if (!item.item) {
-        item.itemError = true;
-      }
+        if (!item.item) {
+          item.itemError = true;
+        }
 
-      if (!item.amount || isNaN(Number(item.amount))) {
-        item.amountError = true;
-      }
+        if (!item.amount || isNaN(Number(item.amount))) {
+          item.amountError = true;
+        }
 
-      if (!item.unit || !item.unit.trim()) {
-        item.unitError = true;
-      }
+        if (!item.unit || !item.unit.trim()) {
+          item.unitError = true;
+        }
 
-      if (item.remaining === undefined || item.remaining === null) {
-        item.remainingError = true;
-      }
+        if (item.remaining === undefined || item.remaining === null) {
+          item.remainingError = true;
+        }
 
-      if (Number(item.remaining) < 0) {
-        item.remainingError = true;
-      }
+        if (Number(item.remaining) < 0) {
+          item.remainingError = true;
+        }
 
-      if (!item.reason) {
-        item.reasonError = true;
-      }
+        if (!item.reason) {
+          item.reasonError = true;
+        }
 
-      if (!item.description) {
-        item.descriptionError = true;
-      }
+        if (!item.description) {
+          item.descriptionError = true;
+        }
 
-      if (!item.category) {
-        item.categoryError = true;
-      }
+        if (!item.category) {
+          item.categoryError = true;
+        }
 
-      const hasReceiveMethod = item.receiveMethod?.寄送 || item.receiveMethod?.面交;
+        const hasReceiveMethod = item.receiveMethod?.寄送 || item.receiveMethod?.面交;
 
-      if (!hasReceiveMethod || !item.recipient || !item.address) {
-        item.invalidReceiveInfo = true;
-      }
+        if (!hasReceiveMethod || !item.recipient || !item.address) {
+          item.invalidReceiveInfo = true;
+        }
 
-      if (!item.phone) {
-        item.phoneError = true;
-      }
+        if (!item.phone) {
+          item.phoneError = true;
+        }
 
-      const hasServiceTarget =
-        (Array.isArray(item.serviceTargets) && item.serviceTargets.length > 0) ||
-        item.customServiceTargets?.some((target: string) => target.trim() !== '');
+        const hasServiceTarget =
+          (Array.isArray(item.serviceTargets) && item.serviceTargets.length > 0) ||
+          item.customServiceTargets?.some((target: string) => target.trim() !== '');
 
-      if (!hasServiceTarget) {
-        item.serviceTargetError = true;
-      }
-    });
+        if (!hasServiceTarget) {
+          item.serviceTargetError = true;
+        }
+      });
 
-    const invalid = this.editDemands.some(
-      (item) =>
-        item.itemError ||
-        item.amountError ||
-        item.unitError ||
-        item.reasonError ||
-        item.descriptionError ||
-        item.categoryError ||
-        item.phoneError ||
-        item.remainingError ||
-        item.serviceTargetError ||
-        item.invalidReceiveInfo
-    );
+      const invalid = this.editDemands.some(
+        (item) =>
+          item.itemError ||
+          item.amountError ||
+          item.unitError ||
+          item.reasonError ||
+          item.descriptionError ||
+          item.categoryError ||
+          item.phoneError ||
+          item.remainingError ||
+          item.serviceTargetError ||
+          item.invalidReceiveInfo
+      );
 
-    if (invalid) {
-      this.scrollToFirstError();
-      return;
-    }
-
-    const invalidManualOffShelf = this.editDemands.find((item) => {
-      const originalStatus = this.originalStatusMap[item.serialNo];
-
-      const originalOffShelfReason = this.originalOffShelfReasonMap[item.serialNo];
-
-      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
-
-      const isCurrentManualOffShelf = item.status === '下架' && item.offShelfReason === 'manual';
-
-      return item.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf);
-    });
-
-    if (invalidManualOffShelf) {
-      alert(`需求 A${invalidManualOffShelf.serialNo} 為使用者主動下架，無法重新上架。`);
-
-      invalidManualOffShelf.status = '下架';
-
-      return;
-    }
-
-    this.editDemands.forEach((item) => {
-      if (!item.conditions) {
-        item.conditions = {
-          全新: '',
-          二手: '',
-          有擦痕: '',
-          過期: '',
-          毀損: '',
-        };
-      }
-    });
-
-    // =========================================================
-    // 開始儲存
-    // =========================================================
-    for (const item of this.editDemands) {
-      item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
-
-      item.customServiceTargets = item.customServiceTargets.filter((target) => target.trim() !== '');
-
-      if (item.customConditions.length === 0) {
-        item.customConditions.push('');
-      }
-
-      if (item.customServiceTargets.length === 0) {
-        item.customServiceTargets.push('');
-      }
-
-      if (!Array.isArray(item.serviceTargets)) {
-        item.serviceTargets = [];
-      }
-
-      item.serviceTargetDescription = this.buildServiceTargetDescription(item);
-
-      item.conditionDescription = this.buildConditionDescription(item);
-
-      const originalStatus = this.originalStatusMap[item.serialNo] ?? item.status;
-
-      const originalOffShelfReason = this.originalOffShelfReasonMap[item.serialNo];
-
-      const now = new Date();
-
-      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
-
-      const isCurrentManualOffShelf = item.status === '下架' && item.offShelfReason === 'manual';
-
-      if (item.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
-        alert(`需求 A${item.serialNo} 為使用者主動下架，無法重新上架。`);
-
-        item.status = '下架';
-
+      if (invalid) {
+        this.scrollToFirstError();
         return;
       }
 
-      if (item.status === '上架') {
-        if (originalStatus !== '上架') {
-          item.publishedAt = now.toISOString();
+      const invalidManualOffShelf = this.editDemands.find((item) => {
+        const originalStatus = this.originalStatusMap[item.serialNo];
+        const originalOffShelfReason = this.originalOffShelfReasonMap[item.serialNo];
+        const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+        const isCurrentManualOffShelf = item.status === '下架' && item.offShelfReason === 'manual';
+
+        return item.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf);
+      });
+
+      if (invalidManualOffShelf) {
+        alert(`需求 A${invalidManualOffShelf.serialNo} 為使用者主動下架，無法重新上架。`);
+        invalidManualOffShelf.status = '下架';
+        return;
+      }
+
+      this.editDemands.forEach((item) => {
+        if (!item.conditions) {
+          item.conditions = {
+            全新: '',
+            二手: '',
+            有擦痕: '',
+            過期: '',
+            毀損: '',
+          };
+        }
+      });
+
+      // =========================================================
+      // 開始儲存
+      // =========================================================
+      for (const item of this.editDemands) {
+        item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
+        item.customServiceTargets = item.customServiceTargets.filter((target) => target.trim() !== '');
+
+        if (item.customConditions.length === 0) {
+          item.customConditions.push('');
+        }
+        if (item.customServiceTargets.length === 0) {
+          item.customServiceTargets.push('');
+        }
+
+        item.serviceTargetDescription = this.buildServiceTargetDescription(item);
+        item.conditionDescription = this.buildConditionDescription(item);
+
+        const originalStatus = this.originalStatusMap[item.serialNo] ?? item.status;
+        const originalOffShelfReason = this.originalOffShelfReasonMap[item.serialNo];
+        const now = new Date();
+
+        const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
+        const isCurrentManualOffShelf = item.status === '下架' && item.offShelfReason === 'manual';
+
+        if (item.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
+          alert(`需求 A${item.serialNo} 為使用者主動下架，無法重新上架。`);
+          item.status = '下架';
+          return;
+        }
+
+        if (item.status === '上架') {
+          if (originalStatus !== '上架') {
+            item.publishedAt = now.toISOString();
+            if (!item.createdAt) {
+              item.createdAt = now.toISOString();
+            }
+          }
 
           if (!item.createdAt) {
             item.createdAt = now.toISOString();
           }
-        } else if (item.publishedAt) {
-          item.publishedAt = item.publishedAt;
+
+          if (item.publishedAt) {
+            item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+          }
+
+          item.offShelfReason = undefined;
+        } else if (item.status === '隱藏') {
+          item.publishedAt = undefined;
+          item.expectedOffShelfAt = undefined;
+          item.offShelfReason = undefined;
+        } else if (item.status === '下架') {
+          if (!item.offShelfReason) {
+            item.offShelfReason = 'manual';
+          }
+
+          if (!item.expectedOffShelfAt) {
+            item.expectedOffShelfAt = now.toISOString();
+          }
         }
 
-        if (!item.createdAt) {
-          item.createdAt = now.toISOString();
+        // =====================================================
+        // 地址 → 經緯度
+        // =====================================================
+        const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
+
+        if (!addressSuccess) {
+          alert(`需求 A${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
+          return;
         }
 
-        if (item.publishedAt) {
-          item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+        // =====================================================
+        // 儲存圖片
+        // =====================================================
+        const files = this.imageFiles[item.serialNo] || [];
+        item.image = [];
+        item.imageFileNames = [];
+
+        for (const file of files) {
+          const base64 = await this.fileToBase64(file);
+          item.image.push(base64);
+          item.imageFileNames.push(file.name);
         }
 
-        item.offShelfReason = undefined;
-      } else if (item.status === '隱藏') {
-        item.publishedAt = undefined;
-        item.expectedOffShelfAt = undefined;
-        item.offShelfReason = undefined;
-      } else if (item.status === '下架') {
-        if (!item.offShelfReason) {
-          item.offShelfReason = 'manual';
-        }
-
-        if (!item.expectedOffShelfAt) {
-          item.expectedOffShelfAt = now.toISOString();
-        }
+        // =====================================================
+        // 更新 Service
+        // =====================================================
+        this.service.updateDemand(item);
       }
 
-      // =====================================================
-      // 地址 → 經緯度
-      // =====================================================
-      const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
+      localStorage.removeItem('editDemands');
 
-      if (!addressSuccess) {
-        alert(`需求 A${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
-
-        return;
-      }
-
-      console.log(`需求 A${item.serialNo} 經緯度：`, item.latitude, item.longitude);
-
-      // =====================================================
-      // 儲存圖片
-      // =====================================================
-      const files = this.imageFiles[item.serialNo] || [];
-
-      item.image = [];
-      item.imageFileNames = [];
-
-      for (const file of files) {
-        const base64 = await this.fileToBase64(file);
-
-        item.image.push(base64);
-        item.imageFileNames.push(file.name);
-      }
-
-      // =====================================================
-      // 更新 Service
-      // =====================================================
-      this.service.updateDemand(item);
+      // 最後才跳回列表，並帶上 refresh 參數確保列表讀到最新資料
+      await this.router.navigate(['/agency/daily'], {
+        queryParams: {
+          refresh: Date.now(),
+        },
+      });
+    } catch (error) {
+      console.error('批次修改日常物資需求失敗：', error);
+      alert('批次修改失敗，請確認網路或 Supabase 權限後再試。');
     }
-
-    localStorage.removeItem('editDemands');
-
-    this.router.navigate(['/agency/daily']);
   }
 
   scrollToFirstError() {

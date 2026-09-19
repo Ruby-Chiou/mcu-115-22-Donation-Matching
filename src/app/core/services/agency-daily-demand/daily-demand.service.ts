@@ -1,1140 +1,448 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { DailyDemand, CreateDailyDemand } from '../../../models/agency/daily-demand';
+import { Observable, from } from 'rxjs';
+
+import { DailyDemand, CreateDailyDemand, DailyConditions } from '../../../models/agency/daily-demand';
+
+import { SupabaseService } from '../supabase.service';
+
+interface DailyDemandRow {
+  id: number;
+
+  createdAt: string;
+  publishedAt: string | null;
+  expectedOffShelfAt: string | null;
+
+  item: string;
+  amount: number;
+  remaining: number | null;
+  unit: string;
+  amountDescription: string | null;
+
+  category: string;
+  reason: string;
+  description: string;
+  brand: string | null;
+
+  serviceTargets: string[] | null;
+  customServiceTargets: unknown[] | null;
+  conditions: string[] | null;
+  customConditions: unknown[] | null;
+
+  priority: string;
+  status: string;
+
+  receiveMethod: string[];
+  recipient: string;
+  address: string;
+  phone: string;
+  note: string | null;
+
+  imageFileNames: unknown;
+  serialNo: number | null;
+  image: unknown;
+
+  contactTimeWeekday: boolean;
+  contactTimeWeekend: boolean | null;
+  contactTimeMorning: boolean | null;
+  contactTimeAfternoon: boolean | null;
+  contactTimeEvening: boolean | null;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class DailyDemandService {
-  demands: DailyDemand[] = [
-    {
-      serialNo: 1,
-      item: '白米',
-      amount: 50,
-      unit: '包',
-      amountDescription: '每包5公斤，需完整包裝且無受潮、破損或異味情況。',
-      reason: '機構目前服務多戶經濟弱勢家庭，需要穩定補充基本主食。',
-      description: '希望募集一般家庭食用白米，提供服務對象作為日常三餐使用。米袋需完整密封，保存期限充足，若有小包裝也可以接受。',
-      priority: '緊急',
-      category: '食品與飲用水',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭縣弱勢家庭服務中心',
-      address: '臺北市信義區市府路1號',
-      phone: '03-9321001',
-      note: '若一次提供超過20包，請事前聯絡機構安排收貨時間。',
-      brand: '不限品牌',
-      serviceTargets: ['貧困'],
-      customServiceTargets: ['弱勢家庭'],
-      serviceTargetDescription: '貧困、弱勢家庭',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['需為完整未拆封包裝', '保存期限至少6個月'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、需為完整未拆封包裝、保存期限至少6個月',
-      status: '上架',
-      remaining: 32,
-      messageCount: 2,
-      createdAt: '2026-08-01T09:30:00',
-      publishedAt: '2026-08-02T10:00:00',
-      expectedOffShelfAt: '2026-09-01T10:00:00',
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
-      imageFileNames: ['測試圖1'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
+  private readonly tableName = 'agency_daily_supply_items';
 
-    {
-      serialNo: 2,
-      item: '成人紙尿褲',
-      amount: 30,
-      unit: '包',
-      amountDescription: '成人用型紙尿褲，每包約10至20片，中大型尺寸皆可。',
-      reason: '機構服務長者及身心障礙者，有多名服務對象有長期照護用品需求。',
-      description: '因服務對象多為需要長期照護的長者與身心障礙者，成人紙尿褲消耗量較高，希望募集不同尺寸的全新成人紙尿褲。',
-      priority: '非常緊急',
-      category: '長者與身心障礙用品',
-      receiveMethod: { 寄送: true, 面交: false },
-      recipient: '蘭陽長期照顧服務協會',
-      address: '新北市板橋區中山路一段161號',
-      phone: '03-9542200',
-      note: '尺寸以M、L、XL為主，寄送前請確認外箱標示清楚。',
-      brand: '不限品牌',
-      serviceTargets: ['老人', '身障'],
-      customServiceTargets: [],
-      serviceTargetDescription: '老人、身障',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['必須為全新未拆封用品', '不可有受潮或異味'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、必須為全新未拆封用品、不可有受潮或異味',
+  private demands: DailyDemand[] = [];
 
-      // 自然下架
-      status: '下架',
-      offShelfReason: 'natural',
+  private loadingPromise: Promise<void>;
 
-      remaining: 18,
-      messageCount: 2,
-      createdAt: '2026-08-03T08:20:00',
-      publishedAt: '2026-08-03T09:00:00',
-      expectedOffShelfAt: '2026-08-17T09:00:00',
-      image: [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-      ],
-      imageFileNames: ['測試圖2', '測試圖3'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 3,
-      item: '嬰兒奶粉',
-      amount: 20,
-      unit: '罐',
-      amountDescription: '一般嬰幼兒配方奶粉，每罐約800公克。',
-      reason: '服務家庭近期有嬰幼兒照顧需求，但家庭收入不足以負擔完整奶粉支出。',
-      description: '募集嬰幼兒配方奶粉，協助經濟困難家庭降低育兒支出。奶粉須為全新未開封，並有清楚標示有效期限。',
-      priority: '緊急',
-      category: '嬰幼兒用品',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭兒少家庭支持中心',
-      address: '桃園市桃園區縣府路1號',
-      phone: '03-9351500',
-      note: '不同年齡階段奶粉皆可，請提供品牌與適用年齡資訊。',
-      brand: '不限品牌',
-      serviceTargets: ['嬰幼兒', '貧困'],
-      customServiceTargets: [],
-      serviceTargetDescription: '嬰幼兒、貧困',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['有效期限至少8個月', '不可為已開封奶粉'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、有效期限至少8個月、不可為已開封奶粉',
-      status: '上架',
-      remaining: 7,
-      messageCount: 2,
-      createdAt: '2026-08-05T10:00:00',
-      publishedAt: '2026-08-05T11:00:00',
-      expectedOffShelfAt: '2026-09-04T11:00:00',
-      image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?'],
-      imageFileNames: ['測試圖3'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: true,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 4,
-      item: '冬季外套',
-      amount: 40,
-      unit: '件',
-      amountDescription: '成人及青少年冬季外套，尺寸S至XXL皆可。',
-      reason: '冬季即將到來，服務家庭中有多名兒童與成人缺乏足夠保暖衣物。',
-      description: '希望募集狀況良好的全新或近全新冬季外套，提供經濟弱勢家庭於冬季使用。男女款式皆可，尺寸以成人與青少年為主。',
-      priority: '普通',
-      category: '衣物與保暖用品',
-      receiveMethod: { 寄送: false, 面交: true },
-      recipient: '蘭陽弱勢家庭扶助協會',
-      address: '新竹市東區中正路120號',
-      phone: '03-9558800',
-      note: '面交時間需事前電話確認，避免機構無人收件。',
-      brand: '不限品牌',
-      serviceTargets: ['孩童', '青少年', '貧困'],
-      customServiceTargets: ['成人'],
-      serviceTargetDescription: '孩童、青少年、貧困、成人',
-      conditions: {
-        全新: '接受',
-        二手: '接受',
-        有擦痕: '接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['衣物需乾淨無明顯污漬', '不可有破損'],
-      conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、衣物需乾淨無明顯污漬、不可有破損',
-      status: '上架',
-      remaining: 25,
-      messageCount: 2,
-      createdAt: '2026-08-07T13:00:00',
-      publishedAt: '2026-08-08T09:30:00',
-      expectedOffShelfAt: '2026-10-07T09:30:00',
-      image: [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-      ],
-      imageFileNames: ['測試圖1', '測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: false,
-      contactTimeAfternoon: true,
-      contactTimeEvening: true,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 5,
-      item: '洗衣精',
-      amount: 25,
-      unit: '瓶',
-      amountDescription: '一般家庭用洗衣精，每瓶約2至3公升。',
-      reason: '機構協助多戶家庭處理日常生活物資不足問題，清潔用品消耗量較大。',
-      description: '募集家庭日常使用的洗衣精，提供服務對象維持基本生活與衣物清潔。',
-      priority: '普通',
-      category: '清潔與衛生用品',
-      receiveMethod: { 寄送: true, 面交: false },
-      recipient: '宜蘭家庭服務站',
-      address: '新竹縣竹北市光明六路10號',
-      phone: '03-9886600',
-      note: '液體洗衣精及洗衣粉皆可。',
-      brand: '不限品牌',
-      serviceTargets: ['貧困'],
-      customServiceTargets: [],
-      serviceTargetDescription: '貧困',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['瓶身不可破損', '需為未使用商品'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、瓶身不可破損、需為未使用商品',
-      status: '隱藏',
-      remaining: 25,
-      messageCount: 2,
-      createdAt: '2026-08-09T09:15:00',
-      publishedAt: undefined,
-      expectedOffShelfAt: undefined,
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
-      imageFileNames: ['測試圖1'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: false,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 6,
-      item: '女性衛生棉',
-      amount: 100,
-      unit: '包',
-      amountDescription: '日用及夜用型皆可，每包至少10片。',
-      reason: '服務對象中有多名經濟弱勢女性，日常生理用品支出造成額外生活負擔。',
-      description: '希望募集全新女性生理用品，提供女性服務對象於日常生活中使用，日用、夜用及不同尺寸皆可。',
-      priority: '緊急',
-      category: '女性生理用品',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭女性支持中心',
-      address: '苗栗縣苗栗市府前路1號',
-      phone: '03-9325500',
-      note: '請避免捐贈已拆封或單片包裝破損之用品。',
-      brand: '不限品牌',
-      serviceTargets: ['青少年', '貧困'],
-      customServiceTargets: ['女性'],
-      serviceTargetDescription: '青少年、貧困、女性',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['必須全新未拆封', '包裝不可破損'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、必須全新未拆封、包裝不可破損',
-
-      // 自然下架
-      status: '下架',
-      offShelfReason: 'natural',
-
-      remaining: 66,
-      messageCount: 2,
-      createdAt: '2026-07-01T11:30:00',
-      publishedAt: '2026-08-01T13:00:00',
-      expectedOffShelfAt: '2026-08-31T13:00:00',
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
-      imageFileNames: ['測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: true,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 7,
-      item: '犬貓飼料',
-      amount: 15,
-      unit: '包',
-      amountDescription: '犬用或貓用乾飼料皆可，每包至少3公斤。',
-      reason: '機構協助弱勢家庭照顧寵物，近期飼料庫存即將不足。',
-      description: '募集犬貓日常乾飼料，提供給無法穩定負擔寵物飼養成本的家庭，犬用與貓用皆有需求。',
-      priority: '普通',
-      category: '寵物與動物用品',
-      receiveMethod: { 寄送: true, 面交: false },
-      recipient: '宜蘭毛孩家庭援助站',
-      address: '臺中市西屯區臺灣大道三段99號',
-      phone: '03-9591200',
-      note: '請在外箱標示犬用或貓用。',
-      brand: '不限品牌',
-      serviceTargets: ['貧困', '動物'],
-      customServiceTargets: [],
-      serviceTargetDescription: '貧困、動物',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['有效期限至少3個月'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、有效期限至少3個月',
-      status: '隱藏',
-      remaining: 9,
-      messageCount: 2,
-      createdAt: '2026-08-12T08:45:00',
-      publishedAt: undefined,
-      expectedOffShelfAt: undefined,
-      image: [
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-      ],
-      imageFileNames: ['測試圖3', '測試圖1', '測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 8,
-      item: '成人口罩',
-      amount: 500,
-      unit: '片',
-      amountDescription: '成人醫療口罩或一般防護口罩皆可。',
-      reason: '服務據點需要提供服務對象及工作人員基本防護用品。',
-      description: '募集成人口罩作為機構日常防護用品，讓前來接受服務的民眾及工作人員於需要時使用。',
-      priority: '普通',
-      category: '醫療與照護用品',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭社會福利服務中心',
-      address: '彰化縣彰化市中山路二段416號',
-      phone: '03-9313000',
-      note: '獨立包裝或整盒包裝皆可。',
-      brand: '不限品牌',
-      serviceTargets: ['身障', '重症照護'],
-      customServiceTargets: ['一般服務對象', '工作人員'],
-      serviceTargetDescription: '身障、重症照護、一般服務對象、工作人員',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['全新未使用'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、全新未使用',
-
-      // 手動下架
-      status: '下架',
-      offShelfReason: 'manual',
-
-      remaining: 0,
-      messageCount: 2,
-      createdAt: '2026-07-01T09:00:00',
-
-      // 手動下架：上架日期固定為 2026/09/08
-      publishedAt: '2026-09-08T09:00:00',
-
-      // 普通：上架 60 天
-      expectedOffShelfAt: '2026-11-07T09:00:00',
-
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
-      imageFileNames: ['測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: false,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 9,
-      item: '沐浴乳',
-      amount: 30,
-      unit: '瓶',
-      amountDescription: '一般成人及兒童沐浴乳，每瓶約500毫升以上。',
-      reason: '服務家庭有基本衛生用品不足的情形，希望提供日常清潔用品。',
-      description: '募集沐浴乳協助弱勢家庭維持日常衛生，成人及兒童適用產品皆可。',
-      priority: '普通',
-      category: '清潔與衛生用品',
-      receiveMethod: { 寄送: false, 面交: true },
-      recipient: '羅東家庭支持服務站',
-      address: '南投縣南投市中興路660號',
-      phone: '03-9544500',
-      note: '面交請提前預約。',
-      brand: '不限品牌',
-      serviceTargets: ['孩童', '貧困'],
-      customServiceTargets: ['成人'],
-      serviceTargetDescription: '孩童、貧困、成人',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['瓶身完整無破損'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、瓶身完整無破損',
-      status: '隱藏',
-      remaining: 30,
-      messageCount: 2,
-      createdAt: '2026-08-15T14:20:00',
-      publishedAt: undefined,
-      expectedOffShelfAt: undefined,
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
-      imageFileNames: ['測試圖1'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: false,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 10,
-      item: '兒童書包',
-      amount: 12,
-      unit: '個',
-      amountDescription: '國小學童使用書包，容量約15至25公升。',
-      reason: '新學期開始，部分弱勢家庭兒童缺乏完整的學用品。',
-      description: '希望募集適合國小學童使用的書包，提供給有學用品需求的家庭。全新或保存良好的二手書包皆可。',
-      priority: '緊急',
-      category: '其他',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭兒童學習支持中心',
-      address: '雲林縣斗六市雲林路二段515號',
-      phone: '03-9367500',
-      note: '希望以國小學童尺寸為主。',
-      brand: '不限品牌',
-      serviceTargets: ['孩童', '貧困'],
-      customServiceTargets: [],
-      serviceTargetDescription: '孩童、貧困',
-      conditions: {
-        全新: '接受',
-        二手: '接受',
-        有擦痕: '接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['拉鍊與背帶功能正常', '不可有嚴重破損'],
-      conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、拉鍊與背帶功能正常、不可有嚴重破損',
-
-      // 手動下架
-      status: '下架',
-      offShelfReason: 'manual',
-
-      remaining: 5,
-      messageCount: 2,
-      createdAt: '2026-08-17T10:10:00',
-
-      // 手動下架：上架日期固定為 2026/09/08
-      publishedAt: '2026-09-08T11:00:00',
-
-      // 緊急：上架 30 天
-      expectedOffShelfAt: '2026-10-08T11:00:00',
-
-      image: [
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-      ],
-      imageFileNames: ['測試圖3', '測試圖1'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: true,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 11,
-      item: '罐頭食品',
-      amount: 80,
-      unit: '罐',
-      amountDescription: '魚罐頭、肉類罐頭或蔬菜罐頭皆可，每罐約200至400公克。',
-      reason: '機構備有緊急糧食物資，近期庫存不足，需要補充常溫保存食品。',
-      description: '募集可長期常溫保存的罐頭食品，供臨時有糧食需求的家庭使用。',
-      priority: '普通',
-      category: '食品與飲用水',
-      receiveMethod: { 寄送: true, 面交: false },
-      recipient: '宜蘭緊急物資服務站',
-      address: '嘉義縣太保市祥和一路東段1號',
-      phone: '03-9658000',
-      note: '請勿捐贈已過期或即將到期食品。',
-      brand: '不限品牌',
-      serviceTargets: ['貧困'],
-      customServiceTargets: ['急難家庭'],
-      serviceTargetDescription: '貧困、急難家庭',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['保存期限至少6個月', '罐身不得凹陷嚴重或生鏽'],
-      conditionDescription:
-        '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、保存期限至少6個月、罐身不得凹陷嚴重或生鏽',
-      status: '隱藏',
-      remaining: 46,
-      messageCount: 2,
-      createdAt: '2026-08-18T08:00:00',
-      publishedAt: undefined,
-      expectedOffShelfAt: undefined,
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
-      imageFileNames: ['測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 12,
-      item: '成人營養補充品',
-      amount: 10,
-      unit: '罐',
-      amountDescription: '成人營養補充飲品或營養配方，每罐約800公克。',
-      reason: '部分長者及慢性照護家庭有額外營養補充需求。',
-      description: '募集成人營養補充品，協助日常飲食攝取不足的長者及照護家庭。請提供完整商品資訊與有效期限。',
-      priority: '非常緊急',
-      category: '長者與身心障礙用品',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭長者照護支持站',
-      address: '嘉義市東區中山路199號',
-      phone: '03-9221000',
-      note: '不同口味皆可，特殊醫療用途產品請先聯繫確認。',
-      brand: '不限品牌',
-      serviceTargets: ['老人', '身障', '重症照護'],
-      customServiceTargets: [],
-      serviceTargetDescription: '老人、身障、重症照護',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['有效期限至少6個月', '需為全新未開封'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、有效期限至少6個月、需為全新未開封',
-
-      // 自然下架
-      status: '下架',
-      offShelfReason: 'natural',
-
-      remaining: 3,
-      messageCount: 2,
-      createdAt: '2026-07-19T09:40:00',
-      publishedAt: '2026-08-19T10:00:00',
-      expectedOffShelfAt: '2026-09-02T10:00:00',
-      image: [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-      ],
-      imageFileNames: ['測試圖1', '測試圖2', '測試圖3'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: true,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 13,
-      item: '衛生紙',
-      amount: 60,
-      unit: '串',
-      amountDescription: '家庭用抽取式衛生紙，每串至少8包。',
-      reason: '機構日常服務人數增加，衛生紙等基本生活用品消耗量提高。',
-      description: '募集家庭日常使用衛生紙，供服務據點及弱勢家庭使用。',
-      priority: '普通',
-      category: '清潔與衛生用品',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭社福物資中心',
-      address: '臺南市安平區永華路二段6號',
-      phone: '03-9331200',
-      note: '紙箱外觀若有輕微破損但商品完整仍可接受。',
-      brand: '不限品牌',
-      serviceTargets: ['老人', '孩童', '貧困'],
-      customServiceTargets: ['一般家庭'],
-      serviceTargetDescription: '老人、孩童、貧困、一般家庭',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['紙品需保持乾燥', '不可受潮'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、毀損：不接受、紙品需保持乾燥、不可受潮',
-      status: '隱藏',
-      remaining: 60,
-      messageCount: 2,
-      createdAt: '2026-08-20T13:15:00',
-      publishedAt: undefined,
-      expectedOffShelfAt: undefined,
-      image: ['https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?'],
-      imageFileNames: ['測試圖3'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 14,
-      item: '電熱水壺',
-      amount: 5,
-      unit: '台',
-      amountDescription: '一般家庭使用電熱水壺，容量約1至2公升。',
-      reason: '部分獨居長者家庭缺乏基本生活家電，需要安全簡易的熱水設備。',
-      description: '募集功能正常的電熱水壺，提供給有基本生活家電需求的獨居長者家庭使用。',
-      priority: '緊急',
-      category: '生活與炊事用品',
-      receiveMethod: { 寄送: false, 面交: true },
-      recipient: '宜蘭獨居長者關懷站',
-      address: '高雄市苓雅區四維三路2號',
-      phone: '03-9893500',
-      note: '二手用品需確認通電與自動斷電功能正常。',
-      brand: '不限品牌',
-      serviceTargets: ['老人', '貧困'],
-      customServiceTargets: ['獨居長者'],
-      serviceTargetDescription: '老人、貧困、獨居長者',
-      conditions: {
-        全新: '接受',
-        二手: '接受',
-        有擦痕: '接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['電源線不可破損', '加熱功能需正常'],
-      conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、電源線不可破損、加熱功能需正常',
-
-      // 手動下架
-      status: '下架',
-      offShelfReason: 'manual',
-
-      remaining: 2,
-      messageCount: 2,
-      createdAt: '2026-08-21T08:30:00',
-
-      // 手動下架：上架日期固定為 2026/09/08
-      publishedAt: '2026-09-08T09:00:00',
-
-      // 緊急：上架 30 天
-      expectedOffShelfAt: '2026-10-08T09:00:00',
-
-      image: [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-      ],
-      imageFileNames: ['測試圖2', '測試圖3'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 15,
-      item: '兒童牙刷',
-      amount: 50,
-      unit: '支',
-      amountDescription: '適合學齡兒童使用的軟毛牙刷。',
-      reason: '機構推動兒童衛生教育活動，需要準備日常口腔清潔用品。',
-      description: '募集適合兒童使用的全新牙刷，搭配衛生教育活動發放給有需要的兒童。',
-      priority: '普通',
-      category: '醫療與照護用品',
-      receiveMethod: { 寄送: true, 面交: false },
-      recipient: '宜蘭兒童健康關懷中心',
-      address: '屏東縣屏東市自由路527號',
-      phone: '03-9561200',
-      note: '希望為全新商品，刷毛需柔軟。',
-      brand: '不限品牌',
-      serviceTargets: ['孩童', '貧困'],
-      customServiceTargets: [],
-      serviceTargetDescription: '孩童、貧困',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['全新未使用'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、毀損：不接受、全新未使用',
-      status: '上架',
-      remaining: 35,
-      messageCount: 2,
-      createdAt: '2026-07-22T10:00:00',
-      publishedAt: '2026-07-22T11:00:00',
-      expectedOffShelfAt: '2026-09-20T11:00:00',
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10'],
-      imageFileNames: ['測試圖1'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 16,
-      item: '摺疊床墊',
-      amount: 8,
-      unit: '張',
-      amountDescription: '單人尺寸摺疊床墊，收納後方便搬運。',
-      reason: '機構偶爾需要協助臨時安置家庭，現有床墊數量不足。',
-      description: '募集狀況良好的單人摺疊床墊，用於臨時安置服務對象或緊急住宿需求。',
-      priority: '緊急',
-      category: '居住安置與修繕用品',
-      receiveMethod: { 寄送: false, 面交: true },
-      recipient: '宜蘭臨時安置服務中心',
-      address: '臺東縣臺東市中山路276號',
-      phone: '03-9387000',
-      note: '體積較大，僅接受面交。',
-      brand: '不限品牌',
-      serviceTargets: ['貧困'],
-      customServiceTargets: ['急難家庭', '臨時安置家庭'],
-      serviceTargetDescription: '貧困、急難家庭、臨時安置家庭',
-      conditions: {
-        全新: '接受',
-        二手: '接受',
-        有擦痕: '接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['不可有明顯異味', '不可有嚴重污漬或破損'],
-      conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、不可有明顯異味、不可有嚴重污漬或破損',
-      status: '隱藏',
-      remaining: 4,
-      messageCount: 2,
-      createdAt: '2026-08-23T09:20:00',
-      publishedAt: undefined,
-      expectedOffShelfAt: undefined,
-      image: [
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-      ],
-      imageFileNames: ['測試圖3', '測試圖1'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: false,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 17,
-      item: '雨衣',
-      amount: 30,
-      unit: '件',
-      amountDescription: '成人及兒童輕便雨衣皆可，尺寸不限。',
-      reason: '宜蘭地區降雨頻繁，部分服務家庭缺乏基本雨具。',
-      description: '募集全新或狀況良好的雨衣，協助經濟弱勢家庭因應日常通勤、就學及外出需求。',
-      priority: '普通',
-      category: '衣物與保暖用品',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭弱勢家庭物資站',
-      address: '花蓮縣花蓮市府前路17號',
-      phone: '03-9329000',
-      note: '成人及兒童尺寸均有需求。',
-      brand: '不限品牌',
-      serviceTargets: ['老人', '孩童', '貧困'],
-      customServiceTargets: ['成人'],
-      serviceTargetDescription: '老人、孩童、貧困、成人',
-      conditions: {
-        全新: '接受',
-        二手: '接受',
-        有擦痕: '接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['不可破損', '需能正常防水'],
-      conditionDescription: '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、不可破損、需能正常防水',
-
-      // 手動下架
-      status: '下架',
-      offShelfReason: 'manual',
-
-      remaining: 0,
-      messageCount: 2,
-      createdAt: '2026-06-10T09:00:00',
-
-      // 手動下架：上架日期固定為 2026/09/08
-      publishedAt: '2026-09-08T10:00:00',
-
-      // 普通：上架 60 天
-      expectedOffShelfAt: '2026-11-07T10:00:00',
-
-      image: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10'],
-      imageFileNames: ['測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 18,
-      item: '即溶麥片',
-      amount: 40,
-      unit: '盒',
-      amountDescription: '即溶燕麥或穀物早餐食品，每盒至少10小包。',
-      reason: '部分服務長者早餐營養攝取不足，需要容易準備且方便保存的食品。',
-      description: '募集方便沖泡的即溶麥片及穀物食品，提供給長者及經濟弱勢家庭作為日常早餐或點心。',
-      priority: '普通',
-      category: '食品與飲用水',
-      receiveMethod: { 寄送: true, 面交: false },
-      recipient: '宜蘭長者營養支持站',
-      address: '澎湖縣馬公市治平路32號',
-      phone: '03-9771500',
-      note: '原味或低糖口味皆可。',
-      brand: '不限品牌',
-      serviceTargets: ['老人', '貧困'],
-      customServiceTargets: [],
-      serviceTargetDescription: '老人、貧困',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: ['保存期限至少4個月'],
-      conditionDescription: '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、保存期限至少4個月',
-      status: '上架',
-      remaining: 22,
-      messageCount: 2,
-      createdAt: '2026-08-25T08:40:00',
-      publishedAt: '2026-08-25T09:30:00',
-      expectedOffShelfAt: '2026-10-24T09:30:00',
-      image: [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-      ],
-      imageFileNames: ['測試圖1', '測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 19,
-      item: '行動電源',
-      amount: 10,
-      unit: '個',
-      amountDescription: '容量10000mAh以上之行動電源，需可正常充放電。',
-      reason: '機構服務部分需要長時間外出的服務對象，基本通訊設備需要備用電源。',
-      description: '希望募集狀況良好的行動電源，供服務對象在外出就業、就學或接受服務時維持手機基本電力。',
-      priority: '緊急',
-      category: '通訊與求救用品',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭弱勢青年支持中心',
-      address: '金門縣金城鎮民生路60號',
-      phone: '03-9571800',
-      note: '二手商品需確認電池狀況正常，若有充電線也歡迎一併提供。',
-      brand: '不限品牌',
-      serviceTargets: ['青少年', '貧困'],
-      customServiceTargets: ['弱勢成人'],
-      serviceTargetDescription: '青少年、貧困、弱勢成人',
-      conditions: {
-        全新: '接受',
-        二手: '接受',
-        有擦痕: '接受',
-        過期: '',
-        毀損: '不接受',
-      },
-      customConditions: ['需能正常充電及放電', '外觀不可有嚴重破損', '不可有電池膨脹情況'],
-      conditionDescription:
-        '全新：接受、二手：接受、有擦痕：接受、毀損：不接受、需能正常充電及放電、外觀不可有嚴重破損、不可有電池膨脹情況',
-      status: '隱藏',
-      remaining: 6,
-      messageCount: 2,
-      createdAt: '2026-08-27T11:00:00',
-      publishedAt: undefined,
-      expectedOffShelfAt: undefined,
-      image: [
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-      ],
-      imageFileNames: ['測試圖3', '測試圖1', '測試圖2'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: false,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-
-    {
-      serialNo: 20,
-      item: '綜合生活物資箱',
-      amount: 15,
-      unit: '箱',
-      amountDescription: '每箱可包含食品、清潔用品、衛生用品及其他日常生活必需品，實際內容依捐贈情況調整。',
-      reason: '機構需要準備家庭緊急物資包，提供遭遇突發經濟困難或短期生活物資不足的服務對象。',
-      description:
-        '募集綜合生活物資，內容可以包含常溫食品、衛生紙、清潔用品、女性生理用品及其他家庭日常必需品。若捐贈者希望自行組合物資，也可以先與機構聯絡確認需求。',
-      priority: '非常緊急',
-      category: '其他',
-      receiveMethod: { 寄送: true, 面交: true },
-      recipient: '宜蘭急難家庭支援中心',
-      address: '連江縣南竿鄉介壽村76號',
-      phone: '03-9362000',
-      note: '此項需求內容較為彈性，若有大量物資或不同種類物資欲捐贈，請先聯絡機構確認，方便安排分類與配送。',
-      brand: '不限品牌',
-      serviceTargets: ['老人', '孩童', '青少年', '身障', '貧困'],
-      customServiceTargets: ['急難家庭', '低收入戶', '弱勢家庭', '獨居長者'],
-      serviceTargetDescription: '老人、孩童、青少年、身障、貧困、急難家庭、低收入戶、弱勢家庭、獨居長者',
-      conditions: {
-        全新: '接受',
-        二手: '不接受',
-        有擦痕: '不接受',
-        過期: '不接受',
-        毀損: '不接受',
-      },
-      customConditions: [
-        '食品需有清楚有效期限',
-        '所有用品需保持乾燥及完整',
-        '不可提供已開封或明顯損壞商品',
-        '若一次捐贈大量物資，請先聯繫機構',
-      ],
-      conditionDescription:
-        '全新：接受、二手：不接受、有擦痕：不接受、過期：不接受、毀損：不接受、食品需有清楚有效期限、所有用品需保持乾燥及完整、不可提供已開封或明顯損壞商品、若一次捐贈大量物資，請先聯繫機構',
-
-      // 自然下架
-      status: '下架',
-      offShelfReason: 'natural',
-
-      remaining: 11,
-      messageCount: 2,
-      createdAt: '2026-08-29T09:00:00',
-
-      // 原本日期保留，因為這筆是自然下架
-      publishedAt: '2026-08-20T10:00:00',
-      expectedOffShelfAt: '2026-09-03T10:00:00',
-
-      image: [
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD5ONgl_Kphwaa5nFr_VfHXg1Ej2CkswQyVQtNUTKsmPyT1x_3wCCwoqVl&s=10',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RSqD5lxT2gEWllJgc4AKNXx5WuH9hxR1mbbS9aT12g&s=10',
-        'https://shoplineimg.com/64587ad406d620007ce10917/6a2f518ab8d8ed2696bdf42d/800x.jpg?',
-      ],
-      imageFileNames: ['測試圖1', '測試圖2', '測試圖3'],
-      contactTimeWeekday: true,
-      contactTimeWeekend: true,
-      contactTimeMorning: true,
-      contactTimeAfternoon: true,
-      contactTimeEvening: false,
-      contactTimeSeparate: false,
-      contactTimeWeekdayMorning: false,
-      contactTimeWeekdayAfternoon: false,
-      contactTimeWeekdayEvening: false,
-      contactTimeWeekendMorning: false,
-      contactTimeWeekendAfternoon: false,
-      contactTimeWeekendEvening: false,
-    },
-  ];
-
-  addDemand(demand: CreateDailyDemand) {
-    this.demands.push({
-      ...demand,
-      serialNo: this.demands.length + 1,
-    });
+  constructor(private readonly supabaseService: SupabaseService) {
+    this.loadingPromise = this.loadFromSupabase();
   }
 
-  getDemands() {
-    return this.demands;
+  private async loadFromSupabase(): Promise<void> {
+    const { data, error } = await this.supabaseService.client
+      .from(this.tableName)
+      .select('*')
+      .order('id', {
+        ascending: true,
+      })
+      .abortSignal(AbortSignal.timeout(10000));
+
+    if (error) {
+      console.error('讀取日常物資需求失敗：', error);
+
+      throw error;
+    }
+
+    this.demands = (data ?? []).map((row) => this.mapRowToDemand(row as DailyDemandRow));
+  }
+
+  async waitUntilLoaded(): Promise<void> {
+    await this.loadingPromise;
+  }
+
+  async reload(): Promise<void> {
+    this.loadingPromise = this.loadFromSupabase();
+
+    await this.loadingPromise;
+  }
+
+  private mapRowToDemand(row: DailyDemandRow): DailyDemand {
+    return {
+      id: row.id,
+      serialNo: this.toSerialNo(row.serialNo, row.id),
+
+      item: row.item,
+      amount: Number(row.amount ?? 0),
+      unit: row.unit,
+      amountDescription: row.amountDescription ?? '',
+
+      reason: row.reason,
+      description: row.description,
+      priority: row.priority as DailyDemand['priority'],
+      category: row.category as DailyDemand['category'],
+
+      receiveMethod: {
+        寄送: row.receiveMethod?.includes('寄送') ?? false,
+
+        面交: row.receiveMethod?.includes('面交') ?? false,
+      },
+
+      recipient: row.recipient,
+      address: row.address,
+      phone: row.phone,
+      note: row.note ?? '',
+      brand: row.brand ?? '',
+
+      serviceTargets: row.serviceTargets ?? [],
+
+      customServiceTargets: this.toStringArray(row.customServiceTargets),
+
+      serviceTargetDescription: [...(row.serviceTargets ?? []), ...this.toStringArray(row.customServiceTargets)].join('、'),
+
+      conditions: this.toConditions(row.conditions),
+
+      customConditions: this.toStringArray(row.customConditions),
+
+      conditionDescription: this.createConditionDescription(row.conditions, row.customConditions),
+
+      status: row.status as DailyDemand['status'],
+
+      remaining: row.remaining === null ? undefined : Number(row.remaining),
+
+      messageCount: 0,
+
+      createdAt: row.createdAt,
+      publishedAt: row.publishedAt ?? undefined,
+
+      expectedOffShelfAt: row.expectedOffShelfAt ?? undefined,
+
+      image: this.toStringArray(row.image),
+      imageFileNames: this.toStringArray(row.imageFileNames),
+
+      contactTimeWeekday: row.contactTimeWeekday ?? false,
+
+      contactTimeWeekend: row.contactTimeWeekend ?? false,
+
+      contactTimeMorning: row.contactTimeMorning ?? false,
+
+      contactTimeAfternoon: row.contactTimeAfternoon ?? false,
+
+      contactTimeEvening: row.contactTimeEvening ?? false,
+
+      contactTimeSeparate: false,
+
+      contactTimeWeekdayMorning: false,
+      contactTimeWeekdayAfternoon: false,
+      contactTimeWeekdayEvening: false,
+
+      contactTimeWeekendMorning: false,
+      contactTimeWeekendAfternoon: false,
+      contactTimeWeekendEvening: false,
+    };
+  }
+
+  private toSerialNo(serialNo: number | string | null, id: number): number {
+    const parsedSerialNo = Number(serialNo);
+
+    if (serialNo !== null && serialNo !== '' && Number.isFinite(parsedSerialNo)) {
+      return parsedSerialNo;
+    }
+
+    return id;
+  }
+  private demandToRow(demand: DailyDemand): Record<string, unknown> {
+    return {
+      createdAt: demand.createdAt || undefined,
+
+      publishedAt: demand.publishedAt ?? null,
+
+      expectedOffShelfAt: demand.expectedOffShelfAt ?? null,
+
+      item: demand.item,
+      amount: demand.amount,
+      remaining: demand.remaining ?? 0,
+      unit: demand.unit,
+
+      amountDescription: demand.amountDescription ?? null,
+
+      category: demand.category,
+      reason: demand.reason,
+      description: demand.description,
+
+      brand: demand.brand ?? '無',
+
+      serviceTargets: demand.serviceTargets ?? [],
+
+      customServiceTargets: demand.customServiceTargets ?? [],
+
+      conditions: this.conditionsToArray(demand.conditions),
+
+      customConditions: demand.customConditions ?? [],
+
+      priority: demand.priority,
+      status: demand.status,
+
+      receiveMethod: this.receiveMethodToArray(demand.receiveMethod),
+
+      recipient: demand.recipient,
+      address: demand.address,
+      phone: demand.phone,
+      note: demand.note ?? null,
+
+      imageFileNames: demand.imageFileNames ?? [],
+
+      serialNo: demand.serialNo,
+
+      image: demand.image ?? [],
+
+      contactTimeWeekday: demand.contactTimeWeekday ?? false,
+
+      contactTimeWeekend: demand.contactTimeWeekend ?? false,
+
+      contactTimeMorning: demand.contactTimeMorning ?? false,
+
+      contactTimeAfternoon: demand.contactTimeAfternoon ?? false,
+
+      contactTimeEvening: demand.contactTimeEvening ?? false,
+    };
+  }
+
+  async addDemand(demand: CreateDailyDemand): Promise<void> {
+    await this.reload();
+
+    const serialNo = this.getNextSerialNo();
+
+    const newDemand = {
+      ...demand,
+      serialNo,
+    } as DailyDemand;
+
+    const row = this.demandToRow(newDemand);
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).insert(row).select('*').single();
+
+    if (error) {
+      console.error('新增日常物資需求失敗：', error);
+
+      throw error;
+    }
+
+    const savedDemand = this.mapRowToDemand(data as DailyDemandRow);
+
+    this.demands = [...this.demands, savedDemand];
+  }
+
+  getDemands(): DailyDemand[] {
+    return [...this.demands];
   }
 
   getDemandsFromServer(): Observable<DailyDemand[]> {
-    return of(this.demands).pipe(delay(3000));
+    return from(this.reload().then(() => [...this.demands]));
   }
 
-  getDemandById(serialNo: number): DailyDemand | undefined {
-    return this.demands.find((demand) => demand.serialNo === serialNo);
-  }
+  async getDemandById(id: number): Promise<DailyDemand | undefined> {
+    console.log('[getDemandById] 準備查詢資料庫 id：', id);
 
-  updateDemand(updatedDemand: DailyDemand) {
-    const index = this.demands.findIndex((item) => item.serialNo === updatedDemand.serialNo);
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('id', id).maybeSingle();
 
-    if (index !== -1) {
-      this.demands[index] = updatedDemand;
+    console.log('[getDemandById] Supabase data：', data);
+    console.log('[getDemandById] Supabase error：', error);
+
+    if (error) {
+      console.error('讀取單筆日常物資需求失敗：', error);
+
+      throw error;
     }
+
+    if (!data) {
+      console.warn(`查無日常物資需求：id=${id}`);
+
+      return undefined;
+    }
+
+    return this.mapRowToDemand(data as DailyDemandRow);
   }
 
-  deleteDemand(serialNo: number) {
-    this.demands = this.demands.filter((item) => item.serialNo !== serialNo);
+  async updateDemand(updatedDemand: DailyDemand): Promise<void> {
+    if (updatedDemand.id == null) {
+      throw new Error(`找不到資料庫 id，無法更新日常物資：serialNo=${updatedDemand.serialNo}`);
+    }
+
+    const row = this.demandToRow(updatedDemand);
+
+    const { data, error } = await this.supabaseService.client
+      .from(this.tableName)
+      .update(row)
+      .eq('id', updatedDemand.id)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('修改日常物資需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error(`找不到更新後的日常物資資料：id=${updatedDemand.id}`);
+    }
+
+    const savedDemand = this.mapRowToDemand(data as DailyDemandRow);
+
+    this.demands = this.demands.map((item) => (item.id === savedDemand.id ? savedDemand : item));
+  }
+
+  async updateDemandStatus(
+    serialNo: number,
+    status: DailyDemand['status'],
+    publishedAt?: string,
+    expectedOffShelfAt?: string
+  ): Promise<DailyDemand> {
+    const updateData = {
+      status,
+      publishedAt: publishedAt ?? null,
+      expectedOffShelfAt: expectedOffShelfAt ?? null,
+    };
+
+    const { data, error } = await this.supabaseService.client
+      .from(this.tableName)
+      .update(updateData)
+      .eq('serialNo', serialNo)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('修改日常物資狀態失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error(`找不到要更新的日常物資，serialNo：${serialNo}`);
+    }
+
+    const savedDemand = this.mapRowToDemand(data as DailyDemandRow);
+
+    this.demands = this.demands.map((item) => (item.serialNo === serialNo ? savedDemand : item));
+
+    return savedDemand;
+  }
+
+  async deleteDemand(id: number): Promise<void> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error(`要刪除的日常物資需求 id 不正確：${id}`);
+    }
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).delete().eq('id', id).select('id');
+
+    if (error) {
+      console.error('刪除日常物資需求失敗：', error);
+
+      throw error;
+    }
+
+    /*
+     * PostgREST / Supabase delete().select()
+     * 只有在資料真的被刪除時才會回傳資料。
+     */
+    if (!data || data.length === 0) {
+      throw new Error(`找不到要刪除的日常物資需求，id：${id}`);
+    }
+
+    this.demands = this.demands.filter((item) => item.id !== id);
+
+    console.log('[DailyDemandService] 日常物資需求已刪除：', {
+      id,
+    });
+  }
+
+  private getNextSerialNo(): number {
+    if (this.demands.length === 0) {
+      return 1;
+    }
+
+    return Math.max(...this.demands.map((item) => item.serialNo)) + 1;
+  }
+
+  private toStringArray(value: unknown): string[] {
+    if (Array.isArray(value)) {
+      return value.filter((item): item is string => typeof item === 'string');
+    }
+
+    return [];
+  }
+
+  private toConditions(value: string[] | null): DailyConditions {
+    const conditions: DailyConditions = {
+      全新: '不接受',
+      二手: '不接受',
+      有擦痕: '不接受',
+      過期: '不接受',
+      毀損: '不接受',
+    };
+
+    for (const condition of value ?? []) {
+      const separatorIndex = condition.indexOf('：');
+
+      if (separatorIndex === -1) {
+        continue;
+      }
+
+      const name = condition.slice(0, separatorIndex) as keyof DailyConditions;
+
+      const result = condition.slice(separatorIndex + 1) as DailyConditions[keyof DailyConditions];
+
+      if (name in conditions) {
+        conditions[name] = result;
+      }
+    }
+
+    return conditions;
+  }
+
+  private conditionsToArray(conditions: DailyDemand['conditions']): string[] {
+    return Object.entries(conditions ?? {}).map(([name, result]) => `${name}：${result}`);
+  }
+
+  private createConditionDescription(conditions: string[] | null, customConditions: unknown[] | null): string {
+    return [...(conditions ?? []), ...this.toStringArray(customConditions)].join('、');
+  }
+
+  private receiveMethodToArray(receiveMethod: DailyDemand['receiveMethod']): string[] {
+    const methods: string[] = [];
+
+    if (receiveMethod?.寄送) {
+      methods.push('寄送');
+    }
+
+    if (receiveMethod?.面交) {
+      methods.push('面交');
+    }
+
+    return methods;
   }
 }

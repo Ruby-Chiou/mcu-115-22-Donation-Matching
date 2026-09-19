@@ -163,104 +163,103 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     this.categoryDropdownOpen = false;
   }
 
-  ngOnInit() {
-    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
+    const id = Number(rawId);
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
 
-    if (serialNo) {
-      this.isEditMode = true;
+    console.log('[DailyFormComponent] 取得路由資料庫 id：', {
+      rawId,
+      id,
+    });
 
-      const data = this.dailyDemandService.getDemands().find((item) => item.serialNo === serialNo);
+    if (rawId === null) {
+      this.isEditMode = false;
+      console.log('[DailyFormComponent] 新增模式');
+      return;
+    }
 
-      if (data) {
-        this.originalStatus = data.status ?? '隱藏';
-        this.originalOffShelfReason = data.offShelfReason;
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyFormComponent] 編輯網址的資料庫 id 不正確：', rawId);
+      this.router.navigate(['/agency/daily']);
+      return;
+    }
 
-        let serviceTargets: string[] = [];
+    this.isEditMode = true;
+    console.log('[DailyFormComponent] 編輯模式，資料庫 id：', id);
 
-        if (Array.isArray(data.serviceTargets)) {
-          serviceTargets = [...data.serviceTargets];
-        } else if (data.serviceTargets && typeof data.serviceTargets === 'object') {
-          serviceTargets = Object.entries(data.serviceTargets)
-            .filter(([, value]) => Boolean(value))
-            .map(([key]) => key);
-        }
+    try {
+      const data = await this.dailyDemandService.getDemandById(id);
 
-        this.demand = {
-          ...data,
+      console.log('[DailyFormComponent] Service 回傳編輯資料：', data);
 
-          status: data.status ?? '上架',
-
-          remaining: data.remaining ?? null,
-
-          receiveMethod:
-            typeof data.receiveMethod === 'object'
-              ? { ...data.receiveMethod }
-              : {
-                  寄送: data.receiveMethod === '寄送',
-                  面交: data.receiveMethod === '面交',
-                },
-
-          recipient: data.recipient ?? '',
-          address: data.address ?? '',
-          latitude: data.latitude,
-          longitude: data.longitude,
-          phone: data.phone ?? '',
-
-          image: [...(data.image ?? [])],
-          imageFileNames: [...(data.imageFileNames ?? [])],
-
-          contactTimeWeekday: data.contactTimeWeekday ?? false,
-          contactTimeWeekend: data.contactTimeWeekend ?? false,
-          contactTimeMorning: data.contactTimeMorning ?? false,
-          contactTimeAfternoon: data.contactTimeAfternoon ?? false,
-          contactTimeEvening: data.contactTimeEvening ?? false,
-
-          contactTimeSeparate: data.contactTimeSeparate ?? false,
-
-          contactTimeWeekdayMorning: data.contactTimeWeekdayMorning ?? false,
-          contactTimeWeekdayAfternoon: data.contactTimeWeekdayAfternoon ?? false,
-          contactTimeWeekdayEvening: data.contactTimeWeekdayEvening ?? false,
-
-          contactTimeWeekendMorning: data.contactTimeWeekendMorning ?? false,
-          contactTimeWeekendAfternoon: data.contactTimeWeekendAfternoon ?? false,
-          contactTimeWeekendEvening: data.contactTimeWeekendEvening ?? false,
-
-          serviceTargetDescription: data.serviceTargetDescription ?? '',
-
-          conditionDescription: data.conditionDescription ?? '',
-
-          serviceTargets: serviceTargets,
-
-          customServiceTargets: data.customServiceTargets?.length ? [...data.customServiceTargets] : [''],
-
-          conditions: data.conditions
-            ? { ...data.conditions }
-            : {
-                全新: '',
-                二手: '',
-                有擦痕: '',
-                過期: '',
-                毀損: '',
-              },
-
-          customConditions: data.customConditions?.length ? [...data.customConditions] : [''],
-        };
-
-        this.imageFiles = [];
-
-        Promise.all(
-          (data.image ?? []).map((image, index) => {
-            const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
-
-            return this.base64ToFile(image, fileName);
-          })
-        ).then((files) => {
-          this.imageFiles = files;
-          this.cdr.detectChanges();
-        });
+      if (!data) {
+        console.error('[DailyFormComponent] 找不到要編輯的日常需求，id：', id);
+        this.router.navigate(['/agency/daily']);
+        return;
       }
+
+      this.originalStatus = data.status ?? '隱藏';
+      this.originalOffShelfReason = data.offShelfReason;
+
+      let serviceTargets: string[] = [];
+
+      if (Array.isArray(data.serviceTargets)) {
+        serviceTargets = [...data.serviceTargets];
+      } else if (data.serviceTargets && typeof data.serviceTargets === 'object') {
+        serviceTargets = Object.entries(data.serviceTargets)
+          .filter(([, value]) => Boolean(value))
+          .map(([key]) => key);
+      }
+
+      this.demand = {
+        ...data,
+        status: data.status ?? '上架',
+        remaining: data.remaining ?? null,
+        serviceTargets: serviceTargets,
+        customServiceTargets: data.customServiceTargets?.length ? [...data.customServiceTargets] : [''],
+        conditions: data.conditions
+          ? { ...data.conditions }
+          : {
+              全新: '',
+              二手: '',
+              有擦痕: '',
+              過期: '',
+              毀損: '',
+            },
+        customConditions: data.customConditions?.length ? [...data.customConditions] : [''],
+        recipient: data.recipient ?? '',
+        address: data.address ?? '',
+        phone: data.phone ?? '',
+        image: [...(data.image ?? [])],
+        imageFileNames: [...(data.imageFileNames ?? [])],
+      };
+
+      this.imageFiles = [];
+
+      const files = await Promise.all(
+        (data.image ?? []).map(async (image, index) => {
+          const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+
+          try {
+            return await this.base64ToFile(image, fileName);
+          } catch (error) {
+            console.warn('[DailyFormComponent] 圖片無法轉成 File，略過：', image, error);
+            return null;
+          }
+        })
+      );
+
+      this.imageFiles = files.filter((file): file is File => file !== null);
+
+      this.cdr.detectChanges();
+
+      console.log('[DailyFormComponent] 編輯資料已載入：', this.demand);
+    } catch (error) {
+      console.error('[DailyFormComponent] 載入日常編輯資料失敗：', error);
+      alert('載入日常需求失敗');
+      this.router.navigate(['/agency/daily']);
     }
   }
 
@@ -301,7 +300,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
 
     const wasManualOffShelf = this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
-
     const currentlyManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
 
     if (wasManualOffShelf || currentlyManualOffShelf) {
@@ -383,12 +381,22 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async base64ToFile(base64: string, fileName: string): Promise<File> {
-    const response = await fetch(base64);
+  async base64ToFile(imageSource: string, fileName: string): Promise<File | null> {
+    if (!imageSource.startsWith('data:')) {
+      console.warn('[DailyFormComponent] 外部圖片不轉換為 File，保留原網址：', imageSource);
+      return null;
+    }
+
+    const response = await fetch(imageSource);
+
+    if (!response.ok) {
+      throw new Error(`圖片讀取失敗：${response.status}`);
+    }
+
     const blob = await response.blob();
 
     return new File([blob], fileName, {
-      type: blob.type,
+      type: blob.type || 'image/*',
     });
   }
 
@@ -412,35 +420,20 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
   }
 
-  // =========================================================
-  // 從完整地址取得道路名稱
-  // =========================================================
   private extractRoadName(address: string): string {
     let roadAddress = address.trim().replace(/臺/g, '台').replace(/\s+/g, '');
 
-    // 移除縣市名稱
     roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
-
-    // 移除區、鄉、鎮、縣轄市名稱
     roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
-
-    // 移除門牌號碼及後面的內容
     roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
 
     return roadAddress.trim();
   }
 
-  // =========================================================
-  // 地址 → 經緯度
-  // =========================================================
   async getCoordinatesFromAddress(address: string): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
-
     const originalAddress = address.trim();
 
-    // =========================================================
-    // 第一階段：先搜尋完整地址
-    // =========================================================
     const searchAddresses: string[] = [
       originalAddress,
       originalAddress.replace(/臺/g, '台'),
@@ -453,11 +446,8 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     const uniqueAddresses = [...new Set(searchAddresses.filter((item) => item.length > 0))];
 
-    console.log('Nominatim 將先嘗試搜尋完整地址：', uniqueAddresses);
-
     for (const searchAddress of uniqueAddresses) {
       const params = {
-        // 原城市碼／台灣設定維持不變
         q: `${searchAddress}, Taiwan`,
         format: 'jsonv2',
         limit: '1',
@@ -465,62 +455,35 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       };
 
       try {
-        console.log('Nominatim 搜尋完整地址：', searchAddress);
-
         const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
-
-        console.log('Nominatim 回傳結果：', results);
 
         if (!results || results.length === 0) {
           continue;
         }
 
         const result = results[0];
-
         const latitude = Number(result.lat);
         const longitude = Number(result.lon);
 
         if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-          console.warn('完整地址回傳的經緯度無效：', result);
           continue;
         }
 
         this.demand.latitude = latitude;
         this.demand.longitude = longitude;
-
-        console.log('--------------------------------');
-        console.log('Nominatim 完整地址搜尋成功');
-        console.log('原始地址：', address);
-        console.log('成功搜尋：', searchAddress);
-        console.log('轉換後緯度：', latitude);
-        console.log('轉換後經度：', longitude);
-        console.log('Nominatim 找到的位置：', result.display_name);
-        console.log('--------------------------------');
-
         return true;
       } catch (error) {
-        console.error(`Nominatim 搜尋完整地址失敗：${searchAddress}`, error);
-
-        // 繼續嘗試下一種完整地址格式
         continue;
       }
     }
 
-    // =========================================================
-    // 第二階段：完整地址找不到 → 搜尋道路名稱
-    // =========================================================
     const roadAddress = this.extractRoadName(originalAddress);
 
     if (!roadAddress) {
-      console.warn('無法從地址取得道路名稱：', originalAddress);
-
       return false;
     }
 
-    console.log('完整地址全部找不到，改搜尋道路名稱：', roadAddress);
-
     const roadParams = {
-      // 原城市碼／台灣設定維持不變
       q: `${roadAddress}, Taiwan`,
       format: 'jsonv2',
       limit: '1',
@@ -530,56 +493,32 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     try {
       const roadResults = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params: roadParams }));
 
-      console.log('Nominatim 道路搜尋結果：', roadResults);
-
       if (!roadResults || roadResults.length === 0) {
-        console.warn('道路名稱也找不到：', roadAddress);
-
         return false;
       }
 
       const roadResult = roadResults[0];
-
       const latitude = Number(roadResult.lat);
       const longitude = Number(roadResult.lon);
 
       if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-        console.warn('道路回傳的經緯度無效：', roadResult);
-
         return false;
       }
 
-      // 將道路座標寫入需求資料
       this.demand.latitude = latitude;
       this.demand.longitude = longitude;
-
-      console.log('--------------------------------');
-      console.log('Nominatim 道路搜尋成功');
-      console.log('原始地址：', address);
-      console.log('道路名稱：', roadAddress);
-      console.log('道路座標緯度：', latitude);
-      console.log('道路座標經度：', longitude);
-      console.log('Nominatim 找到的位置：', roadResult.display_name);
-      console.log('--------------------------------');
-
       return true;
     } catch (error) {
-      console.error(`Nominatim 道路搜尋失敗：${roadAddress}`, error);
-
       return false;
     }
   }
 
-  // =========================================================
-  // 儲存
-  // =========================================================
-  async save() {
+  async save(): Promise<void> {
     this.submitted = true;
 
     this.hasServiceTarget = this.demand.serviceTargets.length > 0 || this.demand.customServiceTargets.some((target) => target.trim());
 
     const hasReceiveMethod = this.demand.receiveMethod.寄送 || this.demand.receiveMethod.面交;
-
     const invalidReceiveInfo = !hasReceiveMethod || !this.demand.recipient || !this.demand.address;
 
     if (
@@ -593,55 +532,23 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       (this.isEditMode && (this.demand.remaining === null || this.demand.remaining === undefined))
     ) {
       if (!this.demand.item) {
-        this.itemInput.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        this.itemInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (!this.demand.amount) {
-        this.amountInput.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        this.amountInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (!this.demand.unit) {
-        this.unitInput.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        this.unitInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (this.isEditMode && (this.demand.remaining === null || this.demand.remaining === undefined)) {
-        this.remainingInput.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        this.remainingInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (!this.demand.category) {
-        this.categoryInput.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        this.categoryInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (!this.demand.reason) {
-        this.reasonInput.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        this.reasonInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (!this.demand.description) {
-        this.descriptionInput.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        this.descriptionInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (!hasReceiveMethod) {
-        document.querySelector('.receive-method-box')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      } else if (!this.demand.recipient) {
-        document.querySelector('.receive-info-box')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      } else if (!this.demand.address) {
-        document.querySelector('.receive-info-box')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        document.querySelector('.receive-method-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (!this.demand.recipient || !this.demand.address) {
+        document.querySelector('.receive-info-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
       return;
@@ -652,22 +559,14 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // =======================================================
-    // 地址轉換經緯度
-    // =======================================================
     const addressSuccess = await this.getCoordinatesFromAddress(this.demand.address);
 
     if (!addressSuccess) {
       alert('無法找到此地址的位置，請確認地址是否正確。');
-
       return;
     }
 
-    // =======================================================
-    // 清除空白自訂欄位
-    // =======================================================
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
-
     this.demand.customServiceTargets = this.demand.customServiceTargets.filter((item) => item.trim() !== '');
 
     if (this.demand.customConditions.length === 0) {
@@ -679,42 +578,26 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
 
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
-
     this.demand.conditionDescription = this.buildConditionDescription();
 
-    // =======================================================
-    // 編輯
-    // =======================================================
     if (this.isEditMode) {
-      const originalItem = this.dailyDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
-
-      const originalStatus = originalItem?.status;
-      const originalOffShelfReason = originalItem?.offShelfReason;
-      const originalPublishedAt = originalItem?.publishedAt;
-
       const now = new Date();
-
-      const isOriginalManualOffShelf = originalStatus === '下架' && originalOffShelfReason === 'manual';
-
+      const isOriginalManualOffShelf = this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
       const isCurrentManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
 
       if (this.demand.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
         alert('此需求為使用者主動下架，無法重新上架。');
-
         this.demand.status = '下架';
-
         return;
       }
 
       if (this.demand.status === '上架') {
-        if (originalStatus !== '上架') {
+        if (this.originalStatus !== '上架') {
           this.demand.publishedAt = now.toISOString();
 
           if (!this.demand.createdAt) {
             this.demand.createdAt = now.toISOString();
           }
-        } else if (originalPublishedAt) {
-          this.demand.publishedAt = originalPublishedAt;
         }
 
         if (this.demand.publishedAt) {
@@ -736,26 +619,29 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         }
       }
 
-      this.dailyDemandService.updateDemand(this.demand);
+      try {
+        await this.dailyDemandService.updateDemand(this.demand);
 
-      if (this.fromDetail) {
-        this.router.navigate(['/agency/daily-detail', this.demand.serialNo]);
-      } else {
-        this.router.navigate(['/agency/daily']);
+        if (this.fromDetail) {
+          await this.router.navigate(['/agency/daily-detail', this.demand.id]);
+        } else {
+          await this.router.navigate(['/agency/daily'], {
+            queryParams: {
+              refresh: Date.now(),
+            },
+          });
+        }
+      } catch (error) {
+        console.error('修改日常物資需求失敗：', error);
+        alert('修改失敗，請稍後再試。');
       }
     } else {
-      // =====================================================
-      // 新增
-      // =====================================================
       const createdDate = new Date();
-
       this.demand.createdAt = createdDate.toISOString();
 
       if (this.demand.status === '上架') {
         this.demand.publishedAt = createdDate.toISOString();
-
         this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, this.demand.priority);
-
         this.demand.offShelfReason = undefined;
       } else {
         this.demand.publishedAt = undefined;
@@ -763,9 +649,18 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         this.demand.offShelfReason = undefined;
       }
 
-      this.dailyDemandService.addDemand(this.demand);
+      try {
+        await this.dailyDemandService.addDemand(this.demand);
 
-      this.router.navigate(['/agency/daily']);
+        await this.router.navigate(['/agency/daily'], {
+          queryParams: {
+            refresh: Date.now(),
+          },
+        });
+      } catch (error) {
+        console.error('新增日常物資需求失敗：', error);
+        alert('新增失敗，請稍後再試。');
+      }
     }
   }
 
@@ -791,26 +686,11 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
   buildConditionDescription(): string {
     const conditions = [
-      {
-        name: '全新',
-        value: this.demand.conditions.全新,
-      },
-      {
-        name: '二手',
-        value: this.demand.conditions.二手,
-      },
-      {
-        name: '有擦痕',
-        value: this.demand.conditions.有擦痕,
-      },
-      {
-        name: '過期',
-        value: this.demand.conditions.過期,
-      },
-      {
-        name: '毀損',
-        value: this.demand.conditions.毀損,
-      },
+      { name: '全新', value: this.demand.conditions.全新 },
+      { name: '二手', value: this.demand.conditions.二手 },
+      { name: '有擦痕', value: this.demand.conditions.有擦痕 },
+      { name: '過期', value: this.demand.conditions.過期 },
+      { name: '毀損', value: this.demand.conditions.毀損 },
     ];
 
     const result: string[] = [];
@@ -848,7 +728,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
 
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
-
     this.demand.conditionDescription = this.buildConditionDescription();
   }
 
@@ -886,7 +765,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
 
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
-
     this.demand.conditionDescription = this.buildConditionDescription();
   }
 
@@ -937,7 +815,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
   limitNumberLength(event: Event, field: 'amount' | 'remaining') {
     const input = event.target as HTMLInputElement;
-
     let value = input.value.replace(/[^0-9]/g, '');
 
     if (value.length > 10) {
@@ -945,7 +822,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     }
 
     input.value = value;
-
     const numberValue = value ? Number(value) : null;
 
     if (field === 'amount') {
@@ -959,7 +835,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     if (field === 'remaining') {
       if (numberValue !== null && this.demand.amount !== null && numberValue > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
-
         input.value = this.demand.amount.toString();
       } else {
         this.demand.remaining = numberValue;
@@ -1030,15 +905,12 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       }
 
       this.demand.image.push(reader.result as string);
-
       this.demand.imageFileNames.push(file.name);
+      input.value = '';
     };
 
     reader.readAsDataURL(file);
-
-    input.value = '';
   }
-
   removeImage(index: number) {
     this.imageFiles.splice(index, 1);
 

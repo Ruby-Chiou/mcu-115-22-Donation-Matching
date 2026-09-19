@@ -1,3 +1,9 @@
+@if (isLoading) {
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>資料載入中，請稍候...</p>
+  </div>
+} @else if (demand) {
 <div class="detail-page">
   <button type="button" class="back-button" (click)="goBackToList()">← 返回需求清單</button>
   <!-- =========================
@@ -13,7 +19,7 @@
     <!-- 左邊：物資圖片 -->
     <!-- 左邊：物資圖片 -->
     <div class="detail-image">
-      <app-supply-detail-carousel [images]="demand.image ?? []"> </app-supply-detail-carousel>
+      <app-supply-detail-carousel [images]="demand?.image ?? []"> </app-supply-detail-carousel>
     </div>
     <!-- 右邊：物資資訊 -->
     <div class="detail-info">
@@ -206,3 +212,16 @@
     </div>
   </div>
 </div>
+} @else {
+  <div class="loading-state empty-state">
+    <p>找不到此筆災害物資需求。</p>
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBackToList()"
+    >
+      ← 返回需求清單
+    </button>
+  </div>
+}

@@ -1,4 +1,7 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { DonorDisasterCardComponent } from '../../../card/disaster/donor-disaster-card/donor-disaster-card.component';
 import { PaginationComponent } from '../../../pagination/pagination.component';
@@ -26,38 +29,73 @@ export type DisasterFilters = MaterialFilters | VolunteerFilters;
 
 @Component({
   selector: 'app-donor-disaster-card-list',
+  standalone: true,
   imports: [DonorDisasterCardComponent, PaginationComponent],
   templateUrl: './donor-disaster-card-list.component.html',
   styleUrl: './donor-disaster-card-list.component.scss',
 })
-export class DonorDisasterCardListComponent {
-  // 目前顯示：物資 or 志工
+export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
   @Input() type: 'material' | 'volunteer' = 'material';
 
-  // 篩選條件
   @Input() filters: DisasterFilters = {
     category: [],
     priority: [],
     hasRemaining: false,
   };
 
-  protected readonly disasterData = inject(DisasterControlService).data;
+  protected disasterData!: DisasterControlService['data'];
 
-  // 物資需求
   demands: DisasterDemand[] = [];
-
-  // 志工需求
   volunteers: VolunteerDemand[] = [];
 
-  constructor(
-    private disasterDemandService: DisasterDemandService,
-    private volunteerDemandService: VolunteerDemandService
-  ) {
-    // 從 DisasterDemandService 取得物資
-    this.demands = this.disasterDemandService.getDemands().filter((demand) => demand.status === '上架');
+  currentPage = 1;
+  pageSize = 8;
+  isLoading = true;
 
-    // 從 VolunteerDemandService 取得志工
-    this.volunteers = this.volunteerDemandService.getVolunteers();
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(
+    private readonly disasterDemandService: DisasterDemandService,
+    private readonly volunteerDemandService: VolunteerDemandService,
+    private readonly disasterControlService: DisasterControlService
+  ) {
+    this.disasterData = this.disasterControlService.data;
+  }
+
+  async ngOnInit(): Promise<void> {
+    this.isLoading = true;
+
+    this.disasterDemandService.demandChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (this.type === 'material') {
+        void this.loadDemands();
+      }
+    });
+
+    await Promise.all([this.disasterDemandService.waitUntilLoaded(), this.volunteerDemandService.waitUntilLoaded()]);
+
+    await this.loadDemands();
+  }
+
+  private async loadDemands(): Promise<void> {
+    this.isLoading = true;
+
+    try {
+      await Promise.all([this.disasterDemandService.reload(), this.volunteerDemandService.reload()]);
+
+      this.demands = this.disasterDemandService.getDemands().filter((demand) => demand.status === '上架');
+
+      this.volunteers = this.volunteerDemandService.getVolunteers().filter((volunteer) => volunteer.status === '上架');
+
+      this.currentPage = 1;
+    } catch (error) {
+      console.error('載入捐贈需求失敗：', error);
+
+      this.demands = [];
+      this.volunteers = [];
+      this.currentPage = 1;
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   get filteredDemands(): DisasterDemand[] {
@@ -95,44 +133,45 @@ export class DonorDisasterCardListComponent {
     });
   }
 
-  // 分頁相關變數
-  currentPage: number = 1;
-  pageSize: number = 8; // 依需求調整每頁顯示幾筆
-
-  // 切換分頁時觸發的方法
-  onPageChange(page: number) {
-    this.currentPage = page;
-  }
-
-  // 取得目前分頁後的物資資料
   get paginatedDemands(): DisasterDemand[] {
     const start = (this.currentPage - 1) * this.pageSize;
+
     return this.filteredDemands.slice(start, start + this.pageSize);
   }
 
-  // 取得目前分頁後的志工資料
   get paginatedVolunteers(): VolunteerDemand[] {
     const start = (this.currentPage - 1) * this.pageSize;
+
     return this.filteredVolunteers.slice(start, start + this.pageSize);
   }
 
-  // 取得目前資料總數（給分頁元件計算頁數用）
   get totalItems(): number {
     return this.type === 'material' ? this.filteredDemands.length : this.filteredVolunteers.length;
   }
 
-  // 取得總頁數
   get totalPages(): number {
     return Math.ceil(this.totalItems / this.pageSize);
   }
 
-  // 取得分頁數字陣列
   get pageNumbers(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    return Array.from(
+      {
+        length: this.totalPages,
+      },
+      (_, index) => index + 1
+    );
   }
 
-  // 切換到指定頁數
-  goToPage(page: number) {
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+
     this.currentPage = page;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
