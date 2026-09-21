@@ -167,12 +167,13 @@
       ></textarea>
 
       <!-- 物資示意圖片 -->
-      <label class="label-row"> 物資示意圖片 </label>
+      <!-- 物資示意圖片 -->
+      <label class="label-row">物資示意圖片</label>
 
       <div class="image-upload-box">
         <div class="image-upload-area">
           <!-- 未滿 5 張才顯示選擇圖片 -->
-          <ng-container *ngIf="(imageFiles[demand.serialNo] || []).length < 5">
+          <ng-container *ngIf="(imagePreviewUrls[demand.serialNo] || []).length < 5">
             <div class="upload-controls">
               <label class="image-upload-btn">
                 <i class="fa-solid fa-image"></i>
@@ -185,10 +186,13 @@
             </div>
           </ng-container>
 
-          <div class="selected-image-list" *ngIf="(imageFiles[demand.serialNo] || []).length > 0">
-            <div class="selected-image" *ngFor="let image of (imageFiles[demand.serialNo] || []); let j = index">
+          <!-- 已有圖片 -->
+          <div class="selected-image-list" *ngIf="(imagePreviewUrls[demand.serialNo] || []).length > 0">
+            <div class="selected-image" *ngFor="let image of (imagePreviewUrls[demand.serialNo] || []); let j = index">
               <!-- 圖片名稱：點擊可預覽 -->
-              <button type="button" class="selected-image-name" (click)="openImagePreview(demand, j)">{{ image.name }}</button>
+              <button type="button" class="selected-image-name" (click)="openImagePreview(demand, j)">
+                {{ demand.imageFileNames?.[j] ?? '未命名圖片' + (j + 1) }}
+              </button>
 
               <button type="button" class="remove-image-btn" (click)="removeImage(demand, j)">移除圖片</button>
             </div>

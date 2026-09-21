@@ -3,7 +3,7 @@ import { Component, AfterViewInit, computed, inject, signal } from '@angular/cor
 import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
 
-import { DisasterControlService } from '../../../core/services/disaster-control.service';
+import { DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
 import { DonorDisasterPageComponent } from '../../../components/page/donor-disaster-page/donor-disaster-page.component';
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;

@@ -31,7 +31,7 @@
 
     <div class="detail-table">
       <div class="detail-row">
-        <div class="detail-title">建立日期</div>
+        <div class="detail-title">創建日期</div>
         <div class="detail-content">{{ currentDemand.createdAt ? (currentDemand.createdAt | date: 'yyyy/MM/dd HH:mm') : '無' }}</div>
       </div>
 
@@ -90,55 +90,63 @@
       </div>
 
       <div class="detail-row">
-        <div class="detail-title">接收方式</div>
+        <div class="detail-title">物資示意圖片</div>
 
-        <div class="detail-content">
-          <ng-container
-            *ngIf="
-              currentDemand.receiveMethod[
-                '寄送'
-              ] ||
-              currentDemand.receiveMethod[
-                '面交'
-              ];
-              else noReceiveMethod
-            "
-          >
-            <span
-              *ngIf="
-                currentDemand.receiveMethod[
-                  '寄送'
-                ]
-              "
-            >
-              寄送
-            </span>
+        <div class="detail-content image-detail-content">
+          <ng-container *ngIf="currentDemand.image && currentDemand.image.length > 0; else noImages">
+            <div class="image-name-list">
+              <button
+                type="button"
+                class="image-name-btn"
+                *ngFor="let image of currentDemand.image; let i = index"
+                (click)="
+            openImagePreview(
+              image,
+              currentDemand.imageFileNames?.[i] || '未命名圖片' + (i + 1)
+            )
+          "
+              >
+                <i class="fa-solid fa-image"></i>
 
-            <span
-              *ngIf="
-                currentDemand.receiveMethod[
-                  '寄送'
-                ] &&
-                currentDemand.receiveMethod[
-                  '面交'
-                ]
-              "
-            >
-              ／
-            </span>
-
-            <span
-              *ngIf="
-                currentDemand.receiveMethod[
-                  '面交'
-                ]
-              "
-            >
-              面交
-            </span>
+                {{ currentDemand.imageFileNames?.[i] || '未命名圖片' + (i + 1) }}
+              </button>
+            </div>
           </ng-container>
 
-          <ng-template #noReceiveMethod> 無 </ng-template>
+          <ng-template #noImages>
+            <span>無</span>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-title">需求對象</div>
+        <div class="detail-content">{{ getSelectedServiceTargets() }}</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-title">其他自訂需求對象</div>
+
+        <div class="detail-content">
+          <ng-container *ngIf="hasCustomServiceTargets(); else noServiceTarget"> {{ getCustomServiceTargets() }} </ng-container>
+
+          <ng-template #noServiceTarget> 無 </ng-template>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-title">接受物資狀態</div>
+
+        <div class="detail-content condition-detail" [innerHTML]="getConditionsText()"></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-title">其他物品狀態</div>
+
+        <div class="detail-content">
+          <ng-container *ngIf="hasCustomConditions(); else noCondition"> {{ getCustomConditions() }} </ng-container>
+
+          <ng-template #noCondition> 無 </ng-template>
         </div>
       </div>
 
@@ -167,6 +175,39 @@
       </div>
 
       <div class="detail-row">
+        <div class="detail-title">接收方式</div>
+
+        <div class="detail-content">
+          <span *ngIf="currentDemand.receiveMethod['寄送']"> 寄送 </span>
+
+          <span
+            *ngIf="
+        currentDemand.receiveMethod['寄送'] &&
+        currentDemand.receiveMethod['面交']
+      "
+          >
+            、
+          </span>
+
+          <span *ngIf="currentDemand.receiveMethod['面交']"> 面交 </span>
+
+          <span
+            *ngIf="
+        !currentDemand.receiveMethod['寄送'] &&
+        !currentDemand.receiveMethod['面交']
+      "
+          >
+            無
+          </span>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-title">收件人</div>
+        <div class="detail-content">{{ currentDemand.recipient || '無' }}</div>
+      </div>
+
+      <div class="detail-row">
         <div class="detail-title">接收物資地址</div>
         <div class="detail-content">{{ currentDemand.address || '無' }}</div>
       </div>
@@ -174,6 +215,16 @@
       <div class="detail-row">
         <div class="detail-title">聯絡電話</div>
         <div class="detail-content">{{ currentDemand.phone || '無' }}</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-title">聯絡時間</div>
+
+        <div class="detail-content contact-time-detail">
+          <ng-container *ngIf="hasContactTime(); else noContactTime"> {{ getContactTimeText() }} </ng-container>
+
+          <ng-template #noContactTime> 無 </ng-template>
+        </div>
       </div>
 
       <div class="detail-row">
@@ -217,3 +268,6 @@
   (deleted)="onDeleted()"
 >
 </app-supply-delete>
+
+<app-supply-image-preview *ngIf="showImagePreview" [image]="previewImage" [imageName]="previewImageName" (closed)="closeImagePreview()">
+</app-supply-image-preview>

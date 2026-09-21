@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AiChatService } from '../../../core/services/ai-chat.service.service';
+import { AiChatService } from '../../../core/services/backend-ai-chat/ai-chat.service.service';
 
 interface ChatMessage {
   sender: 'user' | 'assistant';
