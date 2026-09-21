@@ -151,20 +151,7 @@ export class DailyBatchEditComponent implements OnInit {
 
       this.editDemands.forEach((item) => {
         this.imageFiles[item.serialNo] = [];
-
-        Promise.all(
-          (item.image ?? []).map((image: string, index: number) => {
-            const fileName = item.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
-
-            return this.base64ToFile(image, fileName);
-          })
-        ).then((files) => {
-          this.imageFiles[item.serialNo] = files;
-
-          this.imagePreviewUrls[item.serialNo] = files.map((file) => URL.createObjectURL(file));
-
-          this.cdr.detectChanges();
-        });
+        this.imagePreviewUrls[item.serialNo] = [...(item.image ?? [])];
       });
     }
 
@@ -542,7 +529,7 @@ export class DailyBatchEditComponent implements OnInit {
 
     const file = input.files[0];
 
-    if (this.imageFiles[demand.serialNo].length >= 5) {
+    if ((this.imagePreviewUrls[demand.serialNo] || []).length >= 5) {
       alert('最多只能上傳 5 張圖片');
       input.value = '';
       return;
@@ -553,14 +540,18 @@ export class DailyBatchEditComponent implements OnInit {
       input.value = '';
       return;
     }
-
     this.imageFiles[demand.serialNo].push(file);
 
     if (!this.imagePreviewUrls[demand.serialNo]) {
       this.imagePreviewUrls[demand.serialNo] = [];
     }
 
+    if (!demand.imageFileNames) {
+      demand.imageFileNames = [];
+    }
+
     this.imagePreviewUrls[demand.serialNo].push(URL.createObjectURL(file));
+    demand.imageFileNames.push(file.name);
 
     input.value = '';
   }
@@ -641,20 +632,17 @@ export class DailyBatchEditComponent implements OnInit {
   }
 
   openImagePreview(demand: EditableDailyDemand, index: number): void {
-    const files = this.imageFiles[demand.serialNo] || [];
-
     const previewUrls = this.imagePreviewUrls[demand.serialNo] || [];
 
-    const file = files[index];
     const previewUrl = previewUrls[index];
 
-    if (!file || !previewUrl) {
+    if (!previewUrl) {
       return;
     }
 
     this.previewImage = previewUrl;
 
-    this.previewImageName = file.name;
+    this.previewImageName = demand.imageFileNames?.[index] ?? `未命名圖片${index + 1}`;
 
     this.showImagePreview = true;
   }

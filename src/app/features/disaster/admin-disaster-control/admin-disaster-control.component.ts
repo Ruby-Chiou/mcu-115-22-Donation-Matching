@@ -1,10 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  DisasterControlService,
-  MaterialNeed,
-} from '../../../core/services/disaster-control.service';
+import { DisasterControlService, MaterialNeed } from '../../../core/services/disaster-control.service';
 
 @Component({
   selector: 'app-admin-disaster-control',
@@ -58,17 +55,14 @@ export class AdminDisasterControlComponent {
   }
 
   saveDisaster(): void {
-    this.disasterService.updateInfo(
-      this.disasterName.trim(),
-      this.disasterDescription.trim(),
-    );
+    this.disasterService.updateInfo(this.disasterName.trim(), this.disasterDescription.trim());
     this.isEditing = false;
   }
 
   saveSchedule(): void {
     this.disasterService.scheduleClose(
       this.scheduledCloseAt ? new Date(this.scheduledCloseAt).toISOString() : null,
-      this.announcement.trim(),
+      this.announcement.trim()
     );
   }
 

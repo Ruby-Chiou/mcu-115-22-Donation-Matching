@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, from } from 'rxjs';
 
 import { DisasterDemand, CreateDisasterDemand } from '../../../models/agency/disaster-demand';
-
 import { SupabaseService } from '../supabase.service';
 
 interface DisasterDemandRow {

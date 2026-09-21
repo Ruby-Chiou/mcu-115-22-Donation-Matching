@@ -194,6 +194,8 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
       console.log('[DailyFormComponent] Service 回傳編輯資料：', data);
 
+      console.log('[DailyFormComponent] 編輯 conditions：', data?.conditions);
+
       if (!data) {
         console.error('[DailyFormComponent] 找不到要編輯的日常需求，id：', id);
         this.router.navigate(['/agency/daily']);
@@ -237,21 +239,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       };
 
       this.imageFiles = [];
-
-      const files = await Promise.all(
-        (data.image ?? []).map(async (image, index) => {
-          const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
-
-          try {
-            return await this.base64ToFile(image, fileName);
-          } catch (error) {
-            console.warn('[DailyFormComponent] 圖片無法轉成 File，略過：', image, error);
-            return null;
-          }
-        })
-      );
-
-      this.imageFiles = files.filter((file): file is File => file !== null);
 
       this.cdr.detectChanges();
 
@@ -879,7 +866,9 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
     const file = input.files[0];
 
-    if (this.imageFiles.length >= 5) {
+    // 總圖片數以 demand.image 為準
+    // 包含：資料庫原本的圖片 + 本次新增的圖片
+    if ((this.demand.image?.length ?? 0) >= 5) {
       alert('最多只能上傳 5 張圖片');
       input.value = '';
       return;
@@ -891,6 +880,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    // 記錄這次選擇的 File
     this.imageFiles.push(file);
 
     const reader = new FileReader();
@@ -904,22 +894,33 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         this.demand.imageFileNames = [];
       }
 
+      // 立即加入圖片資料
       this.demand.image.push(reader.result as string);
+
+      // 加入原始檔名
       this.demand.imageFileNames.push(file.name);
+
+      // 清空 input，讓之後可以再次選擇同一張圖片
       input.value = '';
+
+      // 強制 Angular 立即更新畫面
+      this.cdr.detectChanges();
     };
 
     reader.readAsDataURL(file);
   }
-  removeImage(index: number) {
-    this.imageFiles.splice(index, 1);
 
+  removeImage(index: number) {
     if (this.demand.image) {
       this.demand.image.splice(index, 1);
     }
 
     if (this.demand.imageFileNames) {
       this.demand.imageFileNames.splice(index, 1);
+    }
+
+    if (this.imageFiles.length > index) {
+      this.imageFiles.splice(index, 1);
     }
   }
 

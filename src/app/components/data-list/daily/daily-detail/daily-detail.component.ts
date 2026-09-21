@@ -82,6 +82,10 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
       this.listNumber = this.demand.serialNo;
 
       console.log('[DailyDetailComponent] 已設定 this.demand：', this.demand);
+
+      console.log('[DailyDetailComponent] conditions：', this.demand?.conditions);
+
+      console.log('[DailyDetailComponent] conditions text：', this.getConditionsText());
     } catch (error) {
       console.error('載入日常物資詳細資料失敗：', error);
 

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 
 import { DailyDemand, CreateDailyDemand, DailyConditions } from '../../../models/agency/daily-demand';
-
 import { SupabaseService } from '../supabase.service';
 
 interface DailyDemandRow {
@@ -270,6 +269,9 @@ export class DailyDemandService {
     const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('id', id).maybeSingle();
 
     console.log('[getDemandById] Supabase data：', data);
+
+    console.log('[getDemandById] Supabase conditions：', data?.conditions);
+
     console.log('[getDemandById] Supabase error：', error);
 
     if (error) {
@@ -398,25 +400,28 @@ export class DailyDemandService {
 
   private toConditions(value: string[] | null): DailyConditions {
     const conditions: DailyConditions = {
-      全新: '不接受',
-      二手: '不接受',
-      有擦痕: '不接受',
-      過期: '不接受',
-      毀損: '不接受',
+      全新: '',
+      二手: '',
+      有擦痕: '',
+      過期: '',
+      毀損: '',
     };
 
     for (const condition of value ?? []) {
-      const separatorIndex = condition.indexOf('：');
+      // 同時支援舊資料的全形冒號「：」以及統一後的半形冒號「:」
+      const normalized = condition.trim();
+
+      const separatorIndex = normalized.includes(':') ? normalized.indexOf(':') : normalized.indexOf('：');
 
       if (separatorIndex === -1) {
         continue;
       }
 
-      const name = condition.slice(0, separatorIndex) as keyof DailyConditions;
+      const name = normalized.slice(0, separatorIndex).trim() as keyof DailyConditions;
 
-      const result = condition.slice(separatorIndex + 1) as DailyConditions[keyof DailyConditions];
+      const result = normalized.slice(separatorIndex + 1).trim() as DailyConditions[keyof DailyConditions];
 
-      if (name in conditions) {
+      if (name in conditions && (result === '接受' || result === '不接受')) {
         conditions[name] = result;
       }
     }
@@ -425,7 +430,9 @@ export class DailyDemandService {
   }
 
   private conditionsToArray(conditions: DailyDemand['conditions']): string[] {
-    return Object.entries(conditions ?? {}).map(([name, result]) => `${name}：${result}`);
+    return Object.entries(conditions ?? {})
+      .filter(([, result]) => result === '接受' || result === '不接受')
+      .map(([name, result]) => `${name}:${result}`);
   }
 
   private createConditionDescription(conditions: string[] | null, customConditions: unknown[] | null): string {

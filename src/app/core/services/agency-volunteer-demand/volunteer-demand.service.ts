@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, from } from 'rxjs';
 
 import { VolunteerDemand } from '../../../models/agency/volunteer-demand';
-
 import { SupabaseService } from '../supabase.service';
 
 interface VolunteerDemandRow {

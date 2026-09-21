@@ -188,7 +188,7 @@
     <div class="image-upload-box">
       <div class="image-upload-area">
         <!-- 未滿 5 張才顯示選擇圖片 -->
-        <ng-container *ngIf="imageFiles.length < 5">
+        <ng-container *ngIf="(demand.image?.length ?? 0) < 5">
           <div class="upload-controls">
             <label class="image-upload-btn">
               <i class="fa-solid fa-image"></i>
@@ -200,11 +200,14 @@
           </div>
         </ng-container>
 
-        <div class="selected-image-list" *ngIf="imageFiles.length > 0">
-          <div class="selected-image" *ngFor="let image of imageFiles; let i = index">
-            <!-- 圖片名稱：點擊可預覽 -->
-            <button type="button" class="selected-image-name" (click)="openImagePreview(demand.image![i], image.name)">
-              {{ image.name }}
+        <div class="selected-image-list" *ngIf="demand.image && demand.image.length > 0">
+          <div class="selected-image" *ngFor="let image of demand.image; let i = index">
+            <button
+              type="button"
+              class="selected-image-name"
+              (click)="openImagePreview(image, demand.imageFileNames?.[i] ?? '未命名圖片' + (i + 1))"
+            >
+              {{ demand.imageFileNames?.[i] ?? '未命名圖片' + (i + 1) }}
             </button>
 
             <button type="button" class="remove-image-btn" (click)="removeImage(i)">移除圖片</button>
