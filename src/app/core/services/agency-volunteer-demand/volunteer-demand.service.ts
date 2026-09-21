@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { VolunteerDemand } from '../../../models/agency/volunteer-demand';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -228,18 +230,16 @@ export class VolunteerDemandService {
     return this.demands;
   }
 
-  // =========================
   // 取得全部
-  // =========================
-
   getDemands(): VolunteerDemand[] {
     return this.demands;
   }
 
-  // =========================
-  // 取得單筆
-  // =========================
+  getDemandsFromServer(): Observable<VolunteerDemand[]> {
+    return of(this.demands).pipe(delay(3000));
+  }
 
+  // 取得單筆
   getDemandById(id: number): VolunteerDemand | undefined {
     return this.demands.find((demand) => demand.serialNo === id);
   }

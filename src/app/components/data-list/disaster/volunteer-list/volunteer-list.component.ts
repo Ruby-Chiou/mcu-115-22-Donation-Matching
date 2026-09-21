@@ -1,8 +1,8 @@
-import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { timeout, catchError, of } from 'rxjs';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/volunteer-demand';
 
@@ -113,10 +113,12 @@ export class VolunteerListComponent {
 
   constructor(
     private VolunteerDemandService: VolunteerDemandService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
   }
+
   // 初始化
   ngOnInit() {
     const restoreListPosition = sessionStorage.getItem('restore-agency-disaster-list');
@@ -189,9 +191,11 @@ export class VolunteerListComponent {
   saveScrollPosition() {
     this.saveListPosition();
   }
+
   // 讀取需求
-  loadDemands() {
+  loadDemands(): void {
     this.isLoading = true;
+    this.cdr.detectChanges();
 
     const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
       上架: '已上架',
@@ -199,37 +203,47 @@ export class VolunteerListComponent {
       下架: '已下架',
     };
 
-    setTimeout(() => {
-      this.demands = this.VolunteerDemandService.getDemands().map((item) => {
-        return {
-          ...item,
+    this.VolunteerDemandService.getDemandsFromServer()
+      .pipe(
+        timeout(2000),
+        catchError(() => {
+          return of(this.VolunteerDemandService.getDemands());
+        })
+      )
+      .subscribe((data) => {
+        this.demands = data.map((item) => {
+          return {
+            ...item,
 
-          selected: false,
+            selected: false,
 
-          // 這裡加上 as VolunteerStatus
-          displayStatus: displayStatus[item.status as VolunteerStatus],
+            displayStatus: displayStatus[item.status as VolunteerStatus],
 
-          displayCreatedAt: new Date(item.createdAt!).toLocaleDateString('zh-TW'),
-          displayPublishedAt:
-            item.status === '隱藏' || !item.publishedAt ? '尚未發布' : new Date(item.publishedAt).toLocaleDateString('zh-TW'),
+            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
 
-          displayOffShelfAt:
-            item.status === '隱藏' || !item.expectedOffShelfAt ? '—' : new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW'),
+            displayPublishedAt:
+              item.status === '隱藏' || !item.publishedAt ? '尚未發布' : new Date(item.publishedAt).toLocaleDateString('zh-TW'),
 
-          category: item.type ?? '其他',
-        };
+            displayOffShelfAt:
+              item.status === '隱藏' || !item.expectedOffShelfAt ? '—' : new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW'),
+
+            category: item.type ?? '其他',
+          };
+        });
+
+        this.applyFilters(false);
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
       });
-
-      this.applyFilters(false);
-
-      this.isLoading = false;
-    }, 300);
   }
+
   // 搜尋
   onSearchChange(value: string) {
     this.searchTerm = value;
     this.applyFilters();
   }
+
   // 排序
   onSortChange(event: { selectedSort: SortType; sortAscending: boolean }) {
     const scrollY = window.scrollY;
@@ -244,6 +258,7 @@ export class VolunteerListComponent {
       });
     }, 0);
   }
+
   // 全選
   toggleAll() {
     this.pagedDemands.forEach((item) => {
