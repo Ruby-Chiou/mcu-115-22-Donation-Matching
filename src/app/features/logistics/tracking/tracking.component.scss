@@ -1,30 +1,367 @@
-.search{
-   padding-left: 35px;
+// ==========================================
+// 物流查詢頁面
+// ==========================================
+
+.tracking-page {
+  max-width: 1000px;
+  margin: 40px auto 80px;
+  padding: 0 25px;
 }
 
-.search-box {
+
+// ==========================================
+// 頁面標題
+// ==========================================
+
+.tracking-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h2 {
+    margin: 0 0 10px;
+
+    color: var(--color-text-main);
+
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 16px;
+  }
+}
+
+
+// ==========================================
+// 查詢區
+// ==========================================
+
+.tracking-search {
+  padding: 30px;
+
+  background-color: var(--bg-layer-1);
+
+  border: 1px solid var(--border-default);
+  border-radius: var(--border-radius-main);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+  margin-bottom: 30px;
+}
+
+
+// ==========================================
+// 區塊標題
+// ==========================================
+
+.search-title,
+.result-title,
+.carrier-title {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 25px;
+
+  i {
+    color: var(--color-brand-primary);
+    font-size: 22px;
+  }
+
+  h3 {
+    margin: 0;
+
+    color: var(--color-text-main);
+
+    font-size: 22px;
+    font-weight: 600;
+  }
+}
+
+
+// ==========================================
+// 表單
+// ==========================================
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--color-text-main);
+
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  select,
+  input {
+    width: 100%;
+    height: 46px;
+
+    box-sizing: border-box;
+
+    padding: 0 14px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    background-color: var(--color-white);
+
+    color: var(--color-text-main);
+
+    font-size: 16px;
+
+    outline: none;
+
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: var(--color-brand-primary);
+
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+  }
+}
+
+
+// ==========================================
+// 輸入框＋按鈕
+// ==========================================
+
+.input-row {
+  display: flex;
+
+  gap: 12px;
+
+  input {
+    flex: 1;
+  }
+
+  button {
+    width: 120px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: var(--color-brand-primary);
+    color: var(--color-white);
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      background-color: #0b57b5;
+    }
+  }
+}
+
+
+// ==========================================
+// 格式提示
+// ==========================================
+
+.format-hint {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+
+  padding: 15px 18px;
+
+  background-color: #eef6ff;
+
+  border-radius: 10px;
+
+  color: var(--color-text-main);
+
+  i {
+    margin-top: 2px;
+
+    color: var(--color-brand-primary);
+
+    font-size: 18px;
+  }
+
+  strong {
+    display: block;
+
+    margin-bottom: 5px;
+  }
+
+  p {
+    margin: 3px 0;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+  }
+}
+
+
+// ==========================================
+// 查詢結果
+// ==========================================
+
+.tracking-result {
+  margin-bottom: 30px;
+
+  padding: 30px;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-default);
+  border-radius: var(--border-radius-main);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+
+.result-card {
+  padding: 18px 20px;
+
+  background-color: #f8fafc;
+
+  border-radius: 10px;
+
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+
+.result-row {
+  display: flex;
+  align-items: center;
+
+  min-height: 38px;
+
+  .label {
+    width: 110px;
+
+    color: var(--color-text-muted);
+
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .value {
+    color: var(--color-text-main);
+
+    font-size: 16px;
+  }
+
+  .status {
+    color: #16803c;
+
+    font-size: 16px;
+    font-weight: 600;
+  }
+}
+
+
+// ==========================================
+// 物流查詢入口
+// ==========================================
+
+.carrier-section {
+  padding: 30px;
+
+  background-color: var(--bg-layer-2);
+
+  border-radius: var(--border-radius-main);
+}
+
+
+.carrier-description {
+  margin: -10px 0 20px;
+
+  color: var(--color-text-muted);
+
+  font-size: 15px;
+}
+
+
+.carrier-list {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
   gap: 15px;
-  margin: 20px 0;
-  padding-left: 35px;
 }
 
-.search-box input {
-  width: 300px;
-  height: 40px;
-  font-size: 18px;
-  padding: 0 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
 
-.search-box button {
-  width: 120px;
-  height: 40px;
-  font-size: 18px;
-  border-radius: 8px;
-  cursor: pointer;
-}
+.carrier-card {
+  display: flex;
+  align-items: center;
 
-.show{
-  padding-left: 35px;
+  gap: 15px;
+
+  padding: 20px;
+
+  background-color: var(--color-white);
+
+  border-radius: 15px;
+
+  color: var(--color-text-main);
+
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 50px;
+    height: 50px;
+
+    border-radius: 12px;
+
+    background-color: var(--color-brand-primary);
+
+    color: var(--color-white);
+
+    font-size: 22px;
+  }
+
+  h4 {
+    margin: 0 0 5px;
+
+    font-size: 17px;
+  }
+
+  span {
+    color: var(--color-brand-primary);
+
+    font-size: 14px;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  }
 }
