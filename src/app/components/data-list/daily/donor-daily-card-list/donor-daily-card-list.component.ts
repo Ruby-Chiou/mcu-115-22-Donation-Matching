@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
 
 import { Router } from '@angular/router';
 
@@ -20,6 +20,8 @@ import { PaginationComponent } from '../../../pagination/pagination.component';
   styleUrl: './donor-daily-card-list.component.scss',
 })
 export class DonorDailyCardListComponent implements OnInit {
+  @Input() searchKeyword = '';
+  @Input() filters!: DailyFilter;
   private readonly router = inject(Router);
 
   private readonly demandService = inject(DailyDemandService);
@@ -37,8 +39,6 @@ export class DonorDailyCardListComponent implements OnInit {
   currentPage = 1;
 
   isLoading = true;
-
-  private searchKeyword = '';
 
   private activeFilter: DailyFilter = {
     categories: [],

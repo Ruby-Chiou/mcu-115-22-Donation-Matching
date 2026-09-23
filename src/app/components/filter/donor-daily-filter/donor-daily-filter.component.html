@@ -1,89 +1,12 @@
-<div class="filter-section">
-  <!-- 類別 -->
-  <div class="filter-row">
-    <div class="filter-title">
-      類別
-    </div>
-    <div class="filter-options">
-      <button
-        *ngFor="let option of categoryOptions"
-        class="filter-option"
-        [class.active]="selectedCategories.includes(option)"
-        (click)="toggleCategory(option)">
-        {{ option }}
-      </button>
-    </div>
-  </div>
-
-  <!-- 需求對象 -->
-  <div class="filter-row">
-    <div class="filter-title">
-      需求對象
-    </div>
-    <div class="filter-options">
-      <button
-        *ngFor="let option of targetOptions"
-        class="filter-option"
-        [class.active]="selectedTargets.includes(option)"
-        (click)="toggleTarget(option)">
-        {{ option }}
-      </button>
-    </div>
-  </div>
-
-  <!-- 地區 -->
-  <div class="filter-row">
-    <div class="filter-title">
-      地區
-    </div>
-    <div class="filter-options">
-      <button
-        *ngFor="let option of regionOptions"
-        class="filter-option"
-        [class.active]="selectedRegions.includes(option)"
-        (click)="toggleRegion(option)">
-        {{ option }}
-      </button>
-    </div>
-  </div>
-
-  <!-- 接收方式 -->
-  <div class="filter-row">
-    <div class="filter-title">
-      接收方式
-    </div>
-    <div class="filter-options">
-      <button
-        *ngFor="let option of receiveMethodOptions"
-        class="filter-option"
-        [class.active]="selectedReceiveMethods.includes(option)"
-        (click)="toggleReceiveMethod(option)">
-        {{ option }}
-      </button>
-    </div>
-  </div>
-<div class="filter-row">
-    <div class="filter-title">
-      緊急優先度
-    </div>
-    <div class="filter-options">
-      <button
-        *ngFor="let option of priorityMethodOptions"
-        class="filter-option"
-        [class.active]="selectedPriorities.includes(option)"
-         (click)="togglePriority(option)">
-        {{ option }}
-      </button>
-    </div>
-  </div>
-  <!-- 清除篩選 -->
-  <div
-    class="filter-footer"
-    *ngIf="hasFilter()">
-    <button
-      class="clear-filter-btn"
-      (click)="clearFilters()">
-      <i class="fa-solid fa-trash"></i> 清除篩選
-    </button>
-  </div>
-</div>
+<app-filter-base
+  [options]="[
+    { key: '類別', values: categoryOptions },
+    { key: '需求對象', values: targetOptions },
+    { key: '地區', values: regionOptions },
+    { key: '接收方式', values: receiveMethodOptions },
+    { key: '緊急優先度', values: priorityMethodOptions }
+  ]"
+  (filterChange)="filterChange.emit($event)"
+>
+  <!-- 注意這裡直接用 filterChange -->
+</app-filter-base>

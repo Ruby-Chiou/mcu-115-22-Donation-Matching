@@ -1,0 +1,20 @@
+<div class="filter-section">
+  <div *ngFor="let optionGroup of options" class="filter-row">
+    <div class="filter-title">{{ optionGroup.key }}</div>
+    <div class="filter-options">
+      <button
+        *ngFor="let value of optionGroup.values"
+        class="filter-option"
+        [class.active]="selected[optionGroup.key]?.includes(value)"
+        (click)="toggle(optionGroup.key, value)"
+      >
+        {{ value }}
+      </button>
+    </div>
+  </div>
+
+  <!-- 清除篩選 -->
+  <div class="filter-footer" *ngIf="hasSelected">
+    <button class="clear-filter-btn" (click)="clearFilters()"><i class="fa-solid fa-trash"></i> 清除篩選</button>
+  </div>
+</div>

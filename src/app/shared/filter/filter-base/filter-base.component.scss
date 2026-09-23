@@ -1,0 +1,91 @@
+.filter-section {
+  width: 100%;
+  max-width: 1300px; // 縮窄寬度
+  margin: 20px auto; // 上下留白縮小
+  padding: 16px 20px; // 內距縮小
+  box-sizing: border-box;
+
+  background: var(--color-white); // 整個區塊保持白底
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-main);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-row {
+  display: flex;
+  align-items: start; // 改成置中對齊
+  padding: 12px 0; // 縮小上下間距
+  border-bottom: 1px solid var(--border-lighter);
+}
+
+.filter-title {
+  width: 100px;
+  flex-shrink: 0;
+  padding: 8px 12px; // 減少 padding，避免太高
+
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-white);
+
+  background: var(--color-brand-primary); // 標題區塊改成鮮明藍色
+  border-radius: var(--border-radius-main);
+  text-align: center;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 20px; // 去掉上下 padding，只留左右
+  align-items: center; // 保持按鈕垂直置中
+}
+
+.filter-option {
+  padding: 6px 14px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-pill);
+
+  background: var(--color-white);
+  font-size: 14px;
+  color: var(--color-text-medium);
+
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.filter-option:hover {
+  background: var(--bg-layer-1);
+  border-color: var(--border-default);
+  color: var(--color-text-dark);
+}
+
+.filter-option.active {
+  background-color: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+  color: var(--color-white);
+}
+
+.filter-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  background: transparent; // footer 保持透明
+}
+
+.clear-filter-btn {
+  padding: 6px 12px;
+  border-radius: var(--border-radius-pill);
+  border: 1px solid var(--color-brand-primary);
+
+  background: var(--color-white);
+  color: var(--color-brand-primary);
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.clear-filter-btn:hover {
+  background: var(--color-brand-primary);
+  color: var(--color-white);
+}

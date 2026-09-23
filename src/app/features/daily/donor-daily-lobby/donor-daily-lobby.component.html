@@ -1,15 +1,8 @@
+<app-donor-daily-search (searchChange)="onSearchChange($event)"></app-donor-daily-search>
+<app-donor-daily-filter (filterChange)="onFilterChange($event)"></app-donor-daily-filter>
 
-<app-donor-daily-search
-  (searchChange)="onSearchChange($event)"
-></app-donor-daily-search>
-
-<app-donor-daily-filter
-  (filterChange)="onFilterChange($event)"
-></app-donor-daily-filter>
-
-<app-donor-daily-card-list></app-donor-daily-card-list>
+<app-donor-daily-card-list [searchKeyword]="searchKeyword" [filters]="activeFilter"> </app-donor-daily-card-list>
 
 <div class="ThanksAndBlacklist">
   <app-thank-you-wall></app-thank-you-wall>
 </div>
-

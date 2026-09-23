@@ -1,0 +1,12 @@
+<section>
+  <div *ngIf="isLoading" class="loading">載入中...</div>
+  <ng-content></ng-content>
+  <app-pagination
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [pageNumbers]="pageNumbers"
+    (pageChange)="goToPage($event)"
+  >
+  </app-pagination>
+</section>

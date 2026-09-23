@@ -44,3 +44,11 @@
   //導覽列背景色
   --nav-bg: var(--mat-sys-surface);
 }
+
+:host {
+  --color-brand-primary: #007bff;
+}
+
+:host {
+  --color-brand-primary: var(--color-error);
+}
