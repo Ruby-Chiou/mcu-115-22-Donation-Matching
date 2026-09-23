@@ -1,27 +1,200 @@
-<div class="search">
-  <h2>查詢配送進度</h2>
-</div>
-<div class="search-box">
-  <input
-    type="text"
-    placeholder="輸入物流單號查詢配送進度"
-    [(ngModel)]="keyword"
-  />
+<div class="tracking-page">
 
-  <button (click)="search()">
-    搜尋
-  </button>
+  <!-- 頁面標題 -->
+  <section class="tracking-header">
+    <h2>配送查詢</h2>
+    <p>輸入物流單號，快速查詢物資配送進度</p>
+  </section>
 
-</div>
-<div class="show">
-  <div *ngIf="showResult">
-    <div *ngFor="let item of resultList">
-      <p>
-        物流單號：{{ item.id }}
-        <br>
-        配送進度：{{ item.status }}
-      </p>
+
+  <!-- 查詢區 -->
+  <section class="tracking-search">
+
+    <div class="search-title">
+      <i class="fa-solid fa-truck-fast"></i>
+      <h3>查詢配送進度</h3>
     </div>
-  </div>
+
+
+    <!-- 物流公司 -->
+<div class="form-group">
+  <label for="carrier">物流公司</label>
+
+  <select
+    id="carrier"
+    [(ngModel)]="selectedCarrier"
+  >
+    @for (carrier of carriers; track carrier.value) {
+      <option [value]="carrier.value">
+        {{ carrier.name }}
+      </option>
+    }
+  </select>
 </div>
 
+
+    <!-- 物流單號 -->
+    <div class="form-group">
+      <label for="tracking-number">物流單號</label>
+
+      <div class="input-row">
+        <input
+          id="tracking-number"
+          type="text"
+          placeholder="請輸入物流單號"
+          [(ngModel)]="keyword"
+        />
+
+        <button
+          type="button"
+          (click)="search()"
+        >
+          <i class="fa-solid fa-magnifying-glass"></i>
+          查詢
+        </button>
+      </div>
+    </div>
+
+
+    <!-- 格式提示 -->
+    <div class="format-hint">
+      <i class="fa-solid fa-circle-info"></i>
+
+      <div>
+        <strong>物流單號格式提示</strong>
+
+
+    <p>
+      黑貓宅急便：10～12 碼數字
+    </p>
+
+    <p>
+      7-ELEVEN：寄件 8 碼或取件 11 碼
+    </p>
+
+    <p>
+      全家：11 碼數字
+    </p>
+
+    <p>
+      中華郵政：請依寄件單據上的「郵件號碼」輸入
+    </p>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- 查詢結果 -->
+  @if (showResult) {
+
+    <section class="tracking-result">
+
+      <div class="result-title">
+        <i class="fa-solid fa-box"></i>
+        <h3>查詢結果</h3>
+      </div>
+
+
+      @for (item of resultList; track item.id) {
+
+        <div class="result-card">
+
+          <div class="result-row">
+            <span class="label">物流公司</span>
+            <span class="value">{{ item.carrier }}</span>
+          </div>
+
+          <div class="result-row">
+            <span class="label">物流單號</span>
+            <span class="value">{{ item.id }}</span>
+          </div>
+
+          <div class="result-row">
+            <span class="label">配送進度</span>
+
+            <span class="status">
+              {{ item.status }}
+            </span>
+          </div>
+
+        </div>
+
+      }
+
+    </section>
+
+  }
+
+
+  <!-- 物流商查詢入口 -->
+  <section class="carrier-section">
+
+    <div class="carrier-title">
+      <i class="fa-solid fa-link"></i>
+      <h3>物流查詢入口</h3>
+    </div>
+
+    <p class="carrier-description">
+      點擊下方物流商，前往官方網站查詢最新配送狀態
+    </p>
+
+
+    <div class="carrier-list">
+
+  <a
+    href="#"
+    class="carrier-card"
+    (click)="goToCarrier('black-cat', $event)"
+  >
+    <i class="fa-solid fa-box"></i>
+    <div>
+      <h4>黑貓宅急便</h4>
+      <span>查詢貨態 →</span>
+    </div>
+  </a>
+
+
+  <a
+    href="#"
+    class="carrier-card"
+    (click)="goToCarrier('711', $event)"
+  >
+    <i class="fa-solid fa-store"></i>
+    <div>
+      <h4>7-ELEVEN</h4>
+      <span>查詢貨態 →</span>
+    </div>
+  </a>
+
+
+  <a
+    href="#"
+    class="carrier-card"
+    (click)="goToCarrier('family', $event)"
+  >
+    <i class="fa-solid fa-store"></i>
+    <div>
+      <h4>全家</h4>
+      <span>查詢貨態 →</span>
+    </div>
+  </a>
+
+
+  <a
+    href="#"
+    class="carrier-card"
+    (click)="goToCarrier('post', $event)"
+  >
+    <i class="fa-solid fa-envelope"></i>
+    <div>
+      <h4>中華郵政</h4>
+      <span>查詢貨態 →</span>
+    </div>
+  </a>
+
+</div>
+
+  </section>
+
+</div>

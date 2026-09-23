@@ -26,12 +26,27 @@ header {
     height: 70px; // 固定導覽列高度
   }
 
-  .left .nav-name {
+  .left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .site-logo {
+    width: 42px;
+    height: 42px;
+
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .nav-name {
     font-size: 20px;
     font-weight: 700;
     color: var(--color-brand-primary);
     margin: 0;
+    cursor: pointer;
   }
+}
 
   .center nav {
     display: flex;
