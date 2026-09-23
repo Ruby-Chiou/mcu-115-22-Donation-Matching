@@ -1,0 +1,576 @@
+
+// 平台介紹頁
+
+
+.intro-page {
+  background-color: #f8fafc;
+  padding-bottom: 70px;
+}
+
+
+
+// Hero
+
+
+.intro-hero {
+  background-color: #eaf4f8;
+
+  padding: 55px 20px;
+
+  border-bottom: 1px solid var(--border-default);
+}
+
+
+.hero-content {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 25px;
+
+  text-align: left;
+}
+
+
+.hero-logo {
+  width: 110px;
+  height: 110px;
+
+  object-fit: contain;
+}
+
+
+.hero-content h1 {
+  margin: 0 0 12px;
+
+  color: var(--color-brand-primary);
+
+  font-size: 34px;
+  font-weight: 700;
+}
+
+
+.hero-content p {
+  margin: 0;
+
+  color: var(--color-text-main);
+
+  font-size: 20px;
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+
+
+// 共用 Section
+
+
+.intro-section {
+  max-width: 1200px;
+
+  margin: 45px auto 0;
+
+  padding: 0 20px;
+}
+
+
+.section-heading {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 22px;
+
+  i {
+    color: var(--color-brand-primary);
+
+    font-size: 24px;
+  }
+
+  h2 {
+    margin: 0;
+
+    color: var(--color-text-main);
+
+    font-size: 26px;
+    font-weight: 700;
+  }
+}
+
+
+
+// 為什麼做這個平台
+
+
+.reason-card {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  align-items: center;
+
+  gap: 35px;
+
+  padding: 35px;
+
+  background-color: var(--bg-layer-1);
+
+  border: 1px solid var(--border-default);
+
+  border-radius: var(--border-radius-main);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+
+.reason-text {
+  p {
+    margin: 0 0 18px;
+
+    color: var(--color-text-main);
+
+    font-size: 17px;
+
+    line-height: 1.9;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+
+.reason-image {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    max-width: 500px;
+
+    height: auto;
+
+    object-fit: contain;
+  }
+}
+
+
+
+// 平台目標
+
+
+.goal-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 20px;
+}
+
+
+.goal-card {
+  padding: 28px 25px;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-default);
+
+  border-radius: var(--border-radius-main);
+
+  text-align: center;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+
+
+  h3 {
+    margin: 15px 0 10px;
+
+    color: var(--color-text-main);
+
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 15px;
+
+    line-height: 1.7;
+  }
+}
+
+
+.goal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 60px;
+  height: 60px;
+
+  margin: 0 auto;
+
+  border-radius: 16px;
+
+  background-color: var(--color-brand-primary);
+
+  color: var(--color-white);
+
+  font-size: 25px;
+}
+
+
+
+// 兩大服務情境
+
+
+.scenario-section {
+  padding-top: 5px;
+}
+
+
+.scenario-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 20px;
+}
+
+
+.scenario-card {
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 28px;
+
+  background-color: var(--bg-layer-1);
+
+  border-radius: var(--border-radius-main);
+
+  border: 1px solid var(--border-default);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+
+}
+
+
+.scenario-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 65px;
+  height: 65px;
+
+  border-radius: 18px;
+
+  background-color: var(--color-brand-primary);
+
+  color: var(--color-white);
+
+  font-size: 26px;
+}
+
+
+.scenario-content {
+  h3 {
+    margin: 0 0 8px;
+
+    color: var(--color-text-main);
+
+    font-size: 21px;
+  }
+
+  p {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 15px;
+
+    line-height: 1.7;
+  }
+}
+
+
+
+// 平台特色
+
+
+.feature-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 18px;
+}
+
+
+.feature-card {
+  padding: 25px;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-default);
+
+  border-radius: var(--border-radius-main);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+
+
+  > i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+
+    margin-bottom: 15px;
+
+    border-radius: 12px;
+
+    background-color: #eaf4f8;
+
+    color: var(--color-brand-primary);
+
+    font-size: 21px;
+  }
+
+  h3 {
+    margin: 0 0 9px;
+
+    color: var(--color-text-main);
+
+    font-size: 18px;
+  }
+
+  p {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 14px;
+
+    line-height: 1.7;
+  }
+}
+
+
+
+// 捐助流程
+
+
+.process-section {
+  padding-bottom: 10px;
+}
+
+
+.process-list {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+}
+
+
+.process-item {
+  display: flex;
+  align-items: center;
+
+  width: min(100%, 650px);
+
+  gap: 18px;
+
+  padding: 20px 25px;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-default);
+
+  border-radius: 15px;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+
+
+  h3 {
+    margin: 0 0 5px;
+
+    color: var(--color-text-main);
+
+    font-size: 18px;
+  }
+
+  p {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 14px;
+  }
+}
+
+
+.process-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 45px;
+  height: 45px;
+
+  border-radius: 50%;
+
+  background-color: var(--color-brand-primary);
+
+  color: var(--color-white);
+
+  font-size: 20px;
+
+  font-weight: 700;
+}
+
+
+.process-arrow {
+  padding: 8px 0;
+
+  color: var(--color-brand-primary);
+
+  font-size: 18px;
+}
+
+
+
+// 結尾
+
+
+.intro-ending {
+  max-width: 1200px;
+
+  margin: 55px auto 0;
+
+  padding: 45px 30px;
+
+  background-color: #eaf4f8;
+
+  border-radius: var(--border-radius-main);
+
+  text-align: center;
+}
+
+
+.intro-ending i {
+  color: var(--color-brand-primary);
+
+  font-size: 38px;
+
+  margin-bottom: 15px;
+}
+
+
+.intro-ending h2 {
+  margin: 0 0 12px;
+
+  color: var(--color-text-main);
+
+  font-size: 25px;
+}
+
+
+.intro-ending p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 16px;
+}
+
+
+
+// RWD
+
+
+@media (max-width: 900px) {
+
+  .goal-grid,
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reason-card {
+    grid-template-columns: 1fr;
+  }
+
+  .reason-image {
+    order: -1;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .hero-content {
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+  .hero-logo {
+    width: 90px;
+    height: 90px;
+  }
+
+  .hero-content h1 {
+    font-size: 28px;
+  }
+
+  .hero-content p {
+    font-size: 17px;
+  }
+
+  .goal-grid,
+  .feature-grid,
+  .scenario-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reason-card {
+    padding: 22px;
+  }
+
+  .intro-section {
+    padding: 0 15px;
+  }
+
+}

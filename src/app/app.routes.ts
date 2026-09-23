@@ -211,6 +211,27 @@ export const routes: Routes = [
     loadComponent: () => import('./features/customer-service/faq/faq.component').then((m) => m.FAQComponent),
   },
 
+  // 7. 關於我們
+{
+  path: 'intro',
+  loadComponent: () =>
+    import('./features/about-us/intro/intro.component')
+      .then(m => m.IntroComponent),
+},
+
+{
+  path: 'news-section',
+  loadComponent: () =>
+    import('./features/about-us/news-section/news-section.component')
+      .then(m => m.NewsSectionComponent),
+},
+
+{
+  path: 'contact-us',
+  loadComponent: () =>
+    import('./features/about-us/contact-us/contact-us.component')
+      .then(m => m.ContactUsComponent),
+},
 
   // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回大廳
   { path: '**', redirectTo: 'home' },
