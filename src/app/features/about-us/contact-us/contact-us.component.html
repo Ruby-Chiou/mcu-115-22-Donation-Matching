@@ -1,1 +1,245 @@
-<p>contact-us works!</p>
+<div class="contact-page">
+
+  <!-- 頁面標題 -->
+  <section class="contact-header">
+    <div class="title-area">
+      <h1>聯絡我們</h1>
+      <p>有任何問題，都歡迎與我們聯繫</p>
+    </div>
+  </section>
+
+
+  <!-- 聯絡內容 -->
+  <section class="contact-content">
+
+    <!-- 左側：聯絡方式 -->
+    <div class="contact-info">
+
+      <div class="section-heading">
+        <i class="fa-solid fa-headset"></i>
+        <h2>聯絡方式</h2>
+      </div>
+
+      <p class="section-description">
+        如果你在使用平台時遇到問題，或對捐助流程有任何疑問，
+        可以透過以下方式取得協助。
+      </p>
+
+
+      <!-- AI 客服 -->
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-headset"></i>
+        </div>
+
+        <div class="info-text">
+          <h3>AI 客服</h3>
+          <p>
+            提供平台操作、捐助流程與物流查詢等相關協助
+          </p>
+
+          <a routerLink="/customer-service/ai-chat">
+            前往 AI 客服
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- 常見問題 -->
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-circle-question"></i>
+        </div>
+
+        <div class="info-text">
+          <h3>常見問題</h3>
+          <p>
+            查看其他使用者常遇到的問題與解決方式
+          </p>
+
+          <a routerLink="/customer-service/faq">
+            查看常見問題
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+
+      <!-- 客服信箱 -->
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-envelope"></i>
+        </div>
+
+        <div class="info-text">
+          <h3>客服信箱</h3>
+          <p>
+            若有其他問題，可以透過電子郵件與平台聯繫
+          </p>
+
+          <!-- 這裡之後可以換成你們實際的信箱 -->
+          <a href="mailto:donationmatching@gmail.com">
+            donationmatching@gmail.com
+          </a>
+        </div>
+      </div>
+
+
+      <!-- 服務時間 -->
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+
+        <div class="info-text">
+          <h3>服務時間</h3>
+          <p>
+            平台 AI 客服提供全天候的基本問題協助
+          </p>
+          <span class="info-note">
+            人工客服服務時間將依平台公告為準
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- 右側：聯絡表單 -->
+    <div class="contact-form-card">
+
+      <div class="section-heading">
+        <i class="fa-solid fa-paper-plane"></i>
+        <h2>聯絡表單</h2>
+      </div>
+
+      <p class="section-description">
+        請填寫以下資訊，我們會依照你的問題提供協助
+      </p>
+
+
+      <form>
+
+        <!-- 姓名 -->
+        <div class="form-group">
+          <label for="name">
+            姓名
+            <span>*</span>
+          </label>
+
+          <input
+            id="name"
+            type="text"
+            placeholder="請輸入您的姓名"
+          />
+        </div>
+
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">
+            Email
+            <span>*</span>
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            placeholder="請輸入您的 Email"
+          />
+        </div>
+
+
+        <!-- 問題類型 -->
+        <div class="form-group">
+          <label for="category">
+            問題類型
+            <span>*</span>
+          </label>
+
+          <select id="category">
+            <option value="">請選擇問題類型</option>
+            <option value="account">帳號與登入</option>
+            <option value="donation">捐助相關</option>
+            <option value="logistics">物流相關</option>
+            <option value="disaster">災害救助</option>
+            <option value="system">平台使用問題</option>
+            <option value="other">其他問題</option>
+          </select>
+        </div>
+
+
+        <!-- 問題內容 -->
+        <div class="form-group">
+          <label for="message">
+            問題內容
+            <span>*</span>
+          </label>
+
+          <textarea
+            id="message"
+            rows="6"
+            placeholder="請詳細描述您遇到的問題..."
+          ></textarea>
+        </div>
+
+
+        <!-- 同意 -->
+        <label class="checkbox-row">
+          <input type="checkbox" />
+
+          <span>
+            我同意平台依照服務需求使用上述聯絡資訊與我聯繫
+          </span>
+        </label>
+
+
+        <!-- 送出 -->
+        <button type="button" class="submit-button">
+          <i class="fa-solid fa-paper-plane"></i>
+          送出訊息
+        </button>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- 底部導引 -->
+  <section class="contact-bottom">
+
+    <div class="bottom-content">
+      <h2>還有其他問題嗎？</h2>
+
+      <p>
+        你也可以先查看常見問題，或使用 AI 客服快速取得協助。
+      </p>
+    </div>
+
+
+    <div class="bottom-actions">
+
+      <a
+        routerLink="/customer-service/faq"
+        class="secondary-button"
+      >
+        <i class="fa-solid fa-circle-question"></i>
+        查看常見問題
+      </a>
+
+      <a
+        routerLink="/customer-service/ai-chat"
+        class="secondary-button"
+      >
+        <i class="fa-solid fa-headset"></i>
+        使用 AI 客服
+      </a>
+
+    </div>
+
+  </section>
+
+</div>

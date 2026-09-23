@@ -1,0 +1,551 @@
+.contact-page {
+  width: 100%;
+  min-height: 100vh;
+
+  padding: 40px 60px 70px;
+
+  background-color: #f6f9fb;
+
+  box-sizing: border-box;
+}
+
+
+
+   //頁面標題
+
+
+.contact-header {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto 45px;
+
+  text-align: center;
+}
+
+.title-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 6px;
+
+  h1 {
+    margin: 0;
+
+    font-size: 32px;
+    font-weight: 700;
+
+    color: #1c2833;
+  }
+
+  p {
+    margin: 0;
+
+    font-size: 16px;
+
+    color: #71808c;
+  }
+}
+
+
+
+   //主要內容
+
+
+.contact-content {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto 45px;
+
+  display: grid;
+
+  grid-template-columns: 0.9fr 1.1fr;
+
+  gap: 30px;
+
+  align-items: start;
+}
+
+
+
+   //標題
+
+
+.section-heading {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 10px;
+
+  i {
+    color: var(--color-brand-primary);
+
+    font-size: 20px;
+  }
+
+  h2 {
+    margin: 0;
+
+    font-size: 23px;
+    font-weight: 700;
+
+    color: #1c2833;
+  }
+}
+
+.section-description {
+  margin: 0 0 20px;
+
+  line-height: 1.8;
+
+  font-size: 15px;
+
+  color: #71808c;
+}
+
+
+
+   //左側聯絡方式
+
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.info-card {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 15px;
+
+  padding: 20px;
+
+  margin-bottom: 14px;
+
+  background: #ffffff;
+
+  border-radius: 15px;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+
+}
+
+
+.info-icon {
+  flex-shrink: 0;
+
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #eaf4f8;
+
+  color: var(--color-brand-primary);
+
+  font-size: 19px;
+}
+
+
+.info-text {
+  flex: 1;
+
+  h3 {
+    margin: 0 0 5px;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    color: #1c2833;
+  }
+
+  p {
+    margin: 0 0 8px;
+
+    line-height: 1.6;
+
+    font-size: 14px;
+
+    color: #71808c;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 6px;
+
+    color: var(--color-brand-primary);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition: gap 0.2s ease;
+
+    &:hover {
+      gap: 10px;
+    }
+  }
+}
+
+
+.info-note {
+  display: block;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+  color: #89959e;
+}
+
+
+
+   //聯絡表單
+
+
+.contact-form-card {
+  padding: 30px;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 18px;
+
+  label {
+    margin-bottom: 8px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    color: #1c2833;
+
+    span {
+      color: #e74c3c;
+
+      margin-left: 3px;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dce4e8;
+
+    border-radius: 10px;
+
+    background: #fbfcfd;
+
+    color: #1c2833;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease;
+
+    &:focus {
+      border-color: var(--color-brand-primary);
+
+      background: #ffffff;
+
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    &::placeholder {
+      color: #a5afb6;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+
+    min-height: 140px;
+  }
+
+  select {
+    cursor: pointer;
+  }
+}
+
+
+
+   //勾選
+
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 8px;
+
+  margin: 5px 0 20px;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+
+  color: #71808c;
+
+  cursor: pointer;
+
+  input {
+    flex-shrink: 0;
+
+    margin-top: 3px;
+
+    accent-color: var(--color-brand-primary);
+
+    cursor: pointer;
+  }
+}
+
+
+
+   //送出按鈕
+
+
+.submit-button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 13px 20px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: var(--color-brand-primary);
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+
+    opacity: 0.92;
+  }
+}
+
+
+
+   //底部導引
+
+
+.contact-bottom {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 25px 30px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 25px;
+
+  background: #eaf4f8;
+
+  border-radius: 18px;
+}
+
+
+.bottom-content {
+  flex: 1;
+
+  h2 {
+    margin: 0 0 6px;
+
+    font-size: 19px;
+
+    color: #1c2833;
+  }
+
+  p {
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    color: #65727d;
+  }
+}
+
+
+.bottom-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 11px 18px;
+
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  text-decoration: none;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+
+
+
+.secondary-button {
+  background: #ffffff;
+  color: var(--color-brand-primary);
+  border: 1px solid #d4e0e6;
+
+  &:hover {
+    background: var(--color-brand-primary);
+    color: #ffffff;
+    border-color: var(--color-brand-primary);
+  }
+}
+
+
+
+   //RWD
+
+
+@media (max-width: 950px) {
+  .contact-page {
+    padding: 35px 30px 60px;
+  }
+
+  .contact-content {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bottom-actions {
+    width: 100%;
+  }
+
+  .primary-button,
+  .secondary-button {
+    flex: 1;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .contact-page {
+    padding: 25px 15px 45px;
+  }
+
+  .contact-header {
+    margin-bottom: 35px;
+  }
+
+  .title-area {
+    h1 {
+      font-size: 28px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .contact-form-card {
+    padding: 22px;
+  }
+
+  .info-card {
+    padding: 17px;
+  }
+
+  .bottom-actions {
+    flex-direction: column;
+
+    width: 100%;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+    flex: none;
+  }
+}
