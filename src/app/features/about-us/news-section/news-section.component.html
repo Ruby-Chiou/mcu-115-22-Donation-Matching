@@ -1,1 +1,198 @@
-<p>news-section works!</p>
+<div class="news-page">
+
+  <!-- 頁面標題 -->
+  <section class="news-header">
+  <div class="title-area">
+    <h1>最新消息</h1>
+    <p>掌握災情、救援資訊與目前物資需求</p>
+  </div>
+</section>
+
+
+  <!-- 最新災情 -->
+  <section class="latest-news-section">
+    <div class="section-title">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <h2>最新災情</h2>
+    </div>
+
+    <div class="latest-news-card">
+
+      <div class="latest-news-icon">
+        <i class="fa-solid fa-bullhorn"></i>
+      </div>
+
+      <div class="latest-news-content">
+
+        <div class="latest-news-meta">
+          <span class="news-badge disaster">
+            災情快訊
+          </span>
+
+          <span class="news-date">
+            <i class="fa-regular fa-calendar"></i>
+            {{ latestNews.date }}
+          </span>
+
+          <span class="news-location">
+            <i class="fa-solid fa-location-dot"></i>
+            {{ latestNews.location }}
+          </span>
+        </div>
+
+        <h3>{{ latestNews.title }}</h3>
+
+        <p>
+          {{ latestNews.content }}
+        </p>
+
+        <a routerLink="/donor/disaster" class="latest-news-link">
+          查看災害救助
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- 分類 -->
+  <section class="news-list-section">
+
+    <div class="section-title">
+      <i class="fa-solid fa-list"></i>
+      <h2>資訊分類</h2>
+    </div>
+
+    <div class="category-buttons">
+
+      <button
+        type="button"
+        [class.active]="selectedCategory === 'all'"
+        (click)="selectCategory('all')"
+      >
+        <i class="fa-solid fa-border-all"></i>
+        全部
+      </button>
+
+      <button
+        type="button"
+        [class.active]="selectedCategory === 'disaster'"
+        (click)="selectCategory('disaster')"
+      >
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        災情快訊
+      </button>
+
+      <button
+        type="button"
+        [class.active]="selectedCategory === 'rescue'"
+        (click)="selectCategory('rescue')"
+      >
+        <i class="fa-solid fa-hand-holding-heart"></i>
+        救援資訊
+      </button>
+
+      <button
+        type="button"
+        [class.active]="selectedCategory === 'supply'"
+        (click)="selectCategory('supply')"
+      >
+        <i class="fa-solid fa-box-open"></i>
+        物資需求
+      </button>
+
+    </div>
+
+
+    <!-- 消息卡片 -->
+    <div class="news-grid">
+
+      @for (news of filteredNews; track news.id) {
+
+        <article class="news-card">
+
+          <div class="news-card-top">
+
+            <span
+              class="news-badge"
+              [class.disaster]="news.category === 'disaster'"
+              [class.rescue]="news.category === 'rescue'"
+              [class.supply]="news.category === 'supply'"
+            >
+              {{ news.categoryName }}
+            </span>
+
+            <span class="news-date">
+              <i class="fa-regular fa-calendar"></i>
+              {{ news.date }}
+            </span>
+
+          </div>
+
+
+          <div class="news-card-location">
+            <i class="fa-solid fa-location-dot"></i>
+            {{ news.location }}
+          </div>
+
+
+          <h3>{{ news.title }}</h3>
+
+          <p>
+            {{ news.content }}
+          </p>
+
+
+          <div class="news-card-footer">
+            <span></span>
+
+            @if (news.category === 'supply') {
+              <a routerLink="/donor/disaster">
+                查看需求
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            } @else {
+              <a routerLink="/donor/disaster">
+                查看相關資訊
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            }
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <!-- 底部導引 -->
+  <section class="news-bottom">
+
+    <div class="bottom-card">
+
+      <div class="bottom-icon">
+        <i class="fa-solid fa-heart"></i>
+      </div>
+
+      <div class="bottom-content">
+        <h3>想幫助受災地區嗎？</h3>
+        <p>
+          查看目前物資需求，選擇需要的物資並進行捐助。
+        </p>
+      </div>
+
+      <a routerLink="/donor/disaster" class="bottom-button">
+        前往災害救助
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+
+    </div>
+
+  </section>
+
+</div>
