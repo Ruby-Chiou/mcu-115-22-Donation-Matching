@@ -5,6 +5,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
+import { DonationService } from '../../../../core/services/agency-daily-demand/daily-donation.service';
 
 @Component({
   selector: 'app-donor-daily-form',
@@ -21,11 +22,13 @@ export class DonorDailyFormComponent implements OnInit {
   showImagePreview = false;
   previewImage = '';
   previewImageName = '';
+  isSubmitting = false;
 
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly demandService: DailyDemandService
+    private readonly demandService: DailyDemandService,
+    private readonly donationService: DonationService
   ) {
     this.demandId = Number(this.route.snapshot.paramMap.get('id'));
   }
@@ -124,8 +127,13 @@ export class DonorDailyFormComponent implements OnInit {
     console.log('捐贈完成證明：', this.proofFile);
     alert('捐贈完成證明已上傳，等待受助單位確認。');
   }
-  submitForm(form: NgForm): void {
+  async submitForm(form: NgForm): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
     this.formSubmitted = true;
+
     form.control.markAllAsTouched();
 
     if (form.invalid) {
@@ -145,20 +153,47 @@ export class DonorDailyFormComponent implements OnInit {
       return;
     }
 
-    this.submitted = true;
+    if (!this.quantity || this.quantity <= 0) {
+      alert('請輸入正確的捐贈數量');
+      return;
+    }
 
-    console.log('捐贈申請資料：', {
-      donorName: this.donorName,
-      phone: this.phone,
-      actualMaterial: this.actualMaterial,
-      quantity: this.quantity,
-      materialFiles: this.materialFiles,
-      needReceipt: this.needReceipt,
-      needThankYou: this.needThankYou,
-      receiptTitle: this.receiptTitle,
-      taxId: this.taxId,
-      note: this.note,
-    });
+    if (this.donationMethod !== '寄送' && this.donationMethod !== '面交') {
+      alert('請選擇捐贈方式');
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    try {
+      console.log('開始送出捐助資料');
+
+      const donation = await this.donationService.createDonation({
+        demandId: this.demandId,
+        donorName: this.donorName,
+        phone: this.phone,
+        actualMaterial: this.actualMaterial,
+        quantity: this.quantity,
+        donationMethod: this.donationMethod,
+        note: this.note,
+        needReceipt: this.needReceipt === 'yes',
+        needThankYou: this.needThankYou === 'yes',
+        receiptTitle: this.needReceipt === 'yes' ? this.receiptTitle : null,
+        taxId: this.taxId || null,
+        materialFiles: this.materialFiles,
+        materialVideoFiles: this.materialVideoFiles,
+      });
+
+      console.log('捐助資料、圖片和影片已成功儲存：', donation);
+
+      this.submitted = true;
+    } catch (error) {
+      console.error('寫入捐助資料失敗：', error);
+
+      alert('捐助資料送出失敗，請稍後再試。');
+    } finally {
+      this.isSubmitting = false;
+    }
   }
   goToDisasterOpen() {
     this.router.navigate(['/disaster/open']);
@@ -230,7 +265,7 @@ export class DonorDailyFormComponent implements OnInit {
     const file = input.files[0];
 
     // 檢查檔案大小：5MB
-    if (file.size > 100 * 1024 * 1024) {
+    if (file.size > 50 * 1024 * 1024) {
       alert('影片大小不能超過 5MB');
       input.value = '';
       return;
