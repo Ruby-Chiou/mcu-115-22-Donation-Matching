@@ -2,11 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-
+import { ChangeDetectorRef } from '@angular/core';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
-import { DonationService } from '../../../../core/services/agency-daily-demand/daily-donation.service';
-
+import { AiReviewResult, DonationService } from '../../../../core/services/agency-daily-demand/daily-donation.service';
 @Component({
   selector: 'app-donor-daily-form',
   imports: [CommonModule, FormsModule],
@@ -23,12 +22,17 @@ export class DonorDailyFormComponent implements OnInit {
   previewImage = '';
   previewImageName = '';
   isSubmitting = false;
+  isReviewing = false;
+  reviewResult: AiReviewResult | null = null;
+  reviewError = '';
+  donationId = '';
 
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly demandService: DailyDemandService,
-    private readonly donationService: DonationService
+    private readonly donationService: DonationService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.demandId = Number(this.route.snapshot.paramMap.get('id'));
   }
@@ -133,7 +137,6 @@ export class DonorDailyFormComponent implements OnInit {
     }
 
     this.formSubmitted = true;
-
     form.control.markAllAsTouched();
 
     if (form.invalid) {
@@ -164,6 +167,8 @@ export class DonorDailyFormComponent implements OnInit {
     }
 
     this.isSubmitting = true;
+    this.reviewResult = null;
+    this.reviewError = '';
 
     try {
       console.log('開始送出捐助資料');
@@ -186,15 +191,47 @@ export class DonorDailyFormComponent implements OnInit {
 
       console.log('捐助資料、圖片和影片已成功儲存：', donation);
 
+      this.donationId = donation.id;
+
+      // 上傳完成後立刻結束 loading
+      this.isSubmitting = false;
+
+      // 切換完成畫面
       this.submitted = true;
+
+      // 立即要求 Angular 更新模板
+      this.cdr.detectChanges();
+
+      // 背景執行 AI，不阻塞完成畫面
+      void this.runAiReview(this.donationId);
     } catch (error) {
       console.error('寫入捐助資料失敗：', error);
 
-      alert('捐助資料送出失敗，請稍後再試。');
-    } finally {
       this.isSubmitting = false;
+      this.cdr.detectChanges();
+
+      alert('捐助資料送出失敗，請稍後再試。');
     }
   }
+  private async runAiReview(donationId: string): Promise<void> {
+    this.isReviewing = true;
+    this.reviewError = '';
+
+    try {
+      const result = await this.donationService.reviewDonationWithAi(donationId);
+
+      this.reviewResult = result;
+
+      console.log('AI 審核結果：', result);
+    } catch (error) {
+      console.error('AI 審核失敗：', error);
+
+      this.reviewError = '捐助資料已成功送出，但 AI 審核暫時失敗。';
+    } finally {
+      this.isReviewing = false;
+    }
+  }
+
   goToDisasterOpen() {
     this.router.navigate(['/disaster/open']);
   }
