@@ -1,29 +1,20 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
-
+import { timeout, catchError, of } from 'rxjs';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/volunteer-demand';
 
 import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
 import { VolunteerDeleteComponent } from '../../../modal/delete/volunteer-delete/volunteer-delete.component';
 import { PaginationComponent } from '../../../pagination/pagination.component';
+
 import { VolunteerSearchBarComponent } from '../../../search-bar/volunteer-search-bar/volunteer-search-bar.component';
 import { VolunteerFilterComponent, VolunteerFilterState } from '../../../filter/volunteer-filter/volunteer-filter.component';
 import { VolunteerSortBarComponent, SortType } from '../../../sort-bar/volunteer-sort-bar/volunteer-sort-bar.component';
 import { VolunteerOnShelfComponent } from '../../../modal/shelf/volunteer-on-shelf/volunteer-on-shelf.component';
 import { VolunteerOffShelfComponent } from '../../../modal/shelf/volunteer-off-shelf/volunteer-off-shelf.component';
-
-type VolunteerListItem = VolunteerDemand & {
-  selected: boolean;
-  displayStatus: DisplayVolunteerStatus;
-  displayCreatedAt: string;
-  displayPublishedAt: string;
-  displayOffShelfAt: string;
-  category: string;
-};
 
 @Component({
   selector: 'app-volunteer-list',
@@ -44,47 +35,72 @@ type VolunteerListItem = VolunteerDemand & {
   templateUrl: './volunteer-list.component.html',
   styleUrl: './volunteer-list.component.scss',
 })
-export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy {
-  demands: VolunteerListItem[] = [];
-  filteredDemands: VolunteerListItem[] = [];
-  pagedDemands: VolunteerListItem[] = [];
+export class VolunteerListComponent {
+  demands: (VolunteerDemand & {
+    selected: boolean;
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  })[] = [];
 
-  private demandChangedSubscription?: Subscription;
+  filteredDemands: (VolunteerDemand & {
+    selected: boolean;
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  })[] = [];
+  pagedDemands: (VolunteerDemand & {
+    selected: boolean;
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  })[] = [];
 
   selectAll = false;
   isLoading = false;
   isRestoringScroll = false;
-
+  // 搜尋
   searchTerm = '';
-
+  // 分頁
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
   pageNumbers: number[] = [];
 
-  private readonly scrollPositionKey = 'agency-volunteer-workspace-scroll';
+  // 保留列表位置
+  private readonly scrollPositionKey = 'agency-disaster-workspace-scroll';
+  private readonly pagePositionKey = 'agency-disaster-workspace-page';
 
-  private readonly pagePositionKey = 'agency-volunteer-workspace-page';
-
+  // 排序
   selectedSort: SortType = 'id';
   sortAscending = true;
   private userHasSorted = true;
 
+  // 刪除
   showDeleteModal = false;
   deleteIds: number[] = [];
   deleteType: 'single' | 'batch' = 'single';
 
+  // 手動下架提示
   showOffShelfWarning = false;
+
+  // 已下架無法重新上架提示
   showOnShelfWarning = false;
 
-  pendingOffShelfItem?: VolunteerListItem;
-
+  pendingOffShelfItem?: VolunteerDemand & {
+    selected: boolean;
+    displayStatus: DisplayVolunteerStatus;
+    displayCreatedAt: string;
+    displayPublishedAt: string;
+    displayOffShelfAt: string;
+  };
+  // 篩選選項
   statusOptions: DisplayVolunteerStatus[] = ['已上架', '隱藏中', '已下架'];
-
   priorityOptions: VolunteerDemand['priority'][] = ['普通', '緊急', '非常緊急'];
-
   typeOptions: NonNullable<VolunteerDemand['type']>[] = ['物資搬運', '物資整理', '環境清潔', '醫療照護', '其他'];
-
   messageOptions = ['已回覆', '未回覆'];
 
   selectedFilters: VolunteerFilterState = {
@@ -96,58 +112,46 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
   };
 
   constructor(
-    private readonly volunteerDemandService: VolunteerDemandService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private VolunteerDemandService: VolunteerDemandService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
-
-    this.demandChangedSubscription = this.volunteerDemandService.demandChanged$.subscribe(() => {
-      void this.loadDemands();
-    });
   }
 
-  ngOnInit(): void {
-    const restoreListPosition = sessionStorage.getItem('restore-agency-volunteer-list');
-
+  // 初始化
+  ngOnInit() {
+    const restoreListPosition = sessionStorage.getItem('restore-agency-disaster-list');
     if (restoreListPosition === 'true') {
       const savedPage = sessionStorage.getItem(this.pagePositionKey);
-
       if (savedPage) {
         const page = Number(savedPage);
-
         if (page >= 1) {
           this.currentPage = page;
         }
       }
-
-      sessionStorage.removeItem('restore-agency-volunteer-list');
+      // 只使用一次，避免重新進入列表又恢復舊頁數
+      sessionStorage.removeItem('restore-agency-disaster-list');
     } else {
+      // 第一次進入列表 → 永遠從第 1 頁開始
       this.currentPage = 1;
-
+      // 清掉舊的位置資料
       sessionStorage.removeItem(this.pagePositionKey);
-
       sessionStorage.removeItem(this.scrollPositionKey);
     }
-
-    void this.loadDemands();
+    this.loadDemands();
   }
-
-  ngAfterViewInit(): void {
+  ngAfterViewInit() {
     const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
-
     if (!savedScroll) {
       return;
     }
-
     const scrollY = Number(savedScroll);
-
     window.scrollTo({
       top: scrollY,
       left: 0,
       behavior: 'instant',
     });
-
     requestAnimationFrame(() => {
       if (window.scrollY !== scrollY) {
         window.scrollTo({
@@ -158,112 +162,95 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
       }
     });
   }
-
-  ngOnDestroy(): void {
-    this.demandChangedSubscription?.unsubscribe();
-  }
-
-  goToAddDemand(): void {
+  // 新增
+  goToAddDemand() {
     this.router.navigate(['/agency/volunteer-form']);
   }
-
-  goToDetail(id: number): void {
-    if (!Number.isInteger(id) || id <= 0) {
-      console.error('[VolunteerListComponent] 無法前往詳細頁，資料庫 id 不正確：', id);
-
-      return;
-    }
-
+  // 查看
+  goToDetail(id: number) {
     this.saveListPosition();
-
-    sessionStorage.setItem('restore-agency-volunteer-list', 'true');
-
-    this.router.navigate(['/agency/volunteer-detail', id]);
+    sessionStorage.setItem('restore-agency-disaster-list', 'true');
+    this.router.navigate(['/agency/volunteer-detail', id], {
+      queryParams: {
+        number: id,
+      },
+    });
   }
-
-  goToEdit(id: number): void {
-    if (!Number.isInteger(id) || id <= 0) {
-      console.error('[VolunteerListComponent] 無法前往編輯頁，資料庫 id 不正確：', id);
-
-      return;
-    }
-
+  // 編輯
+  goToEdit(id: number) {
     this.saveListPosition();
-
-    sessionStorage.setItem('restore-agency-volunteer-list', 'true');
-
     this.router.navigate(['/agency/volunteer-edit', id]);
   }
-
-  saveListPosition(): void {
+  // 儲存列表位置
+  saveListPosition() {
     sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
-
     sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
   }
 
   @HostListener('window:beforeunload')
-  saveScrollPosition(): void {
+  saveScrollPosition() {
     this.saveListPosition();
   }
 
-  async loadDemands(): Promise<void> {
+  // 讀取需求
+  loadDemands(): void {
     this.isLoading = true;
+    this.cdr.detectChanges();
 
-    try {
-      await this.volunteerDemandService.reload();
+    const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
+      上架: '已上架',
+      隱藏: '隱藏中',
+      下架: '已下架',
+    };
 
-      const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
-        上架: '已上架',
-        隱藏: '隱藏中',
-        下架: '已下架',
-      };
+    this.VolunteerDemandService.getDemandsFromServer()
+      .pipe(
+        timeout(2000),
+        catchError(() => {
+          return of(this.VolunteerDemandService.getDemands());
+        })
+      )
+      .subscribe((data) => {
+        this.demands = data.map((item) => {
+          return {
+            ...item,
 
-      this.demands = this.volunteerDemandService.getDemands().map((item) => ({
-        ...item,
+            selected: false,
 
-        selected: false,
+            displayStatus: displayStatus[item.status as VolunteerStatus],
 
-        displayStatus: displayStatus[item.status as VolunteerStatus],
+            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
 
-        displayCreatedAt:
-          item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
+            displayPublishedAt:
+              item.status === '隱藏' || !item.publishedAt ? '尚未發布' : new Date(item.publishedAt).toLocaleDateString('zh-TW'),
 
-        displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+            displayOffShelfAt:
+              item.status === '隱藏' || !item.expectedOffShelfAt ? '—' : new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW'),
 
-        displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+            category: item.type ?? '其他',
+          };
+        });
 
-        category: item.type ?? '其他',
-      }));
+        this.applyFilters(false);
 
-      this.applyFilters(false);
-    } catch (error) {
-      console.error('載入志工需求失敗：', error);
-
-      this.demands = [];
-      this.filteredDemands = [];
-      this.pagedDemands = [];
-    } finally {
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      });
   }
 
-  onSearchChange(value: string): void {
+  // 搜尋
+  onSearchChange(value: string) {
     this.searchTerm = value;
     this.applyFilters();
   }
 
-  onSortChange(event: { selectedSort: SortType; sortAscending: boolean }): void {
+  // 排序
+  onSortChange(event: { selectedSort: SortType; sortAscending: boolean }) {
     const scrollY = window.scrollY;
-
     this.selectedSort = event.selectedSort;
-
     this.sortAscending = event.sortAscending;
-
     this.userHasSorted = true;
-
     this.applySort();
-
     setTimeout(() => {
       window.scrollTo({
         top: scrollY,
@@ -272,40 +259,35 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
     }, 0);
   }
 
-  toggleAll(): void {
+  // 全選
+  toggleAll() {
     this.pagedDemands.forEach((item) => {
       item.selected = this.selectAll;
     });
   }
-
-  hasSelected(): boolean {
+  hasSelected() {
     return this.filteredDemands.some((item) => item.selected);
   }
-
-  editSelected(): void {
+  // 批次編輯
+  editSelected() {
     const selectedItems = this.filteredDemands.filter((item) => item.selected);
-
     if (selectedItems.length === 0) {
       alert('請先選擇要修改的需求');
-
       return;
     }
-
     localStorage.setItem('editVolunteerDemands', JSON.stringify(selectedItems));
-
     this.saveListPosition();
-
-    sessionStorage.setItem('restore-agency-volunteer-list', 'true');
-
+    sessionStorage.setItem('restore-agency-disaster-list', 'true');
     this.router.navigate(['/agency/volunteer-batch-edit']);
   }
 
-  onFilterApply(filters: VolunteerFilterState): void {
+  // 篩選
+  onFilterApply(filters: VolunteerFilterState) {
     this.selectedFilters = filters;
+
     this.applyFilters();
   }
-
-  resetFilters(): void {
+  resetFilters() {
     this.selectedFilters = {
       status: [],
       priority: [],
@@ -313,57 +295,61 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
       type: [],
       messageStatus: [],
     };
-
     this.applyFilters();
   }
-
-  applyFilters(resetPage = true): void {
+  // 套用篩選
+  applyFilters(resetPage: boolean = true) {
     this.filteredDemands = this.demands.filter((item) => {
+      // 關鍵字
       if (this.searchTerm && this.searchTerm.trim() !== '') {
         const term = this.searchTerm.trim().toLowerCase();
-
-        const matchType = item.type ? item.type.toLowerCase().includes(term) : false;
-
-        if (!matchType) {
+        const matchItem = item.type ? item.type.toLowerCase().includes(term) : false;
+        if (!matchItem) {
           return false;
         }
       }
 
+      // 上架狀態
       if (this.selectedFilters.status.length > 0 && !this.selectedFilters.status.includes(item.displayStatus)) {
         return false;
       }
 
+      // 優先度
       if (this.selectedFilters.priority.length > 0 && !this.selectedFilters.priority.includes(item.priority)) {
         return false;
       }
-
+      // 類別
       if (this.selectedFilters.type.length > 0 && (!item.type || !this.selectedFilters.type.includes(item.type))) {
         return false;
       }
 
+      // 留言狀態
       if (this.selectedFilters.messageStatus.length > 0) {
-        const hasMessage = (item.messageCount ?? 0) > 0;
-
-        const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
-
-        const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
-
-        if (wantsReplied && !wantsNotReplied && !hasMessage) {
+        // 留言篩選只套用在「已上架」
+        if (item.displayStatus !== '已上架') {
           return false;
         }
 
-        if (wantsNotReplied && !wantsReplied && hasMessage) {
+        const hasMsg = (item.messageCount || 0) > 0;
+
+        const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
+        const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
+
+        // 有回覆 → 留言數大於 0
+        if (wantsReplied && !wantsNotReplied && !hasMsg) {
+          return false;
+        }
+
+        // 未回覆 → 留言數等於 0
+        if (wantsNotReplied && !wantsReplied && hasMsg) {
           return false;
         }
       }
-
       return true;
     });
-
     if (resetPage) {
       this.currentPage = 1;
     }
-
     if (this.userHasSorted) {
       this.applySort();
     } else {
@@ -371,28 +357,53 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
+  // 排序
+  private getUnpublishAt(demand: VolunteerDemand): string {
+    if (demand.status === '隱藏' || !demand.createdAt) {
+      return '尚未發布';
+    }
+    const unpublishAt = new Date(demand.createdAt);
+    const daysToAdd = {
+      普通: 14,
+      緊急: 7,
+      非常緊急: 3,
+    }[demand.priority];
+
+    if (Number.isNaN(unpublishAt.getTime())) {
+      return '尚未發布';
+    }
+    unpublishAt.setDate(unpublishAt.getDate() + daysToAdd);
+    return unpublishAt.toLocaleDateString('zh-TW');
+  }
+
   private getCreatedAtTime(demand: VolunteerDemand): number {
     if (demand.status === '隱藏' || !demand.createdAt) {
       return Number.POSITIVE_INFINITY;
     }
-
     const timestamp = new Date(demand.createdAt).getTime();
-
     return Number.isNaN(timestamp) ? Number.POSITIVE_INFINITY : timestamp;
   }
 
-  applySort(): void {
-    this.filteredDemands = [...this.filteredDemands].sort((a, b) => {
+  // 排序
+  applySort() {
+    this.filteredDemands.sort((a, b) => {
       let result = 0;
 
+      // 編號
       if (this.selectedSort === 'id') {
         result = Number(a.serialNo ?? 0) - Number(b.serialNo ?? 0);
       }
 
+      // 建立日期
       if (this.selectedSort === 'createdAt') {
-        result = this.getCreatedAtTime(a) - this.getCreatedAtTime(b);
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+
+        result = aTime - bTime;
       }
 
+      // 上架日期
       if (this.selectedSort === 'publishedAt') {
         const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
 
@@ -401,6 +412,7 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
         result = aTime - bTime;
       }
 
+      // 預計下架日期
       if (this.selectedSort === 'expectedOffShelfAt') {
         const aTime = a.expectedOffShelfAt ? new Date(a.expectedOffShelfAt).getTime() : 0;
 
@@ -409,6 +421,7 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
         result = aTime - bTime;
       }
 
+      // 需求數量
       if (this.selectedSort === 'people') {
         result = Number(a.people ?? 0) - Number(b.people ?? 0);
       }
@@ -419,81 +432,74 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.updatePagination();
   }
 
-  updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredDemands.length / this.pageSize) || 1;
+  // 分頁
 
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredDemands.length / this.pageSize) || 1;
     if (this.currentPage > this.totalPages) {
       this.currentPage = this.totalPages;
     }
-
     this.pageNumbers = Array.from(
       {
         length: this.totalPages,
       },
-      (_, index) => index + 1
+      (_, i) => i + 1
     );
-
     const startIndex = (this.currentPage - 1) * this.pageSize;
-
     const endIndex = startIndex + this.pageSize;
-
-    this.pagedDemands = [...this.filteredDemands.slice(startIndex, endIndex)];
-
+    this.pagedDemands = this.filteredDemands.slice(startIndex, endIndex);
     this.selectAll = this.pagedDemands.length > 0 && this.pagedDemands.every((item) => item.selected);
   }
 
-  goToPage(page: number): void {
+  goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updatePagination();
     }
   }
-
-  openDeleteModal(id: number): void {
-    if (!Number.isInteger(id) || id <= 0) {
-      console.error('[VolunteerListComponent] 無法刪除，資料庫 id 不正確：', id);
-
-      return;
-    }
-
+  // 刪除
+  openDeleteModal(id: number) {
     this.deleteIds = [id];
     this.deleteType = 'single';
     this.showDeleteModal = true;
   }
 
-  openBatchDeleteModal(): void {
-    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => Number(item.id));
-
-    if (this.deleteIds.length === 0) {
-      alert('請先選擇要刪除的需求');
-
-      return;
-    }
-
+  openBatchDeleteModal() {
+    this.deleteIds = this.filteredDemands
+      .filter((item) => item.selected && item.serialNo !== undefined)
+      .map((item) => item.serialNo as number);
     this.deleteType = 'batch';
     this.showDeleteModal = true;
   }
 
-  closeDeleteModal(): void {
+  closeDeleteModal() {
     this.showDeleteModal = false;
   }
 
-  async onDeleted(): Promise<void> {
+  onDeleted() {
     this.showDeleteModal = false;
     this.deleteIds = [];
     this.selectAll = false;
-
-    await this.loadDemands();
+    this.loadDemands();
   }
-
-  changeStatus(item: VolunteerListItem, event: Event): void {
+  // 修改狀態
+  changeStatus(
+    item: VolunteerDemand & {
+      selected: boolean;
+      displayStatus: DisplayVolunteerStatus;
+      displayCreatedAt: string;
+      displayPublishedAt: string;
+      displayOffShelfAt: string;
+    },
+    event: Event
+  ) {
     const select = event.target as HTMLSelectElement;
-
     const newStatus = select.value as DisplayVolunteerStatus;
 
-    const originalItem = this.volunteerDemandService.getDemands().find((demand) => demand.id === item.id);
-
+    // 選擇「已下架」
     if (newStatus === '已下架') {
+      const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+      // 暫存原本的顯示狀態
       if (originalItem?.status === '上架') {
         item.displayStatus = '已上架';
       } else if (originalItem?.status === '隱藏') {
@@ -501,105 +507,123 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
       } else if (originalItem?.status === '下架') {
         item.displayStatus = '已下架';
       }
-
       setTimeout(() => {
         select.value = item.displayStatus;
       });
-
       this.pendingOffShelfItem = item;
       this.showOffShelfWarning = true;
-
       return;
     }
-
+    // 選擇「已上架」或「隱藏中」
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+    // 已下架 → 禁止重新上架
     if (newStatus === '已上架' && originalItem?.status === '下架') {
       item.displayStatus = '已下架';
-
       setTimeout(() => {
         select.value = '已下架';
       });
-
       this.showOnShelfWarning = true;
-
       return;
     }
-
+    // 正常變更狀態
     item.displayStatus = newStatus;
-
-    void this.applyStatusChange(item);
+    this.applyStatusChange(item);
   }
-
-  async confirmManualOffShelf(): Promise<void> {
+  // 確認手動下架
+  confirmManualOffShelf() {
     if (!this.pendingOffShelfItem) {
       return;
     }
 
     const item = this.pendingOffShelfItem;
+
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
     const now = new Date();
 
+    // 狀態改成下架
     item.status = '下架';
 
+    // 記錄實際手動下架時間
     item.expectedOffShelfAt = now.toISOString();
 
+    // 顯示狀態
     item.displayStatus = '已下架';
 
+    // 顯示下架日期
     item.displayOffShelfAt = now.toLocaleDateString('zh-TW');
 
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    // 建立日期永遠保留
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
-    try {
-      await this.volunteerDemandService.updateDemand(item);
+    // 保留原本的建立日期
+    // 建立日期已在前面處理
 
-      await this.loadDemands();
-    } catch (error) {
-      console.error('下架失敗：', error);
-    } finally {
-      this.closeOffShelfWarning();
-    }
-  }
+    // 儲存
+    this.VolunteerDemandService.updateDemand(item);
 
-  cancelManualOffShelf(): void {
+    // 關閉提示框
     this.closeOffShelfWarning();
   }
 
-  async hideInsteadOfOffShelf(): Promise<void> {
+  // 取消手動下架
+  cancelManualOffShelf() {
+    this.closeOffShelfWarning();
+  }
+
+  // 選擇「隱藏」
+  hideInsteadOfOffShelf() {
     if (!this.pendingOffShelfItem) {
       return;
     }
 
     const item = this.pendingOffShelfItem;
 
+    // 改成隱藏
     item.status = '隱藏';
+
     item.displayStatus = '隱藏中';
+
+    // 隱藏後視為尚未上架
+    item.publishedAt = undefined;
     item.expectedOffShelfAt = undefined;
+
     item.displayPublishedAt = '尚未上架';
     item.displayOffShelfAt = '—';
 
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    // 建立日期永遠保留
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
-    try {
-      await this.volunteerDemandService.updateDemand(item);
+    // 儲存
+    this.VolunteerDemandService.updateDemand(item);
 
-      await this.loadDemands();
-    } catch (error) {
-      console.error('隱藏失敗：', error);
-    } finally {
-      this.closeOffShelfWarning();
-    }
+    // 關閉提示框
+    this.closeOffShelfWarning();
   }
 
-  closeOffShelfWarning(): void {
+  // 關閉手動下架提示
+  closeOffShelfWarning() {
     this.showOffShelfWarning = false;
+
     this.pendingOffShelfItem = undefined;
   }
 
-  closeOnShelfWarning(): void {
+  // 關閉無法重新上架提示
+  closeOnShelfWarning() {
     this.showOnShelfWarning = false;
   }
-
-  private async applyStatusChange(item: VolunteerListItem): Promise<void> {
-    const originalItem = this.volunteerDemandService.getDemands().find((demand) => demand.id === item.id);
+  // 實際處理狀態變更
+  private applyStatusChange(
+    item: VolunteerDemand & {
+      selected: boolean;
+      displayStatus: DisplayVolunteerStatus;
+      displayCreatedAt: string;
+      displayPublishedAt: string;
+      displayOffShelfAt: string;
+    }
+  ) {
+    // 取得原本儲存的資料
+    const originalItem = this.VolunteerDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
 
     const originalStatus = originalItem?.status;
 
@@ -616,73 +640,90 @@ export class VolunteerListComponent implements OnInit, AfterViewInit, OnDestroy 
 
       default:
         status = '上架';
-        break;
     }
 
     const now = new Date();
 
+    // 上架
     if (status === '上架') {
+      // 手動下架後禁止重新上架
       if (originalStatus === '下架') {
         item.displayStatus = '已下架';
+
         this.showOnShelfWarning = true;
 
         return;
       }
 
+      // 原本不是上架
+      // → 現在重新上架
       if (originalStatus !== '上架') {
         item.publishedAt = now.toISOString();
 
+        // 建立日期只在建立時記錄
         if (!item.createdAt) {
           item.createdAt = now.toISOString();
         }
-      } else if (originalItem?.publishedAt) {
+      }
+
+      // 原本就是上架
+      // → 保留原本上架日期
+      else if (originalItem?.publishedAt) {
         item.publishedAt = originalItem.publishedAt;
       }
 
+      // 重新計算預計下架日期
       if (item.publishedAt) {
         item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
       }
 
       item.status = '上架';
+
       item.displayStatus = '已上架';
 
-      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未發布';
 
       item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
-    } else {
+    }
+
+    // 隱藏
+    else if (status === '隱藏') {
       item.status = '隱藏';
+
+      // 隱藏後視為尚未上架
       item.publishedAt = undefined;
+
       item.expectedOffShelfAt = undefined;
+
       item.displayStatus = '隱藏中';
+
       item.displayPublishedAt = '尚未上架';
+
       item.displayOffShelfAt = '—';
     }
 
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    // 建立日期永遠保留
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
-    try {
-      await this.volunteerDemandService.updateDemand(item);
-
-      await this.loadDemands();
-    } catch (error) {
-      console.error('狀態更新失敗：', error);
-    }
+    // 儲存
+    this.VolunteerDemandService.updateDemand(item);
   }
 
+  // 預計下架日期
   calculateExpectedOffShelfDate(publishedDate: Date, priority: VolunteerDemand['priority']): string {
     const offShelfDate = new Date(publishedDate);
 
     switch (priority) {
       case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-
-      case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 14);
         break;
 
-      case '非常緊急':
+      case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 7);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 3);
         break;
     }
 

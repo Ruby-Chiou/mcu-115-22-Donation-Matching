@@ -3,7 +3,6 @@
   <app-supply-loading *ngIf="isLoading"></app-supply-loading>
   <ng-container *ngIf="!isLoading">
     <div class="volunteer-section">
-      <h1>志工需求列表</h1>
       <!-- 新增志工需求 -->
       <div class="top-action-bar">
         <button class="add-btn" routerLink="/agency/volunteer-form">新增志工需求</button>
@@ -47,16 +46,16 @@
       <table class="volunteer-table">
         <thead>
           <tr>
-            <th class="checkbox-column" style="width: 55px">選取</th>
-            <th style="width: 60px">編號</th>
-            <th class="category-column" style="width: 90px">需求類型</th>
-            <th class="category-column" style="width: 90px">需求人數</th>
-            <th style="width: 105px">緊急優先度</th>
-            <th class="created-time-column" style="width: 95px">建立日期</th>
-            <th class="published-time-column" style="width: 95px">上架日期</th>
-            <th class="off-shelf-time-column" style="width: 100px">預計下架日期</th>
-            <th class="message-column" style="width: 75px">留言區</th>
-            <th class="operation-column" style="width: 340px">操作</th>
+            <th class="checkbox-column" style="width: 5%">選取</th>
+            <th style="width: 5%">編號</th>
+            <th class="category-column" style="width: 10%">需求類型</th>
+            <th class="category-column" style="width: 9%">需求人數</th>
+            <th style="width: 10%">緊急優先度</th>
+            <th class="created-time-column" style="width: 9%">建立日期</th>
+            <th class="published-time-column" style="width: 9%">上架日期</th>
+            <th class="off-shelf-time-column" style="width: 10%">預計下架日期</th>
+            <th class="message-column" style="width: 7%">留言區</th>
+            <th class="operation-column" style="width: 26%">操作</th>
           </tr>
         </thead>
 
@@ -88,22 +87,33 @@
               {{ item.priority }}
             </td>
 
-            <!-- 發布時間 -->
-            <td class="created-time-column">{{ item.displayCreatedAt || '尚未發布' }}</td>
+            <!-- 建立日期 -->
+            <td class="created-time-column">{{ item.displayCreatedAt }}</td>
 
-            <!-- 下架時間 -->
-            <td class="created-time-column">{{ item.displayOffShelfAt || '—' }}</td>
+            <!-- 上架日期 -->
+            <td class="published-time-column">{{ item.displayPublishedAt }}</td>
+
+            <!-- 預計下架日期 -->
             <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
+
             <!-- 留言 -->
             <td class="message-column">
+              <!-- 上架：可以點擊留言區 -->
               <a
+                *ngIf="item.displayStatus === '已上架'"
                 [routerLink]="[
-              '/donor/disaster/volunteer/detail',
-              item.serialNo
-            ]"
+      '/donor/disaster/volunteer/detail',
+      item.serialNo
+    ]"
               >
                 {{ item.messageCount || 0 }}
               </a>
+
+              <!-- 隱藏：固定顯示 0，不可點擊 -->
+              <span *ngIf="item.displayStatus === '隱藏中'"> 0 </span>
+
+              <!-- 下架：顯示留言數，但不可點擊 -->
+              <span *ngIf="item.displayStatus === '已下架'"> {{ item.messageCount || 0 }} </span>
             </td>
 
             <!-- 操作 -->
