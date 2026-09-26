@@ -4,7 +4,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environment/environment';
-import { RecipientDonationReview } from '../../../models/agency/item-review';
+import { DonationFile, RecipientDonationReview } from '../../../models/agency/item-review';
 
 type DonationFileType = 'material_image' | 'material_video';
 
@@ -188,5 +188,83 @@ export class DonationService {
     }
 
     return data?.conditions ?? [];
+  }
+
+  async getRecipientDonationReviewById(donationId: string): Promise<RecipientDonationReview> {
+    const { data, error } = await this.supabase
+      .from('donor_daily_donations')
+      .select(
+        `
+        id,
+        demand_id,
+        donor_name,
+        actual_material,
+        quantity,
+        note,
+        donation_method,
+        status,
+        ai_decision,
+        ai_condition,
+        ai_reason,
+        ai_checked_at,
+        human_decision,
+        human_reason,
+        human_checked_at,
+        created_at
+      `
+      )
+      .eq('id', donationId)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data as RecipientDonationReview;
+  }
+
+  async getDonationFiles(donationId: string): Promise<DonationFile[]> {
+    const { data, error } = await this.supabase
+      .from(this.fileTableName)
+      .select(
+        `
+        id,
+        donation_id,
+        file_type,
+        storage_path,
+        original_filename,
+        mime_type,
+        file_size,
+        created_at
+      `
+      )
+      .eq('donation_id', donationId)
+      .in('file_type', ['material_image', 'material_video'])
+      .order('created_at', {
+        ascending: true,
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    const files = data ?? [];
+
+    return Promise.all(
+      (data ?? []).map(async (file) => {
+        const { data: signedData, error: signedError } = await this.supabase.storage
+          .from(this.bucketName)
+          .createSignedUrl(file.storage_path, 3600);
+
+        if (signedError) {
+          throw signedError;
+        }
+
+        return {
+          ...file,
+          public_url: signedData.signedUrl,
+        };
+      })
+    );
   }
 }

@@ -1,0 +1,157 @@
+<section class="detail-page">
+  <button type="button" class="back-button" (click)="goBack()">← 返回審核列表</button>
+
+  @if (isLoading) {
+  <div class="loading-container" role="status" aria-live="polite">
+    <span class="loading-spinner" aria-hidden="true"></span>
+
+    <p>正在載入物資詳細資料...</p>
+  </div>
+  } @else if (errorMessage) {
+  <p class="error-message" role="alert">{{ errorMessage }}</p>
+  } @else if (donation) {
+  <article class="detail-card">
+    <header class="detail-header">
+      <div>
+        <h1>{{ donation.actual_material }}</h1>
+      </div>
+
+      <span
+        class="status-label"
+        [class.pending]="
+            donation.status ===
+            'pending_human_review'
+          "
+        [class.approved]="
+            donation.status ===
+            'human_approved'
+          "
+        [class.rejected]="
+            donation.status ===
+            'human_rejected'
+          "
+      >
+        {{ getStatusText(donation) }}
+      </span>
+    </header>
+
+    <section class="detail-section">
+      <h2>物資資訊</h2>
+
+      <p>捐助者： {{ donation.donor_name }}</p>
+
+      <p>實際捐助物資： {{ donation.actual_material }}</p>
+
+      <p>物資狀態要求： {{ getAcceptedConditionsText() || '無法判斷' }}</p>
+
+      <p>數量： {{ donation.quantity }}</p>
+
+      <p>捐贈方式： {{ donation.donation_method }}</p>
+
+      @if (donation.note) {
+      <p>備註： {{ donation.note }}</p>
+      }
+    </section>
+
+    <section class="detail-section">
+      <h2>AI 審核結果</h2>
+
+      <p>AI 判定： {{ getAiDecisionText( donation.ai_decision ) }}</p>
+
+      @if (donation.ai_reason) {
+      <div class="reason-box">
+        <h3>說明</h3>
+
+        <p>{{ donation.ai_reason }}</p>
+      </div>
+      }
+    </section>
+
+    @if ( imageFiles.length > 0 || videoFiles.length > 0 ) {
+    <section class="media-section">
+      <h2>物資照片與影片</h2>
+
+      @if (imageFiles.length > 0) {
+      <div class="media-group">
+
+        <div class="image-button-list">
+          @for ( file of imageFiles; track file.id ) {
+          <button type="button" class="image-preview-button" (click)="openImage(file)">
+            <i class="fa-solid fa-image"></i>
+
+            <span class="image-file-name"> {{ file.original_filename || '物資圖片' }} </span>
+          </button>
+          }
+        </div>
+      </div>
+      } @if (videoFiles.length > 0) {
+      <div class="media-group">
+        <h3>物資影片</h3>
+
+        <div class="video-list">
+          @for ( file of videoFiles; track file.id ) { @if (file.public_url) {
+          <video class="donation-video" controls preload="metadata">
+            <source [src]="file.public_url" [type]="file.mime_type" />
+
+            您的瀏覽器不支援影片播放。
+          </video>
+          } }
+        </div>
+      </div>
+      }
+    </section>
+    } @else {
+    <section class="media-section empty-media">
+      <h2>物資照片與影片</h2>
+
+      <p>捐助者尚未上傳照片或影片。</p>
+    </section>
+    } @if ( donation.status === 'pending_human_review' ) {
+    <section class="decision-section">
+      <div class="decision-buttons">
+        <button type="button" class="accept-button">接受物資</button>
+
+        <button type="button" class="reject-button">不接受物資</button>
+      </div>
+    </section>
+    } @if ( donation.status === 'human_rejected' && donation.human_reason ) {
+    <section class="detail-section">
+      <h2>人工審核結果</h2>
+
+      <p>不接受原因： {{ donation.human_reason }}</p>
+    </section>
+    }
+  </article>
+  }
+</section>
+
+@if (selectedImage) {
+<div class="image-modal-backdrop" role="presentation" (click)="closeImage()">
+  <section class="image-modal" role="dialog" aria-modal="true" aria-labelledby="image-modal-title" (click)="$event.stopPropagation()">
+    <header class="image-modal-header">
+      <h2 id="image-modal-title">{{ selectedImage.original_filename || '物資圖片' }}</h2>
+
+      <button type="button" class="modal-close-button" aria-label="關閉圖片" (click)="closeImage()">×</button>
+    </header>
+
+    <div class="image-modal-content">
+      @if (selectedImage.public_url) {
+      <img
+        class="preview-image"
+        [src]="selectedImage.public_url"
+        [alt]="
+              selectedImage.original_filename
+                || '物資圖片'
+            "
+      />
+      } @else {
+      <p class="image-url-error">找不到圖片網址。</p>
+      }
+    </div>
+
+    <footer class="image-modal-footer">
+      <button type="button" class="modal-close-text-button" (click)="closeImage()">關閉</button>
+    </footer>
+  </section>
+</div>
+}

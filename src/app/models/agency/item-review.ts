@@ -34,9 +34,14 @@ export interface RecipientDonationReview {
 export interface DonationFile {
   id: string;
   donation_id: string;
-  file_type: DonationFileType;
+  file_type:
+    | 'material_image'
+    | 'material_video'
+    | 'proof';
   storage_path: string;
   original_filename: string;
   mime_type: string;
-  file_size: number;
+  file_size: number | null;
+  created_at: string;
+  public_url?: string;
 }

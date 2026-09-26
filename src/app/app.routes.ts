@@ -54,8 +54,7 @@ export const routes: Routes = [
   },
   {
     path: 'daily-locations',
-    loadComponent: () =>
-      import('./features/daily-locations/daily-locations.component').then(m => m.DailyLocationsComponent)
+    loadComponent: () => import('./features/daily-locations/daily-locations.component').then((m) => m.DailyLocationsComponent),
   },
 
   {
@@ -88,12 +87,9 @@ export const routes: Routes = [
   },
   //感謝牆與黑名單
   {
-  path: 'thank-you-wall',
-  loadComponent: () =>
-    import('./features/thank-you-wall/thank-you-wall.component').then(
-      (m) => m.ThankYouWallComponent
-    ),
-},
+    path: 'thank-you-wall',
+    loadComponent: () => import('./features/thank-you-wall/thank-you-wall.component').then((m) => m.ThankYouWallComponent),
+  },
   // 4. 社福機構模組 (機構端)
   // 4.1 社福團體儀錶板
   {
@@ -136,6 +132,11 @@ export const routes: Routes = [
     path: 'agency/item-review',
     loadComponent: () =>
       import('./features/daily/agency-item-review/agency-item-review.component').then((m) => m.AgencyItemReviewComponent), // 日常物資 AI+人工審核工作流
+  },
+  {
+    path: 'agency/item-review/:id',
+    loadComponent: () =>
+      import('./features/daily/agency-item-review-detail/agency-item-review-detail.component').then((m) => m.AgencyItemReviewDetailComponent),
   },
 
   //4.5 急難救助需求管理區
@@ -210,7 +211,6 @@ export const routes: Routes = [
     path: 'customer-service/faq',
     loadComponent: () => import('./features/customer-service/faq/faq.component').then((m) => m.FAQComponent),
   },
-
 
   // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回大廳
   { path: '**', redirectTo: 'home' },
