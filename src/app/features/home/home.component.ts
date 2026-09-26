@@ -33,8 +33,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   protected readonly newsList: NewsItem[] = [
     {
       image: 'assets/images/lobby.jpg',
-      text: '歡迎民眾協助捐助。',
-      highlight: '目前花蓮災後物資募集開放中。',
+      text: '歡迎民眾協助捐助',
+      highlight: '目前花蓮災後物資募集開放中',
     },
     {
       image: 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img', //網址是示意圖片
