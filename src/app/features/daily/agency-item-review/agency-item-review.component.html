@@ -1,1 +1,98 @@
-<p>agency-item-review works!</p>
+<section class="review-list-page" [attr.aria-busy]="isLoading">
+  <header>
+    <h1>物資審核列表</h1>
+    <p>請確認 AI 審核結果並做最後決定</p>
+  </header>
+
+  <nav class="review-tabs">
+    <button type="button" class="review-tab" [class.active]="selectedFilter === 'all'" (click)="selectedFilter = 'all'">全部</button>
+
+    <button type="button" class="review-tab" [class.active]="selectedFilter === 'accepted'" (click)="selectedFilter = 'accepted'">
+      通過
+    </button>
+
+    <button type="button" class="review-tab" [class.active]="selectedFilter === 'rejected'" (click)="selectedFilter = 'rejected'">
+      不通過
+    </button>
+  </nav>
+
+  @if (isLoading) {
+  <div class="loading-container" role="status" aria-live="polite">
+    <span class="loading-spinner" aria-hidden="true"></span>
+
+    <p>正在載入物資資料...</p>
+  </div>
+  } @else {
+  <section class="review-section">
+    <h2>待審核</h2>
+
+    @if ( filterByAiDecision( pendingDonations ).length === 0 ) {
+    <p class="empty-message">目前沒有待決定物資。</p>
+    }
+
+    <div class="donation-list">
+      @for ( donation of filterByAiDecision( pendingDonations ); track donation.id ) {
+      <article class="donation-card">
+        <div class="donation-card-header">
+          <h3>{{ donation.actual_material }}</h3>
+
+          <span class="pending-label"> 待最後決定 </span>
+        </div>
+
+        <p>數量： {{ donation.quantity }}</p>
+
+        <p>AI 判定： {{ getAiDecisionText( donation.ai_decision ) }}</p>
+
+        <p>物資狀態要求： {{ getAcceptedConditionsText( donation ) || '無法判斷' }}</p>
+
+        <button type="button" (click)="openDonation(donation)">查看並確認</button>
+      </article>
+      }
+    </div>
+  </section>
+
+  <div class="section-divider">
+    <span>以下為已完成審核的物資</span>
+  </div>
+
+  <section class="review-section">
+    <h2>已完成</h2>
+
+    @if ( filterByAiDecision( completedDonations ).length === 0 ) {
+    <p class="empty-message">目前沒有已完成審核的物資。</p>
+    }
+
+    <div class="donation-list">
+      @for ( donation of filterByAiDecision( completedDonations ); track donation.id ) {
+      <article class="donation-card completed-card">
+        <div class="donation-card-header">
+          <h3>{{ donation.actual_material }}</h3>
+
+          @if ( donation.status === 'human_approved' ) {
+          <span class="approved-label"> 已接受 </span>
+          } @if ( donation.status === 'human_rejected' ) {
+          <span class="rejected-label"> 已不接受 </span>
+          }
+        </div>
+
+        <p>捐助者： {{ donation.donor_name }}</p>
+
+        <p>AI 判定： {{ getAiDecisionText( donation.ai_decision ) }}</p>
+
+        <p>物資狀態要求： {{ getAcceptedConditionsText( donation ) || '無法判斷' }}</p>
+
+        <p>最後決定： {{ donation.human_decision === 'accepted' ? '接受' : '不接受' }}</p>
+
+        @if ( donation.status === 'human_rejected' ) {
+        <p class="human-reason">不接受原因： {{ donation.human_reason || '未提供原因' }}</p>
+        }
+
+        <button type="button" (click)="openDonation(donation)">查看詳細資料</button>
+      </article>
+      }
+    </div>
+  </section>
+  } @if (errorMessage) {
+  <p class="error-message" role="alert">{{ errorMessage }}</p>
+  }
+</section>

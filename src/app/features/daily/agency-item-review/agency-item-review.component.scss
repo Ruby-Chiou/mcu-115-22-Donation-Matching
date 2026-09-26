@@ -1,0 +1,410 @@
+:host {
+  --primary: #1565c0;
+  --primary-dark: #0f56a8;
+  --text-main: #0f172a;
+  --text-body: #475569;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --page-bg: #f8fafc;
+  --card-bg: #ffffff;
+
+  display: block;
+  min-height: 100%;
+  background: var(--page-bg);
+}
+
+.review-list-page {
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 40px 0 64px;
+  color: #1f2937;
+}
+
+.review-list-page > header {
+  margin-bottom: 28px;
+}
+
+.review-list-page h1,
+.review-list-page h2,
+.review-list-page h3,
+.review-list-page p {
+  margin-top: 0;
+}
+
+.review-list-page h1 {
+  margin-bottom: 8px;
+  color: #111827;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.review-list-page > header p {
+  margin-bottom: 0;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+/* 分頁按鈕 */
+.review-tabs {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: 32px;
+  border-bottom: 1px solid #d9dee8;
+}
+
+.review-tab {
+  position: relative;
+  padding: 0 18px 13px;
+  border: 0;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.review-tab:first-child {
+  padding-left: 10px;
+}
+
+.review-tab.active {
+  color: var(--primary);
+}
+
+.review-tab.active::after {
+  position: absolute;
+  right: 18px;
+  bottom: -1px;
+  left: 18px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--primary);
+  content: '';
+}
+
+.review-tab:first-child.active::after {
+  right: 0;
+  left: 0;
+}
+
+/* 區塊標題 */
+.review-section h2 {
+  margin-bottom: 14px;
+  color: #1e293b;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.section-description {
+  margin-bottom: 22px;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+/* 卡片列表：桌面版固定最多四欄 */
+.donation-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* 卡片 */
+.donation-card {
+  display: flex;
+  min-width: 0;
+  min-height: 220px;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.donation-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 12px 28px rgba(30, 64, 175, 0.12);
+  transform: translateY(-2px);
+}
+
+.donation-card:focus-within {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
+}
+
+.donation-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  margin-bottom: 18px;
+}
+
+.donation-card h3 {
+  min-width: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  color: var(--text-main);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donation-card p {
+  margin-bottom: 10px;
+  color: var(--text-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+/* 讓按鈕固定在卡片下方 */
+.donation-card button {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-top: auto;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* AI / 人工審核原因 */
+.donation-card .ai-reason,
+.donation-card .human-reason {
+  display: -webkit-box;
+  margin-top: 14px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: var(--text-body);
+  font-size: 15px;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* 狀態標籤 */
+.pending-label,
+.approved-label,
+.rejected-label {
+  flex: 0 0 auto;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pending-label {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.approved-label {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.rejected-label {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.completed-card {
+  border-color: #dbeafe;
+}
+
+/* 分隔線 */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 44px 0 28px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.section-divider::before,
+.section-divider::after {
+  flex: 1;
+  border-top: 1px dashed #cbd5e1;
+  content: '';
+}
+
+/* 空資料 */
+.empty-message {
+  margin: 0;
+  padding: 36px 20px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  color: var(--text-muted);
+  background: var(--card-bg);
+  font-size: 16px;
+  text-align: center;
+}
+
+/* 錯誤訊息 */
+.error-message,
+.error {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #991b1b;
+  background: #fef2f2;
+  font-size: 16px;
+}
+
+.loading-container {
+  min-height: 320px;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  color: #666;
+  text-align: center;
+}
+
+.loading-container p {
+  margin: 18px 0 0;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.loading-spinner {
+  width: 54px;
+  height: 54px;
+
+  border: 5px solid #e8f1f8;
+  border-top-color: #1769aa;
+  border-right-color: #1769aa;
+  border-radius: 50%;
+
+  animation: donor-loading-spin 0.85s linear infinite;
+}
+
+@keyframes donor-loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 中大型螢幕：三欄 */
+@media (max-width: 1100px) {
+  .donation-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* 平板：兩欄 */
+@media (max-width: 800px) {
+  .review-list-page {
+    width: min(100% - 28px, 680px);
+    padding: 32px 0 48px;
+  }
+
+  .donation-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 手機：一欄 */
+@media (max-width: 560px) {
+  .review-list-page {
+    width: calc(100% - 20px);
+    padding: 24px 0 40px;
+  }
+
+  .review-list-page h1 {
+    font-size: 26px;
+  }
+
+  .review-list-page > header p {
+    font-size: 15px;
+  }
+
+  .review-tabs {
+    margin-bottom: 26px;
+  }
+
+  .review-tab {
+    flex: 1;
+    padding: 0 8px 12px;
+    font-size: 15px;
+  }
+
+  .review-tab:first-child {
+    padding-left: 8px;
+  }
+
+  .review-tab.active::after {
+    right: 8px;
+    left: 8px;
+  }
+
+  .review-section h2 {
+    font-size: 20px;
+  }
+
+  .donation-list {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .donation-card {
+    min-height: 270px;
+    padding: 20px;
+  }
+
+  .donation-card-header {
+    gap: 10px;
+  }
+
+  .donation-card h3 {
+    font-size: 20px;
+    white-space: normal;
+  }
+
+  .donation-card p {
+    font-size: 16px;
+  }
+
+  .donation-card button {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .section-divider {
+    gap: 10px;
+    margin: 36px 0 24px;
+    font-size: 13px;
+  }
+}
