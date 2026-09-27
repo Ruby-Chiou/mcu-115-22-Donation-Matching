@@ -23,6 +23,8 @@ export interface RecipientDonationReview {
   human_checked_at: string | null;
   created_at: string;
   demand_material?: string;
+  demand_category?: string;
+  demand_priority?: string;
 }
 
 export interface DonationFile {

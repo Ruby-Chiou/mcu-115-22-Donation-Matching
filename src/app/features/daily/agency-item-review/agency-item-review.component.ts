@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { DonationService } from '../../../core/services/agency-daily-demand/daily-donation.service';
@@ -9,7 +10,7 @@ import { RecipientDonationReview } from '../../../models/agency/item-review';
 @Component({
   selector: 'app-agency-item-review',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './agency-item-review.component.html',
   styleUrl: './agency-item-review.component.scss',
 })
@@ -19,7 +20,39 @@ export class AgencyItemReviewComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
-  selectedFilter: 'all' | 'accepted' | 'rejected' = 'all';
+  isFilterExpanded = false;
+  searchTerm = '';
+
+  readonly aiDecisionOptions = [
+    { value: 'accepted', label: '通過' },
+    { value: 'rejected', label: '不通過' },
+  ] as const;
+
+  readonly categoryOptions = [
+    '食品與飲用水',
+    '衣物與保暖用品',
+    '醫療與照護用品',
+    '清潔與衛生用品',
+    '嬰幼兒用品',
+    '長者與身心障礙用品',
+    '女性生理用品',
+    '寵物與動物用品',
+    '防災與照明用品',
+    '通訊與求救用品',
+    '生活與炊事用品',
+    '居住安置與修繕用品',
+    '其他',
+  ];
+
+  readonly priorityOptions = ['普通', '緊急', '非常緊急'];
+  readonly receiveMethodOptions: Array<'寄送' | '面交'> = ['寄送', '面交'];
+
+  selectedFilters = {
+    aiDecision: [] as string[],
+    category: [] as string[],
+    priority: [] as string[],
+    receiveMethod: [] as string[],
+  };
 
   /**
    * key：donation.id
@@ -34,7 +67,6 @@ export class AgencyItemReviewComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.selectedFilter = 'all';
     await this.loadDonations();
   }
 
@@ -48,8 +80,6 @@ export class AgencyItemReviewComponent implements OnInit {
       this.donations = [...donations];
 
       await this.loadDonationConditions();
-
-      this.selectedFilter = 'all';
     } catch (error) {
       console.error('讀取物資審核列表失敗：', error);
 
@@ -133,12 +163,69 @@ export class AgencyItemReviewComponent implements OnInit {
     return this.donations.filter((donation) => donation.status === 'human_approved' || donation.status === 'human_rejected');
   }
 
-  filterByAiDecision(donations: RecipientDonationReview[]): RecipientDonationReview[] {
-    if (this.selectedFilter === 'all') {
-      return donations;
-    }
+  get filteredPendingDonations(): RecipientDonationReview[] {
+    return this.filterDonations(this.pendingDonations);
+  }
 
-    return donations.filter((donation) => donation.ai_decision === this.selectedFilter);
+  get filteredCompletedDonations(): RecipientDonationReview[] {
+    return this.filterDonations(this.completedDonations);
+  }
+
+  toggleFilter(key: 'aiDecision' | 'category' | 'priority' | 'receiveMethod', value: string): void {
+    const selectedValues = this.selectedFilters[key];
+    const selectedIndex = selectedValues.indexOf(value);
+
+    if (selectedIndex >= 0) {
+      selectedValues.splice(selectedIndex, 1);
+    } else {
+      selectedValues.push(value);
+    }
+  }
+
+  resetFilters(): void {
+    this.selectedFilters = {
+      aiDecision: [],
+      category: [],
+      priority: [],
+      receiveMethod: [],
+    };
+  }
+
+  private filterDonations(donations: RecipientDonationReview[]): RecipientDonationReview[] {
+    const searchTerm = this.searchTerm.trim().toLocaleLowerCase();
+
+    return donations.filter((donation) => {
+      if (searchTerm && !(donation.demand_material ?? '').toLocaleLowerCase().includes(searchTerm)) {
+        return false;
+      }
+
+      if (
+        this.selectedFilters.aiDecision.length > 0 &&
+        (!donation.ai_decision || !this.selectedFilters.aiDecision.includes(donation.ai_decision))
+      ) {
+        return false;
+      }
+
+      if (
+        this.selectedFilters.category.length > 0 &&
+        (!donation.demand_category || !this.selectedFilters.category.includes(donation.demand_category))
+      ) {
+        return false;
+      }
+
+      if (
+        this.selectedFilters.priority.length > 0 &&
+        (!donation.demand_priority || !this.selectedFilters.priority.includes(donation.demand_priority))
+      ) {
+        return false;
+      }
+
+      if (this.selectedFilters.receiveMethod.length > 0 && !this.selectedFilters.receiveMethod.includes(donation.donation_method)) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   getAiDecisionText(decision: string | null): string {

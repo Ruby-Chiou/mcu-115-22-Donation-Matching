@@ -165,6 +165,27 @@ export class DonationService {
   }
 
   /**
+   * 取得審核列表需要顯示與篩選的需求欄位。
+   */
+  private async getDemandReviewMetadata(demandId: number): Promise<{ item: string; category: string; priority: string }> {
+    const { data, error } = await this.supabase
+      .from(this.supplyItemTableName)
+      .select('item, category, priority')
+      .eq('id', demandId)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return {
+      item: data?.item ?? '',
+      category: data?.category ?? '',
+      priority: data?.priority ?? '',
+    };
+  }
+
+  /**
    * 取得受助者需求條件。
    */
   async getDemandConditions(demandId: number): Promise<string[]> {
@@ -218,11 +239,13 @@ export class DonationService {
 
     return Promise.all(
       donationList.map(async (donation) => {
-        const demandMaterial = await this.getDemandItem(donation.demand_id);
+        const demandMetadata = await this.getDemandReviewMetadata(donation.demand_id);
 
         return {
           ...donation,
-          demand_material: demandMaterial,
+          demand_material: demandMetadata.item,
+          demand_category: demandMetadata.category,
+          demand_priority: demandMetadata.priority,
         } as RecipientDonationReview;
       })
     );

@@ -110,7 +110,7 @@ export class AgencyItemReviewDetailComponent implements OnInit {
   getStatusText(donation: RecipientDonationReview): string {
     switch (donation.status) {
       case 'pending_human_review':
-        return '待最後決定';
+        return '待決定';
 
       case 'human_approved':
         return '已接受';
