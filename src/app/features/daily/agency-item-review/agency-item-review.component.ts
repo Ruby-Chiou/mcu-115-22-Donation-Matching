@@ -159,7 +159,7 @@ export class AgencyItemReviewComponent implements OnInit {
     }
 
     if (donation.status === 'human_rejected') {
-      return '已不接受';
+      return '不接受';
     }
 
     return '尚未決定';

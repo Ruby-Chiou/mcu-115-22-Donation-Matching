@@ -4,9 +4,12 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environment/environment';
+
 import { DonationFile, RecipientDonationReview } from '../../../models/agency/item-review';
 
 type DonationFileType = 'material_image' | 'material_video';
+
+type HumanDecision = 'accepted' | 'rejected';
 
 interface DonationFileUpload {
   file: File;
@@ -28,6 +31,8 @@ export interface AiReviewResult {
 })
 export class DonationService {
   private readonly tableName = 'donor_daily_donations';
+
+  private readonly supplyItemTableName = 'agency_daily_supply_items';
 
   private readonly fileTableName = 'donation_files';
 
@@ -92,7 +97,7 @@ export class DonationService {
       })),
     ];
 
-    for (let index = 0; index < files.length; index++) {
+    for (let index = 0; index < files.length; index += 1) {
       const currentFile = files[index];
 
       await this.uploadDonationFile(donation.id, currentFile.file, currentFile.fileType, index);
@@ -146,42 +151,24 @@ export class DonationService {
     return extension ? `${baseName}.${extension}` : baseName;
   }
 
-  //人工審核
-  async getRecipientDonationReviews(): Promise<RecipientDonationReview[]> {
-    const { data, error } = await this.supabase
-      .from(this.tableName)
-      .select(
-        `
-      id,
-      demand_id,
-      donor_name,
-      actual_material,
-      quantity,
-      note,
-      donation_method,
-      status,
-      ai_decision,
-      ai_condition,
-      ai_reason,
-      ai_checked_at,
-      human_decision,
-      human_reason,
-      human_checked_at,
-      created_at
-    `
-      )
-      .order('created_at', {
-        ascending: false,
-      });
+  /**
+   * 取得受助者需求物資名稱。
+   */
+  async getDemandItem(demandId: number): Promise<string> {
+    const { data, error } = await this.supabase.from(this.supplyItemTableName).select('item').eq('id', demandId).single();
 
     if (error) {
       throw error;
     }
-    return data ?? [];
+
+    return data?.item ?? '';
   }
 
+  /**
+   * 取得受助者需求條件。
+   */
   async getDemandConditions(demandId: number): Promise<string[]> {
-    const { data, error } = await this.supabase.from('agency_daily_supply_items').select('conditions').eq('id', demandId).single();
+    const { data, error } = await this.supabase.from(this.supplyItemTableName).select('conditions').eq('id', demandId).single();
 
     if (error) {
       throw error;
@@ -190,9 +177,15 @@ export class DonationService {
     return data?.conditions ?? [];
   }
 
-  async getRecipientDonationReviewById(donationId: string): Promise<RecipientDonationReview> {
-    const { data, error } = await this.supabase
-      .from('donor_daily_donations')
+  /**
+   * 取得審核列表。
+   *
+   * demand_material 是受助者原本需要的物資。
+   * actual_material 是捐助者實際填寫的物資。
+   */
+  async getRecipientDonationReviews(): Promise<RecipientDonationReview[]> {
+    const { data: donations, error: donationError } = await this.supabase
+      .from(this.tableName)
       .select(
         `
         id,
@@ -213,16 +206,77 @@ export class DonationService {
         created_at
       `
       )
+      .order('created_at', {
+        ascending: false,
+      });
+
+    if (donationError) {
+      throw donationError;
+    }
+
+    const donationList = donations ?? [];
+
+    return Promise.all(
+      donationList.map(async (donation) => {
+        const demandMaterial = await this.getDemandItem(donation.demand_id);
+
+        return {
+          ...donation,
+          demand_material: demandMaterial,
+        } as RecipientDonationReview;
+      })
+    );
+  }
+
+  /**
+   * 取得單筆物資審核詳細資料。
+   */
+  async getRecipientDonationReviewById(donationId: string): Promise<RecipientDonationReview> {
+    const { data: donation, error: donationError } = await this.supabase
+      .from(this.tableName)
+      .select(
+        `
+        id,
+        demand_id,
+        donor_name,
+        phone,
+        actual_material,
+        quantity,
+        note,
+        donation_method,
+        status,
+        ai_decision,
+        ai_condition,
+        ai_reason,
+        ai_checked_at,
+        human_decision,
+        human_reason,
+        human_checked_at,
+        created_at
+      `
+      )
       .eq('id', donationId)
       .single();
 
-    if (error) {
-      throw error;
+    if (donationError) {
+      throw donationError;
     }
 
-    return data as RecipientDonationReview;
+    if (!donation) {
+      throw new Error('找不到物資審核資料');
+    }
+
+    const demandMaterial = await this.getDemandItem(donation.demand_id);
+
+    return {
+      ...donation,
+      demand_material: demandMaterial,
+    } as RecipientDonationReview;
   }
 
+  /**
+   * 取得需求物資的圖片和影片。
+   */
   async getDonationFiles(donationId: string): Promise<DonationFile[]> {
     const { data, error } = await this.supabase
       .from(this.fileTableName)
@@ -248,8 +302,6 @@ export class DonationService {
       throw error;
     }
 
-    const files = data ?? [];
-
     return Promise.all(
       (data ?? []).map(async (file) => {
         const { data: signedData, error: signedError } = await this.supabase.storage
@@ -263,8 +315,33 @@ export class DonationService {
         return {
           ...file,
           public_url: signedData.signedUrl,
-        };
+        } as DonationFile;
       })
     );
+  }
+
+  /**
+   * 寫入人工審核結果。
+   */
+  async updateHumanReviewDecision(donationId: string, humanDecision: HumanDecision, humanReason: string | null): Promise<void> {
+    const isAccepted = humanDecision === 'accepted';
+
+    const updateData = {
+      status: isAccepted ? 'human_approved' : 'human_rejected',
+
+      human_decision: humanDecision,
+
+      human_reason: isAccepted ? null : humanReason,
+
+      human_checked_at: new Date().toISOString(),
+    };
+
+    const { error } = await this.supabase.from(this.tableName).update(updateData).eq('id', donationId).eq('status', 'pending_human_review');
+
+    if (error) {
+      console.error('更新人工審核結果失敗：', error);
+
+      throw error;
+    }
   }
 }

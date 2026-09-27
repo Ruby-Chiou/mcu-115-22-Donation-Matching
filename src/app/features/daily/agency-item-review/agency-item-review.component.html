@@ -34,7 +34,7 @@
       @for ( donation of filterByAiDecision( pendingDonations ); track donation.id ) {
       <article class="donation-card">
         <div class="donation-card-header">
-          <h3>{{ donation.actual_material }}</h3>
+          <h3>{{ donation.demand_material}}</h3>
 
           <span class="pending-label"> 待最後決定 </span>
         </div>
@@ -66,12 +66,12 @@
       @for ( donation of filterByAiDecision( completedDonations ); track donation.id ) {
       <article class="donation-card completed-card">
         <div class="donation-card-header">
-          <h3>{{ donation.actual_material }}</h3>
+        <h3>{{ donation.demand_material }}</h3>
 
           @if ( donation.status === 'human_approved' ) {
           <span class="approved-label"> 已接受 </span>
           } @if ( donation.status === 'human_rejected' ) {
-          <span class="rejected-label"> 已不接受 </span>
+          <span class="rejected-label"> 不接受 </span>
           }
         </div>
 
@@ -82,10 +82,6 @@
         <p>物資狀態要求： {{ getAcceptedConditionsText( donation ) || '無法判斷' }}</p>
 
         <p>最後決定： {{ donation.human_decision === 'accepted' ? '接受' : '不接受' }}</p>
-
-        @if ( donation.status === 'human_rejected' ) {
-        <p class="human-reason">不接受原因： {{ donation.human_reason || '未提供原因' }}</p>
-        }
 
         <button type="button" (click)="openDonation(donation)">查看詳細資料</button>
       </article>

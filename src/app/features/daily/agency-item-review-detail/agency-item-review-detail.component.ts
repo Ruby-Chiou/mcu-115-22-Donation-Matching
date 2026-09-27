@@ -1,6 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { DonationService } from '../../../core/services/agency-daily-demand/daily-donation.service';
 
@@ -9,7 +13,7 @@ import { DonationFile, RecipientDonationReview } from '../../../models/agency/it
 @Component({
   selector: 'app-agency-item-review-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './agency-item-review-detail.component.html',
   styleUrl: './agency-item-review-detail.component.scss',
 })
@@ -23,6 +27,16 @@ export class AgencyItemReviewDetailComponent implements OnInit {
   conditions: string[] = [];
 
   selectedImage: DonationFile | null = null;
+
+  selectedVideo: DonationFile | null = null;
+
+  isRejectModalOpen = false;
+  isSubmittingDecision = false;
+
+  humanReasonControl = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.minLength(2)],
+  });
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -94,19 +108,22 @@ export class AgencyItemReviewDetailComponent implements OnInit {
   }
 
   getStatusText(donation: RecipientDonationReview): string {
-    if (donation.status === 'pending_human_review') {
-      return '待最後決定';
-    }
+    switch (donation.status) {
+      case 'pending_human_review':
+        return '待最後決定';
 
-    if (donation.status === 'human_approved') {
-      return '已接受';
-    }
+      case 'human_approved':
+        return '已接受';
 
-    if (donation.status === 'human_rejected') {
-      return '已不接受';
-    }
+      case 'human_rejected':
+        return '不接受';
 
-    return '處理中';
+      case 'pending_ai_review':
+        return '等待 AI 審核';
+
+      default:
+        return '處理中';
+    }
   }
 
   get imageFiles(): DonationFile[] {
@@ -118,13 +135,140 @@ export class AgencyItemReviewDetailComponent implements OnInit {
   }
 
   openImage(file: DonationFile): void {
-    console.log('點擊圖片：', file);
+    if (!file.public_url) {
+      return;
+    }
 
+    this.selectedVideo = null;
     this.selectedImage = file;
   }
 
   closeImage(): void {
     this.selectedImage = null;
+  }
+
+  openVideo(file: DonationFile): void {
+    if (!file.public_url) {
+      return;
+    }
+
+    this.selectedImage = null;
+    this.selectedVideo = file;
+  }
+
+  closeVideo(): void {
+    this.selectedVideo = null;
+  }
+
+  openRejectModal(): void {
+    if (this.isSubmittingDecision || this.donation?.status !== 'pending_human_review') {
+      return;
+    }
+
+    this.humanReasonControl.reset('');
+    this.isRejectModalOpen = true;
+  }
+
+  closeRejectModal(): void {
+    if (this.isSubmittingDecision) {
+      return;
+    }
+
+    this.isRejectModalOpen = false;
+    this.humanReasonControl.reset('');
+  }
+
+  async acceptDonation(): Promise<void> {
+    if (!this.donation || this.isSubmittingDecision || this.donation.status !== 'pending_human_review') {
+      return;
+    }
+
+    const donationId = this.getDonationId();
+
+    if (!donationId) {
+      this.errorMessage = '找不到物資資料 ID。';
+      return;
+    }
+
+    this.isSubmittingDecision = true;
+    this.errorMessage = '';
+
+    try {
+      await this.donationService.updateHumanReviewDecision(donationId, 'accepted', null);
+
+      this.donation = {
+        ...this.donation,
+        status: 'human_approved',
+        human_decision: 'accepted',
+        human_reason: null,
+        human_checked_at: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error('接受物資失敗：', error);
+
+      this.errorMessage = '接受物資失敗，請稍後再試。';
+    } finally {
+      this.isSubmittingDecision = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async rejectDonation(): Promise<void> {
+    if (!this.donation || this.isSubmittingDecision || this.donation.status !== 'pending_human_review') {
+      return;
+    }
+
+    this.humanReasonControl.markAsTouched();
+
+    if (this.humanReasonControl.invalid) {
+      return;
+    }
+
+    const humanReason = this.humanReasonControl.value.trim();
+
+    if (humanReason.length < 2) {
+      this.humanReasonControl.setErrors({
+        minlength: true,
+      });
+
+      return;
+    }
+
+    const donationId = this.getDonationId();
+
+    if (!donationId) {
+      this.errorMessage = '找不到物資資料 ID。';
+      return;
+    }
+
+    this.isSubmittingDecision = true;
+    this.errorMessage = '';
+
+    try {
+      await this.donationService.updateHumanReviewDecision(donationId, 'rejected', humanReason);
+
+      this.donation = {
+        ...this.donation,
+        status: 'human_rejected',
+        human_decision: 'rejected',
+        human_reason: humanReason,
+        human_checked_at: new Date().toISOString(),
+      };
+
+      this.isRejectModalOpen = false;
+      this.humanReasonControl.reset('');
+    } catch (error) {
+      console.error('不接受物資失敗：', error);
+
+      this.errorMessage = '不接受物資失敗，請稍後再試。';
+    } finally {
+      this.isSubmittingDecision = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private getDonationId(): string {
+    return this.donation?.id || this.route.snapshot.paramMap.get('id') || '';
   }
 
   goBack(): void {

@@ -13,7 +13,7 @@
   <article class="detail-card">
     <header class="detail-header">
       <div>
-        <h1>{{ donation.actual_material }}</h1>
+        <h1>{{ donation.demand_material }}</h1>
       </div>
 
       <span
@@ -40,7 +40,9 @@
 
       <p>捐助者： {{ donation.donor_name }}</p>
 
-      <p>實際捐助物資： {{ donation.actual_material }}</p>
+      <p>捐助者手機： {{ donation.phone }}</p>
+      
+      <p>捐助者實際提供： {{ donation.actual_material }}</p>
 
       <p>物資狀態要求： {{ getAcceptedConditionsText() || '無法判斷' }}</p>
 
@@ -71,34 +73,21 @@
     <section class="media-section">
       <h2>物資照片與影片</h2>
 
-      @if (imageFiles.length > 0) {
-      <div class="media-group">
+      <div class="media-button-list">
+        @for ( file of imageFiles; track file.id ) {
+        <button type="button" class="image-preview-button" [disabled]="!file.public_url" (click)="openImage(file)">
+          <i class="fa-solid fa-image" aria-hidden="true"></i>
 
-        <div class="image-button-list">
-          @for ( file of imageFiles; track file.id ) {
-          <button type="button" class="image-preview-button" (click)="openImage(file)">
-            <i class="fa-solid fa-image"></i>
+          <span class="image-file-name"> {{ file.original_filename || '物資圖片' }} </span>
+        </button>
+        } @for ( file of videoFiles; track file.id ) {
+        <button type="button" class="image-preview-button" [disabled]="!file.public_url" (click)="openVideo(file)">
+          <i class="fa-solid fa-video" aria-hidden="true"></i>
 
-            <span class="image-file-name"> {{ file.original_filename || '物資圖片' }} </span>
-          </button>
-          }
-        </div>
+          <span class="image-file-name"> {{ file.original_filename || '物資影片' }} </span>
+        </button>
+        }
       </div>
-      } @if (videoFiles.length > 0) {
-      <div class="media-group">
-        <h3>物資影片</h3>
-
-        <div class="video-list">
-          @for ( file of videoFiles; track file.id ) { @if (file.public_url) {
-          <video class="donation-video" controls preload="metadata">
-            <source [src]="file.public_url" [type]="file.mime_type" />
-
-            您的瀏覽器不支援影片播放。
-          </video>
-          } }
-        </div>
-      </div>
-      }
     </section>
     } @else {
     <section class="media-section empty-media">
@@ -109,9 +98,27 @@
     } @if ( donation.status === 'pending_human_review' ) {
     <section class="decision-section">
       <div class="decision-buttons">
-        <button type="button" class="accept-button">接受物資</button>
+        <button
+          type="button"
+          class="accept-button"
+          [disabled]="
+                isSubmittingDecision
+              "
+          (click)="acceptDonation()"
+        >
+          @if (isSubmittingDecision) { 處理中... } @else { 接受物資 }
+        </button>
 
-        <button type="button" class="reject-button">不接受物資</button>
+        <button
+          type="button"
+          class="reject-button"
+          [disabled]="
+                isSubmittingDecision
+              "
+          (click)="openRejectModal()"
+        >
+          不接受物資
+        </button>
       </div>
     </section>
     } @if ( donation.status === 'human_rejected' && donation.human_reason ) {
@@ -125,6 +132,7 @@
   }
 </section>
 
+<!-- 圖片預覽視窗 -->
 @if (selectedImage) {
 <div class="image-modal-backdrop" role="presentation" (click)="closeImage()">
   <section class="image-modal" role="dialog" aria-modal="true" aria-labelledby="image-modal-title" (click)="$event.stopPropagation()">
@@ -151,6 +159,89 @@
 
     <footer class="image-modal-footer">
       <button type="button" class="modal-close-text-button" (click)="closeImage()">關閉</button>
+    </footer>
+  </section>
+</div>
+}
+
+<!-- 影片預覽視窗 -->
+@if (selectedVideo) {
+<div class="image-modal-backdrop" role="presentation" (click)="closeVideo()">
+  <section class="image-modal" role="dialog" aria-modal="true" aria-labelledby="video-modal-title" (click)="$event.stopPropagation()">
+    <header class="image-modal-header">
+      <h2 id="video-modal-title">{{ selectedVideo.original_filename || '物資影片' }}</h2>
+
+      <button type="button" class="modal-close-button" aria-label="關閉影片" (click)="closeVideo()">×</button>
+    </header>
+
+    <div class="image-modal-content">
+      @if (selectedVideo.public_url) {
+      <video class="preview-image" controls autoplay preload="metadata">
+        <source [src]="selectedVideo.public_url" [type]="selectedVideo.mime_type" />
+
+        您的瀏覽器不支援影片播放。
+      </video>
+      } @else {
+      <p class="image-url-error">找不到影片網址。</p>
+      }
+    </div>
+
+    <footer class="image-modal-footer">
+      <button type="button" class="modal-close-text-button" (click)="closeVideo()">關閉</button>
+    </footer>
+  </section>
+</div>
+}
+
+<!-- 不接受原因視窗 -->
+@if (isRejectModalOpen) {
+<div class="reject-modal-backdrop" role="presentation" (click)="closeRejectModal()">
+  <section class="reject-modal" role="dialog" aria-modal="true" aria-labelledby="reject-modal-title" (click)="$event.stopPropagation()">
+    <header class="reject-modal-header">
+      <h2 id="reject-modal-title">不接受原因</h2>
+
+      <button type="button" class="modal-close-button" aria-label="關閉視窗" (click)="closeRejectModal()">×</button>
+    </header>
+
+    <div class="reject-modal-content">
+      <textarea
+        id="human-reason"
+        class="reason-textarea"
+        rows="5"
+        placeholder="請說明不接受此物資的原因"
+        [formControl]="humanReasonControl"
+      ></textarea>
+
+      @if ( humanReasonControl.invalid && humanReasonControl.touched ) {
+      <p class="reason-error" role="alert">
+        @if ( humanReasonControl.hasError( 'required' ) ) { 請輸入不接受原因。 } @else if ( humanReasonControl.hasError( 'minlength' ) ) {
+        原因至少需要 2 個字。 }
+      </p>
+      }
+    </div>
+
+    <footer class="reject-modal-footer">
+      <button
+        type="button"
+        class="cancel-button"
+        [disabled]="
+            isSubmittingDecision
+          "
+        (click)="closeRejectModal()"
+      >
+        取消
+      </button>
+
+      <button
+        type="button"
+        class="confirm-reject-button"
+        [disabled]="
+            isSubmittingDecision
+          "
+        (click)="rejectDonation()"
+      >
+        @if (isSubmittingDecision) { 送出中... } @else { 確認不接受 }
+      </button>
     </footer>
   </section>
 </div>
