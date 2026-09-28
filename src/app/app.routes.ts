@@ -220,12 +220,11 @@ export const routes: Routes = [
 },
 
 {
-  path: 'news-section',
+  path: 'platform-guide',
   loadComponent: () =>
-    import('./features/about-us/news-section/news-section.component')
-      .then(m => m.NewsSectionComponent),
+    import('./features/about-us/platform-guide/platform-guide.component')
+      .then(m => m.PlatformGuideComponent),
 },
-
 {
   path: 'contact-us',
   loadComponent: () =>
