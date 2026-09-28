@@ -97,7 +97,8 @@ h1 {
   gap: 16px;
 }
 /* 表格 */
-th,td {
+th,
+td {
   border: 1px solid #ddd;
   padding: 16px 6px;
   text-align: center;
@@ -157,7 +158,6 @@ th {
 }
 
 .operation-column {
-  width: 370px;
   padding: 16px 6px;
 }
 
@@ -165,17 +165,23 @@ th {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 15px;
   flex-wrap: nowrap;
 
   select {
     width: 95px;
     height: 36px;
-    padding: 4px 4px;
+    padding: 6px 0;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 14px;
     cursor: pointer;
+    text-align: center;
+    text-align-last: center;
+
+    option {
+      text-align: center;
+    }
   }
 
   label {
@@ -330,18 +336,18 @@ tbody tr:last-child td:last-child {
   }
 }
 
-
 /* 志工需求列表*/
 .volunteer-section {
-  margin-top: 70px;
-  padding: 40px 30px 80px;
-  border-top: 3px solid #e5e7eb;
+  margin-top: 5px;
+  padding: 20px 30px 80px;
   box-sizing: border-box;
 }
+
 .volunteer-section app-pagination {
   display: block;
   margin-top: 25px;
 }
+
 .volunteer-header {
   display: flex;
   justify-content: space-between;
@@ -355,6 +361,7 @@ tbody tr:last-child td:last-child {
 
 .volunteer-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   margin-top: 20px;
@@ -362,6 +369,7 @@ tbody tr:last-child td:last-child {
   border-radius: 15px;
   overflow: hidden;
 }
+
 .volunteer-table th,
 .volunteer-table td {
   padding: 14px 10px;

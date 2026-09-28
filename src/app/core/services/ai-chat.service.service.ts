@@ -13,19 +13,18 @@ export interface AiChatResponse {
   reply?: string;
 }
 
-
 @Injectable({
   providedIn: 'root',
 })
 export class AiChatService {
-  private readonly http=inject(HttpClient);
-  private readonly apiUrl = 'https://localhost:7020/api/assistant/chat';
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = 'https://mcu-115-22-donation-matching-backend.onrender.com/api/assistant/chat';
 
- chat(message: string,role: string,history: ChatHistoryItem[]): Observable<AiChatResponse> {
+  chat(message: string, role: string, history: ChatHistoryItem[]): Observable<AiChatResponse> {
     return this.http.post<AiChatResponse>(this.apiUrl, {
       message,
       role,
-      history
+      history,
     });
   }
 }

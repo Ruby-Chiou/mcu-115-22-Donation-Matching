@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
@@ -7,6 +8,13 @@ import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 import { DisasterDemand, ConditionStatus } from '../../../../models/agency/disaster-demand';
+import { firstValueFrom } from 'rxjs';
+
+interface NominatimSearchResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
 
 @Component({
   selector: 'app-supply-form',
@@ -98,6 +106,8 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     priority: '普通',
     status: '隱藏',
     address: '',
+    latitude: undefined,
+    longitude: undefined,
     phone: '',
     note: '',
     brand: '',
@@ -123,72 +133,130 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     private disasterDemandService: DisasterDemandService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {}
 
-  ngOnInit() {
-    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
+
+    const id = Number(rawId);
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
+
     this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
 
-    // 編輯模式
-    if (serialNo) {
-      this.isEditMode = true;
+    /*
+     * 新增頁沒有 id。
+     * 只有進入 /agency/supply-edit/:id 時，
+     * 才進行資料庫查詢與編輯模式初始化。
+     */
+    if (rawId === null) {
+      this.isEditMode = false;
 
-      const data = this.disasterDemandService.getDemands().find((item) => item.serialNo === serialNo);
+      this.listNumber = undefined;
 
-      if (data) {
-        // 記錄編輯前的原始狀態
-        this.originalStatus = data.status ?? '隱藏';
-        this.originalOffShelfReason = data.offShelfReason;
+      console.log('[SupplyFormComponent] 新增模式');
 
-        this.demand = {
-          ...data,
-          status: data.status ?? '上架',
-          remaining: data.remaining ?? null,
-          image: [...(data.image ?? [])],
-          imageFileNames: [...(data.imageFileNames ?? [])],
+      return;
+    }
 
-          contactTimeDifferent: data.contactTimeDifferent ?? false,
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[SupplyFormComponent] 編輯網址的資料庫 id 不正確：', rawId);
 
-          contactTimeMorning: data.contactTimeMorning ?? false,
-          contactTimeAfternoon: data.contactTimeAfternoon ?? false,
-          contactTimeEvening: data.contactTimeEvening ?? false,
+      this.router.navigate(['/agency/disaster']);
 
-          weekdayMorning: data.weekdayMorning ?? false,
-          weekdayAfternoon: data.weekdayAfternoon ?? false,
-          weekdayEvening: data.weekdayEvening ?? false,
+      return;
+    }
 
-          weekendMorning: data.weekendMorning ?? false,
-          weekendAfternoon: data.weekendAfternoon ?? false,
-          weekendEvening: data.weekendEvening ?? false,
+    this.isEditMode = true;
 
-          conditions: data.conditions ?? {
+    console.log('[SupplyFormComponent] 編輯模式，資料庫 id：', id);
+
+    try {
+      const data = await this.disasterDemandService.getDemandById(id);
+
+      if (!data) {
+        console.error('[SupplyFormComponent] 找不到要編輯的災害物資，id：', id);
+
+        this.router.navigate(['/agency/disaster']);
+
+        return;
+      }
+
+      this.listNumber = data.serialNo;
+
+      this.originalStatus = data.status ?? '隱藏';
+
+      this.originalOffShelfReason = data.offShelfReason;
+
+      this.demand = {
+        ...data,
+
+        status: data.status ?? '隱藏',
+
+        remaining: data.remaining ?? null,
+
+        image: [...(data.image ?? [])],
+
+        imageFileNames: [...(data.imageFileNames ?? [])],
+
+        conditions: {
+          ...(data.conditions ?? {
             全新: '',
             二手: '',
             有擦痕: '',
             過期: '',
             毀損: '',
-          },
+          }),
+        },
 
-          customConditions: data.customConditions?.length ? data.customConditions : [''],
-        };
+        customConditions: data.customConditions?.length ? [...data.customConditions] : [''],
 
-        // 載入原本已儲存的圖片
-        this.imageFiles = [];
+        contactTimeDifferent: data.contactTimeDifferent ?? false,
 
-        Promise.all(
-          (data.image ?? []).map((image, index) => {
-            const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+        contactTimeMorning: data.contactTimeMorning ?? false,
 
-            return this.base64ToFile(image, fileName);
-          })
-        ).then((files) => {
-          this.imageFiles = files;
-          this.cdr.detectChanges();
-        });
-      }
+        contactTimeAfternoon: data.contactTimeAfternoon ?? false,
+
+        contactTimeEvening: data.contactTimeEvening ?? false,
+
+        weekdayMorning: data.weekdayMorning ?? false,
+
+        weekdayAfternoon: data.weekdayAfternoon ?? false,
+
+        weekdayEvening: data.weekdayEvening ?? false,
+
+        weekendMorning: data.weekendMorning ?? false,
+
+        weekendAfternoon: data.weekendAfternoon ?? false,
+
+        weekendEvening: data.weekendEvening ?? false,
+      };
+
+      this.imageFiles = [];
+
+      const files = await Promise.all(
+        (data.image ?? []).map(async (image, index) => {
+          const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
+
+          try {
+            return await this.base64ToFile(image, fileName);
+          } catch (error) {
+            console.warn('[SupplyFormComponent] 圖片無法轉 File，略過：', image, error);
+
+            return null;
+          }
+        })
+      );
+
+      this.imageFiles = files.filter((file): file is File => file !== null);
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('[SupplyFormComponent] 載入編輯資料失敗：', error);
+
+      this.router.navigate(['/agency/disaster']);
     }
   }
 
@@ -205,7 +273,9 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     const response = await fetch(base64);
     const blob = await response.blob();
 
-    return new File([blob], fileName, { type: blob.type });
+    return new File([blob], fileName, {
+      type: blob.type,
+    });
   }
 
   // 點擊類別下拉選單以外的地方時關閉
@@ -231,6 +301,30 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     this.demand.contactTimeDifferent = different;
   }
 
+  // 判斷目前需求是否為手動下架
+  isManualOffShelf(): boolean {
+    return this.isEditMode && this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
+  }
+
+  // 點擊公開狀態
+  onStatusClick(event: MouseEvent, newStatus: DisasterDemand['status']): void {
+    // 手動下架的需求不能重新上架
+    if (newStatus === '上架' && this.isManualOffShelf()) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // 強制維持下架
+      this.demand.status = '下架';
+
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    // 其他狀態交給原本的狀態處理
+    this.onStatusSelect(newStatus);
+  }
+
   // 狀態選擇
   onStatusSelect(newStatus: DisasterDemand['status']): void {
     // 新增模式不需要處理原本手動下架的限制
@@ -251,9 +345,14 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     const currentlyManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
 
-    if (newStatus === '上架' && (wasManualOffShelf || currentlyManualOffShelf)) {
-      this.demand.status = '下架';
-      this.showOnShelfWarning = true;
+    // 手動下架的需求固定維持下架
+    if (wasManualOffShelf || currentlyManualOffShelf) {
+      if (newStatus === '上架') {
+        this.demand.status = '下架';
+        this.showOnShelfWarning = true;
+      } else {
+        this.demand.status = '下架';
+      }
 
       return;
     }
@@ -334,10 +433,195 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   closeOnShelfWarning(): void {
     this.showOnShelfWarning = false;
 
-    this.demand.status = '下架';
+    // 手動下架永遠維持下架
+    if (this.isManualOffShelf()) {
+      this.demand.status = '下架';
+      this.demand.offShelfReason = 'manual';
+    }
   }
 
-  save() {
+  // =========================================================
+  // 使用 Nominatim 將地址轉換成經緯度
+  //
+  // 第一階段：
+  // 完整地址
+  //
+  // 第二階段：
+  // 如果完整地址找不到，就改搜尋道路
+  //
+  // 例如：
+  // 台北市中正區重慶南路一段122號
+  // ↓
+  // 重慶南路一段
+  // =========================================================
+  async getCoordinatesFromAddress(address: string): Promise<boolean> {
+    const url = 'https://nominatim.openstreetmap.org/search';
+
+    const originalAddress = address.trim();
+
+    if (!originalAddress) {
+      return false;
+    }
+
+    // =========================================================
+    // 第一階段：搜尋完整地址
+    // =========================================================
+    const params = {
+      // 原本的城市 / 國家寫法保持不變
+      q: `${originalAddress}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      console.log('================================');
+      console.log('第一階段：搜尋完整地址');
+      console.log('搜尋地址：', originalAddress);
+
+      const results = await firstValueFrom(
+        this.http.get<NominatimSearchResult[]>(url, {
+          params,
+        })
+      );
+
+      console.log('Nominatim 完整地址回傳結果：', results);
+
+      if (results && results.length > 0) {
+        const result = results[0];
+
+        const latitude = Number(result.lat);
+        const longitude = Number(result.lon);
+
+        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+          this.demand.latitude = latitude;
+          this.demand.longitude = longitude;
+
+          console.log('完整地址定位成功');
+          console.log('地址：', originalAddress);
+          console.log('緯度：', latitude);
+          console.log('經度：', longitude);
+          console.log('找到的位置：', result.display_name);
+          console.log('================================');
+
+          return true;
+        }
+      }
+
+      console.warn('完整地址找不到，準備搜尋道路。');
+    } catch (error) {
+      console.error('完整地址搜尋失敗，準備搜尋道路：', error);
+    }
+
+    // =========================================================
+    // 第二階段：搜尋道路
+    // =========================================================
+
+    // 臺 → 台
+    let roadAddress = originalAddress.replace(/臺/g, '台');
+
+    // 移除門牌號碼
+    //
+    // 例如：
+    // 台北市中正區重慶南路一段122號
+    // ↓
+    // 台北市中正區重慶南路一段
+    //
+    // 也支援：
+    // 122-1號
+    // 122號之1
+    roadAddress = roadAddress.replace(/\d+(?:-\d+)?號.*$/, '');
+
+    roadAddress = roadAddress.trim();
+
+    // 移除縣市名稱
+    //
+    // 台北市中正區重慶南路一段
+    // ↓
+    // 中正區重慶南路一段
+    //
+    // 宜蘭縣宜蘭市○○路
+    // ↓
+    // 宜蘭市○○路
+    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+    // 移除區／鄉／鎮／市
+    //
+    // 中正區重慶南路一段
+    // ↓
+    // 重慶南路一段
+    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+    roadAddress = roadAddress.trim();
+
+    console.log('第二階段：搜尋道路');
+    console.log('道路名稱：', roadAddress);
+
+    if (!roadAddress) {
+      console.warn('無法從地址取得道路名稱：', originalAddress);
+      console.log('================================');
+
+      return false;
+    }
+
+    const roadParams = {
+      // 原本的城市 / 國家寫法保持不變
+      q: `${roadAddress}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      const roadResults = await firstValueFrom(
+        this.http.get<NominatimSearchResult[]>(url, {
+          params: roadParams,
+        })
+      );
+
+      console.log('Nominatim 道路搜尋回傳結果：', roadResults);
+
+      if (!roadResults || roadResults.length === 0) {
+        console.warn('連道路也找不到：', roadAddress);
+        console.log('================================');
+
+        return false;
+      }
+
+      const roadResult = roadResults[0];
+
+      const latitude = Number(roadResult.lat);
+      const longitude = Number(roadResult.lon);
+
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        console.warn('道路回傳的經緯度無效：', roadResult);
+        console.log('================================');
+
+        return false;
+      }
+
+      // 使用道路座標
+      this.demand.latitude = latitude;
+      this.demand.longitude = longitude;
+
+      console.log('道路定位成功');
+      console.log('原始地址：', originalAddress);
+      console.log('搜尋道路：', roadAddress);
+      console.log('緯度：', latitude);
+      console.log('經度：', longitude);
+      console.log('找到的位置：', roadResult.display_name);
+      console.log('================================');
+
+      return true;
+    } catch (error) {
+      console.error('道路搜尋失敗：', error);
+      console.log('================================');
+
+      return false;
+    }
+  }
+
+  async save(): Promise<void> {
     this.submitted = true;
 
     if (
@@ -391,6 +675,17 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    // =========================================================
+    // 地址 → 經緯度
+    // =========================================================
+    const addressSuccess = await this.getCoordinatesFromAddress(this.demand.address);
+
+    if (!addressSuccess) {
+      alert('無法找到此地址的位置，請確認地址是否正確。');
+
+      return;
+    }
+
     // 清除空白的自訂欄位
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
 
@@ -405,7 +700,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     const conditionLabels: (keyof DisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
 
     // 處理接受物資需求狀態
-    // 只有有設定接受或不接受才加入
     conditionLabels.forEach((key) => {
       const status = this.demand.conditions[key];
 
@@ -417,7 +711,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     });
 
     // 處理其它物資需求狀態
-    // 只加入有填寫的內容
     this.demand.customConditions.forEach((condition) => {
       const value = condition.trim();
 
@@ -431,9 +724,9 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     // 編輯模式
     if (this.isEditMode) {
-      const originalItem = this.disasterDemandService.getDemands().find((item) => item.serialNo === this.demand.serialNo);
-
+      const originalItem = this.disasterDemandService.getDemands().find((item) => item.id === this.demand.id);
       const originalStatus = originalItem?.status;
+
       const originalOffShelfReason = originalItem?.offShelfReason;
 
       const originalPublishedAt = originalItem?.publishedAt;
@@ -479,17 +772,15 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
       // 處理隱藏狀態
       else if (this.demand.status === '隱藏') {
-        // 隱藏後視為尚未上架
         this.demand.publishedAt = undefined;
+
         this.demand.expectedOffShelfAt = undefined;
 
-        // 隱藏不是手動下架
         this.demand.offShelfReason = undefined;
       }
 
       // 處理下架狀態
       else if (this.demand.status === '下架') {
-        // 原本手動下架或這次確認下架時保留原本的下架時間
         if (!this.demand.offShelfReason) {
           this.demand.offShelfReason = 'manual';
         }
@@ -500,14 +791,10 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       }
 
       // 更新資料
-      this.disasterDemandService.updateDemand(this.demand);
+      await this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
-        this.router.navigate(['/agency/supply-detail', this.demand.serialNo], {
-          queryParams: {
-            number: this.listNumber,
-          },
-        });
+        this.router.navigate(['/agency/supply-detail', this.demand.id]);
       } else {
         this.router.navigate(['/agency/disaster']);
       }
@@ -515,7 +802,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     // 新增模式
     else {
-      // 按下發布需求的時間
       const createdDate = new Date();
 
       // 記錄發布日期
@@ -523,22 +809,20 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
       // 新增時選擇上架
       if (this.demand.status === '上架') {
-        // 上架日期等於發布日期
         this.demand.publishedAt = createdDate.toISOString();
 
-        // 計算預計下架日期
         this.demand.expectedOffShelfAt = this.calculateExpectedOffShelfDate(createdDate, this.demand.priority);
 
-        // 新增上架不應該有下架原因
         this.demand.offShelfReason = undefined;
       } else {
-        // 隱藏時尚未上架
         this.demand.publishedAt = undefined;
+
         this.demand.expectedOffShelfAt = undefined;
+
         this.demand.offShelfReason = undefined;
       }
 
-      this.disasterDemandService.addDemand(this.demand);
+      await this.disasterDemandService.addDemand(this.demand);
 
       this.router.navigate(['/agency/disaster']);
     }
@@ -647,6 +931,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     if (field === 'remaining') {
       if (value !== null && this.demand.amount !== null && value > this.demand.amount) {
         this.demand.remaining = this.demand.amount;
+
         input.value = this.demand.amount.toString();
       } else {
         this.demand.remaining = value;
@@ -693,14 +978,18 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     // 限制最多五張圖片
     if (this.imageFiles.length >= 5) {
       alert('最多只能上傳 5 張圖片');
+
       input.value = '';
+
       return;
     }
 
     // 限制圖片大小為五 MB
     if (file.size > 5 * 1024 * 1024) {
       alert('圖片大小不可超過 5MB');
+
       input.value = '';
+
       return;
     }
 

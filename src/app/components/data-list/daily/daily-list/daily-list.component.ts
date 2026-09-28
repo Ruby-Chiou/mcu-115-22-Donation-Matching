@@ -1,10 +1,8 @@
-import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { timeout, catchError, of } from 'rxjs';
-
+import { filter, Subject, takeUntil, timeout, catchError, of } from 'rxjs';
 import { DailyDemand, DailyDisplayStatus } from '../../../../models/agency/daily-demand';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 
@@ -58,13 +56,15 @@ type DailyListItem = DailyDemand & {
   templateUrl: './daily-list.component.html',
   styleUrls: ['./daily-list-A.component.scss', './daily-list-B.component.scss'],
 })
-export class DailyListComponent implements OnInit, AfterViewInit {
+export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
   // 資料
   demands: DailyListItem[] = [];
   filteredDemands: DailyListItem[] = [];
   pagedDemands: DailyListItem[] = [];
   selectAll = false;
   isLoading = false;
+
+  private readonly destroy$ = new Subject<void>();
 
   // 搜尋
   searchTerm = '';
@@ -146,19 +146,36 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
   // 初始化
   ngOnInit(): void {
-    const savedPage = sessionStorage.getItem(this.pagePositionKey);
+    // 每次進入列表先顯示第一頁。
+    this.currentPage = 1;
 
-    if (savedPage) {
-      const page = Number(savedPage);
+    // 不使用舊的 sessionStorage 頁碼。
+    sessionStorage.removeItem(this.pagePositionKey);
 
-      if (page >= 1) {
-        this.currentPage = page;
-      }
-    }
+    // 第一次進入列表時讀取資料。
+    void this.loadDemands();
+    // 每次路由成功完成時都印出最後網址，
+    // 先用它確認真正的列表路由。
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event) => {
+        console.log('Router NavigationEnd：', event.urlAfterRedirects);
 
-    this.loadDemands();
+        // 只要網址是 /agency/daily 開頭，
+        // 例如 /agency/daily 或 /agency/daily?refresh=1，
+        // 都重新讀取最新資料。
+        const url = event.urlAfterRedirects;
+
+        if (url === '/agency/daily' || url.startsWith('/agency/daily?')) {
+          this.currentPage = 1;
+
+          void this.loadDemands();
+        }
+      });
   }
-
   // 初始化後恢復捲動位置
   ngAfterViewInit(): void {
     const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
@@ -192,22 +209,30 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   // 查看詳細資料
-  goToDetail(serialNo: number): void {
+  goToDetail(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyListComponent] 無法前往詳細頁，資料庫 id 不正確：', id);
+
+      return;
+    }
+
     this.saveListPosition();
 
-    this.router.navigate(['/agency/daily-detail', serialNo], {
-      queryParams: {
-        number: serialNo,
-      },
-    });
+    this.router.navigate(['/agency/daily-detail', id]);
   }
 
   // 編輯
-  goToEdit(serialNo: number): void {
-    this.saveListPosition();
-    this.router.navigate(['/agency/daily-edit', serialNo]);
-  }
+  goToEdit(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyListComponent] 無法前往編輯頁，資料庫 id 不正確：', id);
 
+      return;
+    }
+
+    this.saveListPosition();
+
+    this.router.navigate(['/agency/daily-edit', id]);
+  }
   // 儲存列表位置
   saveListPosition(): void {
     sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
@@ -258,57 +283,102 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   // 讀取需求
-  loadDemands(): void {
+  async loadDemands(): Promise<void> {
+    if (this.isLoading) {
+      return;
+    }
+
     this.isLoading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
 
-    this.dailyDemandService
-      .getDemandsFromServer()
-      .pipe(
-        timeout(2000),
-        catchError(() => {
-          return of(this.dailyDemandService.getDemands());
-        })
-      )
-      .subscribe((data) => {
-        this.demands = data.map((item) => {
-          let currentStatus: DailyDisplayStatus = '已上架';
+    try {
+      // 嘗試從伺服器或 Service 取得資料
+      this.dailyDemandService
+        .getDemandsFromServer()
+        .pipe(
+          timeout(2000),
+          catchError(() => {
+            return of(this.dailyDemandService.getDemands());
+          }),
+          takeUntil(this.destroy$)
+        )
+        .subscribe((data) => {
+          this.demands = data.map((item) => {
+            // 1. 先檢查是否已達到預計下架日期
+            const checkedItem = this.checkNaturalOffShelf(item);
 
-          if (item.status === '上架') {
-            currentStatus = '已上架';
-          }
+            // 2. 轉換狀態顯示文字
+            let displayStatus: DailyDisplayStatus;
+            switch (checkedItem.status) {
+              case '上架':
+                displayStatus = '已上架';
+                break;
+              case '隱藏':
+                displayStatus = '隱藏中';
+                break;
+              case '下架':
+                displayStatus = '已下架';
+                break;
+              default:
+                displayStatus = '隱藏中';
+                break;
+            }
 
-          if (item.status === '隱藏') {
-            currentStatus = '隱藏中';
-          }
+            return {
+              ...checkedItem,
+              selected: false,
+              displayStatus,
+              displayCreatedAt: checkedItem.createdAt ? new Date(checkedItem.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
+              displayPublishedAt: checkedItem.publishedAt ? new Date(checkedItem.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+              displayOffShelfAt: checkedItem.expectedOffShelfAt
+                ? new Date(checkedItem.expectedOffShelfAt).toLocaleDateString('zh-TW')
+                : '—',
+              remaining: checkedItem.remaining ?? checkedItem.amount ?? 0,
+              category: checkedItem.category ?? '其他',
+            };
+          });
 
-          if (item.status === '下架') {
-            currentStatus = '已下架';
-          }
-
-          return {
-            ...item,
-            selected: false,
-            status: item.status,
-            displayStatus: currentStatus,
-
-            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
-
-            displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
-
-            displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
-
-            remaining: item.remaining ?? item.amount ?? 0,
-
-            category: item.category ?? '其他',
-          };
+          this.applyFilters(false);
+          this.isLoading = false;
+          this.cdr.detectChanges();
         });
+    } catch (error) {
+      console.error('載入日常需求失敗：', error);
+      this.demands = [];
+      this.filteredDemands = [];
+      this.pagedDemands = [];
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
 
-        this.applyFilters(false);
+  // 檢查是否已達到預計下架日期
+  private checkNaturalOffShelf(item: DailyDemand): DailyDemand {
+    // 只有目前是「上架」才需要檢查
+    if (item.status !== '上架') {
+      return item;
+    }
 
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      });
+    // 沒有預計下架日期，不處理
+    if (!item.expectedOffShelfAt) {
+      return item;
+    }
+
+    const now = new Date();
+    const expectedOffShelfAt = new Date(item.expectedOffShelfAt);
+
+    // 已經到達或超過預計下架日期
+    if (now >= expectedOffShelfAt) {
+      item.status = '下架';
+
+      // 記錄為「自然下架」
+      item.offShelfReason = 'natural';
+
+      // 同步更新 Service
+      this.dailyDemandService.updateDemand(item);
+    }
+
+    return item;
   }
 
   // 搜尋
@@ -403,16 +473,22 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
       // 留言狀態
       if (this.selectedFilters.messageStatus.length > 0) {
+        // 留言篩選只套用在「已上架」
+        if (item.displayStatus !== '已上架') {
+          return false;
+        }
+
         const hasMsg = (item.messageCount || 0) > 0;
 
         const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
-
         const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
 
+        // 有回覆 → 留言數大於 0
         if (wantsReplied && !wantsNotReplied && !hasMsg) {
           return false;
         }
 
+        // 未回覆 → 留言數等於 0
         if (wantsNotReplied && !wantsReplied && hasMsg) {
           return false;
         }
@@ -542,20 +618,25 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   // 單筆刪除
-  openDeleteModal(serialNo: number): void {
-    this.deleteIds = [serialNo];
+  openDeleteModal(id: number): void {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[DailyListComponent] 無法刪除，資料庫 id 不正確：', id);
+
+      return;
+    }
+
+    this.deleteIds = [id];
     this.deleteType = 'single';
     this.showDeleteModal = true;
   }
 
   // 批次刪除
   openBatchDeleteModal(): void {
-    this.deleteIds = this.filteredDemands
-      .filter((item) => item.selected && item.serialNo !== undefined)
-      .map((item) => item.serialNo as number);
+    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => Number(item.id));
 
     if (this.deleteIds.length === 0) {
       alert('請先選擇要刪除的需求');
+
       return;
     }
 
@@ -569,92 +650,153 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   // 刪除完成
-  onDeleted(): void {
+  async onDeleted(): Promise<void> {
     this.showDeleteModal = false;
     this.deleteIds = [];
     this.selectAll = false;
-    this.loadDemands();
+
+    this.cdr.detectChanges();
+
+    await this.loadDemands();
+
+    this.cdr.detectChanges();
   }
 
   // 修改狀態
-  changeStatus(item: DailyListItem, newStatus: DailyDisplayStatus): void {
+  async changeStatus(item: DailyListItem, newStatus: DailyDisplayStatus): Promise<void> {
     const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+
     const originalStatus = originalItem?.status;
 
-    // 1. 已下架嘗試重新上架 -> 保持「已下架」，跳出無法重新上架提示
+    // 1. 選擇「已上架」
     if (newStatus === '已上架') {
-      if (originalStatus === '下架') {
+      // 只有「手動下架」才禁止重新上架
+      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
         item.status = '下架';
         item.displayStatus = '已下架';
 
-        // 強制重刷陣列中的物件，讓 Angular 偵測到變更並還原選單顯示
+        // 還原下拉選單
         this.refreshItemReference(item);
 
+        // 顯示無法重新上架提示
         this.showOnShelfWarning = true;
         return;
       }
 
-      // 非下架狀態正常上架
+      // 自然下架可以重新上架
       const now = new Date();
+
       item.publishedAt = now.toISOString();
 
-      if (!item.createdAt) {
-        item.createdAt = now.toISOString();
+      const updatedItem: DailyListItem = {
+        ...item,
+        status: '上架',
+        displayStatus: '已上架',
+
+        createdAt: item.createdAt ?? now.toISOString(),
+
+        publishedAt: now.toISOString(),
+
+        expectedOffShelfAt: this.calculateExpectedOffShelfDate(now, item.priority),
+
+        displayCreatedAt:
+          (item.createdAt ?? now.toISOString()) ? new Date(item.createdAt ?? now.toISOString()).toLocaleDateString('zh-TW') : '尚未建立',
+
+        displayPublishedAt: now.toLocaleDateString('zh-TW'),
+
+        displayOffShelfAt: this.calculateExpectedOffShelfDate(now, item.priority)
+          ? new Date(this.calculateExpectedOffShelfDate(now, item.priority)).toLocaleDateString('zh-TW')
+          : '—',
+      };
+
+      try {
+        await this.dailyDemandService.updateDemand(updatedItem);
+
+        this.refreshItemReference(updatedItem);
+
+        this.cdr.detectChanges();
+
+        console.log('日常物資已上架並儲存至 Supabase：', updatedItem);
+      } catch (error) {
+        console.error('上架更新失敗：', error);
+
+        alert('上架失敗，請確認 Supabase 設定。');
+
+        this.loadDemands();
       }
 
+      // 重新計算預計下架日期
       item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
+
       item.status = '上架';
+
+      // 重新上架後，清除之前的下架原因
+      item.offShelfReason = undefined;
+
       item.displayStatus = '已上架';
 
       item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+
       item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
+
       item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
       this.dailyDemandService.updateDemand(item);
       this.refreshItemReference(item);
+
       return;
     }
 
-    // 2. 嘗試改為「已下架」 -> 保持原顯示狀態，跳出確認視窗
+    // 2. 選擇「已下架」
     if (newStatus === '已下架') {
+      // 已經是下架狀態，就維持下架
       if (originalStatus === '下架') {
         item.status = '下架';
         item.displayStatus = '已下架';
+
         this.refreshItemReference(item);
         return;
       }
 
-      // 保持目前的顯示狀態不變，等待使用者於 Modal 點擊確認
+      // 尚未下架，先顯示確認 Modal
       this.pendingOffShelfItem = item;
 
-      // 還原選單顯示為點擊前的狀態（否則選單會卡在已下架）
       this.refreshItemReference(item);
 
       this.showOffShelfWarning = true;
+
       return;
     }
 
-    // 3. 隱藏中
+    // 3. 選擇「隱藏中」
     if (newStatus === '隱藏中') {
-      if (originalStatus === '下架') {
-        // 已下架不能改成隱藏中，保持已下架
+      // 手動下架後不能改回隱藏
+      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
         item.status = '下架';
         item.displayStatus = '已下架';
+
         this.refreshItemReference(item);
         return;
       }
 
       item.status = '隱藏';
       item.displayStatus = '隱藏中';
+
+      // 隱藏後清除上架相關資料
       item.publishedAt = undefined;
       item.expectedOffShelfAt = undefined;
 
+      // 隱藏不是下架，因此清除下架原因
+      item.offShelfReason = undefined;
+
       item.displayPublishedAt = '尚未上架';
       item.displayOffShelfAt = '—';
+
       item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
       this.dailyDemandService.updateDemand(item);
       this.refreshItemReference(item);
+
       return;
     }
   }
@@ -662,16 +804,19 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   // 輔助函式：同步更新主資料與分頁陣列中的參考，觸發 DOM 重新繪製
   private refreshItemReference(item: DailyListItem): void {
     const demandIndex = this.demands.findIndex((d) => d.serialNo === item.serialNo);
+
     if (demandIndex !== -1) {
       this.demands[demandIndex] = { ...item };
     }
 
     const filteredIndex = this.filteredDemands.findIndex((d) => d.serialNo === item.serialNo);
+
     if (filteredIndex !== -1) {
       this.filteredDemands[filteredIndex] = { ...item };
     }
 
     const pagedIndex = this.pagedDemands.findIndex((d) => d.serialNo === item.serialNo);
+
     if (pagedIndex !== -1) {
       this.pagedDemands[pagedIndex] = { ...item };
     }
@@ -699,20 +844,23 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   // 確認手動下架
-  confirmManualOffShelf(): void {
+  async confirmManualOffShelf(): Promise<void> {
     if (!this.pendingOffShelfItem) {
       return;
     }
 
     const item = { ...this.pendingOffShelfItem };
 
-    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
+    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.id === item.id);
 
     const now = new Date();
 
     // 確認後才真正變成已下架
     item.status = '下架';
     item.displayStatus = '已下架';
+
+    // 記錄這次是「手動下架」
+    item.offShelfReason = 'manual';
 
     // 記錄實際下架時間
     item.expectedOffShelfAt = now.toISOString();
@@ -730,12 +878,23 @@ export class DailyListComponent implements OnInit, AfterViewInit {
       item.displayPublishedAt = '尚未上架';
     }
 
-    this.dailyDemandService.updateDemand(item);
+    try {
+      await this.dailyDemandService.updateDemand(item);
 
-    // 強制重新整理該筆資料的參考，觸發畫面選單更新為「已下架」
-    this.refreshItemReference(item);
+      this.refreshItemReference(item);
 
-    this.closeOffShelfWarning();
+      this.closeOffShelfWarning();
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('下架更新失敗：', error);
+
+      alert('下架失敗，請稍後再試。');
+
+      this.closeOffShelfWarning();
+
+      this.loadDemands();
+    }
   }
 
   // 取消手動下架
@@ -745,7 +904,7 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   }
 
   // 隱藏而不是下架
-  hideInsteadOfOffShelf(): void {
+  async hideInsteadOfOffShelf(): Promise<void> {
     if (!this.pendingOffShelfItem) {
       return;
     }
@@ -756,6 +915,8 @@ export class DailyListComponent implements OnInit, AfterViewInit {
     item.status = '隱藏';
     item.displayStatus = '隱藏中';
 
+    item.offShelfReason = undefined;
+
     item.publishedAt = undefined;
     item.expectedOffShelfAt = undefined;
 
@@ -765,12 +926,23 @@ export class DailyListComponent implements OnInit, AfterViewInit {
 
     item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
 
-    this.dailyDemandService.updateDemand(item);
+    try {
+      await this.dailyDemandService.updateDemand(item);
 
-    // 強制重新整理該筆資料的參考，觸發畫面選單更新為「隱藏中」
-    this.refreshItemReference(item);
+      this.refreshItemReference(item);
 
-    this.closeOffShelfWarning();
+      this.closeOffShelfWarning();
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('隱藏失敗：', error);
+
+      alert('隱藏失敗，請稍後再試。');
+
+      this.closeOffShelfWarning();
+
+      this.loadDemands();
+    }
   }
 
   // 關閉下架提示
@@ -782,5 +954,9 @@ export class DailyListComponent implements OnInit, AfterViewInit {
   // 關閉無法重新上架提示
   closeOnShelfWarning(): void {
     this.showOnShelfWarning = false;
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

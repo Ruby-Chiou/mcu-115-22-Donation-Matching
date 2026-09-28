@@ -2,5 +2,30 @@
   <h1>災害需求列表</h1>
 </div>
 
-<app-disaster-list></app-disaster-list>
-<app-volunteer-list></app-volunteer-list>
+<div class="switch-area">
+  <button
+    type="button"
+    class="switch-button"
+    [class.active]="activeType === 'material'"
+    [attr.aria-selected]="activeType === 'material'"
+    (click)="selectType('material')"
+  >
+    物資捐助
+  </button>
+
+  <span class="switch-divider" aria-hidden="true"> | </span>
+
+  <button
+    type="button"
+    class="switch-button"
+    [class.active]="activeType === 'volunteer'"
+    [attr.aria-selected]="activeType === 'volunteer'"
+    (click)="selectType('volunteer')"
+  >
+    志工需求
+  </button>
+</div>
+
+<app-disaster-list *ngIf="activeType === 'material'"> </app-disaster-list>
+
+<app-volunteer-list *ngIf="activeType === 'volunteer'"> </app-volunteer-list>

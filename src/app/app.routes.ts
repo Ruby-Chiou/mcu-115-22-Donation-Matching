@@ -118,11 +118,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/form/daily/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
   },
   {
-    path: 'agency/daily-edit/:serialNo',
+    path: 'agency/daily-edit/:id',
     loadComponent: () => import('./components/form/daily/daily-form/daily-form.component').then((m) => m.DailyFormComponent),
   },
   {
-    path: 'agency/daily-detail/:serialNo',
+    path: 'agency/daily-detail/:id',
     loadComponent: () => import('./components/data-list/daily/daily-detail/daily-detail.component').then((m) => m.DailyDetailComponent),
   },
   {
@@ -151,11 +151,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/form/disaster/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
-    path: 'agency/supply-edit/:serialNo',
+    path: 'agency/supply-edit/:id',
     loadComponent: () => import('./components/form/disaster/supply-form/supply-form.component').then((m) => m.SupplyFormComponent),
   },
   {
-    path: 'agency/supply-detail/:serialNo',
+    path: 'agency/supply-detail/:id',
     loadComponent: () =>
       import('./components/data-list/disaster/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
   },

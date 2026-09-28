@@ -43,15 +43,39 @@ export class DonorDisasterCardComponent {
   goToFullDetail(event: Event): void {
     event.stopPropagation();
 
-    if (this.isDisasterClosed) return;
+    if (this.isDisasterClosed) {
+      return;
+    }
 
     this.showDetail = false;
 
-    this.router.navigate(
-      this.type === 'material'
-        ? ['donor/disaster/supply/detail', this.demandId]
-        : ['donor/disaster/volunteer/detail', this.volunteer?.serialNo]
-    );
+    if (this.type === 'material') {
+      const id = this.demand?.id;
+
+      console.log('[災害物資] 前往詳細頁資料庫 id：', id);
+
+      if (id == null) {
+        console.error('災害物資缺少資料庫 id：', this.demand);
+
+        return;
+      }
+
+      void this.router.navigate(['/donor/disaster/supply/detail', id]);
+
+      return;
+    }
+
+    const id = this.volunteer?.id;
+
+    console.log('[災害志工] 前往詳細頁資料庫 id：', id);
+
+    if (id == null) {
+      console.error('災害志工缺少資料庫 id：', this.volunteer);
+
+      return;
+    }
+
+    void this.router.navigate(['/donor/disaster/volunteer/detail', id]);
   }
 
   closeDetail(event?: Event): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -25,23 +25,47 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
   constructor(
     private route: ActivatedRoute,
     private service: DisasterDemandService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
-    const serialNo = Number(this.route.snapshot.paramMap.get('serialNo'));
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
+    const id = Number(rawId);
 
-    this.listNumber = Number(this.route.snapshot.queryParamMap.get('number'));
+    console.log('[SupplyDetailComponent] 取得路由參數：', {
+      rawId,
+      id,
+    });
 
-    this.demand = this.service.getDemandBySerialNo(serialNo);
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[SupplyDetailComponent] 網址中的災害物資 id 不正確：', rawId);
 
-    if (this.demand) {
-      this.demand.remaining ??= this.demand.amount ?? 0;
+      return;
+    }
 
-      // 只有資料庫有 conditionDescription 時才進行解析
-      if (this.demand.conditionDescription?.trim()) {
-        this.parseConditionDescription();
+    try {
+      const loadedDemand = await this.service.getDemandById(id);
+
+      console.log('[SupplyDetailComponent] Service 回傳資料：', loadedDemand);
+
+      if (!loadedDemand) {
+        console.error('[SupplyDetailComponent] 找不到災害物資需求，id：', id);
+
+        return;
       }
+
+      this.demand = loadedDemand;
+
+      this.parseConditionDescription();
+
+      this.cdr.detectChanges();
+
+      console.log('[SupplyDetailComponent] 已設定 this.demand，已觸發畫面更新：', this.demand);
+
+      console.log('[SupplyDetailComponent] 處理條件後 this.demand：', this.demand);
+    } catch (error) {
+      console.error('[SupplyDetailComponent] 載入災害物資需求失敗：', error);
     }
   }
 

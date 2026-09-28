@@ -24,11 +24,18 @@ export class VolunteerDeleteComponent {
   }
 
   // 確定刪除
-  confirmDelete() {
-    this.demandIds.forEach((id) => {
-      this.service.deleteDemand(id);
-    });
+  async confirmDelete(): Promise<void> {
+  try {
+    for (const id of this.demandIds) {
+      await this.service.deleteDemand(id);
+    }
 
     this.deleted.emit();
+  } catch (error) {
+    console.error(
+      '刪除志工需求失敗：',
+      error
+    );
   }
+}
 }

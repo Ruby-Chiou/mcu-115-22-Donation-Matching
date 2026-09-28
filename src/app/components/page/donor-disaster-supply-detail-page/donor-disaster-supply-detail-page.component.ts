@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,33 +24,69 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   // 目前查看的需求
   // =========================
   demand!: DisasterDemand;
+
+  isLoading = true;
+  loadError = '';
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private disasterDemandService: DisasterDemandService
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly disasterDemandService: DisasterDemandService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    // 透過 getDemands() 取得全部清單，再用 .find() 找出符合的那一筆
-    const allDemands = this.disasterDemandService.getDemands();
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
 
-    // 請依你的 DisasterDemand 模型實際欄位調整（若模型是 serialNo 就用 serialNo，若是 id 就用 id）
-    const demand = allDemands.find((d) => d.serialNo === id);
+    console.log('[災害詳細頁] route id：', rawId);
 
-    if (!demand) {
-      this.router.navigate(['/donor/disaster']);
+    const id = Number(rawId);
+
+    console.log('[災害詳細頁] number id：', id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[災害詳細頁] 無效的資料庫 id：', id);
+
+      this.loadError = '網址中的災害物資編號不正確。';
+
+      this.isLoading = false;
       return;
     }
-    this.demand = demand;
+
+    try {
+      console.log('[災害詳細頁] 開始查詢資料');
+
+      const demand = await this.disasterDemandService.getDemandById(id);
+
+      console.log('[災害詳細頁] 查詢結果：', demand);
+
+      if (!demand) {
+        this.loadError = '找不到此筆災害物資需求。';
+
+        return;
+      }
+
+      this.demand = demand;
+
+      console.log('[災害詳細頁] demand 指派完成：', this.demand);
+    } catch (error) {
+      console.error('[災害詳細頁] 查詢失敗：', error);
+
+      this.loadError = '讀取災害物資資料失敗，請稍後再試。';
+    } finally {
+      this.isLoading = false;
+
+      console.log('[災害詳細頁] isLoading：', this.isLoading);
+
+      // 強制 Angular 重新判斷 @if (isLoading) 與 @else if (demand)
+      this.cdr.detectChanges();
+    }
   }
 
   // =========================
   // 前往物資捐助表單
   // =========================
   goToSupplyForm(): void {
-    // 同樣對應你模型中的唯一識別欄位（如 serialNo 或 id）
-    this.router.navigate(['/donor/disaster/supply/form', this.demand.serialNo]);
+    this.router.navigate(['/donor/disaster/supply/form', this.demand.id]);
   }
 
   // =========================

@@ -167,12 +167,13 @@
       ></textarea>
 
       <!-- 物資示意圖片 -->
-      <label class="label-row"> 物資示意圖片 </label>
+      <!-- 物資示意圖片 -->
+      <label class="label-row">物資示意圖片</label>
 
       <div class="image-upload-box">
         <div class="image-upload-area">
           <!-- 未滿 5 張才顯示選擇圖片 -->
-          <ng-container *ngIf="(imageFiles[demand.serialNo] || []).length < 5">
+          <ng-container *ngIf="(imagePreviewUrls[demand.serialNo] || []).length < 5">
             <div class="upload-controls">
               <label class="image-upload-btn">
                 <i class="fa-solid fa-image"></i>
@@ -185,10 +186,13 @@
             </div>
           </ng-container>
 
-          <div class="selected-image-list" *ngIf="(imageFiles[demand.serialNo] || []).length > 0">
-            <div class="selected-image" *ngFor="let image of (imageFiles[demand.serialNo] || []); let j = index">
+          <!-- 已有圖片 -->
+          <div class="selected-image-list" *ngIf="(imagePreviewUrls[demand.serialNo] || []).length > 0">
+            <div class="selected-image" *ngFor="let image of (imagePreviewUrls[demand.serialNo] || []); let j = index">
               <!-- 圖片名稱：點擊可預覽 -->
-              <button type="button" class="selected-image-name" (click)="openImagePreview(demand, j)">{{ image.name }}</button>
+              <button type="button" class="selected-image-name" (click)="openImagePreview(demand, j)">
+                {{ demand.imageFileNames?.[j] ?? '未命名圖片' + (j + 1) }}
+              </button>
 
               <button type="button" class="remove-image-btn" (click)="removeImage(demand, j)">移除圖片</button>
             </div>
@@ -483,19 +487,40 @@
         <span class="required">*</span>
       </label>
 
+      <!-- 公開狀態 -->
+      <label class="label-row align-title">
+        公開狀態
+        <span class="required">*</span>
+      </label>
+
       <div class="status-box">
-        <label>
-          <input type="radio" [name]="'status' + i" value="上架" [(ngModel)]="demand.status" />
+        <!-- 上架 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)" (click)="onStatusClick($event, demand, '上架')">
+          <input type="radio" [name]="'status' + i" [checked]="demand.status === '上架'" [disabled]="isManualOffShelf(demand)" />
           上架
         </label>
 
-        <label>
-          <input type="radio" [name]="'status' + i" value="隱藏" [(ngModel)]="demand.status" />
+        <!-- 隱藏 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)">
+          <input
+            type="radio"
+            [name]="'status' + i"
+            [checked]="demand.status === '隱藏'"
+            [disabled]="isManualOffShelf(demand)"
+            (change)="onStatusSelect(demand, '隱藏')"
+          />
           隱藏
         </label>
 
-        <label>
-          <input type="radio" [name]="'status' + i" value="下架" [(ngModel)]="demand.status" />
+        <!-- 下架 -->
+        <label [class.disabled-status]="isManualOffShelf(demand)">
+          <input
+            type="radio"
+            [name]="'status' + i"
+            [checked]="demand.status === '下架'"
+            [disabled]="isManualOffShelf(demand)"
+            (change)="onStatusSelect(demand, '下架')"
+          />
           下架
         </label>
       </div>
@@ -716,3 +741,14 @@
   [imageName]="previewImageName"
   (closed)="closeImagePreview()"
 ></app-supply-image-preview>
+
+<!-- 手動下架確認視窗 -->
+<app-supply-off-shelf
+  *ngIf="showOffShelfWarning"
+  (closed)="cancelManualOffShelf()"
+  (hide)="hideInsteadOfOffShelf()"
+  (confirmed)="confirmManualOffShelf()"
+></app-supply-off-shelf>
+
+<!-- 已下架無法重新上架提示 -->
+<app-supply-on-shelf *ngIf="showOnShelfWarning" (closed)="closeOnShelfWarning()" (confirmed)="closeOnShelfWarning()"></app-supply-on-shelf>

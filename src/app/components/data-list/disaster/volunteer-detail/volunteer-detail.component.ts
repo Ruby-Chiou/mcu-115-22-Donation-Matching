@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -20,58 +20,89 @@ export class VolunteerDetailComponent implements OnInit {
   showDeleteModal = false;
 
   constructor(
-    private volunteerDemandService: VolunteerDemandService,
-    private route: ActivatedRoute,
-    private router: Router
+    private readonly volunteerDemandService: VolunteerDemandService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
 
-    if (!id) {
-      console.error('找不到志工需求 ID');
+    const id = Number(rawId);
+
+    console.log('[VolunteerDetailComponent] 取得路由資料庫 id：', {
+      rawId,
+      id,
+    });
+
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[VolunteerDetailComponent] 網址中的志工需求 id 不正確：', rawId);
+
       this.router.navigate(['/agency/disaster']);
+
       return;
     }
 
-    this.loadDemand(id);
+    await this.loadDemand(id);
   }
 
-  // =========================
-  // 載入志工需求
-  // =========================
-  loadDemand(id: number): void {
-    const data = this.volunteerDemandService.getDemands().find((item) => item.serialNo === id);
+  /**
+   * 直接從 Supabase 以資料庫主鍵 id 載入。
+   * 不依賴 getDemands() 記憶體資料，
+   * 因此重整頁面後仍可正常取得資料。
+   */
+  async loadDemand(id: number): Promise<void> {
+    try {
+      const data = await this.volunteerDemandService.getDemandById(id);
 
-    if (!data) {
-      console.error('找不到志工需求：', id);
+      console.log('[VolunteerDetailComponent] Service 回傳資料：', data);
+
+      if (!data) {
+        console.error('找不到志工需求：', id);
+
+        this.router.navigate(['/agency/disaster']);
+
+        return;
+      }
+
+      this.demand = {
+        ...data,
+      };
+
+      this.cdr.detectChanges();
+
+      console.log('[VolunteerDetailComponent] 已設定 this.demand：', this.demand);
+    } catch (error) {
+      console.error('[VolunteerDetailComponent] 載入志工需求失敗：', error);
+
       this.router.navigate(['/agency/disaster']);
-      return;
     }
-
-    this.demand = data;
   }
 
-  // 開啟刪除視窗
-  openDeleteModal() {
+  openDeleteModal(): void {
     this.showDeleteModal = true;
   }
 
-  // 關閉刪除視窗
-  closeDeleteModal() {
+  closeDeleteModal(): void {
     this.showDeleteModal = false;
   }
 
-  // 刪除完成後返回列表
-  onDeleted() {
+  onDeleted(): void {
     this.showDeleteModal = false;
+
     this.router.navigate(['/agency/disaster']);
   }
 
-  goBack() {
+  goBack(): void {
     this.router.navigate(['/agency/disaster']);
   }
+
+  /**
+   * 刪除 Modal 必須接收資料庫 id，
+   * 不可再傳 serialNo。
+   */
   getDeleteIds(): number[] {
-    return this.demand?.serialNo != null ? [this.demand.serialNo] : [];
+    return this.demand?.id != null ? [this.demand.id] : [];
   }
 }

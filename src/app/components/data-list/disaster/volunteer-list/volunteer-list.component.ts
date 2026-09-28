@@ -1,8 +1,8 @@
-import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { timeout, catchError, of } from 'rxjs';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/volunteer-demand';
 
@@ -113,10 +113,12 @@ export class VolunteerListComponent {
 
   constructor(
     private VolunteerDemandService: VolunteerDemandService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
   }
+
   // 初始化
   ngOnInit() {
     const restoreListPosition = sessionStorage.getItem('restore-agency-disaster-list');
@@ -189,9 +191,11 @@ export class VolunteerListComponent {
   saveScrollPosition() {
     this.saveListPosition();
   }
+
   // 讀取需求
-  loadDemands() {
+  loadDemands(): void {
     this.isLoading = true;
+    this.cdr.detectChanges();
 
     const displayStatus: Record<VolunteerStatus, DisplayVolunteerStatus> = {
       上架: '已上架',
@@ -199,37 +203,47 @@ export class VolunteerListComponent {
       下架: '已下架',
     };
 
-    setTimeout(() => {
-      this.demands = this.VolunteerDemandService.getDemands().map((item) => {
-        return {
-          ...item,
+    this.VolunteerDemandService.getDemandsFromServer()
+      .pipe(
+        timeout(2000),
+        catchError(() => {
+          return of(this.VolunteerDemandService.getDemands());
+        })
+      )
+      .subscribe((data) => {
+        this.demands = data.map((item) => {
+          return {
+            ...item,
 
-          selected: false,
+            selected: false,
 
-          // 這裡加上 as VolunteerStatus
-          displayStatus: displayStatus[item.status as VolunteerStatus],
+            displayStatus: displayStatus[item.status as VolunteerStatus],
 
-          displayCreatedAt:
-            item.status === '隱藏' ? '尚未發布' : item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未發布',
+            displayCreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
 
-          displayPublishedAt: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
+            displayPublishedAt:
+              item.status === '隱藏' || !item.publishedAt ? '尚未發布' : new Date(item.publishedAt).toLocaleDateString('zh-TW'),
 
-          displayOffShelfAt: item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
+            displayOffShelfAt:
+              item.status === '隱藏' || !item.expectedOffShelfAt ? '—' : new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW'),
 
-          category: item.type ?? '其他',
-        };
+            category: item.type ?? '其他',
+          };
+        });
+
+        this.applyFilters(false);
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
       });
-
-      this.applyFilters(false);
-
-      this.isLoading = false;
-    }, 500);
   }
+
   // 搜尋
   onSearchChange(value: string) {
     this.searchTerm = value;
     this.applyFilters();
   }
+
   // 排序
   onSortChange(event: { selectedSort: SortType; sortAscending: boolean }) {
     const scrollY = window.scrollY;
@@ -244,6 +258,7 @@ export class VolunteerListComponent {
       });
     }, 0);
   }
+
   // 全選
   toggleAll() {
     this.pagedDemands.forEach((item) => {
@@ -310,12 +325,22 @@ export class VolunteerListComponent {
 
       // 留言狀態
       if (this.selectedFilters.messageStatus.length > 0) {
+        // 留言篩選只套用在「已上架」
+        if (item.displayStatus !== '已上架') {
+          return false;
+        }
+
         const hasMsg = (item.messageCount || 0) > 0;
+
         const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
         const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
+
+        // 有回覆 → 留言數大於 0
         if (wantsReplied && !wantsNotReplied && !hasMsg) {
           return false;
         }
+
+        // 未回覆 → 留言數等於 0
         if (wantsNotReplied && !wantsReplied && hasMsg) {
           return false;
         }
@@ -529,7 +554,7 @@ export class VolunteerListComponent {
     item.displayOffShelfAt = now.toLocaleDateString('zh-TW');
 
     // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
     // 保留原本的建立日期
     // 建立日期已在前面處理
@@ -560,14 +585,14 @@ export class VolunteerListComponent {
     item.displayStatus = '隱藏中';
 
     // 隱藏後視為尚未上架
+    item.publishedAt = undefined;
     item.expectedOffShelfAt = undefined;
 
     item.displayPublishedAt = '尚未上架';
-
     item.displayOffShelfAt = '—';
 
     // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
     // 儲存
     this.VolunteerDemandService.updateDemand(item);
@@ -656,7 +681,7 @@ export class VolunteerListComponent {
 
       item.displayStatus = '已上架';
 
-      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
+      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未發布';
 
       item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
     }
@@ -678,7 +703,7 @@ export class VolunteerListComponent {
     }
 
     // 建立日期永遠保留
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
+    item.displayCreatedAt = new Date(item.createdAt!).toLocaleDateString('zh-TW');
 
     // 儲存
     this.VolunteerDemandService.updateDemand(item);
@@ -690,15 +715,15 @@ export class VolunteerListComponent {
 
     switch (priority) {
       case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-
-      case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 14);
         break;
 
-      case '非常緊急':
+      case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 7);
+        break;
+
+      case '非常緊急':
+        offShelfDate.setDate(offShelfDate.getDate() + 3);
         break;
     }
 

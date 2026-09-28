@@ -1,47 +1,32 @@
 <div class="featured-card">
-<div class="featured-image">
-  <div class="image-wrapper">
+  <div class="featured-image">
+    <div class="image-wrapper">
+      <!-- 左箭頭 -->
+      @if ((demand?.image?.length ?? 0) > 1) {
+      <button type="button" class="image-arrow previous" (click)="previousImage($event)">‹</button>
+      }
+      <!-- 優先程度 -->
+      <span class="tag" [ngClass]="getPriorityClass(demand.priority)"> {{ demand.priority }} </span>
 
-    <!-- 左箭頭 -->
-        @if ((demand?.image?.length ?? 0) > 1) {
-          <button
-            type="button"
-            class="image-arrow previous"
-            (click)="previousImage($event)"
-          >
-            ‹
-          </button>
-        }
-    <!-- 優先程度 -->
-    <span
-      class="tag"
-      [ngClass]="getPriorityClass(demand.priority)">
-      {{ demand.priority }}
-    </span>
-
-    <!-- 圖片 -->
-    <img
-  [src]="demand.image?.[currentImageIndex] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
-  [alt]="demand.item || '物資圖片'"
-/>
-     <!-- 右箭頭 -->
-    @if ((demand?.image?.length ?? 0) > 1) {
-      <button
-        type="button"
-        class="image-arrow next"
-        (click)="nextImage($event)">
-        ›</button>
-    }
+      <!-- 圖片 -->
+      <img
+        [src]="demand.image?.[currentImageIndex] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
+        [alt]="demand.item || '物資圖片'"
+      />
+      <!-- 右箭頭 -->
+      @if ((demand?.image?.length ?? 0) > 1) {
+      <button type="button" class="image-arrow next" (click)="nextImage($event)">›</button>
+      }
+    </div>
   </div>
-</div>
 
   <div class="featured-content">
     <h3>{{ demand.item }}</h3>
     <div class="tags">
       <span class="tag">{{ demand.category }}</span>
-      @if (demand.receiveMethod['寄送']) {
+      @if (demand?.receiveMethod?.['寄送']) {
       <span class="tag">寄送</span>
-      } @if (demand.receiveMethod['面交']) {
+      } @if (demand?.receiveMethod?.['面交']) {
       <span class="tag">面交</span>
       }
     </div>
@@ -50,14 +35,13 @@
     </div>
     <div class="info">
       <p>需求數量： {{ demand.amount }} {{ demand.unit }}</p>
-      </div>
-      <div class="info">
-      <p>{{ demand.recipient }}</p>
-      </div>
-      <div class="info">
-      <p>{{ getRegion(demand.address) }}</p>
-      </div>
     </div>
-    <button class="detail-btn" type="button" (click)="onView()">查看詳情</button>
+    <div class="info">
+      <p>{{ demand.recipient }}</p>
+    </div>
+    <div class="info">
+      <p>{{ getRegion(demand.address) }}</p>
+    </div>
   </div>
-
+  <button class="detail-btn" type="button" (click)="onView()">查看詳情</button>
+</div>

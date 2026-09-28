@@ -11,6 +11,7 @@ export interface DisasterConditions {
 
 // 急難救助需求資料
 export interface DisasterDemand {
+  id?: number;
   // 基本資料
   serialNo: number; // 編號
   createdAt?: string; // 建立時間
@@ -63,6 +64,8 @@ export interface DisasterDemand {
 
   // 聯絡資訊
   address: string; // 接收物資地址
+  latitude?: number; // 接收物資地址緯度
+  longitude?: number; // 接收物資地址經度
   phone: string; // 聯絡電話
 
   // 是否區分平日、假日的聯絡時段

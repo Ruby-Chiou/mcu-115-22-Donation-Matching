@@ -1,12 +1,20 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../../models/agency/disaster-demand';
 import { SupplyImagePreviewComponent } from '../../../modal/image-preview/supply-image-preview/supply-image-preview.component';
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
+
+interface NominatimSearchResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
 
 @Component({
   selector: 'app-supply-batch-edit',
@@ -52,7 +60,8 @@ export class SupplyBatchEditComponent implements OnInit {
 
   constructor(
     private service: DisasterDemandService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   async base64ToFile(base64: string, fileName: string): Promise<File> {
@@ -83,6 +92,10 @@ export class SupplyBatchEditComponent implements OnInit {
     if (data) {
       this.editDemands = JSON.parse(data).map((item: any) => ({
         ...item,
+
+        // 經緯度
+        latitude: item.latitude,
+        longitude: item.longitude,
 
         conditions: item.conditions ?? {
           全新: '',
@@ -164,6 +177,181 @@ export class SupplyBatchEditComponent implements OnInit {
     console.log('批次修改資料:', this.editDemands);
   }
 
+  // =========================================================
+  // 地址 → 經緯度
+  //
+  // 第一階段：
+  // 搜尋完整地址
+  //
+  // 第二階段：
+  // 完整地址找不到時，搜尋道路
+  //
+  // 例如：
+  // 台北市中正區重慶南路一段122號
+  // ↓
+  // 重慶南路一段
+  // =========================================================
+  async getCoordinatesFromAddress(address: string, demand: EditableDisasterDemand): Promise<boolean> {
+    const url = 'https://nominatim.openstreetmap.org/search';
+
+    const originalAddress = address.trim();
+
+    if (!originalAddress) {
+      return false;
+    }
+
+    // =========================================================
+    // 第一階段：搜尋完整地址
+    // =========================================================
+    const params = {
+      // 原本的城市 / 國家寫法保持不變
+      q: `${originalAddress}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      console.log('================================');
+      console.log('第一階段：搜尋完整地址');
+      console.log('搜尋地址：', originalAddress);
+
+      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
+
+      console.log('Nominatim 完整地址回傳結果：', results);
+
+      if (results && results.length > 0) {
+        const result = results[0];
+
+        const latitude = Number(result.lat);
+
+        const longitude = Number(result.lon);
+
+        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+          demand.latitude = latitude;
+          demand.longitude = longitude;
+
+          console.log('完整地址定位成功');
+          console.log('地址：', originalAddress);
+          console.log('緯度：', latitude);
+          console.log('經度：', longitude);
+          console.log('找到的位置：', result.display_name);
+          console.log('================================');
+
+          return true;
+        }
+      }
+
+      console.warn('完整地址找不到，準備搜尋道路。');
+    } catch (error) {
+      console.error('完整地址搜尋失敗，準備搜尋道路：', error);
+    }
+
+    // =========================================================
+    // 第二階段：搜尋道路
+    // =========================================================
+
+    // 臺 → 台
+    let roadAddress = originalAddress.replace(/臺/g, '台');
+
+    // 移除門牌號碼
+    //
+    // 例如：
+    // 台北市中正區重慶南路一段122號
+    // ↓
+    // 台北市中正區重慶南路一段
+    roadAddress = roadAddress.replace(/\d+(?:-\d+)?號.*$/, '');
+
+    roadAddress = roadAddress.trim();
+
+    // 移除縣市名稱
+    //
+    // 台北市中正區重慶南路一段
+    // ↓
+    // 中正區重慶南路一段
+    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+    // 移除區／鄉／鎮／市
+    //
+    // 中正區重慶南路一段
+    // ↓
+    // 重慶南路一段
+    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+    roadAddress = roadAddress.trim();
+
+    console.log('第二階段：搜尋道路');
+    console.log('道路名稱：', roadAddress);
+
+    if (!roadAddress) {
+      console.warn('無法從地址取得道路名稱：', originalAddress);
+
+      console.log('================================');
+
+      return false;
+    }
+
+    const roadParams = {
+      // 原本的城市 / 國家寫法保持不變
+      q: `${roadAddress}, Taiwan`,
+      format: 'jsonv2',
+      limit: '1',
+      countrycodes: 'tw',
+    };
+
+    try {
+      const roadResults = await firstValueFrom(
+        this.http.get<NominatimSearchResult[]>(url, {
+          params: roadParams,
+        })
+      );
+
+      console.log('Nominatim 道路搜尋回傳結果：', roadResults);
+
+      if (!roadResults || roadResults.length === 0) {
+        console.warn('連道路也找不到：', roadAddress);
+
+        console.log('================================');
+
+        return false;
+      }
+
+      const roadResult = roadResults[0];
+
+      const latitude = Number(roadResult.lat);
+
+      const longitude = Number(roadResult.lon);
+
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        console.warn('道路回傳的經緯度無效：', roadResult);
+
+        console.log('================================');
+
+        return false;
+      }
+
+      // 使用道路座標
+      demand.latitude = latitude;
+      demand.longitude = longitude;
+
+      console.log('道路定位成功');
+      console.log('原始地址：', originalAddress);
+      console.log('搜尋道路：', roadAddress);
+      console.log('緯度：', latitude);
+      console.log('經度：', longitude);
+      console.log('找到的位置：', roadResult.display_name);
+      console.log('================================');
+
+      return true;
+    } catch (error) {
+      console.error('道路搜尋失敗：', error);
+
+      console.log('================================');
+
+      return false;
+    }
+  }
+
   // 設定聯絡時間
   setContactTimeDifferent(demand: EditableDisasterDemand, different: boolean): void {
     demand.contactTimeDifferent = different;
@@ -180,9 +368,39 @@ export class SupplyBatchEditComponent implements OnInit {
     demand.categoryDropdownOpen = false;
   }
 
+  // 判斷目前需求是否為手動下架
+  isManualOffShelf(demand: EditableDisasterDemand): boolean {
+    const originalItem = this.service.getDemands().find((item) => item.serialNo === demand.serialNo);
+
+    const originalStatus = originalItem?.status ?? demand.status;
+
+    const originalOffShelfReason = originalItem?.offShelfReason;
+
+    return originalStatus === '下架' && originalOffShelfReason === 'manual';
+  }
+
+  // 點擊公開狀態
+  onStatusClick(event: MouseEvent, demand: EditableDisasterDemand, newStatus: EditableDisasterDemand['status']): void {
+    // 手動下架的需求不能重新上架
+    if (newStatus === '上架' && this.isManualOffShelf(demand)) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      demand.status = '下架';
+      demand.offShelfReason = 'manual';
+
+      this.pendingStatusDemand = demand;
+
+      this.showOnShelfWarning = true;
+
+      return;
+    }
+
+    this.onStatusSelect(demand, newStatus);
+  }
+
   // 處理批次編輯的狀態選擇
   onStatusSelect(demand: EditableDisasterDemand, newStatus: EditableDisasterDemand['status']): void {
-    // 取得目前 Service 裡真正的原始資料
     const originalItem = this.service.getDemands().find((item) => item.serialNo === demand.serialNo);
 
     const originalStatus = originalItem?.status ?? demand.status;
@@ -195,13 +413,10 @@ export class SupplyBatchEditComponent implements OnInit {
     const isCurrentManualOffShelf = demand.status === '下架' && demand.offShelfReason === 'manual';
 
     if (newStatus === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
-      // 保持下架
       demand.status = '下架';
 
-      // 記錄目前正在處理的資料
       this.pendingStatusDemand = demand;
 
-      // 顯示無法重新上架 Modal
       this.showOnShelfWarning = true;
 
       return;
@@ -209,18 +424,14 @@ export class SupplyBatchEditComponent implements OnInit {
 
     // 選擇下架
     if (newStatus === '下架') {
-      // 本來就是下架時不需要再次確認
       if (demand.status === '下架') {
         return;
       }
 
-      // 記錄正在處理的資料
       this.pendingStatusDemand = demand;
 
-      // 暫時恢復原本狀態
       demand.status = originalStatus;
 
-      // 顯示手動下架確認 Modal
       this.showOffShelfWarning = true;
 
       return;
@@ -230,11 +441,10 @@ export class SupplyBatchEditComponent implements OnInit {
     if (newStatus === '隱藏') {
       demand.status = '隱藏';
 
-      // 隱藏後視為尚未上架
       demand.publishedAt = undefined;
+
       demand.expectedOffShelfAt = undefined;
 
-      // 隱藏不是手動下架
       demand.offShelfReason = undefined;
 
       this.pendingStatusDemand = null;
@@ -257,6 +467,7 @@ export class SupplyBatchEditComponent implements OnInit {
     const demand = this.pendingStatusDemand;
 
     this.showOffShelfWarning = false;
+
     this.pendingStatusDemand = null;
 
     if (!demand) {
@@ -275,6 +486,7 @@ export class SupplyBatchEditComponent implements OnInit {
     const demand = this.pendingStatusDemand;
 
     this.showOffShelfWarning = false;
+
     this.pendingStatusDemand = null;
 
     if (!demand) {
@@ -284,7 +496,9 @@ export class SupplyBatchEditComponent implements OnInit {
     demand.status = '隱藏';
 
     demand.publishedAt = undefined;
+
     demand.expectedOffShelfAt = undefined;
+
     demand.offShelfReason = undefined;
   }
 
@@ -293,6 +507,7 @@ export class SupplyBatchEditComponent implements OnInit {
     const demand = this.pendingStatusDemand;
 
     this.showOffShelfWarning = false;
+
     this.pendingStatusDemand = null;
 
     if (!demand) {
@@ -301,13 +516,10 @@ export class SupplyBatchEditComponent implements OnInit {
 
     const now = new Date();
 
-    // 改成下架
     demand.status = '下架';
 
-    // 記錄為使用者主動下架
     demand.offShelfReason = 'manual';
 
-    // 記錄實際手動下架時間
     demand.expectedOffShelfAt = now.toISOString();
   }
 
@@ -316,6 +528,7 @@ export class SupplyBatchEditComponent implements OnInit {
     const demand = this.pendingStatusDemand;
 
     this.showOnShelfWarning = false;
+
     this.pendingStatusDemand = null;
 
     if (!demand) {
@@ -323,6 +536,7 @@ export class SupplyBatchEditComponent implements OnInit {
     }
 
     demand.status = '下架';
+    demand.offShelfReason = 'manual';
   }
 
   // 限制剩餘需求最高只能填到需求數量
@@ -355,7 +569,6 @@ export class SupplyBatchEditComponent implements OnInit {
     if (field === 'amount') {
       demand.amount = value;
 
-      // 需求數量變更時同步更新剩餘需求
       demand.remaining = value;
     }
 
@@ -379,14 +592,14 @@ export class SupplyBatchEditComponent implements OnInit {
       return;
     }
 
-    // Backspace、Delete、方向鍵、Tab 等功能鍵允許使用
+    // 功能鍵允許使用
     const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Home', 'End'];
 
     if (allowedKeys.includes(event.key)) {
       return;
     }
 
-    // 有選取文字時允許輸入，因為會取代選取內容
+    // 有選取文字時允許輸入
     const selectionLength = input.selectionEnd! - input.selectionStart!;
 
     // 已達最高字數且沒有選取任何文字時禁止輸入
@@ -410,6 +623,7 @@ export class SupplyBatchEditComponent implements OnInit {
       alert('最多只能上傳 5 張圖片');
 
       input.value = '';
+
       return;
     }
 
@@ -418,6 +632,7 @@ export class SupplyBatchEditComponent implements OnInit {
       alert('圖片大小不可超過 5MB');
 
       input.value = '';
+
       return;
     }
 
@@ -459,8 +674,10 @@ export class SupplyBatchEditComponent implements OnInit {
     }
   }
 
+  // =========================================================
   // 儲存全部資料
-  saveAll() {
+  // =========================================================
+  async saveAll() {
     // 清除舊錯誤並檢查必填欄位
     this.editDemands.forEach((item) => {
       item.itemError = false;
@@ -471,7 +688,6 @@ export class SupplyBatchEditComponent implements OnInit {
       item.addressError = false;
       item.phoneError = false;
       item.remainingError = false;
-
       item.categoryError = false;
 
       if (!item.item) {
@@ -531,6 +747,7 @@ export class SupplyBatchEditComponent implements OnInit {
 
     if (invalid) {
       this.scrollToFirstError();
+
       return;
     }
 
@@ -550,7 +767,6 @@ export class SupplyBatchEditComponent implements OnInit {
 
       const conditionLabels: (keyof EditableDisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
 
-      // 處理接受物資需求狀態
       conditionLabels.forEach((key) => {
         const status = item.conditions[key];
 
@@ -561,7 +777,6 @@ export class SupplyBatchEditComponent implements OnInit {
         }
       });
 
-      // 處理其它物資需求狀態
       item.customConditions.forEach((condition) => {
         const value = condition.trim();
 
@@ -570,12 +785,13 @@ export class SupplyBatchEditComponent implements OnInit {
         }
       });
 
-      // 合併成資料庫使用的單一欄位
       item.conditionDescription = conditionParts.join('、');
     });
 
+    // =====================================================
     // 儲存每一筆資料
-    this.editDemands.forEach((item) => {
+    // =====================================================
+    for (const item of this.editDemands) {
       // 清除空白自訂欄位
       item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
 
@@ -594,7 +810,9 @@ export class SupplyBatchEditComponent implements OnInit {
 
       const now = new Date();
 
+      // ===================================================
       // 處理上架狀態
+      // ===================================================
       if (item.status === '上架') {
         // 手動下架禁止重新上架
         if (originalStatus === '下架' && originalOffShelfReason === 'manual') {
@@ -604,20 +822,17 @@ export class SupplyBatchEditComponent implements OnInit {
 
           item.offShelfReason = 'manual';
 
-          // 保留原本手動下架時間
           if (originalItem?.expectedOffShelfAt) {
             item.expectedOffShelfAt = originalItem.expectedOffShelfAt;
           }
 
-          // 保留原本上架日期
           if (originalPublishedAt) {
             item.publishedAt = originalPublishedAt;
           }
 
-          return;
+          continue;
         }
 
-        // 處理可以重新上架的資料
         if (originalStatus !== '上架') {
           item.publishedAt = now.toISOString();
 
@@ -625,51 +840,63 @@ export class SupplyBatchEditComponent implements OnInit {
             item.createdAt = now.toISOString();
           }
         } else if (originalPublishedAt) {
-          // 原本已上架時保留原本上架日期
           item.publishedAt = originalPublishedAt;
         }
 
-        // 依照優先度重新計算預計下架日期
         if (item.publishedAt) {
           item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
         }
 
-        // 重新上架後清除下架原因
         item.offShelfReason = undefined;
       }
 
+      // ===================================================
       // 處理隱藏狀態
+      // ===================================================
       else if (item.status === '隱藏') {
-        // 隱藏後視為尚未上架
         item.publishedAt = undefined;
 
         item.expectedOffShelfAt = undefined;
 
-        // 隱藏不是下架
         item.offShelfReason = undefined;
       }
 
+      // ===================================================
       // 處理下架狀態
+      // ===================================================
       else if (item.status === '下架') {
-        // 儲存時不要重新產生下架時間
         if (!item.offShelfReason) {
           item.offShelfReason = 'manual';
         }
 
-        // 保留原本上架日期
         if (originalPublishedAt) {
           item.publishedAt = originalPublishedAt;
         }
 
-        // 如果沒有下架時間才補上
         if (!item.expectedOffShelfAt) {
           item.expectedOffShelfAt = now.toISOString();
         }
       }
 
+      // ===================================================
+      // 地址 → 經緯度
+      // ===================================================
+      const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
+
+      // 地址找不到就不儲存這一筆
+      if (!addressSuccess) {
+        alert(`需求編號 ${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
+
+        return;
+      }
+
+      console.log(`需求編號 ${item.serialNo} 經緯度：`, item.latitude, item.longitude);
+
+      // ===================================================
       // 更新 Service
+      // ===================================================
       this.service.updateDemand(item);
-    });
+    }
 
     // 清除批次編輯暫存資料
     localStorage.removeItem('editDemands');

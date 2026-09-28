@@ -10,3 +10,34 @@
     letter-spacing: 5px;
   }
 }
+
+.switch-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: -2rem;
+  padding-left: 40px;
+}
+
+.switch-button {
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.switch-button.active {
+  border-bottom-color: #005bac;
+  color: #005bac;
+}
+
+.switch-divider {
+  color: #94a3b8;
+  font-size: 1.2rem;
+}

@@ -46,24 +46,12 @@ export class App {
       }
 
       const isClosed = localStorage.getItem('disasterOpen') !== 'true';
-      const isDisasterOpenPage =
-        this.router.url.startsWith('/disaster/open') ||
-        this.router.url === '/donor/disaster';
-      const isInteractiveControl = target?.closest(
-        'button, a, input, textarea, select, [role="button"]'
-      );
+      const isDisasterOpenPage = this.router.url.startsWith('/disaster/open') || this.router.url === '/donor/disaster';
+      const isInteractiveControl = target?.closest('button, a, input, textarea, select, [role="button"]');
       const isDisasterControl =
-        (target?.closest('.donor-disaster-page') ||
-        this.router.url.startsWith('/disaster/open')) &&
-        !target?.closest('.map-button');
+        (target?.closest('.donor-disaster-page') || this.router.url.startsWith('/disaster/open')) && !target?.closest('.map-button');
 
-      if (
-        isClosed &&
-        isDisasterOpenPage &&
-        isInteractiveControl &&
-        isDisasterControl &&
-        !target?.closest('.disaster-closed-modal')
-      ) {
+      if (isClosed && isDisasterOpenPage && isInteractiveControl && isDisasterControl && !target?.closest('.disaster-closed-modal')) {
         event.preventDefault();
         event.stopPropagation();
         this.closedModal.show();

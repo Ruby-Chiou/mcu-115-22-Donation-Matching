@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
@@ -19,35 +19,64 @@ interface Comment {
   styleUrl: './donor-disaster-volunteer-detail-page.component.scss',
 })
 export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
-  volunteer!: VolunteerDemand;
+  volunteer?: VolunteerDemand;
+  isLoading = true;
+  loadError = '';
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private volunteerDemandService: VolunteerDemandService,
-    private location: Location
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly volunteerDemandService: VolunteerDemandService,
+    private readonly location: Location,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    const volunteer = this.volunteerDemandService.getVolunteerById(id);
 
-    if (!volunteer) {
-      this.router.navigate(['/donor/disaster']);
-      return;
+    console.log('[志工詳細頁] route id：', id);
+
+    try {
+      const volunteer = await this.volunteerDemandService.getVolunteerByDatabaseId(id);
+
+      console.log('[志工詳細頁] 查詢結果：', volunteer);
+
+      if (!volunteer) {
+        this.loadError = '找不到此筆志工需求。';
+
+        return;
+      }
+
+      this.volunteer = volunteer;
+
+      console.log('[志工詳細頁] volunteer 指派完成：', this.volunteer);
+    } catch (error) {
+      console.error('[志工詳細頁] 查詢失敗：', error);
+
+      this.loadError = '讀取志工需求失敗。';
+    } finally {
+      this.isLoading = false;
+
+      console.log('[志工詳細頁] isLoading：', this.isLoading);
+
+      this.cdr.detectChanges();
     }
-
-    this.volunteer = volunteer;
   }
 
   getRemaining(): number {
-    return this.volunteer.people ?? 0;
+    return this.volunteer?.people ?? 0;
   }
   getProgress(): number {
     return 0;
   }
-  goToVolunteerForm() {
-    this.router.navigate(['/donor/disaster/volunteer/form', this.volunteer.serialNo]);
+  goToVolunteerForm(): void {
+    const id = this.volunteer?.id;
+
+    if (id == null) {
+      return;
+    }
+
+    this.router.navigate(['/donor/disaster/volunteer/form', id]);
   }
   // 返回志工需求清單
 
