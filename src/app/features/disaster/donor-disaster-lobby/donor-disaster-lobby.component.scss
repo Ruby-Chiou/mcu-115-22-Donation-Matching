@@ -267,8 +267,8 @@ flex: 1;        // 改成跟左側一樣比例
 
 .map-sidebar {
   box-sizing: border-box;
-  flex: 0 0 280px;
-  width: 280px;
+  flex: 0 0 360px;
+  width: 360px;
   padding: 24px;
   background: #fff;
 }
@@ -285,12 +285,50 @@ flex: 1;        // 改成跟左側一樣比例
   font-weight: 600;
 }
 
-.location-select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+.location-list {
+  display: grid;
+  gap: 12px;
+}
+
+.location-details {
+  padding: 12px;
+  color: var(--color-text-main);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+}
+
+.location-details.active {
+  border-color: #005bac;
+}
+
+.location-details h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.location-details p {
+  line-height: 1.6;
+}
+
+.location-details h4 {
+  margin: 20px 0 8px;
+}
+
+.location-details ul {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+.location-details button {
+  margin-top: 12px;
+  padding: 8px 12px;
+  color: #fff;
+  background: #005bac;
+  border: 0;
+  border-radius: 4px;
   font: inherit;
+  cursor: pointer;
 }
 
 #disaster-map {
