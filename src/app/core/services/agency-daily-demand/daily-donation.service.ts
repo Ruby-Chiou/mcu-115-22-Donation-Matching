@@ -38,7 +38,7 @@ export class DonationService {
 
   private readonly bucketName = 'donation-files';
 
-  private readonly apiUrl = 'http://127.0.0.1:8000';
+  private readonly apiUrl = 'https://localhost:7020';
 
   private readonly supabase: SupabaseClient = createClient(environment.supabaseUrl, environment.supabasePublishableKey);
 
@@ -107,7 +107,9 @@ export class DonationService {
   }
 
   async reviewDonationWithAi(donationId: string): Promise<AiReviewResult> {
-    return await firstValueFrom(this.http.post<AiReviewResult>(`${this.apiUrl}/donations/${donationId}/ai-review`, {}));
+    return await firstValueFrom(
+      this.http.post<AiReviewResult>( `${this.apiUrl}/api/ai-donation-reviews/donations/${donationId}/ai-review`, {})
+    );
   }
 
   private async uploadDonationFile(donationId: string, file: File, fileType: DonationFileType, index: number): Promise<void> {

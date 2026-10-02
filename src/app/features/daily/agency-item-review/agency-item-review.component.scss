@@ -15,14 +15,14 @@
 
 /* 頁面 */
 .review-list-page {
-  width: min(1152px, calc(100% - 38px));
+  width: min(1220px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 32px 0 51px;
+  padding: 38px 0 60px;
   color: #1f2937;
 }
 
 .review-list-page > header {
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
 
 .review-list-page h1,
@@ -33,28 +33,30 @@
 }
 
 .review-list-page h1 {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: #111827;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
+  line-height: 1.35;
   letter-spacing: -0.02em;
 }
 
 .review-list-page > header p {
   margin-bottom: 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .filter-panel {
-  margin-bottom: 26px;
+  margin-bottom: 30px;
 }
 
 .filter-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
 }
 
 .filter-toolbar .search-box {
@@ -68,27 +70,27 @@
 
   .search-icon {
     position: absolute;
-    left: 12px;
-    width: 16px;
-    height: 16px;
+    left: 14px;
+    width: 18px;
+    height: 18px;
     color: #1565c0;
   }
 
   input {
-    width: 200px;
-    height: 36px;
-    padding: 0 32px 0 36px;
+    width: 230px;
+    height: 42px;
+    padding: 0 38px 0 42px;
     border: 1.5px solid #90caf9;
-    border-radius: 18px;
+    border-radius: 22px;
     outline: 0;
     background: #fff;
     color: #333;
-    font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 
     &:focus {
       border-color: #1565c0;
-      box-shadow: 0 3px 8px rgba(21, 101, 192, 0.15);
+      box-shadow: 0 3px 9px rgba(21, 101, 192, 0.16);
     }
 
     &::placeholder {
@@ -98,25 +100,26 @@
 
   .clear-search-btn {
     position: absolute;
-    right: 10px;
+    right: 12px;
     border: 0;
     background: none;
     color: #777;
+    font-size: 16px;
     cursor: pointer;
   }
 }
 
 .filter-toggle {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 42px;
   align-items: center;
-  gap: 8px;
-  padding: 0 7px;
+  gap: 9px;
+  padding: 0 8px;
   border: 0;
   color: #536e8c;
   background: transparent;
   font: inherit;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   cursor: pointer;
 
@@ -127,50 +130,55 @@
 }
 
 .filter-chevron {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .filter-options {
-  margin-top: 12px;
-  padding: 20px 24px;
+  margin-top: 14px;
+  padding: 24px 28px;
   border: 1px solid #e8d9c9;
-  border-radius: 13px;
+  border-radius: 15px;
   background: #fffdf9;
 }
 
 .filter-group {
-  padding: 0 0 13px;
+  padding: 0 0 16px;
   border-bottom: 1px solid #eee1d4;
 
   & + .filter-group {
-    padding-top: 13px;
+    padding-top: 16px;
   }
 
   h2 {
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     color: #30343a;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
+    line-height: 1.45;
   }
 }
 
 .filter-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 10px;
+  gap: 10px 12px;
 }
 
 .filter-pill {
-  min-height: 36px;
-  padding: 7px 16px;
+  min-height: 40px;
+  padding: 8px 18px;
   border: 1px solid #ddcbb8;
   border-radius: 999px;
   color: #4b5563;
   background: #fff;
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.4;
   cursor: pointer;
-  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
 
   &:hover {
     border-color: #8ca8c1;
@@ -192,18 +200,19 @@
 .filter-actions {
   display: flex;
   justify-content: flex-end;
-  padding-top: 14px;
+  padding-top: 17px;
 }
 
 .reset-filter-button {
-  min-height: 38px;
-  padding: 7px 17px;
+  min-height: 42px;
+  padding: 8px 19px;
   border: 1px solid #ddcbb8;
-  border-radius: 8px;
+  border-radius: 9px;
   color: #4b5563;
   background: #fff;
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
 
   &:hover {
@@ -218,37 +227,38 @@
 
 /* 區塊標題 */
 .review-section h2 {
-  margin-bottom: 11px;
+  margin-bottom: 13px;
   color: #1e293b;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
+  line-height: 1.4;
 }
 
 .section-description {
-  margin-bottom: 18px;
+  margin-bottom: 21px;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 /* 卡片列表：桌面版四欄 */
 .donation-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 19px;
+  gap: 22px;
 }
 
 /* 卡片 */
 .donation-card {
   display: flex;
   min-width: 0;
-  min-height: 176px;
+  min-height: 205px;
   flex-direction: column;
-  padding: 18px;
+  padding: 21px;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--card-bg);
-  box-shadow: 0 3px 10px
-    rgba(15, 23, 42, 0.04);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
   cursor: pointer;
   transition:
     border-color 160ms ease,
@@ -258,14 +268,12 @@
 
 .donation-card:hover {
   border-color: #93c5fd;
-  box-shadow: 0 10px 22px
-    rgba(30, 64, 175, 0.12);
+  box-shadow: 0 10px 24px rgba(30, 64, 175, 0.13);
   transform: translateY(-2px);
 }
 
 .donation-card:focus-within {
-  outline: 2px solid
-    rgba(59, 130, 246, 0.2);
+  outline: 2px solid rgba(59, 130, 246, 0.2);
   outline-offset: 2px;
 }
 
@@ -273,9 +281,9 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
-  min-height: 30px;
-  margin-bottom: 14px;
+  gap: 12px;
+  min-height: 34px;
+  margin-bottom: 16px;
 }
 
 .donation-card h3 {
@@ -283,7 +291,7 @@
   margin-bottom: 0;
   overflow: hidden;
   color: var(--text-main);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.45;
   text-overflow: ellipsis;
@@ -291,25 +299,25 @@
 }
 
 .donation-card p {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--text-body);
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 /* 卡片按鈕 */
 .donation-card button {
   display: block;
   width: 100%;
-  min-height: 38px;
+  min-height: 44px;
   margin-top: auto;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: 0;
   border-radius: 999px;
   color: #ffffff;
   background: var(--primary);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1.4;
   text-align: center;
   cursor: pointer;
@@ -320,24 +328,7 @@
 
 .donation-card button:hover {
   background: var(--primary-dark);
-  box-shadow: 0 3px 8px
-    rgba(21, 101, 192, 0.2);
-}
-
-/* AI／人工審核原因 */
-.donation-card .ai-reason,
-.donation-card .human-reason {
-  display: -webkit-box;
-  margin-top: 11px;
-  padding: 10px 11px;
-  border-radius: 10px;
-  color: var(--text-body);
-  background: #f8fafc;
-  font-size: 12px;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(21, 101, 192, 0.22);
 }
 
 /* 狀態標籤 */
@@ -345,10 +336,11 @@
 .approved-label,
 .rejected-label {
   flex: 0 0 auto;
-  padding: 5px 9px;
+  padding: 6px 10px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 1.35;
   white-space: nowrap;
 }
 
@@ -375,11 +367,12 @@
 .section-divider {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin: 35px 0 22px;
+  gap: 16px;
+  margin: 40px 0 26px;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
+  line-height: 1.4;
   text-align: center;
 }
 
@@ -393,32 +386,33 @@
 /* 空資料 */
 .empty-message {
   margin: 0;
-  padding: 29px 16px;
+  padding: 34px 18px;
   border: 1px dashed #cbd5e1;
-  border-radius: 11px;
+  border-radius: 13px;
   color: var(--text-muted);
   background: var(--card-bg);
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1.6;
   text-align: center;
 }
 
 /* 錯誤訊息 */
-.error-message,
-.error {
-  margin: 13px 0;
-  padding: 10px 11px;
+.error-message {
+  margin: 16px 0;
+  padding: 13px 14px;
   border: 1px solid #fecaca;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #991b1b;
   background: #fef2f2;
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 /* 載入畫面 */
 .loading-container {
   display: flex;
   width: 100%;
-  min-height: 256px;
+  min-height: 300px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -427,20 +421,19 @@
 }
 
 .loading-container p {
-  margin: 14px 0 0;
-  font-size: 14px;
-  letter-spacing: 0.8px;
+  margin: 16px 0 0;
+  font-size: 16px;
+  letter-spacing: 0.5px;
 }
 
 .loading-spinner {
-  width: 43px;
-  height: 43px;
-  border: 4px solid #e8f1f8;
+  width: 50px;
+  height: 50px;
+  border: 5px solid #e8f1f8;
   border-top-color: #1769aa;
   border-right-color: #1769aa;
   border-radius: 50%;
-  animation: donor-loading-spin
-    0.85s linear infinite;
+  animation: donor-loading-spin 0.85s linear infinite;
 }
 
 @keyframes donor-loading-spin {
@@ -453,125 +446,117 @@
   }
 }
 
-@media (max-width: 600px) {
-  .filter-options {
-    padding: 16px;
-  }
-
-  .filter-pill {
-    min-height: 34px;
-    padding: 6px 12px;
-    font-size: 12px;
+@media (max-width: 1100px) {
+  .donation-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 800px) {
+  .review-list-page {
+    width: min(calc(100% - 28px), 650px);
+    padding: 30px 0 46px;
+  }
+
+  .donation-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .donation-card {
+    min-height: 210px;
+  }
+}
+
+@media (max-width: 600px) {
   .filter-toolbar {
     flex-wrap: wrap;
   }
 
   .filter-toolbar .search-box {
+    width: 100%;
     margin-left: 0;
   }
-}
 
-/* 中大型螢幕：三欄 */
-@media (max-width: 1100px) {
-  .donation-list {
-    grid-template-columns: repeat(
-      3,
-      minmax(0, 1fr)
-    );
+  .search-box input {
+    width: 100%;
+  }
+
+  .filter-options {
+    padding: 19px;
+  }
+
+  .filter-pill {
+    min-height: 38px;
+    padding: 7px 15px;
+    font-size: 13px;
   }
 }
 
-/* 平板：兩欄 */
-@media (max-width: 800px) {
-  .review-list-page {
-    width: min(
-      calc(100% - 22px),
-      544px
-    );
-    padding: 26px 0 38px;
-  }
-
-  .donation-list {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    );
-  }
-}
-
-/* 手機：一欄 */
 @media (max-width: 560px) {
   .review-list-page {
-    width: calc(100% - 16px);
-    padding: 19px 0 32px;
+    width: calc(100% - 22px);
+    padding: 24px 0 38px;
   }
 
   .review-list-page h1 {
-    font-size: 21px;
+    font-size: 23px;
   }
 
   .review-list-page > header p {
-    font-size: 12px;
-  }
-
-  .review-tabs {
-    margin-bottom: 21px;
-  }
-
-  .review-tab {
-    flex: 1;
-    padding: 0 6px 10px;
-    font-size: 12px;
-  }
-
-  .review-tab:first-child {
-    padding-left: 6px;
-  }
-
-  .review-tab.active::after {
-    right: 6px;
-    left: 6px;
+    font-size: 14px;
   }
 
   .review-section h2 {
-    font-size: 16px;
+    font-size: 18px;
+  }
+
+  .section-description {
+    font-size: 14px;
   }
 
   .donation-list {
     grid-template-columns: 1fr;
-    gap: 13px;
+    gap: 15px;
   }
 
   .donation-card {
-    min-height: 216px;
-    padding: 16px;
+    min-height: 220px;
+    padding: 18px;
   }
 
   .donation-card-header {
-    gap: 8px;
+    gap: 10px;
+    margin-bottom: 14px;
   }
 
   .donation-card h3 {
-    font-size: 16px;
+    font-size: 17px;
     white-space: normal;
   }
 
   .donation-card p {
-    font-size: 13px;
-  }
-
-  .donation-card button {
-    min-height: 38px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .section-divider {
+    gap: 10px;
+    margin: 33px 0 22px;
+    font-size: 12px;
+  }
+
+  .empty-message,
+  .error-message {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .filter-pills {
     gap: 8px;
-    margin: 29px 0 19px;
-    font-size: 10px;
+  }
+
+  .filter-pill {
+    padding: 7px 13px;
   }
 }
