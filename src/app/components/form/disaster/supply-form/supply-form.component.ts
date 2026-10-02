@@ -31,7 +31,7 @@ interface NominatimSearchResult {
 export class SupplyFormComponent implements OnInit, AfterViewInit {
   isEditMode = false;
   submitted = false;
-  imageFiles: File[] = [];
+  imageFiles: (File | string)[] = [];
 
   // 圖片預覽
   showImagePreview = false;
@@ -234,23 +234,10 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         weekendEvening: data.weekendEvening ?? false,
       };
 
-      this.imageFiles = [];
+      this.imageFiles = [...(data.image ?? [])];
 
-      const files = await Promise.all(
-        (data.image ?? []).map(async (image, index) => {
-          const fileName = data.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
-
-          try {
-            return await this.base64ToFile(image, fileName);
-          } catch (error) {
-            console.warn('[SupplyFormComponent] 圖片無法轉 File，略過：', image, error);
-
-            return null;
-          }
-        })
-      );
-
-      this.imageFiles = files.filter((file): file is File => file !== null);
+      // 檢查是否已經達到自然下架時間
+      await this.checkNaturalOffShelf();
 
       this.cdr.detectChanges();
     } catch (error) {
@@ -267,15 +254,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         behavior: 'instant',
       });
     }, 0);
-  }
-
-  async base64ToFile(base64: string, fileName: string): Promise<File> {
-    const response = await fetch(base64);
-    const blob = await response.blob();
-
-    return new File([blob], fileName, {
-      type: blob.type,
-    });
   }
 
   // 點擊類別下拉選單以外的地方時關閉
@@ -304,6 +282,34 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   // 判斷目前需求是否為手動下架
   isManualOffShelf(): boolean {
     return this.isEditMode && this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
+  }
+
+  // 檢查是否達到自然下架時間
+  private async checkNaturalOffShelf(): Promise<void> {
+    if (this.demand.status !== '上架' || !this.demand.expectedOffShelfAt) {
+      return;
+    }
+
+    const now = new Date();
+    const expectedOffShelfAt = new Date(this.demand.expectedOffShelfAt);
+
+    // 尚未到自然下架時間
+    if (now < expectedOffShelfAt) {
+      return;
+    }
+
+    // 已達到自然下架時間
+    this.demand.status = '下架';
+    this.demand.offShelfReason = 'natural';
+
+    console.log('[SupplyFormComponent] 需求已達自然下架時間：', this.demand.serialNo);
+
+    // 更新資料庫
+    await this.disasterDemandService.updateDemand(this.demand);
+
+    // 更新原本狀態，避免後續編輯時判斷錯誤
+    this.originalStatus = '下架';
+    this.originalOffShelfReason = 'natural';
   }
 
   // 點擊公開狀態
@@ -781,12 +787,18 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
       // 處理下架狀態
       else if (this.demand.status === '下架') {
-        if (!this.demand.offShelfReason) {
-          this.demand.offShelfReason = 'manual';
+        // 已經是自然下架，就保留自然下架原因
+        if (this.demand.offShelfReason === 'natural') {
+          // 自然下架不重新設定下架時間
         }
 
-        if (!this.demand.expectedOffShelfAt) {
-          this.demand.expectedOffShelfAt = now.toISOString();
+        // 沒有下架原因才視為使用者手動下架
+        else {
+          this.demand.offShelfReason = 'manual';
+
+          if (!this.demand.expectedOffShelfAt) {
+            this.demand.expectedOffShelfAt = now.toISOString();
+          }
         }
       }
 
@@ -1017,6 +1029,24 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
     // 清空圖片輸入欄位
     input.value = '';
+  }
+
+  // 取得圖片網址
+  getImageUrl(image: File | string, index: number): string {
+    if (typeof image === 'string') {
+      return image;
+    }
+
+    return this.demand.image?.[index] ?? '';
+  }
+
+  // 取得圖片名稱
+  getImageName(image: File | string, index: number): string {
+    if (typeof image === 'string') {
+      return this.demand.imageFileNames?.[index] ?? `物資圖片${index + 1}`;
+    }
+
+    return image.name;
   }
 
   // 移除圖片

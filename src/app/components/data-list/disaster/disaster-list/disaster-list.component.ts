@@ -245,23 +245,26 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private checkNaturalOffShelf(item: DisasterDemand): DisasterDemand {
-    if (item.status !== '上架' || !item.expectedOffShelfAt) {
+    if (item.status !== '上架') {
       return item;
     }
 
-    if (new Date() < new Date(item.expectedOffShelfAt)) {
+    if (!item.expectedOffShelfAt) {
       return item;
     }
 
-    const updatedItem = {
-      ...item,
-      status: '下架' as DisasterStatus,
-      offShelfReason: 'natural' as const,
-    };
+    const now = new Date();
+    const expectedOffShelfAt = new Date(item.expectedOffShelfAt);
 
-    void this.disasterDemandService.updateDemand(updatedItem);
+    if (now >= expectedOffShelfAt) {
+      item.status = '下架';
+      item.offShelfReason = 'natural';
 
-    return updatedItem;
+      // 同步更新 Service 中的資料
+      this.disasterDemandService.updateDemand(item);
+    }
+
+    return item;
   }
 
   onSearchChange(value: string): void {
@@ -479,6 +482,8 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     const newStatus = select.value as DisplayStatus;
 
     const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
+
+    // 選擇「已下架」
     if (newStatus === '已下架') {
       item.displayStatus = originalItem?.status === '上架' ? '已上架' : originalItem?.status === '下架' ? '已下架' : '隱藏中';
 
@@ -491,15 +496,30 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if (newStatus === '已上架' && originalItem?.status === '下架') {
-      item.displayStatus = '已下架';
-      setTimeout(() => {
-        select.value = '已下架';
-      });
-      this.showOnShelfWarning = true;
+    // 從「已下架」重新選擇「已上架」
+    if (newStatus === '已上架' && item.status === '下架') {
+      // 優先使用目前列表資料的下架原因
+      const offShelfReason = item.offShelfReason ?? originalItem?.offShelfReason;
+
+      // 手動下架不能重新上架
+      if (offShelfReason !== 'natural') {
+        item.displayStatus = '已下架';
+
+        setTimeout(() => {
+          select.value = '已下架';
+        });
+
+        this.showOnShelfWarning = true;
+        return;
+      }
+
+      // 自然下架可以重新上架
+      item.displayStatus = '已上架';
+      void this.applyStatusChange(item);
       return;
     }
 
+    // 隱藏中 → 其他狀態
     item.displayStatus = newStatus;
     void this.applyStatusChange(item);
   }
@@ -567,6 +587,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async applyStatusChange(item: DisasterListItem): Promise<void> {
     const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
+
     const originalStatus = originalItem?.status;
 
     let status: DisasterStatus = item.displayStatus === '已上架' ? '上架' : '隱藏';

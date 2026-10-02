@@ -64,15 +64,6 @@ export class SupplyBatchEditComponent implements OnInit {
     private http: HttpClient
   ) {}
 
-  async base64ToFile(base64: string, fileName: string): Promise<File> {
-    const response = await fetch(base64);
-    const blob = await response.blob();
-
-    return new File([blob], fileName, {
-      type: blob.type,
-    });
-  }
-
   // 點擊類別下拉選單以外的地方時關閉
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -156,41 +147,18 @@ export class SupplyBatchEditComponent implements OnInit {
     }
 
     // 載入圖片
-    const imagePromises = this.editDemands.map(async (demand) => {
-      if (demand.image && demand.image.length > 0) {
-        const files = await Promise.all(
-          demand.image.map((img, index) => {
-            const fileName = demand.imageFileNames?.[index] ?? `物資圖片${index + 1}.png`;
-
-            return this.base64ToFile(img, fileName);
-          })
-        );
-
-        demand.imageFiles = files;
-      }
+    this.editDemands.forEach((demand) => {
+      demand.imageFiles = [...(demand.image ?? [])];
     });
 
-    Promise.all(imagePromises).then(() => {
-      this.cdr.detectChanges();
-    });
+    // 檢查自然下架
+    this.editDemands = this.editDemands.map((demand) => this.checkNaturalOffShelf(demand));
+
+    this.cdr.detectChanges();
 
     console.log('批次修改資料:', this.editDemands);
   }
 
-  // =========================================================
-  // 地址 → 經緯度
-  //
-  // 第一階段：
-  // 搜尋完整地址
-  //
-  // 第二階段：
-  // 完整地址找不到時，搜尋道路
-  //
-  // 例如：
-  // 台北市中正區重慶南路一段122號
-  // ↓
-  // 重慶南路一段
-  // =========================================================
   async getCoordinatesFromAddress(address: string, demand: EditableDisasterDemand): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
 
@@ -366,6 +334,29 @@ export class SupplyBatchEditComponent implements OnInit {
   selectCategory(demand: EditableDisasterDemand, category: NonNullable<EditableDisasterDemand['category']>) {
     demand.category = category;
     demand.categoryDropdownOpen = false;
+  }
+
+  // 判斷是否已達自然下架時間
+  private checkNaturalOffShelf(demand: EditableDisasterDemand): EditableDisasterDemand {
+    if (demand.status !== '上架' || !demand.expectedOffShelfAt) {
+      return demand;
+    }
+
+    if (new Date() < new Date(demand.expectedOffShelfAt)) {
+      return demand;
+    }
+
+    // 已達自然下架時間
+    const updatedDemand = {
+      ...demand,
+      status: '下架' as EditableDisasterDemand['status'],
+      offShelfReason: 'natural' as const,
+    };
+
+    // 同步更新資料庫
+    void this.service.updateDemand(updatedDemand);
+
+    return updatedDemand;
   }
 
   // 判斷目前需求是否為手動下架
@@ -661,6 +652,22 @@ export class SupplyBatchEditComponent implements OnInit {
     input.value = '';
   }
 
+  getImageUrl(image: File | string, demand: EditableDisasterDemand, index: number): string {
+    if (typeof image === 'string') {
+      return image;
+    }
+
+    return demand.image?.[index] ?? '';
+  }
+
+  getImageName(image: File | string, demand: EditableDisasterDemand, index: number): string {
+    if (typeof image === 'string') {
+      return demand.imageFileNames?.[index] ?? `物資圖片${index + 1}`;
+    }
+
+    return image.name;
+  }
+
   // 移除圖片
   removeImage(demand: EditableDisasterDemand, index: number) {
     demand.imageFiles.splice(index, 1);
@@ -790,7 +797,8 @@ export class SupplyBatchEditComponent implements OnInit {
 
     // =====================================================
     // 儲存每一筆資料
-    // =====================================================
+    this.editDemands = this.editDemands.map((demand) => this.checkNaturalOffShelf(demand));
+
     for (const item of this.editDemands) {
       // 清除空白自訂欄位
       item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');

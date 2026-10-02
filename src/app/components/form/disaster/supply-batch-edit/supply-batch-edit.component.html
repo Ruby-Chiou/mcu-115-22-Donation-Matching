@@ -195,8 +195,12 @@
           <div class="selected-image-list" *ngIf="demand.imageFiles.length > 0">
             <div class="selected-image" *ngFor="let image of demand.imageFiles; let j = index">
               <!-- 圖片名稱：點擊可預覽 -->
-              <button type="button" class="selected-image-name" (click)="openImagePreview(demand.image![j], image.name)">
-                {{ image.name }}
+              <button
+                type="button"
+                class="selected-image-name"
+                (click)="openImagePreview(getImageUrl(image, demand, j), getImageName(image, demand, j))"
+              >
+                {{ getImageName(image, demand, j) }}
               </button>
 
               <!-- 移除圖片 -->

@@ -29,6 +29,7 @@ interface DisasterDemandRow {
 
   priority: string | null;
   status: string | null;
+  offShelfReason: string | null;
 
   address: string | null;
   phone: string | null;
@@ -137,6 +138,8 @@ export class DisasterDemandService {
 
       status: row.status as DisasterDemand['status'],
 
+      offShelfReason: row.offShelfReason as DisasterDemand['offShelfReason'],
+
       address: row.address ?? '',
 
       phone: row.phone ?? '',
@@ -203,6 +206,8 @@ export class DisasterDemandService {
 
       status: demand.status,
 
+      offShelfReason: demand.offShelfReason ?? null,
+
       address: demand.address,
 
       phone: demand.phone,
@@ -232,25 +237,80 @@ export class DisasterDemandService {
   }
 
   private toStringArray(value: unknown): string[] {
+    // 資料庫直接回傳陣列
     if (Array.isArray(value)) {
       return value.filter((item): item is string => typeof item === 'string');
+    }
+
+    // 如果資料庫回傳的是 JSON 字串
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+
+        if (Array.isArray(parsed)) {
+          return parsed.filter((item): item is string => typeof item === 'string');
+        }
+      } catch (error) {
+        console.warn('圖片資料解析失敗：', value, error);
+      }
     }
 
     return [];
   }
 
   private toConditions(value: unknown): DisasterDemand['conditions'] {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      return value as DisasterDemand['conditions'];
+    const conditions: DisasterDemand['conditions'] = {
+      全新: '',
+      二手: '',
+      有擦痕: '',
+      過期: '',
+      毀損: '',
+    };
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (typeof item !== 'string') {
+          return;
+        }
+
+        const separatorIndex = item.indexOf(':');
+
+        if (separatorIndex === -1) {
+          return;
+        }
+
+        const conditionName = item.substring(0, separatorIndex).trim();
+        const status = item.substring(separatorIndex + 1).trim();
+
+        if (
+          (conditionName === '全新' ||
+            conditionName === '二手' ||
+            conditionName === '有擦痕' ||
+            conditionName === '過期' ||
+            conditionName === '毀損') &&
+          (status === '接受' || status === '不接受')
+        ) {
+          conditions[conditionName] = status;
+        }
+      });
+
+      return conditions;
     }
 
-    return {
-      全新: '不接受',
-      二手: '不接受',
-      有擦痕: '不接受',
-      過期: '不接受',
-      毀損: '不接受',
-    };
+    // 相容舊的物件格式
+    if (value && typeof value === 'object') {
+      const oldConditions = value as Partial<DisasterDemand['conditions']>;
+
+      conditions.全新 = oldConditions.全新 ?? '';
+      conditions.二手 = oldConditions.二手 ?? '';
+      conditions.有擦痕 = oldConditions.有擦痕 ?? '';
+      conditions.過期 = oldConditions.過期 ?? '';
+      conditions.毀損 = oldConditions.毀損 ?? '';
+
+      return conditions;
+    }
+
+    return conditions;
   }
 
   async addDemand(demand: CreateDisasterDemand): Promise<void> {
@@ -286,39 +346,29 @@ export class DisasterDemandService {
     return from(this.reload().then(() => [...this.demands]));
   }
 
-  /**
-   * 依輸入值查詢：
-   * 1. 優先當作資料庫 id。
-   * 2. 若 id 查不到，再當作 serialNo 查詢。
-   *
-   * 這是為了相容目前仍傳 serialNo 的舊元件。
-   */
   async getDemandById(id: number): Promise<DisasterDemand | undefined> {
     if (!Number.isInteger(id) || id <= 0) {
-      console.error('[災害物資] 無效的資料庫 id：', id);
-
+      console.error('[災害物資] 無效的災害物資編號：', id);
       return undefined;
     }
 
-    console.log('[災害物資] 以資料庫 id 查詢：', id);
+    console.log('[災害物資] 依 serialNo 查詢：', id);
 
-    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('id', id).maybeSingle();
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('serialNo', id).maybeSingle();
 
     console.log('[災害物資] Supabase 查詢結果：', {
-      id,
+      serialNo: id,
       data,
       error,
     });
 
     if (error) {
       console.error('讀取單筆災害物資需求失敗：', error);
-
       throw error;
     }
 
     if (!data) {
-      console.warn('[災害物資] 找不到資料，id：', id);
-
+      console.warn('[災害物資] 找不到資料，serialNo：', id);
       return undefined;
     }
 
@@ -400,13 +450,6 @@ export class DisasterDemandService {
     return Math.max(...this.demands.map((item) => item.serialNo)) + 1;
   }
 
-  /**
-   * 依輸入值刪除：
-   * 1. 優先當作資料庫 id。
-   * 2. 若 id 找不到，再當作 serialNo 找出真正 id。
-   *
-   * 這是為了相容目前仍傳 serialNo 的舊元件。
-   */
   async deleteDemand(value: number): Promise<void> {
     if (!Number.isInteger(value) || value <= 0) {
       throw new Error(`無效的災害物資編號：${value}`);

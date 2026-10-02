@@ -108,7 +108,7 @@ export interface EditableDisasterDemand extends DisasterDemand {
 
   // 批次編輯專用
   categoryDropdownOpen?: boolean; // 物資分類下拉選單是否開啟
-  imageFiles: File[]; // 物資圖片檔案
+  imageFiles: (File | string)[]; // 物資圖片檔案
 }
 
 // 新增需求用

@@ -37,7 +37,7 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
     console.log('[志工詳細頁] route id：', id);
 
     try {
-      const volunteer = await this.volunteerDemandService.getVolunteerByDatabaseId(id);
+      const volunteer = await this.volunteerDemandService.getVolunteerBySerialNo(id);
 
       console.log('[志工詳細頁] 查詢結果：', volunteer);
 

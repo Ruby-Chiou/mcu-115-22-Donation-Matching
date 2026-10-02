@@ -212,6 +212,48 @@ export class VolunteerDemandService {
     return this.getDemandById(id);
   }
 
+  async getVolunteerBySerialNo(serialNo: number): Promise<VolunteerDemand | undefined> {
+    if (!Number.isInteger(serialNo) || serialNo <= 0) {
+      console.error('[志工需求] 無效的 serialNo：', serialNo);
+
+      return undefined;
+    }
+
+    console.log('[志工需求] 以 serialNo 查詢：', serialNo);
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('serialNo', serialNo).maybeSingle();
+
+    console.log('[志工需求] Supabase serialNo 查詢結果：', {
+      serialNo,
+      data,
+      error,
+    });
+
+    if (error) {
+      console.error('讀取單筆志工需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      console.warn('[志工需求] 找不到資料庫資料，serialNo：', serialNo);
+
+      return undefined;
+    }
+
+    const demand = this.mapRowToDemand(data as VolunteerDemandRow);
+
+    const index = this.demands.findIndex((item) => item.id === demand.id);
+
+    if (index === -1) {
+      this.demands = [...this.demands, demand];
+    } else {
+      this.demands = this.demands.map((item) => (item.id === demand.id ? demand : item));
+    }
+
+    return demand;
+  }
+
   async addDemand(demand: VolunteerDemand): Promise<VolunteerDemand> {
     const row = this.demandToRow(demand);
 
