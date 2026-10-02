@@ -32,6 +32,8 @@ interface DisasterDemandRow {
   offShelfReason: string | null;
 
   address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   phone: string | null;
 
   contactTimeDifferent: boolean | null;
@@ -132,7 +134,7 @@ export class DisasterDemandService {
 
       conditions: this.toConditions(row.conditionDescription),
 
-      customConditions: [],
+      customConditions: this.toCustomConditions(row.conditionDescription),
 
       priority: row.priority as DisasterDemand['priority'],
 
@@ -141,7 +143,8 @@ export class DisasterDemandService {
       offShelfReason: row.offShelfReason as DisasterDemand['offShelfReason'],
 
       address: row.address ?? '',
-
+      latitude: row.latitude ?? undefined,
+      longitude: row.longitude ?? undefined,
       phone: row.phone ?? '',
 
       contactTimeDifferent: row.contactTimeDifferent ?? false,
@@ -200,16 +203,17 @@ export class DisasterDemandService {
 
       imageFileNames: demand.imageFileNames ?? [],
 
-      conditionDescription: demand.conditions ?? {},
+      conditionDescription: this.buildConditionDescription(demand),
 
       priority: demand.priority,
 
       status: demand.status,
 
-      offShelfReason: demand.offShelfReason ?? null,
+      offShelfReason: demand.offShelfReason ?? 'natural',
 
       address: demand.address,
-
+      latitude: demand.latitude ?? null,
+      longitude: demand.longitude ?? null,
       phone: demand.phone,
 
       contactTimeDifferent: demand.contactTimeDifferent ?? false,
@@ -256,6 +260,100 @@ export class DisasterDemandService {
     }
 
     return [];
+  }
+
+  private toCustomConditions(value: unknown): string[] {
+    const customConditions: string[] = [];
+
+    // 資料庫是陣列格式
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (typeof item !== 'string') {
+          return;
+        }
+
+        // 這 5 個是固定物資狀態，不算自訂狀態
+        const separatorIndex = item.indexOf(':');
+
+        if (separatorIndex !== -1) {
+          const conditionName = item.substring(0, separatorIndex).trim();
+
+          if (
+            conditionName === '全新' ||
+            conditionName === '二手' ||
+            conditionName === '有擦痕' ||
+            conditionName === '過期' ||
+            conditionName === '毀損'
+          ) {
+            return;
+          }
+        }
+
+        const value = item.trim();
+
+        if (value) {
+          customConditions.push(value);
+        }
+      });
+
+      return customConditions;
+    }
+
+    // 相容舊的字串格式
+    if (typeof value === 'string') {
+      const parts = value
+        .split('、')
+        .map((item) => item.trim())
+        .filter((item) => item !== '');
+
+      parts.forEach((item) => {
+        // 舊格式：全新✔、二手✘
+        if (
+          item.startsWith('全新✔') ||
+          item.startsWith('全新✘') ||
+          item.startsWith('二手✔') ||
+          item.startsWith('二手✘') ||
+          item.startsWith('有擦痕✔') ||
+          item.startsWith('有擦痕✘') ||
+          item.startsWith('過期✔') ||
+          item.startsWith('過期✘') ||
+          item.startsWith('毀損✔') ||
+          item.startsWith('毀損✘')
+        ) {
+          return;
+        }
+
+        customConditions.push(item);
+      });
+
+      return customConditions;
+    }
+
+    return [];
+  }
+
+  private buildConditionDescription(demand: DisasterDemand): string[] {
+    const result: string[] = [];
+
+    const conditionLabels: (keyof DisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
+
+    conditionLabels.forEach((key) => {
+      const status = demand.conditions[key];
+
+      if (status === '接受' || status === '不接受') {
+        result.push(`${key}:${status}`);
+      }
+    });
+
+    demand.customConditions.forEach((condition) => {
+      const value = condition.trim();
+
+      if (value) {
+        result.push(value);
+      }
+    });
+
+    return result;
   }
 
   private toConditions(value: unknown): DisasterDemand['conditions'] {
@@ -333,9 +431,7 @@ export class DisasterDemandService {
 
     const savedDemand = this.mapRowToDemand(data as DisasterDemandRow);
 
-    this.demands = [...this.demands, savedDemand];
-
-    this.demandChangedSubject.next();
+    this.demands = this.demands.map((item) => (item.id === savedDemand.id ? savedDemand : item));
   }
 
   getDemands(): DisasterDemand[] {

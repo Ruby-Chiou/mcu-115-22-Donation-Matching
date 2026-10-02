@@ -446,20 +446,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // =========================================================
-  // 使用 Nominatim 將地址轉換成經緯度
-  //
-  // 第一階段：
-  // 完整地址
-  //
-  // 第二階段：
-  // 如果完整地址找不到，就改搜尋道路
-  //
-  // 例如：
-  // 台北市中正區重慶南路一段122號
-  // ↓
-  // 重慶南路一段
-  // =========================================================
   async getCoordinatesFromAddress(address: string): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
 
@@ -469,98 +455,21 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       return false;
     }
 
-    // =========================================================
-    // 第一階段：搜尋完整地址
-    // =========================================================
-    const params = {
-      // 原本的城市 / 國家寫法保持不變
-      q: `${originalAddress}, Taiwan`,
-      format: 'jsonv2',
-      limit: '1',
-      countrycodes: 'tw',
-    };
-
-    try {
-      console.log('================================');
-      console.log('第一階段：搜尋完整地址');
-      console.log('搜尋地址：', originalAddress);
-
-      const results = await firstValueFrom(
-        this.http.get<NominatimSearchResult[]>(url, {
-          params,
-        })
-      );
-
-      console.log('Nominatim 完整地址回傳結果：', results);
-
-      if (results && results.length > 0) {
-        const result = results[0];
-
-        const latitude = Number(result.lat);
-        const longitude = Number(result.lon);
-
-        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
-          this.demand.latitude = latitude;
-          this.demand.longitude = longitude;
-
-          console.log('完整地址定位成功');
-          console.log('地址：', originalAddress);
-          console.log('緯度：', latitude);
-          console.log('經度：', longitude);
-          console.log('找到的位置：', result.display_name);
-          console.log('================================');
-
-          return true;
-        }
-      }
-
-      console.warn('完整地址找不到，準備搜尋道路。');
-    } catch (error) {
-      console.error('完整地址搜尋失敗，準備搜尋道路：', error);
-    }
-
-    // =========================================================
-    // 第二階段：搜尋道路
-    // =========================================================
-
-    // 臺 → 台
     let roadAddress = originalAddress.replace(/臺/g, '台');
 
-    // 移除門牌號碼
-    //
-    // 例如：
-    // 台北市中正區重慶南路一段122號
-    // ↓
-    // 台北市中正區重慶南路一段
-    //
-    // 也支援：
-    // 122-1號
-    // 122號之1
     roadAddress = roadAddress.replace(/\d+(?:-\d+)?號.*$/, '');
 
     roadAddress = roadAddress.trim();
 
-    // 移除縣市名稱
-    //
-    // 台北市中正區重慶南路一段
-    // ↓
-    // 中正區重慶南路一段
-    //
-    // 宜蘭縣宜蘭市○○路
-    // ↓
-    // 宜蘭市○○路
     roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
 
-    // 移除區／鄉／鎮／市
-    //
-    // 中正區重慶南路一段
-    // ↓
-    // 重慶南路一段
     roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
 
     roadAddress = roadAddress.trim();
 
-    console.log('第二階段：搜尋道路');
+    console.log('================================');
+    console.log('搜尋道路');
+    console.log('原始地址：', originalAddress);
     console.log('道路名稱：', roadAddress);
 
     if (!roadAddress) {
@@ -571,7 +480,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
 
     const roadParams = {
-      // 原本的城市 / 國家寫法保持不變
       q: `${roadAddress}, Taiwan`,
       format: 'jsonv2',
       limit: '1',
@@ -588,7 +496,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       console.log('Nominatim 道路搜尋回傳結果：', roadResults);
 
       if (!roadResults || roadResults.length === 0) {
-        console.warn('連道路也找不到：', roadAddress);
+        console.warn('找不到道路：', roadAddress);
         console.log('================================');
 
         return false;
@@ -606,7 +514,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
         return false;
       }
 
-      // 使用道路座標
       this.demand.latitude = latitude;
       this.demand.longitude = longitude;
 
@@ -700,34 +607,6 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       this.demand.customConditions.push('');
     }
 
-    // 整理成資料庫使用的單一物資狀態欄位
-    const conditionParts: string[] = [];
-
-    const conditionLabels: (keyof DisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
-
-    // 處理接受物資需求狀態
-    conditionLabels.forEach((key) => {
-      const status = this.demand.conditions[key];
-
-      if (status === '接受') {
-        conditionParts.push(`${key}✔`);
-      } else if (status === '不接受') {
-        conditionParts.push(`${key}✘`);
-      }
-    });
-
-    // 處理其它物資需求狀態
-    this.demand.customConditions.forEach((condition) => {
-      const value = condition.trim();
-
-      if (value) {
-        conditionParts.push(value);
-      }
-    });
-
-    // 將所有狀態合併成資料庫的單一欄位
-    this.demand.conditionDescription = conditionParts.join('、');
-
     // 編輯模式
     if (this.isEditMode) {
       const originalItem = this.disasterDemandService.getDemands().find((item) => item.id === this.demand.id);
@@ -806,7 +685,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
       await this.disasterDemandService.updateDemand(this.demand);
 
       if (this.fromDetail) {
-        this.router.navigate(['/agency/supply-detail', this.demand.id]);
+        this.router.navigate(['/agency/supply-detail', this.demand.serialNo]);
       } else {
         this.router.navigate(['/agency/disaster']);
       }

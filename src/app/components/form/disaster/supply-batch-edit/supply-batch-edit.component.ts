@@ -168,99 +168,31 @@ export class SupplyBatchEditComponent implements OnInit {
       return false;
     }
 
-    // =========================================================
-    // 第一階段：搜尋完整地址
-    // =========================================================
-    const params = {
-      // 原本的城市 / 國家寫法保持不變
-      q: `${originalAddress}, Taiwan`,
-      format: 'jsonv2',
-      limit: '1',
-      countrycodes: 'tw',
-    };
-
-    try {
-      console.log('================================');
-      console.log('第一階段：搜尋完整地址');
-      console.log('搜尋地址：', originalAddress);
-
-      const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
-
-      console.log('Nominatim 完整地址回傳結果：', results);
-
-      if (results && results.length > 0) {
-        const result = results[0];
-
-        const latitude = Number(result.lat);
-
-        const longitude = Number(result.lon);
-
-        if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
-          demand.latitude = latitude;
-          demand.longitude = longitude;
-
-          console.log('完整地址定位成功');
-          console.log('地址：', originalAddress);
-          console.log('緯度：', latitude);
-          console.log('經度：', longitude);
-          console.log('找到的位置：', result.display_name);
-          console.log('================================');
-
-          return true;
-        }
-      }
-
-      console.warn('完整地址找不到，準備搜尋道路。');
-    } catch (error) {
-      console.error('完整地址搜尋失敗，準備搜尋道路：', error);
-    }
-
-    // =========================================================
-    // 第二階段：搜尋道路
-    // =========================================================
-
-    // 臺 → 台
     let roadAddress = originalAddress.replace(/臺/g, '台');
 
-    // 移除門牌號碼
-    //
-    // 例如：
-    // 台北市中正區重慶南路一段122號
-    // ↓
-    // 台北市中正區重慶南路一段
     roadAddress = roadAddress.replace(/\d+(?:-\d+)?號.*$/, '');
 
     roadAddress = roadAddress.trim();
 
-    // 移除縣市名稱
-    //
-    // 台北市中正區重慶南路一段
-    // ↓
-    // 中正區重慶南路一段
     roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
 
-    // 移除區／鄉／鎮／市
-    //
-    // 中正區重慶南路一段
-    // ↓
-    // 重慶南路一段
     roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
 
     roadAddress = roadAddress.trim();
 
-    console.log('第二階段：搜尋道路');
+    console.log('================================');
+    console.log('搜尋道路');
+    console.log('原始地址：', originalAddress);
     console.log('道路名稱：', roadAddress);
 
     if (!roadAddress) {
       console.warn('無法從地址取得道路名稱：', originalAddress);
-
       console.log('================================');
 
       return false;
     }
 
     const roadParams = {
-      // 原本的城市 / 國家寫法保持不變
       q: `${roadAddress}, Taiwan`,
       format: 'jsonv2',
       limit: '1',
@@ -277,8 +209,7 @@ export class SupplyBatchEditComponent implements OnInit {
       console.log('Nominatim 道路搜尋回傳結果：', roadResults);
 
       if (!roadResults || roadResults.length === 0) {
-        console.warn('連道路也找不到：', roadAddress);
-
+        console.warn('找不到道路：', roadAddress);
         console.log('================================');
 
         return false;
@@ -287,18 +218,15 @@ export class SupplyBatchEditComponent implements OnInit {
       const roadResult = roadResults[0];
 
       const latitude = Number(roadResult.lat);
-
       const longitude = Number(roadResult.lon);
 
       if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
         console.warn('道路回傳的經緯度無效：', roadResult);
-
         console.log('================================');
 
         return false;
       }
 
-      // 使用道路座標
       demand.latitude = latitude;
       demand.longitude = longitude;
 
@@ -313,7 +241,6 @@ export class SupplyBatchEditComponent implements OnInit {
       return true;
     } catch (error) {
       console.error('道路搜尋失敗：', error);
-
       console.log('================================');
 
       return false;
@@ -900,10 +827,7 @@ export class SupplyBatchEditComponent implements OnInit {
 
       console.log(`需求編號 ${item.serialNo} 經緯度：`, item.latitude, item.longitude);
 
-      // ===================================================
-      // 更新 Service
-      // ===================================================
-      this.service.updateDemand(item);
+      await this.service.updateDemand(item);
     }
 
     // 清除批次編輯暫存資料

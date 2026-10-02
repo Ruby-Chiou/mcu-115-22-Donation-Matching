@@ -144,18 +144,29 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
     history.scrollRestoration = 'manual';
   }
 
-  // 初始化
   ngOnInit(): void {
-    // 每次進入列表先顯示第一頁。
-    this.currentPage = 1;
+    const restoreListPosition = sessionStorage.getItem('restore-agency-daily-list');
 
-    // 不使用舊的 sessionStorage 頁碼。
-    sessionStorage.removeItem(this.pagePositionKey);
+    if (restoreListPosition === 'true') {
+      const savedPage = sessionStorage.getItem(this.pagePositionKey);
 
-    // 第一次進入列表時讀取資料。
+      if (savedPage) {
+        const page = Number(savedPage);
+
+        if (page >= 1) {
+          this.currentPage = page;
+        }
+      }
+
+      sessionStorage.removeItem('restore-agency-daily-list');
+    } else {
+      this.currentPage = 1;
+      sessionStorage.removeItem(this.pagePositionKey);
+      sessionStorage.removeItem(this.scrollPositionKey);
+    }
+
     void this.loadDemands();
-    // 每次路由成功完成時都印出最後網址，
-    // 先用它確認真正的列表路由。
+
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -164,18 +175,14 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe((event) => {
         console.log('Router NavigationEnd：', event.urlAfterRedirects);
 
-        // 只要網址是 /agency/daily 開頭，
-        // 例如 /agency/daily 或 /agency/daily?refresh=1，
-        // 都重新讀取最新資料。
         const url = event.urlAfterRedirects;
 
         if (url === '/agency/daily' || url.startsWith('/agency/daily?')) {
-          this.currentPage = 1;
-
           void this.loadDemands();
         }
       });
   }
+
   // 初始化後恢復捲動位置
   ngAfterViewInit(): void {
     const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
@@ -209,16 +216,16 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // 查看詳細資料
-  goToDetail(id: number): void {
-    if (!Number.isInteger(id) || id <= 0) {
-      console.error('[DailyListComponent] 無法前往詳細頁，資料庫 id 不正確：', id);
-
+  goToDetail(serialNo: number | undefined): void {
+    if (serialNo == null || !Number.isInteger(Number(serialNo))) {
+      console.error('無法前往日常需求詳細頁，需求編號不正確：', serialNo);
       return;
     }
 
     this.saveListPosition();
+    sessionStorage.setItem('restore-agency-daily-list', 'true');
 
-    this.router.navigate(['/agency/daily-detail', id]);
+    this.router.navigate(['/agency/daily-detail', serialNo]);
   }
 
   // 編輯
@@ -230,9 +237,11 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.saveListPosition();
+    sessionStorage.setItem('restore-agency-daily-list', 'true');
 
     this.router.navigate(['/agency/daily-edit', id]);
   }
+
   // 儲存列表位置
   saveListPosition(): void {
     sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
@@ -586,6 +595,12 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updatePagination();
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant',
+      });
     }
   }
 

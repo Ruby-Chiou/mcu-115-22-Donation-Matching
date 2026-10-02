@@ -407,64 +407,26 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     this.demand.serviceTargetDescription = this.buildServiceTargetDescription();
   }
 
-  private extractRoadName(address: string): string {
-    let roadAddress = address.trim().replace(/臺/g, '台').replace(/\s+/g, '');
-
-    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
-    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
-    roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
-
-    return roadAddress.trim();
-  }
-
   async getCoordinatesFromAddress(address: string): Promise<boolean> {
     const url = 'https://nominatim.openstreetmap.org/search';
+
     const originalAddress = address.trim();
 
-    const searchAddresses: string[] = [
-      originalAddress,
-      originalAddress.replace(/臺/g, '台'),
-      originalAddress.replace(/號$/, ''),
-      originalAddress.replace(/臺/g, '台').replace(/號$/, ''),
-      originalAddress.replace(/\s+/g, ''),
-      originalAddress.replace(/臺/g, '台').replace(/\s+/g, ''),
-      originalAddress.replace(/臺/g, '台').replace(/號$/, '').replace(/\s+/g, ''),
-    ];
-
-    const uniqueAddresses = [...new Set(searchAddresses.filter((item) => item.length > 0))];
-
-    for (const searchAddress of uniqueAddresses) {
-      const params = {
-        q: `${searchAddress}, Taiwan`,
-        format: 'jsonv2',
-        limit: '1',
-        countrycodes: 'tw',
-      };
-
-      try {
-        const results = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params }));
-
-        if (!results || results.length === 0) {
-          continue;
-        }
-
-        const result = results[0];
-        const latitude = Number(result.lat);
-        const longitude = Number(result.lon);
-
-        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-          continue;
-        }
-
-        this.demand.latitude = latitude;
-        this.demand.longitude = longitude;
-        return true;
-      } catch (error) {
-        continue;
-      }
+    if (!originalAddress) {
+      return false;
     }
 
-    const roadAddress = this.extractRoadName(originalAddress);
+    let roadAddress = originalAddress.replace(/臺/g, '台');
+
+    roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
+
+    roadAddress = roadAddress.trim();
+
+    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
+
+    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
+
+    roadAddress = roadAddress.trim();
 
     if (!roadAddress) {
       return false;
@@ -478,13 +440,18 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     };
 
     try {
-      const roadResults = await firstValueFrom(this.http.get<NominatimSearchResult[]>(url, { params: roadParams }));
+      const roadResults = await firstValueFrom(
+        this.http.get<NominatimSearchResult[]>(url, {
+          params: roadParams,
+        })
+      );
 
       if (!roadResults || roadResults.length === 0) {
         return false;
       }
 
       const roadResult = roadResults[0];
+
       const latitude = Number(roadResult.lat);
       const longitude = Number(roadResult.lon);
 
@@ -494,6 +461,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
       this.demand.latitude = latitude;
       this.demand.longitude = longitude;
+
       return true;
     } catch (error) {
       return false;
@@ -610,7 +578,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
         await this.dailyDemandService.updateDemand(this.demand);
 
         if (this.fromDetail) {
-          await this.router.navigate(['/agency/daily-detail', this.demand.id]);
+          await this.router.navigate(['/agency/daily-detail', this.demand.serialNo]);
         } else {
           await this.router.navigate(['/agency/daily'], {
             queryParams: {

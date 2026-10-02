@@ -107,8 +107,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly cdr: ChangeDetectorRef
   ) {
     history.scrollRestoration = 'manual';
+
     this.demandChangedSubscription = this.disasterDemandService.demandChanged$.subscribe(() => {
-      void this.loadDemands();
+      void this.loadDemands(false);
     });
   }
 
@@ -120,6 +121,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (savedPage) {
         const page = Number(savedPage);
+
         if (page >= 1) {
           this.currentPage = page;
         }
@@ -169,20 +171,19 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/agency/supply-form']);
   }
 
-  goToDetail(id: number | undefined): void {
-    if (id == null || !Number.isInteger(Number(id))) {
-      console.error('無法前往災害物資詳細頁，資料庫 id 不正確：', id);
-
+  goToDetail(serialNo: number | undefined): void {
+    if (serialNo == null || !Number.isInteger(Number(serialNo))) {
+      console.error('無法前往災害物資詳細頁，需求編號不正確：', serialNo);
       return;
     }
 
-    this.router.navigate(['/agency/supply-detail', id]);
+    this.router.navigate(['/agency/supply-detail', serialNo]);
   }
 
-  goToEdit(id: number): void {
+  goToEdit(serialNo: number): void {
     this.saveListPosition();
     sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-edit', id]);
+    this.router.navigate(['/agency/supply-edit', serialNo]);
   }
 
   saveListPosition(): void {
@@ -195,12 +196,14 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.saveListPosition();
   }
 
-  async loadDemands(): Promise<void> {
+  async loadDemands(showLoading = true): Promise<void> {
     if (this.isLoading) {
       return;
     }
 
-    this.isLoading = true;
+    if (showLoading) {
+      this.isLoading = true;
+    }
 
     try {
       await this.disasterDemandService.reload();
@@ -228,8 +231,6 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.filteredDemands = [...this.demands];
 
-      this.currentPage = 1;
-
       this.updatePagination();
     } catch (error) {
       console.error('載入物資需求失敗：', error);
@@ -238,7 +239,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.filteredDemands = [];
       this.pagedDemands = [];
     } finally {
-      this.isLoading = false;
+      if (showLoading) {
+        this.isLoading = false;
+      }
 
       this.cdr.markForCheck();
     }
@@ -274,6 +277,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onSortChange(event: { selectedSort: SortType; sortAscending: boolean }): void {
     const scrollY = window.scrollY;
+
     this.selectedSort = event.selectedSort;
     this.sortAscending = event.sortAscending;
     this.userHasSorted = true;
@@ -324,6 +328,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       category: [],
       messageStatus: [],
     };
+
     this.applyFilters();
   }
 
@@ -444,12 +449,23 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.pagedDemands = [...this.filteredDemands.slice(startIndex, startIndex + this.pageSize)];
 
     this.selectAll = this.pagedDemands.length > 0 && this.pagedDemands.every((item) => item.selected);
+
+    console.log('目前頁數：', this.currentPage);
+    console.log('每頁筆數：', this.pageSize);
+    console.log('目前頁面資料：', this.pagedDemands.length);
+    console.log('目前頁面資料內容：', this.pagedDemands);
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updatePagination();
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant',
+      });
     }
   }
 
@@ -496,13 +512,12 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // 從「已下架」重新選擇「已上架」
     if (newStatus === '已上架' && item.status === '下架') {
-      // 優先使用目前列表資料的下架原因
+      // 取得下架原因
       const offShelfReason = item.offShelfReason ?? originalItem?.offShelfReason;
 
-      // 手動下架不能重新上架
-      if (offShelfReason !== 'natural') {
+      // 只有「手動下架」不能重新上架
+      if (offShelfReason === 'manual') {
         item.displayStatus = '已下架';
 
         setTimeout(() => {
@@ -540,7 +555,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands();
+      await this.loadDemands(false);
     } catch (error) {
       console.error('下架失敗：', error);
     } finally {
@@ -558,6 +573,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const item = this.pendingOffShelfItem;
+
     item.status = '隱藏';
     item.offShelfReason = undefined;
     item.publishedAt = undefined;
@@ -568,7 +584,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands();
+      await this.loadDemands(false);
     } catch (error) {
       console.error('隱藏失敗：', error);
     } finally {
@@ -590,7 +606,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const originalStatus = originalItem?.status;
 
-    let status: DisasterStatus = item.displayStatus === '已上架' ? '上架' : '隱藏';
+    const status: DisasterStatus = item.displayStatus === '已上架' ? '上架' : '隱藏';
 
     const now = new Date();
 
@@ -620,7 +636,6 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands();
     } catch (error) {
       console.error('狀態更新失敗：', error);
     }
@@ -633,9 +648,11 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       case '普通':
         offShelfDate.setDate(offShelfDate.getDate() + 30);
         break;
+
       case '緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 14);
         break;
+
       case '非常緊急':
         offShelfDate.setDate(offShelfDate.getDate() + 7);
         break;
