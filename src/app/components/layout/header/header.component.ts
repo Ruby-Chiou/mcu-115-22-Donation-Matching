@@ -48,7 +48,7 @@ export class HeaderComponent {
       link: '/about-us',
       sub: [
         { name: '平台介紹', link: '/intro' },
-        { name: '最新消息', link: '/news-section' },
+        { name: '平台導覽', link: '/platform-guide' },
         { name: '聯絡我們', link: '/contact-us' },
       ],
     },
