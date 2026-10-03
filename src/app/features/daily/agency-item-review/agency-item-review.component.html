@@ -1,1 +1,194 @@
-<p>agency-item-review works!</p>
+<section class="review-list-page" [attr.aria-busy]="isLoading">
+  <header>
+    <h1>物資審核列表</h1>
+    <p>請確認 AI 審核結果並做最後決定</p>
+  </header>
+
+  <section class="filter-panel" aria-label="物資篩選">
+    <div class="filter-toolbar">
+      <button type="button" class="filter-toggle" [attr.aria-expanded]="isFilterExpanded" (click)="isFilterExpanded = !isFilterExpanded">
+        <i class="fa-solid fa-filter" aria-hidden="true"></i>
+        <span>篩選</span>
+        <span class="filter-chevron" aria-hidden="true">{{ isFilterExpanded ? '▲' : '▼' }}</span>
+      </button>
+      <div class="search-box">
+        <svg
+          class="search-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          placeholder="搜尋需求物..."
+          aria-label="搜尋需求物"
+          [(ngModel)]="searchTerm"
+          (focus)="isFilterExpanded = false"
+          (keyup.enter)="$event.preventDefault()"
+        />
+        @if (searchTerm) {
+        <button type="button" class="clear-search-btn" aria-label="清除搜尋" (click)="searchTerm = ''">✕</button>
+        }
+      </div>
+    </div>
+
+    @if (isFilterExpanded) {
+    <div class="filter-options">
+      <section class="filter-group" aria-labelledby="filter-ai-title">
+        <h2 id="filter-ai-title">AI 審核結果</h2>
+        <div class="filter-pills">
+          @for (option of aiDecisionOptions; track option.value) {
+          <button
+            type="button"
+            class="filter-pill"
+            [class.active]="selectedFilters.aiDecision.includes(option.value)"
+            [attr.aria-pressed]="selectedFilters.aiDecision.includes(option.value)"
+            (click)="toggleFilter('aiDecision', option.value)"
+          >
+            {{ option.label }}
+          </button>
+          }
+        </div>
+      </section>
+
+      <section class="filter-group" aria-labelledby="filter-category-title">
+        <h2 id="filter-category-title">類別</h2>
+        <div class="filter-pills">
+          @for (category of categoryOptions; track category) {
+          <button
+            type="button"
+            class="filter-pill"
+            [class.active]="selectedFilters.category.includes(category)"
+            [attr.aria-pressed]="selectedFilters.category.includes(category)"
+            (click)="toggleFilter('category', category)"
+          >
+            {{ category }}
+          </button>
+          }
+        </div>
+      </section>
+
+      <section class="filter-group" aria-labelledby="filter-priority-title">
+        <h2 id="filter-priority-title">緊急優先度</h2>
+        <div class="filter-pills">
+          @for (priority of priorityOptions; track priority) {
+          <button
+            type="button"
+            class="filter-pill"
+            [class.active]="selectedFilters.priority.includes(priority)"
+            [attr.aria-pressed]="selectedFilters.priority.includes(priority)"
+            (click)="toggleFilter('priority', priority)"
+          >
+            {{ priority }}
+          </button>
+          }
+        </div>
+      </section>
+
+      <section class="filter-group" aria-labelledby="filter-method-title">
+        <h2 id="filter-method-title">接收方式</h2>
+        <div class="filter-pills">
+          @for (method of receiveMethodOptions; track method) {
+          <button
+            type="button"
+            class="filter-pill"
+            [class.active]="selectedFilters.receiveMethod.includes(method)"
+            [attr.aria-pressed]="selectedFilters.receiveMethod.includes(method)"
+            (click)="toggleFilter('receiveMethod', method)"
+          >
+            {{ method }}
+          </button>
+          }
+        </div>
+      </section>
+
+      <div class="filter-actions">
+        <button type="button" class="reset-filter-button" (click)="resetFilters()">重置篩選</button>
+      </div>
+    </div>
+    }
+  </section>
+
+  @if (isLoading) {
+  <div class="loading-container" role="status" aria-live="polite">
+    <span class="loading-spinner" aria-hidden="true"></span>
+
+    <p>正在載入物資資料...</p>
+  </div>
+  } @else {
+  <section class="review-section">
+    <h2>待審核</h2>
+
+    @if ( filteredPendingDonations.length === 0 ) {
+    <p class="empty-message">沒有符合條件的待決定物資。</p>
+    }
+
+    <div class="donation-list">
+      @for ( donation of filteredPendingDonations; track donation.id ) {
+      <article class="donation-card">
+        <div class="donation-card-header">
+          <h3>{{ donation.demand_material}}</h3>
+
+          <span class="pending-label"> 待決定 </span>
+        </div>
+
+        <p>數量： {{ donation.quantity }}</p>
+
+        <p>AI 判定： {{ getAiDecisionText( donation.ai_decision ) }}</p>
+
+        <p>物資狀態要求： {{ getAcceptedConditionsText( donation ) || '無法判斷' }}</p>
+
+        <button type="button" (click)="openDonation(donation)">查看並確認</button>
+      </article>
+      }
+    </div>
+  </section>
+
+  <div class="section-divider">
+    <span>以下為已完成審核的物資</span>
+  </div>
+
+  <section class="review-section">
+    <h2>已完成</h2>
+
+    @if ( filteredCompletedDonations.length === 0 ) {
+    <p class="empty-message">沒有符合條件的已完成審核物資。</p>
+    }
+
+    <div class="donation-list">
+      @for ( donation of filteredCompletedDonations; track donation.id ) {
+      <article class="donation-card completed-card">
+        <div class="donation-card-header">
+          <h3>{{ donation.demand_material }}</h3>
+
+          @if ( donation.status === 'human_approved' ) {
+          <span class="approved-label"> 已接受 </span>
+          } @if ( donation.status === 'human_rejected' ) {
+          <span class="rejected-label"> 不接受 </span>
+          }
+        </div>
+
+        <p>捐助者： {{ donation.donor_name }}</p>
+
+        <p>AI 判定： {{ getAiDecisionText( donation.ai_decision ) }}</p>
+
+        <p>物資狀態要求： {{ getAcceptedConditionsText( donation ) || '無法判斷' }}</p>
+
+        <p>最後決定： {{ donation.human_decision === 'accepted' ? '接受' : '不接受' }}</p>
+
+        <button type="button" (click)="openDonation(donation)">查看詳細資料</button>
+      </article>
+      }
+    </div>
+  </section>
+  } @if (errorMessage) {
+  <p class="error-message" role="alert">{{ errorMessage }}</p>
+  }
+</section>

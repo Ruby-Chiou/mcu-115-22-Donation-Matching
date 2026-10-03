@@ -1,0 +1,562 @@
+:host {
+  --primary: #1565c0;
+  --primary-dark: #0f56a8;
+  --text-main: #0f172a;
+  --text-body: #475569;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --page-bg: #f8fafc;
+  --card-bg: #ffffff;
+
+  display: block;
+  min-height: 100%;
+  background: var(--page-bg);
+}
+
+/* 頁面 */
+.review-list-page {
+  width: min(1220px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 38px 0 60px;
+  color: #1f2937;
+}
+
+.review-list-page > header {
+  margin-bottom: 26px;
+}
+
+.review-list-page h1,
+.review-list-page h2,
+.review-list-page h3,
+.review-list-page p {
+  margin-top: 0;
+}
+
+.review-list-page h1 {
+  margin-bottom: 8px;
+  color: #111827;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.review-list-page > header p {
+  margin-bottom: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.filter-panel {
+  margin-bottom: 30px;
+}
+
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.filter-toolbar .search-box {
+  margin-left: auto;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    color: #1565c0;
+  }
+
+  input {
+    width: 230px;
+    height: 42px;
+    padding: 0 38px 0 42px;
+    border: 1.5px solid #90caf9;
+    border-radius: 22px;
+    outline: 0;
+    background: #fff;
+    color: #333;
+    font-size: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+    &:focus {
+      border-color: #1565c0;
+      box-shadow: 0 3px 9px rgba(21, 101, 192, 0.16);
+    }
+
+    &::placeholder {
+      color: #9e9e9e;
+    }
+  }
+
+  .clear-search-btn {
+    position: absolute;
+    right: 12px;
+    border: 0;
+    background: none;
+    color: #777;
+    font-size: 16px;
+    cursor: pointer;
+  }
+}
+
+.filter-toggle {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 8px;
+  border: 0;
+  color: #536e8c;
+  background: transparent;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #3974a8;
+    outline-offset: 2px;
+  }
+}
+
+.filter-chevron {
+  font-size: 14px;
+}
+
+.filter-options {
+  margin-top: 14px;
+  padding: 24px 28px;
+  border: 1px solid #e8d9c9;
+  border-radius: 15px;
+  background: #fffdf9;
+}
+
+.filter-group {
+  padding: 0 0 16px;
+  border-bottom: 1px solid #eee1d4;
+
+  & + .filter-group {
+    padding-top: 16px;
+  }
+
+  h2 {
+    margin: 0 0 12px;
+    color: #30343a;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+}
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+
+.filter-pill {
+  min-height: 40px;
+  padding: 8px 18px;
+  border: 1px solid #ddcbb8;
+  border-radius: 999px;
+  color: #4b5563;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+
+  &:hover {
+    border-color: #8ca8c1;
+    background: #f5f8fb;
+  }
+
+  &.active {
+    border-color: #547b9e;
+    color: #294f72;
+    background: #eaf2f8;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #3974a8;
+    outline-offset: 2px;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 17px;
+}
+
+.reset-filter-button {
+  min-height: 42px;
+  padding: 8px 19px;
+  border: 1px solid #ddcbb8;
+  border-radius: 9px;
+  color: #4b5563;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #f8f4ef;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #3974a8;
+    outline-offset: 2px;
+  }
+}
+
+/* 區塊標題 */
+.review-section h2 {
+  margin-bottom: 13px;
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.section-description {
+  margin-bottom: 21px;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* 卡片列表：桌面版四欄 */
+.donation-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+/* 卡片 */
+.donation-card {
+  display: flex;
+  min-width: 0;
+  min-height: 205px;
+  flex-direction: column;
+  padding: 21px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.donation-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 10px 24px rgba(30, 64, 175, 0.13);
+  transform: translateY(-2px);
+}
+
+.donation-card:focus-within {
+  outline: 2px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
+}
+
+.donation-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+  margin-bottom: 16px;
+}
+
+.donation-card h3 {
+  min-width: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  color: var(--text-main);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donation-card p {
+  margin-bottom: 10px;
+  color: var(--text-body);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* 卡片按鈕 */
+.donation-card button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.donation-card button:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 10px rgba(21, 101, 192, 0.22);
+}
+
+/* 狀態標籤 */
+.pending-label,
+.approved-label,
+.rejected-label {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.pending-label {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.approved-label {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.rejected-label {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.completed-card {
+  border-color: #dbeafe;
+}
+
+/* 分隔線 */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0 26px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.section-divider::before,
+.section-divider::after {
+  flex: 1;
+  border-top: 1px dashed #cbd5e1;
+  content: '';
+}
+
+/* 空資料 */
+.empty-message {
+  margin: 0;
+  padding: 34px 18px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 13px;
+  color: var(--text-muted);
+  background: var(--card-bg);
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* 錯誤訊息 */
+.error-message {
+  margin: 16px 0;
+  padding: 13px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #991b1b;
+  background: #fef2f2;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* 載入畫面 */
+.loading-container {
+  display: flex;
+  width: 100%;
+  min-height: 300px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #666666;
+  text-align: center;
+}
+
+.loading-container p {
+  margin: 16px 0 0;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #e8f1f8;
+  border-top-color: #1769aa;
+  border-right-color: #1769aa;
+  border-radius: 50%;
+  animation: donor-loading-spin 0.85s linear infinite;
+}
+
+@keyframes donor-loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1100px) {
+  .donation-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .review-list-page {
+    width: min(calc(100% - 28px), 650px);
+    padding: 30px 0 46px;
+  }
+
+  .donation-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .donation-card {
+    min-height: 210px;
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .filter-toolbar .search-box {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  .filter-options {
+    padding: 19px;
+  }
+
+  .filter-pill {
+    min-height: 38px;
+    padding: 7px 15px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 560px) {
+  .review-list-page {
+    width: calc(100% - 22px);
+    padding: 24px 0 38px;
+  }
+
+  .review-list-page h1 {
+    font-size: 23px;
+  }
+
+  .review-list-page > header p {
+    font-size: 14px;
+  }
+
+  .review-section h2 {
+    font-size: 18px;
+  }
+
+  .section-description {
+    font-size: 14px;
+  }
+
+  .donation-list {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .donation-card {
+    min-height: 220px;
+    padding: 18px;
+  }
+
+  .donation-card-header {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .donation-card h3 {
+    font-size: 17px;
+    white-space: normal;
+  }
+
+  .donation-card p {
+    font-size: 14px;
+  }
+
+  .section-divider {
+    gap: 10px;
+    margin: 33px 0 22px;
+    font-size: 12px;
+  }
+
+  .empty-message,
+  .error-message {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .filter-pills {
+    gap: 8px;
+  }
+
+  .filter-pill {
+    padding: 7px 13px;
+  }
+}

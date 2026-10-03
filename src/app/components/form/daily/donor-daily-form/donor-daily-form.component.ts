@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-
+import { ChangeDetectorRef } from '@angular/core';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
-
+import { AiReviewResult, DonationService } from '../../../../core/services/agency-daily-demand/daily-donation.service';
 @Component({
   selector: 'app-donor-daily-form',
   imports: [CommonModule, FormsModule],
@@ -21,11 +21,18 @@ export class DonorDailyFormComponent implements OnInit {
   showImagePreview = false;
   previewImage = '';
   previewImageName = '';
+  isSubmitting = false;
+  isReviewing = false;
+  reviewResult: AiReviewResult | null = null;
+  reviewError = '';
+  donationId = '';
 
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private readonly demandService: DailyDemandService
+    private readonly demandService: DailyDemandService,
+    private readonly donationService: DonationService,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.demandId = Number(this.route.snapshot.paramMap.get('id'));
   }
@@ -124,7 +131,11 @@ export class DonorDailyFormComponent implements OnInit {
     console.log('捐贈完成證明：', this.proofFile);
     alert('捐贈完成證明已上傳，等待受助單位確認。');
   }
-  submitForm(form: NgForm): void {
+  async submitForm(form: NgForm): Promise<void> {
+    if (this.isSubmitting) {
+      return;
+    }
+
     this.formSubmitted = true;
     form.control.markAllAsTouched();
 
@@ -145,21 +156,82 @@ export class DonorDailyFormComponent implements OnInit {
       return;
     }
 
-    this.submitted = true;
+    if (!this.quantity || this.quantity <= 0) {
+      alert('請輸入正確的捐贈數量');
+      return;
+    }
 
-    console.log('捐贈申請資料：', {
-      donorName: this.donorName,
-      phone: this.phone,
-      actualMaterial: this.actualMaterial,
-      quantity: this.quantity,
-      materialFiles: this.materialFiles,
-      needReceipt: this.needReceipt,
-      needThankYou: this.needThankYou,
-      receiptTitle: this.receiptTitle,
-      taxId: this.taxId,
-      note: this.note,
-    });
+    if (this.donationMethod !== '寄送' && this.donationMethod !== '面交') {
+      alert('請選擇捐贈方式');
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.reviewResult = null;
+    this.reviewError = '';
+
+    try {
+      console.log('開始送出捐助資料');
+
+      const donation = await this.donationService.createDonation({
+        demandId: this.demandId,
+        donorName: this.donorName,
+        phone: this.phone,
+        actualMaterial: this.actualMaterial,
+        quantity: this.quantity,
+        donationMethod: this.donationMethod,
+        note: this.note,
+        needReceipt: this.needReceipt === 'yes',
+        needThankYou: this.needThankYou === 'yes',
+        receiptTitle: this.needReceipt === 'yes' ? this.receiptTitle : null,
+        taxId: this.taxId || null,
+        materialFiles: this.materialFiles,
+        materialVideoFiles: this.materialVideoFiles,
+      });
+
+      console.log('捐助資料、圖片和影片已成功儲存：', donation);
+
+      this.donationId = donation.id;
+
+      // 上傳完成後立刻結束 loading
+      this.isSubmitting = false;
+
+      // 切換完成畫面
+      this.submitted = true;
+
+      // 立即要求 Angular 更新模板
+      this.cdr.detectChanges();
+
+      // 背景執行 AI，不阻塞完成畫面
+      void this.runAiReview(this.donationId);
+    } catch (error) {
+      console.error('寫入捐助資料失敗：', error);
+
+      this.isSubmitting = false;
+      this.cdr.detectChanges();
+
+      alert('捐助資料送出失敗，請稍後再試。');
+    }
   }
+  private async runAiReview(donationId: string): Promise<void> {
+    this.isReviewing = true;
+    this.reviewError = '';
+
+    try {
+      const result = await this.donationService.reviewDonationWithAi(donationId);
+
+      this.reviewResult = result;
+
+      console.log('AI 審核結果：', result);
+    } catch (error) {
+      console.error('AI 審核失敗：', error);
+
+      this.reviewError = '捐助資料已成功送出，但 AI 審核暫時失敗。';
+    } finally {
+      this.isReviewing = false;
+    }
+  }
+
   goToDisasterOpen() {
     this.router.navigate(['/disaster/open']);
   }
@@ -230,7 +302,7 @@ export class DonorDailyFormComponent implements OnInit {
     const file = input.files[0];
 
     // 檢查檔案大小：5MB
-    if (file.size > 100 * 1024 * 1024) {
+    if (file.size > 50 * 1024 * 1024) {
       alert('影片大小不能超過 5MB');
       input.value = '';
       return;
