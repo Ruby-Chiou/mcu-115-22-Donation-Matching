@@ -37,8 +37,11 @@ jobs:
           node-version: 24
       - name: 套件安裝
         run: npm install
-      - name: 程式編譯
-        run: npm run build -- --base-href=/${{ github.event.repository.name }}/
+      - name: 程式編譯與 SPA 404 轉發處理
+        run: |
+          npm run build -- --base-href=/${{ github.event.repository.name }}/
+          # 關鍵：把打包出來的 index.html 複製一份並命名為 404.html
+          cp ./dist/donation-matching/browser/index.html ./dist/donation-matching/browser/404.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
