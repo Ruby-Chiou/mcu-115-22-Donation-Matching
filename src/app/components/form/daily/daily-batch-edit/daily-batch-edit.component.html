@@ -487,12 +487,6 @@
         <span class="required">*</span>
       </label>
 
-      <!-- 公開狀態 -->
-      <label class="label-row align-title">
-        公開狀態
-        <span class="required">*</span>
-      </label>
-
       <div class="status-box">
         <!-- 上架 -->
         <label [class.disabled-status]="isManualOffShelf(demand)" (click)="onStatusClick($event, demand, '上架')">

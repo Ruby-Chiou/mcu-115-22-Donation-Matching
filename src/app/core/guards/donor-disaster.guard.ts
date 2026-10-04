@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { DisasterClosedModalService } from '../services/disaster-closed-modal.service';
+import { DisasterClosedModalService } from '../services/disaster-control/disaster-closed-modal.service';
 export const donorDisasterGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const closedModal = inject(DisasterClosedModalService);

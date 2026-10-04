@@ -37,19 +37,19 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
   loadError = '';
 
   async ngOnInit(): Promise<void> {
-    const rawId = this.route.snapshot.paramMap.get('id');
+    const rawSerialNo = this.route.snapshot.paramMap.get('id');
 
-    const id = Number(rawId);
+    const serialNo = Number(rawSerialNo);
 
-    console.log('[DailyDetailComponent] 取得路由資料庫 id：', {
-      rawId,
-      id,
+    console.log('[DailyDetailComponent] 取得路由需求編號：', {
+      rawSerialNo,
+      serialNo,
     });
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!Number.isInteger(serialNo) || serialNo <= 0) {
       this.isLoading = false;
 
-      this.loadError = '網址中的資料編號不正確。';
+      this.loadError = '網址中的需求編號不正確。';
 
       this.cdr.detectChanges();
 
@@ -57,7 +57,7 @@ export class DailyDetailComponent implements OnInit, AfterViewInit {
     }
 
     try {
-      const loadedDemand = await this.service.getDemandById(id);
+      const loadedDemand = await this.service.getDemandBySerialNo(serialNo);
 
       console.log('[DailyDetailComponent] Service 回傳資料：', loadedDemand);
 

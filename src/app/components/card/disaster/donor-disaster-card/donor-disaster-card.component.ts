@@ -4,7 +4,7 @@ import { NgClass } from '@angular/common';
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 
-import { DisasterControlService } from '../../../../core/services/disaster-control.service';
+import { DisasterControlService } from '../../../../core/services/disaster-control/disaster-control.service';
 
 @Component({
   selector: 'app-donor-disaster-card',

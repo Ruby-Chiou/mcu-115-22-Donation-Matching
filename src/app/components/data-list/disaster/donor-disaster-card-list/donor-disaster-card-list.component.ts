@@ -8,7 +8,7 @@ import { PaginationComponent } from '../../../pagination/pagination.component';
 
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
-import { DisasterControlService } from '../../../../core/services/disaster-control.service';
+import { DisasterControlService } from '../../../../core/services/disaster-control/disaster-control.service';
 
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';

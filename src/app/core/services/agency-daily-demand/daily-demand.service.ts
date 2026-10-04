@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 
 import { DailyDemand, CreateDailyDemand, DailyConditions } from '../../../models/agency/daily-demand';
-import { SupabaseService } from '../supabase.service';
+import { SupabaseService } from '../database/supabase.service';
 
 interface DailyDemandRow {
   id: number;
@@ -29,10 +29,13 @@ interface DailyDemandRow {
 
   priority: string;
   status: string;
+  offShelfReason: string | null;
 
   receiveMethod: string[];
   recipient: string;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
   phone: string;
   note: string | null;
 
@@ -112,6 +115,8 @@ export class DailyDemandService {
 
       recipient: row.recipient,
       address: row.address,
+      latitude: row.latitude ?? undefined,
+      longitude: row.longitude ?? undefined,
       phone: row.phone,
       note: row.note ?? '',
       brand: row.brand ?? '',
@@ -129,6 +134,7 @@ export class DailyDemandService {
       conditionDescription: this.createConditionDescription(row.conditions, row.customConditions),
 
       status: row.status as DailyDemand['status'],
+      offShelfReason: row.offShelfReason as DailyDemand['offShelfReason'],
 
       remaining: row.remaining === null ? undefined : Number(row.remaining),
 
@@ -204,11 +210,14 @@ export class DailyDemandService {
 
       priority: demand.priority,
       status: demand.status,
+      offShelfReason: demand.offShelfReason ?? 'natural',
 
       receiveMethod: this.receiveMethodToArray(demand.receiveMethod),
 
       recipient: demand.recipient,
       address: demand.address,
+      latitude: demand.latitude ?? null,
+      longitude: demand.longitude ?? null,
       phone: demand.phone,
       note: demand.note ?? null,
 
@@ -283,6 +292,27 @@ export class DailyDemandService {
     if (!data) {
       console.warn(`查無日常物資需求：id=${id}`);
 
+      return undefined;
+    }
+
+    return this.mapRowToDemand(data as DailyDemandRow);
+  }
+
+  async getDemandBySerialNo(serialNo: number): Promise<DailyDemand | undefined> {
+    console.log('[getDemandBySerialNo] 準備查詢 serialNo：', serialNo);
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('serialNo', serialNo).maybeSingle();
+
+    console.log('[getDemandBySerialNo] Supabase data：', data);
+    console.log('[getDemandBySerialNo] Supabase error：', error);
+
+    if (error) {
+      console.error('讀取單筆日常物資需求失敗：', error);
+      throw error;
+    }
+
+    if (!data) {
+      console.warn(`查無日常物資需求：serialNo=${serialNo}`);
       return undefined;
     }
 
@@ -367,10 +397,6 @@ export class DailyDemandService {
       throw error;
     }
 
-    /*
-     * PostgREST / Supabase delete().select()
-     * 只有在資料真的被刪除時才會回傳資料。
-     */
     if (!data || data.length === 0) {
       throw new Error(`找不到要刪除的日常物資需求，id：${id}`);
     }

@@ -231,7 +231,6 @@ export const routes: Routes = [
     import('./features/about-us/contact-us/contact-us.component')
       .then(m => m.ContactUsComponent),
 },
-
   // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回大廳
   { path: '**', redirectTo: 'home' },
 ];

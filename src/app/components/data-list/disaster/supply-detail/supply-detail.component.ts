@@ -57,8 +57,6 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
 
       this.demand = loadedDemand;
 
-      this.parseConditionDescription();
-
       this.cdr.detectChanges();
 
       console.log('[SupplyDetailComponent] 已設定 this.demand，已觸發畫面更新：', this.demand);
@@ -114,64 +112,6 @@ export class SupplyDetailComponent implements OnInit, AfterViewInit {
 
   getDeleteIds(): number[] {
     return this.demand?.serialNo != null ? [this.demand.serialNo] : [];
-  }
-
-  // 將資料庫單一欄位 conditionDescription
-  // 還原成前端查看頁使用的 conditions + customConditions
-  parseConditionDescription(): void {
-    if (!this.demand) {
-      return;
-    }
-
-    const description = this.demand.conditionDescription?.trim();
-
-    // 初始化前端顯示用資料
-    this.demand.conditions = {
-      全新: '',
-      二手: '',
-      有擦痕: '',
-      過期: '',
-      毀損: '',
-    };
-
-    this.demand.customConditions = [];
-
-    if (!description) {
-      return;
-    }
-
-    const conditionLabels: (keyof DisasterDemand['conditions'])[] = ['全新', '二手', '有擦痕', '過期', '毀損'];
-
-    const parts = description.split('、');
-
-    parts.forEach((part) => {
-      const value = part.trim();
-
-      if (!value) {
-        return;
-      }
-
-      // 判斷是否為接受物資狀態
-      const matchedLabel = conditionLabels.find((label) => value.startsWith(label));
-
-      if (matchedLabel) {
-        const symbol = value.slice(matchedLabel.length);
-
-        if (symbol === '✔') {
-          this.demand!.conditions[matchedLabel] = '接受';
-          return;
-        }
-
-        if (symbol === '✘') {
-          this.demand!.conditions[matchedLabel] = '不接受';
-          return;
-        }
-      }
-
-      // 不是固定接受物資狀態
-      // → 視為其它物資需求狀態
-      this.demand!.customConditions!.push(value);
-    });
   }
 
   // 檢查是否有有效填寫的其他物品狀態

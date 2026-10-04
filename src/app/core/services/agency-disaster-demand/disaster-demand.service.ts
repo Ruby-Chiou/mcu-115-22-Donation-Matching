@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, from } from 'rxjs';
 
 import { DisasterDemand, CreateDisasterDemand } from '../../../models/agency/disaster-demand';
-import { SupabaseService } from '../supabase.service';
+import { SupabaseService } from '../database/supabase.service';
 
 interface DisasterDemandRow {
   id: number | string;

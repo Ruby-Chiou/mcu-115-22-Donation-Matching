@@ -3,10 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
-import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../../models/agency/disaster-demand';
-
+import { DisasterDemand, DisplayStatus } from '../../../../models/agency/disaster-demand';
 import { PaginationComponent } from '../../../pagination/pagination.component';
 import { SupplyLoadingComponent } from '../../../../components/loading/supply-loading/supply-loading.component';
 import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
@@ -15,14 +13,7 @@ import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply
 import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
-
-type DisasterListItem = DisasterDemand & {
-  selected: boolean;
-  displayStatus: DisplayStatus;
-  displayCreatedAt: string;
-  displayPublishedAt: string;
-  displayOffShelfAt: string;
-};
+import { DisasterListLogic, DisasterListItem } from '../../../logic/disaster/disaster-list-logic';
 
 @Component({
   selector: 'app-disaster-list',
@@ -47,7 +38,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   demands: DisasterListItem[] = [];
   filteredDemands: DisasterListItem[] = [];
   pagedDemands: DisasterListItem[] = [];
+
   private demandChangedSubscription?: Subscription;
+  private readonly logic: DisasterListLogic;
 
   selectAll = false;
   isRestoringScroll = false;
@@ -91,6 +84,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     '居住安置與修繕用品',
     '其他',
   ];
+
   messageOptions = ['已回覆', '未回覆'];
 
   selectedFilters: SupplyFilterState = {
@@ -106,9 +100,12 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef
   ) {
+    this.logic = new DisasterListLogic();
+
     history.scrollRestoration = 'manual';
+
     this.demandChangedSubscription = this.disasterDemandService.demandChanged$.subscribe(() => {
-      void this.loadDemands();
+      void this.loadDemands(false);
     });
   }
 
@@ -120,6 +117,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
       if (savedPage) {
         const page = Number(savedPage);
+
         if (page >= 1) {
           this.currentPage = page;
         }
@@ -128,6 +126,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       sessionStorage.removeItem('restore-agency-disaster-list');
     } else {
       this.currentPage = 1;
+
       sessionStorage.removeItem(this.pagePositionKey);
       sessionStorage.removeItem(this.scrollPositionKey);
     }
@@ -169,20 +168,19 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/agency/supply-form']);
   }
 
-  goToDetail(id: number | undefined): void {
-    if (id == null || !Number.isInteger(Number(id))) {
-      console.error('無法前往災害物資詳細頁，資料庫 id 不正確：', id);
-
+  goToDetail(serialNo: number | undefined): void {
+    if (serialNo == null || !Number.isInteger(Number(serialNo))) {
+      console.error('無法前往災害物資詳細頁，需求編號不正確：', serialNo);
       return;
     }
 
-    this.router.navigate(['/agency/supply-detail', id]);
+    this.router.navigate(['/agency/supply-detail', serialNo]);
   }
 
-  goToEdit(id: number): void {
+  goToEdit(serialNo: number): void {
     this.saveListPosition();
     sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-edit', id]);
+    this.router.navigate(['/agency/supply-edit', serialNo]);
   }
 
   saveListPosition(): void {
@@ -195,41 +193,20 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.saveListPosition();
   }
 
-  async loadDemands(): Promise<void> {
+  async loadDemands(showLoading = true): Promise<void> {
     if (this.isLoading) {
       return;
     }
 
-    this.isLoading = true;
+    if (showLoading) {
+      this.isLoading = true;
+    }
 
     try {
       await this.disasterDemandService.reload();
 
-      const displayStatus: Record<DisasterStatus, DisplayStatus> = {
-        上架: '已上架',
-        隱藏: '隱藏中',
-        下架: '已下架',
-      };
-
-      this.demands = this.disasterDemandService.getDemands().map((item) => {
-        const checkedItem = this.checkNaturalOffShelf(item);
-
-        return {
-          ...checkedItem,
-          selected: false,
-          displayStatus: displayStatus[checkedItem.status],
-          displayCreatedAt: checkedItem.createdAt ? new Date(checkedItem.createdAt).toLocaleDateString('zh-TW') : '尚未建立',
-          displayPublishedAt: checkedItem.publishedAt ? new Date(checkedItem.publishedAt).toLocaleDateString('zh-TW') : '尚未上架',
-          displayOffShelfAt: checkedItem.expectedOffShelfAt ? new Date(checkedItem.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—',
-          remaining: checkedItem.remaining ?? checkedItem.amount ?? 0,
-          category: checkedItem.category ?? '其他',
-        };
-      });
-
+      this.demands = this.logic.mapDemands(this.disasterDemandService.getDemands(), this.disasterDemandService);
       this.filteredDemands = [...this.demands];
-
-      this.currentPage = 1;
-
       this.updatePagination();
     } catch (error) {
       console.error('載入物資需求失敗：', error);
@@ -238,30 +215,11 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.filteredDemands = [];
       this.pagedDemands = [];
     } finally {
-      this.isLoading = false;
-
+      if (showLoading) {
+        this.isLoading = false;
+      }
       this.cdr.markForCheck();
     }
-  }
-
-  private checkNaturalOffShelf(item: DisasterDemand): DisasterDemand {
-    if (item.status !== '上架' || !item.expectedOffShelfAt) {
-      return item;
-    }
-
-    if (new Date() < new Date(item.expectedOffShelfAt)) {
-      return item;
-    }
-
-    const updatedItem = {
-      ...item,
-      status: '下架' as DisasterStatus,
-      offShelfReason: 'natural' as const,
-    };
-
-    void this.disasterDemandService.updateDemand(updatedItem);
-
-    return updatedItem;
   }
 
   onSearchChange(value: string): void {
@@ -271,6 +229,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onSortChange(event: { selectedSort: SortType; sortAscending: boolean }): void {
     const scrollY = window.scrollY;
+
     this.selectedSort = event.selectedSort;
     this.sortAscending = event.sortAscending;
     this.userHasSorted = true;
@@ -325,62 +284,11 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applyFilters(resetPage = true): void {
-    this.filteredDemands = this.demands.filter((item) => {
-      if (this.searchTerm && this.searchTerm.trim() !== '') {
-        const term = this.searchTerm.trim().toLowerCase();
-        const matchItem = item.item ? item.item.toLowerCase().includes(term) : false;
-        const matchCategory = item.category ? item.category.toLowerCase().includes(term) : false;
-
-        if (!matchItem && !matchCategory) {
-          return false;
-        }
-      }
-
-      if (this.selectedFilters.status.length > 0 && !this.selectedFilters.status.includes(item.displayStatus)) {
-        return false;
-      }
-
-      if (this.selectedFilters.priority.length > 0 && !this.selectedFilters.priority.includes(item.priority)) {
-        return false;
-      }
-
-      if (this.selectedFilters.lowRemaining && Number(item.remaining ?? 0) <= 0) {
-        return false;
-      }
-
-      if (this.selectedFilters.category.length > 0 && (!item.category || !this.selectedFilters.category.includes(item.category))) {
-        return false;
-      }
-
-      if (this.selectedFilters.messageStatus.length > 0) {
-        // 留言篩選只套用在「已上架」
-        if (item.displayStatus !== '已上架') {
-          return false;
-        }
-
-        const hasMsg = (item.messageCount || 0) > 0;
-
-        const wantsReplied = this.selectedFilters.messageStatus.includes('已回覆');
-        const wantsNotReplied = this.selectedFilters.messageStatus.includes('未回覆');
-
-        // 有回覆 → 留言數大於 0
-        if (wantsReplied && !wantsNotReplied && !hasMsg) {
-          return false;
-        }
-
-        // 未回覆 → 留言數等於 0
-        if (wantsNotReplied && !wantsReplied && hasMsg) {
-          return false;
-        }
-      }
-
-      return true;
-    });
+    this.filteredDemands = this.logic.filterDemands(this.demands, this.searchTerm, this.selectedFilters);
 
     if (resetPage) {
       this.currentPage = 1;
     }
-
     if (this.userHasSorted) {
       this.applySort();
     } else {
@@ -389,64 +297,34 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   applySort(): void {
-    this.filteredDemands = [...this.filteredDemands].sort((a, b) => {
-      let result = 0;
-
-      if (this.selectedSort === 'serialNo') {
-        result = Number(a.serialNo ?? 0) - Number(b.serialNo ?? 0);
-      }
-
-      if (this.selectedSort === 'createdAt') {
-        result = new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime();
-      }
-
-      if (this.selectedSort === 'publishedAt') {
-        result = new Date(a.publishedAt ?? 0).getTime() - new Date(b.publishedAt ?? 0).getTime();
-      }
-
-      if (this.selectedSort === 'expectedOffShelfAt') {
-        result = new Date(a.expectedOffShelfAt ?? 0).getTime() - new Date(b.expectedOffShelfAt ?? 0).getTime();
-      }
-
-      if (this.selectedSort === 'amount') {
-        result = Number(a.amount ?? 0) - Number(b.amount ?? 0);
-      }
-
-      if (this.selectedSort === 'remaining') {
-        result = Number(a.remaining ?? 0) - Number(b.remaining ?? 0);
-      }
-
-      return this.sortAscending ? result : -result;
-    });
-
+    this.filteredDemands = this.logic.sortDemands(this.filteredDemands, this.selectedSort, this.sortAscending);
     this.updatePagination();
   }
 
   updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredDemands.length / this.pageSize) || 1;
+    const result = this.logic.getPaginationData(this.filteredDemands, this.currentPage, this.pageSize);
 
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages;
-    }
+    this.totalPages = result.totalPages;
+    this.pageNumbers = result.pageNumbers;
+    this.pagedDemands = result.pagedDemands;
+    this.currentPage = result.currentPage;
+    this.selectAll = result.selectAll;
 
-    this.pageNumbers = Array.from(
-      {
-        length: this.totalPages,
-      },
-      (_, i) => i + 1
-    );
-
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-
-    this.pagedDemands = [...this.filteredDemands.slice(startIndex, startIndex + this.pageSize)];
-
-    this.selectAll = this.pagedDemands.length > 0 && this.pagedDemands.every((item) => item.selected);
+    console.log('目前頁數：', this.currentPage);
+    console.log('每頁筆數：', this.pageSize);
+    console.log('目前頁面資料：', this.pagedDemands.length);
+    console.log('目前頁面資料內容：', this.pagedDemands);
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updatePagination();
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant',
+      });
     }
   }
 
@@ -458,7 +336,6 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openBatchDeleteModal(): void {
     this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => item.id as number);
-
     this.deleteType = 'batch';
     this.showDeleteModal = true;
   }
@@ -477,8 +354,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   changeStatus(item: DisasterListItem, event: Event): void {
     const select = event.target as HTMLSelectElement;
     const newStatus = select.value as DisplayStatus;
-
     const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
+
+    // 選擇「已下架」
     if (newStatus === '已下架') {
       item.displayStatus = originalItem?.status === '上架' ? '已上架' : originalItem?.status === '下架' ? '已下架' : '隱藏中';
 
@@ -491,15 +369,28 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if (newStatus === '已上架' && originalItem?.status === '下架') {
-      item.displayStatus = '已下架';
-      setTimeout(() => {
-        select.value = '已下架';
-      });
-      this.showOnShelfWarning = true;
+    if (newStatus === '已上架' && item.status === '下架') {
+      const offShelfReason = item.offShelfReason ?? originalItem?.offShelfReason;
+
+      // 只有「手動下架」不能重新上架
+      if (offShelfReason === 'manual') {
+        item.displayStatus = '已下架';
+
+        setTimeout(() => {
+          select.value = '已下架';
+        });
+
+        this.showOnShelfWarning = true;
+        return;
+      }
+
+      // 自然下架可以重新上架
+      item.displayStatus = '已上架';
+      void this.applyStatusChange(item);
       return;
     }
 
+    // 隱藏中 → 其他狀態
     item.displayStatus = newStatus;
     void this.applyStatusChange(item);
   }
@@ -520,7 +411,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands();
+      await this.loadDemands(false);
     } catch (error) {
       console.error('下架失敗：', error);
     } finally {
@@ -538,6 +429,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const item = this.pendingOffShelfItem;
+
     item.status = '隱藏';
     item.offShelfReason = undefined;
     item.publishedAt = undefined;
@@ -548,7 +440,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands();
+      await this.loadDemands(false);
     } catch (error) {
       console.error('隱藏失敗：', error);
     } finally {
@@ -566,60 +458,6 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async applyStatusChange(item: DisasterListItem): Promise<void> {
-    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
-    const originalStatus = originalItem?.status;
-
-    let status: DisasterStatus = item.displayStatus === '已上架' ? '上架' : '隱藏';
-
-    const now = new Date();
-
-    if (status === '上架') {
-      if (originalStatus !== '上架') {
-        item.publishedAt = now.toISOString();
-        item.createdAt ??= now.toISOString();
-      }
-
-      if (item.publishedAt) {
-        item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
-      }
-
-      item.status = '上架';
-      item.offShelfReason = undefined;
-      item.displayStatus = '已上架';
-      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
-      item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
-    } else {
-      item.status = '隱藏';
-      item.publishedAt = undefined;
-      item.expectedOffShelfAt = undefined;
-      item.displayStatus = '隱藏中';
-      item.displayPublishedAt = '尚未上架';
-      item.displayOffShelfAt = '—';
-    }
-
-    try {
-      await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands();
-    } catch (error) {
-      console.error('狀態更新失敗：', error);
-    }
-  }
-
-  calculateExpectedOffShelfDate(publishedDate: Date, priority: DisasterDemand['priority']): string {
-    const offShelfDate = new Date(publishedDate);
-
-    switch (priority) {
-      case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-      case '緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 14);
-        break;
-      case '非常緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 7);
-        break;
-    }
-
-    return offShelfDate.toISOString();
+    await this.logic.applyStatusChange(item, this.disasterDemandService);
   }
 }

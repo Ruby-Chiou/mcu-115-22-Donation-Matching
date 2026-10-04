@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { DisasterControlService } from '../../../core/services/disaster-control.service';
+import { DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
 import { DisasterDemandService } from '../../../core/services/agency-disaster-demand/disaster-demand.service';
 
 import { DonorDisasterSupplyFilterComponent } from '../../filter/donor-disaster-supply-filter/donor-disaster-supply-filter.component';

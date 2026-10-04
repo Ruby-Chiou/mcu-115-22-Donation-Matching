@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DisasterControlService, MaterialNeed } from '../../../core/services/disaster-control.service';
+import { DisasterControlService, MaterialNeed } from '../../../core/services/disaster-control/disaster-control.service';
 
 @Component({
   selector: 'app-admin-disaster-control',
