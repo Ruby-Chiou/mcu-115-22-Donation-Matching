@@ -1,0 +1,139 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+
+// ==========================================
+// 右側快速導覽
+// ==========================================
+
+.right-sidebar {
+  height: 450px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 18px 14px;
+
+  border: 1px solid var(--border-default);
+
+  border-radius: var(--border-radius-main);
+
+  background-color: var(--bg-layer-2);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+
+// ==========================================
+// 每一列
+// ==========================================
+
+.sidebar-row {
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  box-sizing: border-box;
+
+  padding: 10px 14px;
+
+  border-radius: 22px;
+
+  background-color: var(--color-white);
+}
+
+
+// ==========================================
+// 左側標題
+// ==========================================
+
+.row-title {
+  flex: 1;
+
+  color: var(--color-text-main);
+
+  font-size: 22px;
+
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+
+// ==========================================
+// 按鈕區
+// ==========================================
+
+.sidebar-buttons {
+  width: 52%;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+// ==========================================
+// 按鈕
+// ==========================================
+
+.sidebar-button {
+  width: 100%;
+
+  min-height: 48px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 8px 10px;
+
+  border-radius: 16px;
+
+  background-color: var(--color-brand-primary);
+
+  color: var(--color-white);
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  line-height: 1.3;
+
+  text-decoration: none !important;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.03);
+
+    background-color: #0b57b5;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+}

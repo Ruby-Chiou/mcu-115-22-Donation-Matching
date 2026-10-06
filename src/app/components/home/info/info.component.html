@@ -1,0 +1,123 @@
+<div class="home-info-grid">
+<section class="platform-announcements">
+
+  <div class="announcement-title">
+
+    <i class="fa-solid fa-bullhorn"></i>
+
+    <span>平台公告</span>
+
+  </div>
+
+
+  <div class="announcement-list">
+
+    <div class="announcement-item">
+
+      <span class="announcement-date">
+        26/09/07
+      </span>
+
+      <span class="announcement-text">
+        系統更新通知：平台已於 26/09/07 完成系統更新，請使用者重新登入以享受最新功能。
+      </span>
+
+    </div>
+
+
+    <div class="announcement-item">
+
+      <span class="announcement-date">
+        26/09/06
+      </span>
+
+      <span class="announcement-text">
+        平台新增「災害救助」功能，提供民眾在災害發生時快速提出需求。
+      </span>
+
+    </div>
+
+
+    <div class="announcement-item">
+
+      <span class="announcement-date">
+        26/09/05
+      </span>
+
+      <span class="announcement-text">
+        系統維護通知：平台將於 26/09/07 進行系統維護，屆時可能暫時無法使用。
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+
+<section class="latest-news-section">
+
+  <div class="latest-news-header">
+
+    <div class="latest-news-title">
+
+      <i class="fa-solid fa-newspaper"></i>
+
+      <div>
+        <h2>最新消息</h2>
+
+        <p>
+          掌握平台目前的重要資訊與最新動態
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="latest-news-list">
+
+    @for (news of latestNewsList; track news.title) {
+
+      <a
+        [routerLink]="news.link"
+        class="latest-news-item"
+      >
+
+        <div class="latest-news-date">
+          {{ news.date }}
+        </div>
+
+
+        <div class="latest-news-category">
+          {{ news.category }}
+        </div>
+
+
+        <div class="latest-news-content">
+
+          <h3>
+            {{ news.title }}
+          </h3>
+
+          <p>
+            {{ news.content }}
+          </p>
+
+        </div>
+
+
+        <div class="latest-news-arrow">
+
+          <i class="fa-solid fa-chevron-right"></i>
+
+        </div>
+
+      </a>
+
+    }
+
+  </div>
+
+</section>
+</div>
