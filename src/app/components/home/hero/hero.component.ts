@@ -6,6 +6,7 @@ interface NewsItem {
   text: string;
   highlight: string;
   link: string;
+  source: string;
 }
 
 @Component({
@@ -22,18 +23,21 @@ export class HomeHeroComponent implements OnInit, OnDestroy {
       text: '災害救助',
       highlight: '查看目前受災地區的物資需求',
       link: '/donor/disaster',
+      source: '圖片來源：基督教救助協會',
     },
     {
       image: 'assets/images/donate_h.png',
       text: '平台導覽',
       highlight: '快速了解捐助與平台操作方式',
       link: '/platform-guide',
+      source: '',
     },
     {
       image: 'assets/images/H_2.jpeg',
       text: '日常捐助',
       highlight: '瀏覽目前社福機構的物資需求',
       link: '/donor/daily',
+      source: '圖片來源：台灣好新聞',
     },
   ];
 

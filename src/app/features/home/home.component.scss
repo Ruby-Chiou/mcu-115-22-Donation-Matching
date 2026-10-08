@@ -1,21 +1,91 @@
+// ==========================================
+// 首頁整體
+// ==========================================
+
 .lobby-grid {
   display: grid;
 
-  grid-template-columns:
-    minmax(0, 3fr)
-    minmax(250px, 0.78fr);
+  grid-template-columns: minmax(0, 1fr) 280px;
 
+  gap: 20px;
+
+  width: calc(100% - 40px);
   max-width: 1400px;
 
-  margin: 40px auto;
+  margin: 40px auto 50px;
 
-  padding: 0 20px;
+  box-sizing: border-box;
 
-  gap: 24px;
+  align-items: stretch;
 }
 
+
+// ==========================================
+// Angular 子元件
+// ==========================================
+
+app-hero,
+app-quick-links,
+app-info,
+app-about {
+  display: block;
+  min-width: 0;
+}
+
+
+// ==========================================
+// 上方輪播與快速導覽
+// 兩邊固定同高
+// ==========================================
+
+app-hero,
+app-quick-links {
+  height: 420px;
+}
+
+app-hero {
+  min-width: 0;
+}
+
+app-quick-links {
+  min-width: 0;
+}
+
+
+// ==========================================
+// 下方資訊
+// ==========================================
+
+app-info {
+  display: block;
+
+  width: 100%;
+}
+
+app-about {
+  display: block;
+
+  width: 100%;
+}
+
+
+// ==========================================
+// RWD
+// ==========================================
+
 @media (max-width: 900px) {
+
   .lobby-grid {
     grid-template-columns: 1fr;
+
+    width: calc(100% - 30px);
+
+    gap: 20px;
   }
+
+  app-hero,
+  app-quick-links {
+    height: auto;
+  }
+
 }

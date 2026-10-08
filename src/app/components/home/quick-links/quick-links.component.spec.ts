@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { QuickLinksComponent } from './quick-links.component';
+import { HomeQuickLinksComponent } from './quick-links.component';
 
-describe('QuickLinksComponent', () => {
-  let component: QuickLinksComponent;
-  let fixture: ComponentFixture<QuickLinksComponent>;
+describe('HomeQuickLinksComponent', () => {
+  let component: HomeQuickLinksComponent;
+  let fixture: ComponentFixture<HomeQuickLinksComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QuickLinksComponent],
+      imports: [HomeQuickLinksComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(QuickLinksComponent);
+    fixture = TestBed.createComponent(HomeQuickLinksComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
