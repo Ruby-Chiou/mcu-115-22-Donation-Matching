@@ -1,0 +1,273 @@
+<section class="role-guide agency-guide">
+
+  <!-- ==========================================
+       標題
+  ========================================== -->
+
+  <div class="role-guide-header">
+
+    <div class="role-icon">
+      <i class="fa-solid fa-building"></i>
+    </div>
+
+    <div>
+      <span class="role-label">
+        AGENCY
+      </span>
+
+      <h2>
+        受助者導覽
+      </h2>
+
+      <p>
+        從建立需求、管理物資，到查看捐助與物流，可以依照以下步驟完成。
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       受助者操作步驟
+  ========================================== -->
+
+  <div class="guide-steps">
+
+    <div class="guide-step">
+
+      <span class="step-number">
+        01
+      </span>
+
+      <div class="step-content">
+
+        <i class="fa-solid fa-file-circle-plus"></i>
+
+        <h3>
+          建立物資需求
+        </h3>
+
+        <p>
+          填寫物資內容、需求數量、用途與相關需求資訊。
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="guide-step">
+
+      <span class="step-number">
+        02
+      </span>
+
+      <div class="step-content">
+
+        <i class="fa-solid fa-list-check"></i>
+
+        <h3>
+          設定需求資訊
+        </h3>
+
+        <p>
+          設定需求優先度、接收方式及其他必要資訊。
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="guide-step">
+
+      <span class="step-number">
+        03
+      </span>
+
+      <div class="step-content">
+
+        <i class="fa-solid fa-bullhorn"></i>
+
+        <h3>
+          發布需求
+        </h3>
+
+        <p>
+          完成需求內容後發布，讓捐助者查看目前所需物資。
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="guide-step">
+
+      <span class="step-number">
+        04
+      </span>
+
+      <div class="step-content">
+
+        <i class="fa-solid fa-clipboard-check"></i>
+
+        <h3>
+          物資審核
+        </h3>
+
+        <p>
+          依平台流程進行物資與需求相關審核。
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="guide-step">
+
+      <span class="step-number">
+        05
+      </span>
+
+      <div class="step-content">
+
+        <i class="fa-solid fa-truck"></i>
+
+        <h3>
+          查看捐助與物流
+        </h3>
+
+        <p>
+          查看捐助物資與配送狀態，掌握需求處理進度。
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       受助者常用功能
+  ========================================== -->
+
+  <div class="common-functions">
+
+    <div class="common-functions-header">
+
+      <h3>
+        受助者常用功能
+      </h3>
+
+      <p>
+        登入受助者帳號後，可以直接使用以下功能。
+      </p>
+
+    </div>
+
+
+   <div class="common-function-grid">
+
+  <a
+    [routerLink]="currentRole === 'agency' ? '/agency/daily' : '/login'"
+    class="common-function-card"
+  >
+    <div class="function-icon">
+      <i class="fa-solid fa-clipboard-list"></i>
+    </div>
+
+    <div class="function-content">
+      <h4>
+        日常需求
+      </h4>
+
+      <p>
+        管理日常物資需求與捐助狀況
+      </p>
+
+      <span>
+        {{ currentRole === 'agency' ? '前往日常需求 →' : '登入後使用 →' }}
+      </span>
+    </div>
+  </a>
+
+
+  <a
+    [routerLink]="currentRole === 'agency' ? '/agency/disaster' : '/login'"
+    class="common-function-card"
+  >
+    <div class="function-icon">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+
+    <div class="function-content">
+      <h4>
+        災害需求
+      </h4>
+
+      <p>
+        管理災害救助相關物資需求
+      </p>
+
+      <span>
+        {{ currentRole === 'agency' ? '前往災害需求 →' : '登入後使用 →' }}
+      </span>
+    </div>
+  </a>
+
+
+  <a
+    [routerLink]="currentRole === 'agency' ? '/agency/item-review' : '/login'"
+    class="common-function-card"
+  >
+    <div class="function-icon">
+      <i class="fa-solid fa-clipboard-check"></i>
+    </div>
+
+    <div class="function-content">
+      <h4>
+        物資審核
+      </h4>
+
+      <p>
+        查看並處理捐助物資相關審核
+      </p>
+
+      <span>
+        {{ currentRole === 'agency' ? '前往物資審核 →' : '登入後使用 →' }}
+      </span>
+    </div>
+  </a>
+
+
+  <a
+    [routerLink]="currentRole === 'agency' ? '/tracking' : '/login'"
+    class="common-function-card"
+  >
+    <div class="function-icon">
+      <i class="fa-solid fa-truck"></i>
+    </div>
+
+    <div class="function-content">
+      <h4>
+        物流資訊
+      </h4>
+
+      <p>
+        查看捐助物資目前的配送狀態
+      </p>
+
+      <span>
+        {{ currentRole === 'agency' ? '查看物流 →' : '登入後使用 →' }}
+      </span>
+    </div>
+  </a>
+
+</div>
+
+  </div>
+
+</section>

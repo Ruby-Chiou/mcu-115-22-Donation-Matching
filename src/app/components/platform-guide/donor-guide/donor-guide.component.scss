@@ -1,0 +1,424 @@
+.role-guide {
+  margin-bottom: 35px;
+  padding: 30px;
+
+  border-radius: 20px;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-default);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+
+// ==========================================
+// 標題
+// ==========================================
+
+.role-guide-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 25px;
+}
+
+.role-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 16px;
+
+  background-color: #eaf4f8;
+
+  color: var(--color-brand-primary);
+
+  font-size: 22px;
+}
+
+.role-label {
+  color: var(--color-brand-primary);
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+.role-guide-header h2 {
+  margin: 3px 0 4px;
+
+  color: var(--color-text-main);
+
+  font-size: 25px;
+}
+
+.role-guide-header p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 14px;
+}
+
+
+// ==========================================
+// 六步 / 五步教學
+// ==========================================
+
+.guide-steps {
+  display: grid;
+
+  grid-template-columns: repeat(6, 1fr);
+
+  gap: 0;
+
+  margin-bottom: 40px;
+}
+
+.agency-guide .guide-steps {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.guide-step {
+  position: relative;
+
+  min-height: 180px;
+
+  padding: 25px 15px 20px;
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+  background-color: var(--color-white);
+
+  border-right: 1px solid #edf0f2;
+}
+
+.guide-step:last-child {
+  border-right: none;
+}
+
+.step-number {
+  position: absolute;
+
+  top: -15px;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background-color: var(--color-brand-primary);
+
+  color: #fff;
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+.step-content > i {
+  display: flex;
+
+  width: 48px;
+  height: 48px;
+
+  margin: 15px auto 12px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background-color: #eaf4f8;
+
+  color: var(--color-brand-primary);
+
+  font-size: 21px;
+}
+
+.step-content h3 {
+  margin: 0 0 8px;
+
+  color: var(--color-text-main);
+
+  font-size: 16px;
+}
+
+.step-content p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+
+// ==========================================
+// 常用功能
+// ==========================================
+
+.common-functions {
+  margin-top: 15px;
+}
+
+.common-functions-header {
+  margin-bottom: 18px;
+}
+
+.common-functions-header h3 {
+  margin: 0 0 6px;
+
+  color: var(--color-text-main);
+
+  font-size: 22px;
+}
+
+.common-functions-header p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 14px;
+}
+
+.common-function-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 16px;
+}
+
+.common-function-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  border-radius: 16px;
+
+  background-color: #f8fbfc;
+
+  border: 1px solid var(--border-default);
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.common-function-card:hover {
+  transform: translateY(-3px);
+
+  background-color: #ffffff;
+
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08);
+}
+
+.common-function-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.06);
+}
+
+.function-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 14px;
+
+  background-color: #eaf4f8;
+
+  color: var(--color-brand-primary);
+
+  font-size: 21px;
+}
+
+.function-content {
+  flex: 1;
+}
+
+.function-content h4 {
+  margin: 0 0 5px;
+
+  color: var(--color-text-main);
+
+  font-size: 17px;
+}
+
+.function-content p {
+  margin: 0 0 8px;
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.function-content span {
+  color: var(--color-brand-primary);
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+
+// ==========================================
+// 受助者鎖定區
+// ==========================================
+
+.locked-common-functions {
+  padding: 40px 25px;
+
+  text-align: center;
+
+  border-radius: 16px;
+
+  background-color: #f7f9fa;
+
+  border: 1px dashed #cbd5df;
+}
+
+.locked-common-functions > i {
+  margin-bottom: 12px;
+
+  color: var(--color-brand-primary);
+
+  font-size: 30px;
+}
+
+.locked-common-functions h4 {
+  margin: 0 0 8px;
+
+  color: var(--color-text-main);
+
+  font-size: 19px;
+}
+
+.locked-common-functions p {
+  max-width: 520px;
+
+  margin: 0 auto 20px;
+
+  color: var(--color-text-muted);
+
+  font-size: 14px;
+
+  line-height: 1.7;
+}
+
+.login-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 22px;
+
+  border-radius: 18px;
+
+  background-color: var(--color-brand-primary);
+
+  color: #fff;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.login-button:hover {
+  background-color: #0b57b5;
+}
+
+
+// ==========================================
+// RWD
+// ==========================================
+
+@media (max-width: 1100px) {
+
+  .guide-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .agency-guide .guide-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .guide-step {
+    border-bottom: 1px solid #edf0f2;
+  }
+}
+
+@media (max-width: 700px) {
+
+  .role-guide {
+    padding: 22px;
+  }
+
+  .guide-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .agency-guide .guide-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .common-function-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+
+  .guide-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .agency-guide .guide-steps {
+    grid-template-columns: 1fr;
+  }
+}

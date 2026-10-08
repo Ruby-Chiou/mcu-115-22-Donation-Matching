@@ -1,433 +1,207 @@
-.guide-page {
+.platform-guide-page {
   width: 100%;
   min-height: 100vh;
+}
 
-  padding: 40px 60px 70px;
 
-  background-color: #f6f9fb;
+// ==========================================
+// Hero
+// ==========================================
+
+.guide-hero {
+  width: 100%;
+
+  padding: 70px 30px;
+
+  box-sizing: border-box;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eaf4f8 0%,
+      #f7fbfd 100%
+    );
+
+  text-align: center;
+}
+
+
+.guide-hero-content {
+  max-width: 1000px;
+
+  margin: 0 auto;
+}
+
+
+.guide-label,
+.section-label {
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  color: var(--color-brand-primary);
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+
+.guide-hero h1 {
+  margin: 0 0 15px;
+
+  color: var(--color-text-main);
+
+  font-size: 42px;
+
+  font-weight: 700;
+}
+
+
+.guide-hero p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 18px;
+
+  line-height: 1.7;
+}
+
+
+// ==========================================
+// 公共導覽
+// ==========================================
+
+.guide-section {
+  width: 100%;
+
+  max-width: 1200px;
+
+  margin: 50px auto;
+
+  padding: 0 20px;
 
   box-sizing: border-box;
 }
 
 
-/* =========================
-   頁面標題
-========================= */
+// ==========================================
+// 身份導覽
+// ==========================================
 
-.guide-header {
+.guide-role-section {
   width: 100%;
+
   max-width: 1200px;
 
-  margin: 0 auto 45px;
+  margin: 60px auto 80px;
+
+  padding: 0 20px;
+
+  box-sizing: border-box;
+}
+
+
+.section-heading {
+  margin-bottom: 30px;
 
   text-align: center;
 }
 
-.title-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 
-  gap: 6px;
 
-  h1 {
-    margin: 0;
+.section-heading h2 {
+  margin: 0 0 10px;
 
-    font-size: 32px;
-    font-weight: 700;
+  color: var(--color-text-main);
 
-    color: #1c2833;
-  }
+  font-size: 30px;
 
-  p {
-    margin: 0;
-
-    font-size: 16px;
-
-    color: #71808c;
-  }
-}
-
-
-/* =========================
-   共用區塊
-========================= */
-
-.role-section,
-.guide-section,
-.guide-bottom {
-  width: 100%;
-  max-width: 1200px;
-
-  margin: 0 auto 40px;
-}
-
-
-.section-title {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  margin-bottom: 10px;
-
-  i {
-    color: var(--color-brand-primary);
-
-    font-size: 21px;
-  }
-
-  h2 {
-    margin: 0;
-
-    font-size: 24px;
-    font-weight: 700;
-
-    color: #1c2833;
-  }
-}
-
-
-.section-description {
-  margin: 0 0 20px;
-
-  font-size: 15px;
-
-  line-height: 1.7;
-
-  color: #71808c;
-}
-
-/* =========================
-   登入 / 註冊
-========================= */
-
-.account-section {
-  width: 100%;
-  max-width: 1200px;
-
-  margin: 0 auto 40px;
-}
-
-
-.account-cards {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 20px;
-}
-
-
-.account-card {
-  display: flex;
-  align-items: center;
-
-  gap: 18px;
-
-  padding: 24px;
-
-  background: #ffffff;
-
-  border: 1px solid #dce5e9;
-
-  border-radius: 16px;
-
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: var(--color-brand-primary);
-
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
-  }
-}
-
-
-.account-icon {
-  flex-shrink: 0;
-
-  width: 55px;
-  height: 55px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 14px;
-
-  background: #eaf4f8;
-
-  color: var(--color-brand-primary);
-
-  font-size: 22px;
-}
-
-
-.account-content {
-  flex: 1;
-
-  .account-label {
-    display: block;
-
-    margin-bottom: 3px;
-
-    font-size: 13px;
-
-    color: #89959e;
-  }
-
-  h3 {
-    margin: 0 0 6px;
-
-    font-size: 20px;
-
-    color: #1c2833;
-  }
-
-  p {
-    margin: 0 0 12px;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-
-    color: #71808c;
-  }
-}
-
-
-.account-button {
-  display: inline-flex;
-  align-items: center;
-
-  gap: 7px;
-
-  padding: 9px 15px;
-
-  border-radius: 9px;
-
-  font-size: 14px;
   font-weight: 700;
-
-  text-decoration: none;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
 }
 
 
+.section-heading p {
+  margin: 0;
 
+  color: var(--color-text-muted);
 
+  font-size: 16px;
 
-.register-button {
-  background: #ffffff;
-
-  color: var(--color-brand-primary);
-
-  border: 1px solid var(--color-brand-primary);
-
-  &:hover {
-    background: var(--color-brand-primary);
-
-    color: #ffffff;
-  }
+  line-height: 1.6;
 }
-/* =========================
-   角色選擇
-========================= */
 
-.role-buttons {
+// ==========================================
+// 角色導覽選擇按鈕
+// ==========================================
+
+.guide-selector {
   display: grid;
 
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 20px;
-}
-
-
-.role-card {
-  position: relative;
-
-  display: flex;
-  align-items: center;
+  grid-template-columns: repeat(2, 1fr);
 
   gap: 18px;
 
+  margin-bottom: 30px;
+}
+
+
+.guide-selector-button {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
   width: 100%;
 
-  padding: 24px;
+  padding: 20px 24px;
 
-  border: 2px solid #dce5e9;
+  box-sizing: border-box;
+
+  border: 1px solid var(--border-default);
 
   border-radius: 18px;
 
-  background: #ffffff;
+  background-color: var(--color-white);
+
+  color: var(--color-text-main);
+
+  font-size: 18px;
+
+  font-weight: 600;
 
   text-align: left;
 
   cursor: pointer;
 
   transition:
+    transform 0.2s ease,
     border-color 0.2s ease,
     background-color 0.2s ease,
     box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: var(--color-brand-primary);
-
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
-  }
-
-  &.active {
-    border-color: var(--color-brand-primary);
-
-    background: #f5fbfe;
-
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
-  }
 }
 
 
-.role-icon {
+.guide-selector-button > i:first-child {
+  width: 44px;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
   flex-shrink: 0;
 
-  width: 58px;
-  height: 58px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 15px;
-
-  background: #eaf4f8;
-
-  color: var(--color-brand-primary);
-
-  font-size: 24px;
-}
-
-
-.role-content {
-  flex: 1;
-
-  h3 {
-    margin: 0 0 5px;
-
-    font-size: 20px;
-
-    color: #1c2833;
-  }
-
-  p {
-    margin: 0;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-
-    color: #71808c;
-  }
-}
-
-
-.role-check {
-  position: absolute;
-
-  top: 18px;
-  right: 18px;
-
-  color: var(--color-brand-primary);
-
-  font-size: 19px;
-}
-
-
-/* =========================
-   流程教學
-========================= */
-
-.step-list {
-  display: flex;
-
-  align-items: stretch;
-
-  gap: 8px;
-
-  padding: 10px 0;
-}
-
-
-.step-card {
-  position: relative;
-
-  flex: 1;
-
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  text-align: center;
-
-  padding: 22px 14px;
-
-  background: #ffffff;
-
   border-radius: 14px;
 
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-}
-
-
-.step-number {
-  position: absolute;
-
-  top: -10px;
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  width: 27px;
-  height: 27px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: var(--color-brand-primary);
-
-  color: #ffffff;
-
-  font-size: 13px;
-  font-weight: 700;
-
-  z-index: 2;
-}
-
-
-.step-icon {
-  width: 52px;
-  height: 52px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin: 10px 0 12px;
-
-  border-radius: 14px;
-
-  background: #eaf4f8;
+  background-color: #eaf4f8;
 
   color: var(--color-brand-primary);
 
@@ -435,405 +209,79 @@
 }
 
 
-.step-content {
-  h3 {
-    margin: 0 0 7px;
-
-    font-size: 16px;
-
-    color: #1c2833;
-  }
-
-  p {
-    margin: 0;
-
-    font-size: 13px;
-
-    line-height: 1.6;
-
-    color: #71808c;
-  }
-}
-
-
-.step-line {
-  position: absolute;
-
-  top: 50%;
-  right: -24px;
-
-  width: 40px;
-  height: 2px;
-
-  background: #cbdde5;
-
-  transform: translateY(-50%);
-
-  z-index: 1;
-}
-
-
-/* =========================
-   受助者區塊
-========================= */
-
-.recipient-section {
-  padding: 0;
-
-  background: transparent;
-  border-radius: 0;
-}
-
-
-.recipient-note {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 14px;
-
-  padding: 18px 20px;
-
-  margin: 0 0 25px;
-
-  background: #ffffff;
-
-  border-radius: 12px;
-
-  border-left: 4px solid var(--color-brand-primary);
-
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-}
-
-
-.recipient-note-icon {
-  flex-shrink: 0;
-
-  width: 36px;
-  height: 36px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: #eaf4f8;
-
-  color: var(--color-brand-primary);
-}
-
-
-.recipient-note {
-  h3 {
-    margin: 0 0 5px;
-
-    font-size: 16px;
-
-    color: #1c2833;
-  }
-
-  p {
-    margin: 0;
-
-    font-size: 14px;
-
-    line-height: 1.7;
-
-    color: #71808c;
-  }
-}
-
-
-.recipient-number {
-  background: #5d8aa8;
-}
-
-
-.recipient-icon {
-  background: #edf5f8;
-
-  color: #5d8aa8;
-}
-
-
-/* =========================
-   功能卡片
-========================= */
-
-.feature-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 18px;
-}
-
-
-.feature-card {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 15px;
-
-  padding: 22px;
-
-  background: #ffffff;
-
-  border-radius: 15px;
-
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-3px);
-
-    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.08);
-  }
-}
-
-
-.feature-icon {
-  flex-shrink: 0;
-
-  width: 48px;
-  height: 48px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 12px;
-
-  background: #eaf4f8;
-
-  color: var(--color-brand-primary);
-
-  font-size: 20px;
-}
-
-
-.recipient-feature-icon {
-  background: #edf5f8;
-
-  color: #5d8aa8;
-}
-
-
-.feature-content {
+.guide-selector-button span {
   flex: 1;
-
-  h3 {
-    margin: 0 0 7px;
-
-    font-size: 17px;
-
-    color: #1c2833;
-  }
-
-  p {
-    margin: 0 0 12px;
-
-    font-size: 14px;
-
-    line-height: 1.7;
-
-    color: #71808c;
-  }
 }
 
 
-.feature-link {
-  display: inline-flex;
-  align-items: center;
-
-  gap: 6px;
-
+.guide-selector-button .arrow {
   color: var(--color-brand-primary);
 
   font-size: 14px;
-  font-weight: 700;
 
-  text-decoration: none;
-
-  transition: gap 0.2s ease;
-
-  &:hover {
-    gap: 10px;
-  }
+  transition: transform 0.2s ease;
 }
 
 
-/* =========================
-   底部
-========================= */
+.guide-selector-button:hover {
+  transform: translateY(-2px);
 
-.guide-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  border-color: var(--color-brand-primary);
 
-  gap: 25px;
-
-  padding: 25px 30px;
-
-  box-sizing: border-box;
-
-  background: #eaf4f8;
-
-  border-radius: 18px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.06);
 }
 
 
-.bottom-content {
-  flex: 1;
+.guide-selector-button.active {
+  border-color: var(--color-brand-primary);
 
-  h2 {
-    margin: 0 0 6px;
+  background-color: #f1f8fb;
 
-    font-size: 19px;
-
-    color: #1c2833;
-  }
-
-  p {
-    margin: 0;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-
-    color: #65727d;
-  }
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.06);
 }
 
 
-.bottom-actions {
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  flex-shrink: 0;
+.guide-selector-button.active .arrow {
+  transform: rotate(180deg);
 }
 
 
-.primary-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 8px;
-
-  padding: 11px 20px;
-
-  border-radius: 10px;
-
-  background: var(--color-brand-primary);
-
-  color: #ffffff;
-
-  border: 1px solid var(--color-brand-primary);
-
-  font-size: 14px;
-  font-weight: 700;
-
-  text-decoration: none;
-
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
-
-  &:hover {
-    background: #ffffff;
-
-    color: var(--color-brand-primary);
-  }
-}
-
-
-/* =========================
-   RWD
-========================= */
-
-@media (max-width: 1050px) {
-  .guide-page {
-    padding: 35px 30px 60px;
-  }
-
-  .step-list {
-    flex-wrap: wrap;
-
-    gap: 15px;
-  }
-
-  .step-card {
-    flex: 1 1 calc(50% - 15px);
-  }
-
-  .step-line {
-    display: none;
-  }
-}
-
-
-@media (max-width: 750px) {
-  .role-buttons {
-    grid-template-columns: 1fr;
-  }
-  .account-cards {
-  grid-template-columns: 1fr;
-  }
-  .feature-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .guide-bottom {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .bottom-actions {
-    width: 100%;
-  }
-
-  .primary-button {
-    width: 100%;
-  }
-}
-
+// ==========================================
+// RWD
+// ==========================================
 
 @media (max-width: 600px) {
-  .guide-page {
-    padding: 25px 15px 45px;
+
+  .guide-hero {
+    padding: 50px 20px;
   }
 
-  .guide-header {
-    margin-bottom: 35px;
+
+  .guide-hero h1 {
+    font-size: 32px;
   }
 
-  .title-area {
-    h1 {
-      font-size: 28px;
-    }
 
-    p {
-      font-size: 14px;
-    }
+  .guide-hero p {
+    font-size: 16px;
   }
 
-  .step-card {
-    flex: 1 1 100%;
+
+  .guide-section,
+  .guide-role-section {
+    padding: 0 15px;
   }
 
-  .recipient-section {
-    padding: 22px 18px;
+
+  .section-heading h2 {
+    font-size: 25px;
   }
 
-  .role-card {
-    padding: 20px;
+}
+@media (max-width: 700px) {
+
+  .guide-selector {
+    grid-template-columns: 1fr;
   }
+
 }
