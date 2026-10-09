@@ -1,0 +1,64 @@
+.workspace-title {
+  text-align: center;
+  margin-top: 60px;
+
+  h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1565c0;
+    letter-spacing: 5px;
+  }
+}
+
+.switch-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 1.5rem auto 0;
+  padding: 0 40px;
+}
+
+.switch-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.switch-button.active {
+  border-bottom-color: #005bac;
+  color: #005bac;
+}
+
+.switch-divider {
+  color: #94a3b8;
+  font-size: 1.2rem;
+}
+
+.unread-badge {
+  min-width: 1.4rem;
+  padding: 0 0.4rem;
+  border-radius: var(--border-radius-pill);
+  background: var(--color-error);
+  color: var(--color-white);
+  font-size: 0.8rem;
+  line-height: 1.4rem;
+  text-align: center;
+}
+
+.member-content {
+  max-width: 1200px;
+  margin: 1.5rem auto 60px;
+  padding: 0 40px;
+}

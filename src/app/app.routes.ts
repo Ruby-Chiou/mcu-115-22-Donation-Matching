@@ -45,6 +45,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/donor-history/donor-history.component').then((m) => m.DonorHistoryComponent), // 歷史紀錄與進度追蹤
   },
   {
+    path: 'member',
+    loadComponent: () => import('./features/member-center/member-center.component').then((m) => m.MemberCenterComponent), // 會員專區(個人資料/收件匣/感謝狀)
+  },
+  {
     path: 'tracking',
     loadComponent: () => import('./features/logistics/tracking/tracking.component').then((m) => m.TrackingComponent),
   },

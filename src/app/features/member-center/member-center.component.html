@@ -1,0 +1,59 @@
+<div class="workspace-title">
+  <h1>會員專區</h1>
+</div>
+
+<div class="switch-area" role="tablist">
+  <button
+    type="button"
+    role="tab"
+    class="switch-button"
+    [class.active]="activeTab() === 'profile'"
+    [attr.aria-selected]="activeTab() === 'profile'"
+    (click)="selectTab('profile')"
+  >
+    個人資料
+  </button>
+
+  <span class="switch-divider" aria-hidden="true"> | </span>
+
+  <button
+    type="button"
+    role="tab"
+    class="switch-button"
+    [class.active]="activeTab() === 'inbox'"
+    [attr.aria-selected]="activeTab() === 'inbox'"
+    (click)="selectTab('inbox')"
+  >
+    收件匣
+    @if (messageService.unreadCount() > 0) {
+      <span class="unread-badge">{{ messageService.unreadCount() }}</span>
+    }
+  </button>
+
+  <span class="switch-divider" aria-hidden="true"> | </span>
+
+  <button
+    type="button"
+    role="tab"
+    class="switch-button"
+    [class.active]="activeTab() === 'certificates'"
+    [attr.aria-selected]="activeTab() === 'certificates'"
+    (click)="selectTab('certificates')"
+  >
+    感謝狀
+  </button>
+</div>
+
+<section class="member-content">
+  @switch (activeTab()) {
+    @case ('profile') {
+      <app-member-profile />
+    }
+    @case ('inbox') {
+      <app-member-inbox />
+    }
+    @case ('certificates') {
+      <app-member-certificates />
+    }
+  }
+</section>

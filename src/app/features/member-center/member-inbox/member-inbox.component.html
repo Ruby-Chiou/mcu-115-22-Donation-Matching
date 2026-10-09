@@ -1,0 +1,161 @@
+<div class="inbox-toolbar">
+  <div class="folder-switch">
+    <button type="button" [class.active]="folder() === 'inbox'" (click)="switchFolder('inbox')">
+      收件匣
+      @if (messageService.unreadCount() > 0) {
+        <span class="count">{{ messageService.unreadCount() }}</span>
+      }
+    </button>
+    <button type="button" [class.active]="folder() === 'sent'" (click)="switchFolder('sent')">寄件備份</button>
+  </div>
+
+  <div class="toolbar-right">
+    <input type="search" class="search-input" placeholder="搜尋主旨、內容或對象" [value]="keyword()" (input)="onKeywordInput($event)" />
+    <button type="button" class="btn btn-primary" (click)="startCompose()">
+      <i class="fa-solid fa-pen"></i> 寫信
+    </button>
+  </div>
+</div>
+
+@if (folder() === 'inbox') {
+  <div class="filter-chips">
+    @for (option of filterOptions; track option.value) {
+      <button type="button" class="chip" [class.active]="activeFilter() === option.value" (click)="setFilter(option.value)">
+        {{ option.label }}
+      </button>
+    }
+  </div>
+}
+
+@if (errorText()) {
+  <p class="error-text" role="alert">{{ errorText() }}</p>
+}
+
+@if (isLoading()) {
+  <p class="state-text">信件載入中...</p>
+} @else {
+  <div class="inbox-layout">
+    <ul class="message-list">
+      @for (message of filteredMessages(); track message.id) {
+        <li
+          class="message-item"
+          [class.unread]="folder() === 'inbox' && !message.isRead"
+          [class.selected]="selectedId() === message.id"
+          (click)="openMessage(message)"
+        >
+          @if (folder() === 'inbox') {
+            <button
+              type="button"
+              class="star-button"
+              [class.starred]="message.isStarred"
+              [attr.aria-label]="message.isStarred ? '取消星號' : '加上星號'"
+              (click)="toggleStar(message, $event)"
+            >
+              <i [class]="message.isStarred ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+            </button>
+          }
+
+          <div class="message-summary">
+            <div class="summary-top">
+              <span class="counterpart">
+                {{ folder() === 'inbox' ? message.senderName : '寄給：' + message.recipientName }}
+              </span>
+              <span class="date">{{ message.createdAt | date: 'MM/dd HH:mm' }}</span>
+            </div>
+            <div class="subject">
+              @if (folder() === 'inbox') {
+                <span class="category-tag" [attr.data-category]="message.category">{{ categoryLabels[message.category] }}</span>
+              }
+              {{ message.subject }}
+            </div>
+          </div>
+        </li>
+      } @empty {
+        <li class="empty">沒有符合條件的信件</li>
+      }
+    </ul>
+
+    <div class="message-panel">
+      @if (isComposing()) {
+        <form class="compose-form" [formGroup]="composeForm" (ngSubmit)="sendMessage()">
+          <h3>{{ replyParentId() ? '回覆信件' : '撰寫新信' }}</h3>
+
+          <label class="field">
+            <span>收件機構</span>
+            <select formControlName="recipientUid">
+              <option value="" disabled>請選擇機構</option>
+              @for (contact of messageService.contacts(); track contact.uid) {
+                <option [value]="contact.uid">{{ contact.name }}</option>
+              }
+            </select>
+            @if (messageService.contacts().length === 0) {
+              <small class="hint">目前沒有往來過的機構，收到機構來信後即可回覆。</small>
+            }
+            @if (hasComposeError('recipientUid')) {
+              <small class="field-error">請選擇收件機構</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>主旨</span>
+            <input type="text" formControlName="subject" maxlength="100" />
+            @if (hasComposeError('subject')) {
+              <small class="field-error">請輸入主旨（100 字以內）</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>內容</span>
+            <textarea rows="8" formControlName="content" maxlength="2000"></textarea>
+            @if (hasComposeError('content')) {
+              <small class="field-error">請輸入內容（2000 字以內）</small>
+            }
+          </label>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" (click)="cancelCompose()" [disabled]="isSending()">取消</button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSending()">
+              {{ isSending() ? '寄送中...' : '寄出' }}
+            </button>
+          </div>
+        </form>
+      } @else if (selectedMessage(); as message) {
+        <article class="message-detail">
+          <header>
+            <h3>{{ message.subject }}</h3>
+            <div class="meta">
+              @if (folder() === 'inbox') {
+                <span>寄件者：{{ message.senderName }}</span>
+                <span class="category-tag" [attr.data-category]="message.category">{{ categoryLabels[message.category] }}</span>
+              } @else {
+                <span>收件者：{{ message.recipientName }}</span>
+              }
+              <span>{{ message.createdAt | date: 'yyyy/MM/dd HH:mm' }}</span>
+            </div>
+          </header>
+
+          <p class="content">{{ message.content }}</p>
+
+          <div class="detail-actions">
+            @if (folder() === 'inbox') {
+              <button type="button" class="btn btn-outline" (click)="toggleStar(message)">
+                <i [class]="message.isStarred ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                {{ message.isStarred ? '取消星號' : '加星號' }}
+              </button>
+            }
+            @if (canReply(message)) {
+              <button type="button" class="btn btn-primary" (click)="startReply(message)">
+                <i class="fa-solid fa-reply"></i> 回覆
+              </button>
+            }
+            <button type="button" class="btn btn-danger" (click)="deleteMessage(message)">
+              <i class="fa-solid fa-trash"></i> 刪除
+            </button>
+          </div>
+        </article>
+      } @else {
+        <p class="state-text">請從左側選擇一封信件</p>
+      }
+    </div>
+  </div>
+}

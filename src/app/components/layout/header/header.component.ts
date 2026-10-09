@@ -1,6 +1,7 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { MemberMessageService } from '../../../core/services/member-center/member-message.service';
 
 @Component({
   selector: 'app-header',
@@ -8,8 +9,16 @@ import { RouterLink } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
+  protected readonly messageService = inject(MemberMessageService);
+
     isHeaderHidden = false;
+
+  ngOnInit(): void {
+    this.messageService.loadInbox().catch(() => {
+      // 未讀數載入失敗不影響導覽列
+    });
+  }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {

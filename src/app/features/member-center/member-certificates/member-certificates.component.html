@@ -1,0 +1,55 @@
+@if (isLoading()) {
+  <p class="state-text">感謝狀載入中...</p>
+} @else if (errorText()) {
+  <p class="state-text error">{{ errorText() }}</p>
+} @else {
+  <div class="certificate-grid">
+    @for (certificate of certificateService.certificates(); track certificate.id) {
+      <button type="button" class="certificate-card" (click)="open(certificate)">
+        <i class="fa-solid fa-award card-icon"></i>
+        <div class="card-body">
+          <h3>{{ certificate.agencyName }}</h3>
+          <p class="item">{{ certificate.donationItem }}</p>
+          <p class="meta">
+            <span>捐贈日期 {{ certificate.donationDate | date: 'yyyy/MM/dd' }}</span>
+            <span>{{ certificate.certificateNo }}</span>
+          </p>
+        </div>
+      </button>
+    } @empty {
+      <p class="state-text">目前還沒有收到感謝狀，完成捐贈並經機構確認後就會出現在這裡。</p>
+    }
+  </div>
+}
+
+@if (selected(); as certificate) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="感謝狀內容" (click)="$event.stopPropagation()">
+      <div class="certificate">
+        <div class="no">字號：{{ certificate.certificateNo }}</div>
+        <h2>感謝狀</h2>
+        <div class="donor">{{ certificate.donorName }} 台鑒</div>
+        <p class="message">{{ certificate.message }}</p>
+        <div class="donation">
+          捐贈內容：{{ certificate.donationItem }}（{{ certificate.donationDate | date: 'yyyy 年 MM 月 dd 日' }}）
+        </div>
+        <div class="certificate-footer">
+          <div>中華民國 {{ certificate.issuedAt | date: 'yyyy 年 MM 月 dd 日' }}</div>
+          <div class="agency">
+            <div>{{ certificate.agencyName }}</div>
+            @if (certificate.agencyRepresentative) {
+              <div>負責人 {{ certificate.agencyRepresentative }}</div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" (click)="close()">關閉</button>
+        <button type="button" class="btn btn-primary" (click)="print(certificate)">
+          <i class="fa-solid fa-print"></i> 列印 / 存成 PDF
+        </button>
+      </div>
+    </div>
+  </div>
+}

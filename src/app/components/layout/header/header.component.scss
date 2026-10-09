@@ -158,5 +158,25 @@ header {
         color: var(--color-brand-primary);
       }
     }
+
+    .bell-link {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .bell-badge {
+      position: absolute;
+      top: -8px;
+      right: -12px;
+      min-width: 18px;
+      padding: 0 4px;
+      border-radius: 999px;
+      background: var(--color-error);
+      color: var(--color-white);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 18px;
+      text-align: center;
+    }
   }
 }

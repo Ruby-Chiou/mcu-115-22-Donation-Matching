@@ -36,7 +36,14 @@
         <a routerLink="/login">登入</a>
         <span>|</span>
         <a routerLink="/register">註冊</a>
-        <i class="fa-solid fa-bell"></i>
+        <span>|</span>
+        <a routerLink="/member">會員專區</a>
+        <a class="bell-link" routerLink="/member" [queryParams]="{ tab: 'inbox' }" aria-label="收件匣">
+          <i class="fa-solid fa-bell"></i>
+          @if (messageService.unreadCount() > 0) {
+            <span class="bell-badge">{{ messageService.unreadCount() > 99 ? '99+' : messageService.unreadCount() }}</span>
+          }
+        </a>
       </div>
     </div>
   </div>

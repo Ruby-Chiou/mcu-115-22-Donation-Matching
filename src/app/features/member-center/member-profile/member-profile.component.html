@@ -1,0 +1,144 @@
+@if (isLoading()) {
+  <p class="state-text">資料載入中...</p>
+} @else if (loadError()) {
+  <p class="state-text error">{{ loadError() }}</p>
+} @else if (profileService.profile(); as profile) {
+  @if (notice(); as currentNotice) {
+    <div class="notice" [class.error]="currentNotice.type === 'error'" role="status">{{ currentNotice.text }}</div>
+  }
+
+  <div class="profile-layout">
+    <aside class="avatar-card">
+      <div class="avatar">
+        @if (profile.avatarUrl) {
+          <img [src]="profile.avatarUrl" alt="大頭貼" />
+        } @else {
+          <span class="avatar-placeholder">{{ profile.displayName.charAt(0) || '?' }}</span>
+        }
+      </div>
+
+      <label class="btn btn-outline" [class.disabled]="isUploading()">
+        {{ isUploading() ? '上傳中...' : '更換大頭貼' }}
+        <input type="file" hidden [accept]="avatarAccept" [disabled]="isUploading()" (change)="onAvatarSelected($event)" />
+      </label>
+      <p class="hint">支援 JPG / PNG / WEBP，2MB 以內</p>
+    </aside>
+
+    <div class="info-card">
+      <div class="card-header">
+        <h2>基本資料</h2>
+        @if (!isEditing()) {
+          <button type="button" class="btn btn-primary" (click)="startEdit()">編輯資料</button>
+        }
+      </div>
+
+      @if (!isEditing()) {
+        <dl class="info-list">
+          <dt>顯示名稱</dt>
+          <dd>{{ profile.displayName }}</dd>
+
+          <dt>聯絡電話</dt>
+          <dd>{{ profile.phoneNumber || '未填寫' }}</dd>
+
+          <dt>Email</dt>
+          <dd>{{ profile.email || '未綁定' }}</dd>
+
+          <dt>身分</dt>
+          <dd>捐助者</dd>
+
+          <dt>註冊時間</dt>
+          <dd>{{ profile.createdAt | date: 'yyyy/MM/dd HH:mm' }}</dd>
+        </dl>
+      } @else {
+        <form class="profile-form" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <label class="field">
+            <span>顯示名稱 <em>*</em></span>
+            <input type="text" formControlName="displayName" maxlength="20" />
+            @if (hasError('displayName', 'required')) {
+              <small class="field-error">請輸入顯示名稱</small>
+            }
+            @if (hasError('displayName', 'maxlength')) {
+              <small class="field-error">顯示名稱最多 20 字</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>聯絡電話</span>
+            <input type="tel" formControlName="phoneNumber" placeholder="09xxxxxxxx" />
+            @if (hasError('phoneNumber', 'pattern')) {
+              <small class="field-error">請輸入 09 開頭的 10 碼手機號碼</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Email（不可修改）</span>
+            <input type="email" [value]="profile.email" disabled />
+          </label>
+
+          <label class="field">
+            <span>身分（不可修改）</span>
+            <input type="text" value="捐助者" disabled />
+          </label>
+
+          <label class="field">
+            <span>註冊時間（不可修改）</span>
+            <input type="text" [value]="profile.createdAt | date: 'yyyy/MM/dd HH:mm'" disabled />
+          </label>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" (click)="cancelEdit()" [disabled]="isSaving()">取消</button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+              {{ isSaving() ? '儲存中...' : '儲存' }}
+            </button>
+          </div>
+        </form>
+      }
+
+      <div class="password-section">
+        <div class="card-header">
+          <h2>帳號安全</h2>
+          <button type="button" class="btn btn-outline" (click)="togglePasswordForm()">
+            {{ showPasswordForm() ? '收合' : '修改密碼' }}
+          </button>
+        </div>
+
+        @if (showPasswordForm()) {
+          <form class="profile-form" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+            <label class="field">
+              <span>目前密碼</span>
+              <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+              @if (hasPasswordError('currentPassword', 'required')) {
+                <small class="field-error">請輸入目前密碼</small>
+              }
+            </label>
+
+            <label class="field">
+              <span>新密碼</span>
+              <input type="password" formControlName="newPassword" autocomplete="new-password" />
+              @if (hasPasswordError('newPassword', 'required')) {
+                <small class="field-error">請輸入新密碼</small>
+              }
+              @if (hasPasswordError('newPassword', 'minlength')) {
+                <small class="field-error">新密碼至少 8 個字元</small>
+              }
+            </label>
+
+            <label class="field">
+              <span>確認新密碼</span>
+              <input type="password" formControlName="confirmPassword" autocomplete="new-password" />
+              @if (passwordForm.controls.confirmPassword.touched && passwordForm.hasError('passwordMismatch')) {
+                <small class="field-error">兩次輸入的密碼不一致</small>
+              }
+            </label>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="isChangingPassword()">
+                {{ isChangingPassword() ? '處理中...' : '確認修改' }}
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  </div>
+}
