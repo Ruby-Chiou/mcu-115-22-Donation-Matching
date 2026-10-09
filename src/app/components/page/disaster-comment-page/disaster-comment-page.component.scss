@@ -1,0 +1,427 @@
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 50px 30px 30px;
+  box-sizing: border-box;
+}
+
+.page-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+  min-height: 40px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1565c0 !important;
+  letter-spacing: 5px;
+  line-height: 1.2;
+}
+
+/* 返回按鈕主體：適中的 15px 字體與舒適的按鈕大小 */
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #334155;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+/* 箭頭樣式與動畫 */
+.back-button .arrow {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 0.2s ease-in-out;
+}
+
+.back-button:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.back-button:hover .arrow {
+  transform: translateX(-3px);
+}
+
+.loading-message,
+.error-message,
+.empty-message {
+  padding: 30px;
+  text-align: center;
+  color: #777;
+}
+
+.error-message {
+  color: #d9534f;
+}
+
+.comment-section {
+  padding: 25px;
+  background: #fff;
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.comment-thread {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.comment {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 18px;
+  background: #edf5ff;
+  border: 1px solid #edf5ff;
+  border-radius: 8px;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.comment-header strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.comment-header span {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #999;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.comment-content-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.comment-content-row p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.6;
+  color: #555;
+  overflow-wrap: anywhere;
+}
+
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.like-button .material-symbols-outlined {
+  color: pink;
+  font-size: 24px;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-button .material-symbols-outlined.liked {
+  color: red;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-button span:last-child {
+  color: #777;
+  font-size: 16px;
+}
+
+.reply-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 12px;
+  padding-left: 0;
+  box-sizing: border-box;
+}
+
+.reply {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: auto;
+  margin-left: 12px;
+  padding: 8px 0 8px 28px;
+  background: transparent;
+  border: none;
+}
+
+.reply::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 2px;
+  height: 22px;
+  background-color: #1565c0;
+}
+
+.reply:not(:last-child)::before {
+  height: 100%;
+}
+
+.reply-list > .reply::after {
+  display: none;
+}
+
+.reply .comment-header {
+  margin-bottom: 8px;
+}
+
+.reply .comment-header strong {
+  font-size: 14px;
+}
+
+.reply .comment-header span {
+  font-size: 13px;
+}
+
+.reply .comment-content-row p {
+  font-size: 14px;
+}
+
+.show-replies-button {
+  align-self: flex-end;
+  margin-left: 0;
+  padding: 5px 0;
+  border: none;
+  background: transparent;
+  color: #005bac;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.show-replies-button:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 12px;
+  }
+
+  .comment-section {
+    padding: 16px;
+  }
+
+  .comment {
+    padding: 14px;
+  }
+
+  .comment-header {
+    align-items: flex-start;
+  }
+
+  .comment-content-row {
+    gap: 10px;
+  }
+
+  .reply {
+    margin-left: 4px;
+    padding-left: 22px;
+  }
+}
+
+/* 第一層回覆：隱藏橫線 */
+.reply-list:not(.nested-replies) > .reply::after {
+  display: none;
+}
+
+/* 第二層及以上的嵌套回覆：保留橫線 */
+.nested-replies > .reply::after {
+  display: block;
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 8px;
+  width: 16px;
+  height: 2px;
+  background-color: #1565c0;
+}
+
+/* 留言操作按鈕 */
+.comment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* 回覆按鈕 */
+.comment-button {
+  align-self: flex-end;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #1565c0;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.comment-button:hover {
+  background: #0d47a1;
+}
+
+/* 回覆按鈕尺寸 */
+.reply-button {
+  padding: 6px 14px;
+  font-size: 14px;
+  align-self: flex-end;
+  border-radius: 8px;
+}
+
+.reply-button:hover {
+  background: #0d47a1;
+  color: #ffffff;
+}
+
+/* 回覆輸入框 */
+.reply-form {
+  margin-top: 12px;
+  margin-left: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #edf5ff;
+}
+
+.reply-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.reply-form textarea:focus {
+  border-color: #1565c0;
+  outline: none;
+}
+
+/* 發布回覆、取消按鈕排列 */
+.reply-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* 發布回覆按鈕 */
+.reply-submit-button {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* 取消按鈕 */
+.reply-cancel-button {
+  padding: 5px 10px;
+  font-size: 12px;
+  border: 1px solid #1565c0;
+  border-radius: 6px;
+  background: #fff;
+  color: #1565c0;
+  cursor: pointer;
+}
+
+.reply-cancel-button:hover {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+/* 留言者與被回覆者 */
+.comment-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.reply-title-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.comment-title .reply-target-name {
+  color: #005bac;
+  font-weight: 700;
+  background: #e8f3ff;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+.comment-title strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.reply .comment-title strong {
+  font-size: 14px;
+}
+
+.comment-header {
+  gap: 12px;
+}
+
+.comment-header .comment-title {
+  flex: 1;
+}

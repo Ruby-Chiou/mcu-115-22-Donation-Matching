@@ -22,7 +22,7 @@
 /*標題*/
 .detail-header {
   margin-bottom: 30px;
-  color: #005BAC;
+  color: #005bac;
 }
 .detail-header h1 {
   margin: 0;
@@ -126,7 +126,7 @@
   padding: 14px 40px;
   border: none;
   border-radius: 8px;
-  background:#ff6b35;
+  background: #ff6b35;
   color: white;
   font-size: 18px;
   font-weight: bold;
@@ -168,7 +168,6 @@
 .organization-item > span {
   color: #666;
   font-weight: 500;
-
 }
 .organization-item strong {
   color: #333;
@@ -228,8 +227,7 @@
   background: #ffffff;
   border: 1px solid #d6d6d6;
   border-radius: 12px;
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .comment-section h2 {
   margin: 0 0 20px;
@@ -271,15 +269,17 @@
 .comment-button:hover {
   background: #e85a28;
 }
-/* 留言列表 */
+
+/* 1. 留言列表與卡片基礎設置 */
 .comment-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
   width: 100%;
   box-sizing: border-box;
 }
-/* 單則留言 */
+
+/* 主留言卡片 */
 .comment {
   width: 100%;
   box-sizing: border-box;
@@ -288,6 +288,19 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
 }
+
+/* 回覆列表容器 */
+.reply-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 12px;
+  padding-left: 0;
+  box-sizing: border-box;
+}
+
 /* 留言標題 */
 .comment-header {
   display: flex;
@@ -295,16 +308,80 @@
   align-items: center;
   margin-bottom: 10px;
 }
+
+/* 留言標題：留言者、回覆文字與被回覆者 */
+.comment-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.reply-title-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.comment-title .reply-target-name {
+  color: #005bac;
+  font-weight: 700;
+  background: #e8f3ff;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+.comment p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+}
+
 .comment-header strong {
   font-size: 16px;
   color: #333;
 }
+
 .comment-header span {
-  font-size: 13px;
+  font-size: 14px;
   color: #999;
 }
+
+.comment-header,
+.comment-content-row {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* 留言內容 */
-.comment p {
+.comment-content-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+
+.comment-text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.6;
+  color: #444;
+  overflow-wrap: anywhere;
+}
+
+.comment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.comment-content-row p {
+  flex: 1;
   margin: 0;
   line-height: 1.6;
   color: #555;
@@ -408,4 +485,200 @@
 
 .empty-state .back-button:hover {
   background-color: #0d609b;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: center;
+}
+
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.like-button .material-symbols-outlined {
+  color: pink;
+  font-size: 24px;
+
+  /* 未按讚：空心 */
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-button .material-symbols-outlined.liked {
+  color: red;
+
+  /* 已按讚：實心 */
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-button span:last-child {
+  color: #777;
+  font-size: 16px;
+}
+
+.reply-button:hover {
+  color: #fff;
+}
+
+.reply-button {
+  padding: 6px 14px;
+  font-size: 14px;
+  align-self: flex-end;
+  border-radius: 8px;
+}
+
+.reply-form {
+  margin-top: 12px;
+  margin-left: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f8f8f8;
+}
+
+.reply-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.reply-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.reply-submit-button {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.reply-cancel-button {
+  padding: 5px 10px;
+  font-size: 12px;
+  border: 1px solid #f3b27a;
+  border-radius: 6px;
+  background: #fff0e3;
+  color: #e58a45;
+  cursor: pointer;
+}
+
+.reply-cancel-button:hover {
+  background: #ffe3cc;
+  color: #d97832;
+}
+
+/* 貫穿全高的左側垂直主線 */
+.reply-list::before {
+  display: none;
+}
+
+/* 4. 子回覆卡片 (關鍵修復點) */
+.reply {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  padding: 8px 0 8px 28px;
+  margin-left: 12px;
+  width: auto;
+  background: transparent;
+  border: none;
+}
+
+/* 垂直線：從頂部拉到橫線轉彎處 (22px)，絕不往下多延伸 */
+.reply::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 2px;
+  height: 22px;
+  background-color: #ff6b35;
+}
+
+/* 第一層回覆：隱藏橫線 */
+.reply-list:not(.nested-replies) > .reply::after {
+  display: none;
+}
+
+/* 第二層及以上的嵌套回覆：保留橫線 */
+.nested-replies > .reply::after {
+  display: block;
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 8px;
+  width: 16px;
+  height: 2px;
+  background-color: #ff6b35;
+}
+
+.reply:not(:last-child)::before {
+  height: 100%;
+}
+
+.reply .comment-header {
+  font-size: 13px;
+}
+
+.reply .comment-content-row p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* 第二層以後的回覆才縮排 */
+.nested-replies {
+  padding-left: 18px;
+}
+
+/* 主留言與所有層級的回覆都保留相同的右側操作欄 */
+.comment {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.comment-header span {
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.comment-content-row .comment-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.show-replies-button {
+  align-self: flex-end;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: #005bac;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.show-replies-button:hover {
+  text-decoration: underline;
 }
