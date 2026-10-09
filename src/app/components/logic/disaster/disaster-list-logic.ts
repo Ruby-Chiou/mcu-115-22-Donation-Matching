@@ -2,6 +2,7 @@ import { DisasterDemandService } from '../../../core/services/agency-disaster-de
 import { DisasterDemand, DisasterStatus, DisplayStatus } from '../../../models/agency/disaster-demand';
 import { SupplyFilterState } from '../../filter/supply-filter/supply-filter.component';
 import { SortType } from '../../sort-bar/supply-sort-bar/supply-sort-bar.component';
+import { DisasterCommentService } from '../../../core/services/comments/disaster-comment.service';
 
 export type DisasterListItem = DisasterDemand & {
   selected: boolean;
@@ -33,6 +34,28 @@ export class DisasterListLogic {
         category: checkedItem.category ?? '其他',
       };
     });
+  }
+
+  async loadMessageCounts(demands: DisasterListItem[], disasterCommentService: DisasterCommentService): Promise<DisasterListItem[]> {
+    const result = await Promise.all(
+      demands.map(async (item) => {
+        if (item.id == null) {
+          return {
+            ...item,
+            messageCount: 0,
+          };
+        }
+
+        const messageCount = await disasterCommentService.getCommentCount(item.id);
+
+        return {
+          ...item,
+          messageCount,
+        };
+      })
+    );
+
+    return result;
   }
 
   /**

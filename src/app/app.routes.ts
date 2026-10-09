@@ -136,7 +136,9 @@ export const routes: Routes = [
   {
     path: 'agency/item-review/:id',
     loadComponent: () =>
-      import('./features/daily/agency-item-review-detail/agency-item-review-detail.component').then((m) => m.AgencyItemReviewDetailComponent),
+      import('./features/daily/agency-item-review-detail/agency-item-review-detail.component').then(
+        (m) => m.AgencyItemReviewDetailComponent
+      ),
   },
 
   //4.5 急難救助需求管理區
@@ -159,6 +161,11 @@ export const routes: Routes = [
     path: 'agency/supply-detail/:id',
     loadComponent: () =>
       import('./components/data-list/disaster/supply-detail/supply-detail.component').then((m) => m.SupplyDetailComponent),
+  },
+  {
+    path: 'agency/disaster-comments/:id',
+    loadComponent: () =>
+      import('./components/page/disaster-comment-page/disaster-comment-page.component').then((m) => m.DisasterCommentPageComponent),
   },
   {
     path: 'agency/supply-batch-edit',
@@ -213,24 +220,18 @@ export const routes: Routes = [
   },
 
   // 7. 關於我們
-{
-  path: 'intro',
-  loadComponent: () =>
-    import('./features/about-us/intro/intro.component')
-      .then(m => m.IntroComponent),
-},
-{
-  path: 'platform-guide',
-  loadComponent: () =>
-    import('./features/about-us/platform-guide/platform-guide.component')
-      .then(m => m.PlatformGuideComponent),
-},
-{
-  path: 'contact-us',
-  loadComponent: () =>
-    import('./features/about-us/contact-us/contact-us.component')
-      .then(m => m.ContactUsComponent),
-},
+  {
+    path: 'intro',
+    loadComponent: () => import('./features/about-us/intro/intro.component').then((m) => m.IntroComponent),
+  },
+  {
+    path: 'platform-guide',
+    loadComponent: () => import('./features/about-us/platform-guide/platform-guide.component').then((m) => m.PlatformGuideComponent),
+  },
+  {
+    path: 'contact-us',
+    loadComponent: () => import('./features/about-us/contact-us/contact-us.component').then((m) => m.ContactUsComponent),
+  },
   // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回大廳
   { path: '**', redirectTo: 'home' },
 ];

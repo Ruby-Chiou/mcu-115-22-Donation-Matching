@@ -14,6 +14,7 @@ import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 import { DisasterListLogic, DisasterListItem } from '../../../logic/disaster/disaster-list-logic';
+import { DisasterCommentService } from '../../../../core/services/comments/disaster-comment.service';
 
 @Component({
   selector: 'app-disaster-list',
@@ -97,6 +98,7 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private readonly disasterDemandService: DisasterDemandService,
+    private readonly disasterCommentService: DisasterCommentService,
     private readonly router: Router,
     private readonly cdr: ChangeDetectorRef
   ) {
@@ -206,6 +208,9 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
       await this.disasterDemandService.reload();
 
       this.demands = this.logic.mapDemands(this.disasterDemandService.getDemands(), this.disasterDemandService);
+
+      this.demands = await this.logic.loadMessageCounts(this.demands, this.disasterCommentService);
+
       this.filteredDemands = [...this.demands];
       this.updatePagination();
     } catch (error) {

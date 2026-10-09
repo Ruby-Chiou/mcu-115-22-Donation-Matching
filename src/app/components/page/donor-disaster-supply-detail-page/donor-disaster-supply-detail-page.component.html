@@ -1,8 +1,8 @@
 @if (isLoading) {
-  <div class="loading-state">
-    <div class="loading-spinner"></div>
-    <p>資料載入中，請稍候...</p>
-  </div>
+<div class="loading-state">
+  <div class="loading-spinner"></div>
+  <p>資料載入中，請稍候...</p>
+</div>
 } @else if (demand) {
 <div class="detail-page">
   <button type="button" class="back-button" (click)="goBackToList()">← 返回需求清單</button>
@@ -17,9 +17,8 @@
   ========================== -->
   <div class="detail-main">
     <!-- 左邊：物資圖片 -->
-    <!-- 左邊：物資圖片 -->
     <div class="detail-image">
-      <app-supply-detail-carousel [images]="demand?.image ?? []"> </app-supply-detail-carousel>
+      <app-supply-detail-carousel [images]="demand.image ?? []"></app-supply-detail-carousel>
     </div>
     <!-- 右邊：物資資訊 -->
     <div class="detail-info">
@@ -30,9 +29,7 @@
       <div class="category">{{ demand.category }}</div>
       }
       <!-- 緊急程度 -->
-      <div class="urgency" [ngClass]="getPriorityClass()">
-        {{ demand.priority }}
-      </div>
+      <div class="urgency" [ngClass]="getPriorityClass()">{{ demand.priority }}</div>
       <!-- 數量 -->
       <div class="quantity-info">
         <div class="info-item">
@@ -190,9 +187,10 @@
     </ul>
   </div>
   }
+
   <!-- =========================
-       留言區
-  ========================== -->
+     留言區
+========================== -->
   <div class="comment-section">
     <h2>留言區</h2>
     <div class="comment-form">
@@ -200,28 +198,93 @@
       <button type="button" class="comment-button" (click)="addComment()">發布留言</button>
     </div>
     <div class="comment-list">
-      @for ( comment of comments; track $index ) {
-      <div class="comment">
-        <div class="comment-header">
-          <strong> {{ comment.user }} </strong>
-          <span> {{ comment.date }} </span>
+      <!-- 顯示遞迴留言範本 -->
+      <ng-template #commentNode let-node let-depth="depth" let-rootNode="rootNode">
+        <div [ngClass]="depth === 0 ? 'comment' : 'reply'">
+          <!-- 留言者與時間 -->
+          <div class="comment-header">
+            <div class="comment-title">
+              @if (node.comment.parent_comment_id) {
+              <strong>{{ node.comment.user_name }}</strong>
+              <span class="reply-title-text">回覆</span>
+              <strong class="reply-target-name"> {{ getReplyTargetName(node.comment.parent_comment_id) }} </strong>
+              } @else {
+              <strong>{{ node.comment.user_name }}</strong>
+              }
+            </div>
+
+            <span>{{ formatCommentDate(node.comment.created_at) }}</span>
+          </div>
+
+          <!-- 留言內容、愛心、回覆按鈕 -->
+          <div class="comment-content-row">
+            <p class="comment-text">{{ node.comment.content }}</p>
+
+            <div class="comment-actions">
+              <button type="button" class="like-button" (click)="toggleLike(node.comment)">
+                <span class="material-symbols-outlined" [class.liked]="hasLiked(node.comment)">favorite</span>
+                <span>{{ node.comment.like_count }}</span>
+              </button>
+
+              <button type="button" class="comment-button reply-button" (click)="replyTo(node.comment)">回覆</button>
+            </div>
+          </div>
+
+          <!-- 對這一筆留言回覆的輸入框 -->
+          @if (replyingTo?.id === node.comment.id) {
+          <div class="reply-form">
+            <textarea [(ngModel)]="newComment" rows="3" placeholder="輸入回覆內容..."></textarea>
+            <div class="reply-form-actions">
+              <button type="button" class="comment-button reply-submit-button" (click)="addComment()">發布回覆</button>
+              <button type="button" class="reply-cancel-button" (click)="cancelReply()">取消</button>
+            </div>
+          </div>
+          }
+
+          <!-- 顯示這一筆留言底下的回覆 -->
+          @if (node.replies.length > 0) {
+          <div class="reply-list" [class.nested-replies]="depth > 0">
+            @for (childNode of node.replies; track childNode.comment.id) { @if ( rootNode.showAllReplies || childNode.comment.id ===
+            rootNode.replies[0]?.comment.id ) {
+            <ng-container
+              [ngTemplateOutlet]="commentNode"
+              [ngTemplateOutletContext]="{
+              $implicit: childNode,
+              depth: depth + 1,
+              rootNode: rootNode
+            }"
+            ></ng-container>
+            } }
+
+            <!-- 只有主留言顯示控制所有後代回覆的按鈕 -->
+            @if (depth === 0 && countDescendantReplies(node) > 1) {
+            <button type="button" class="show-replies-button" (click)="toggleReplies(node)">
+              @if (node.showAllReplies) { 收起回覆 } @else { 顯示更多回覆（{{ countDescendantReplies(node) - 1 }}） }
+            </button>
+            }
+          </div>
+          }
         </div>
-        <p>{{ comment.content }}</p>
-      </div>
+      </ng-template>
+
+      <!-- 顯示所有主留言 -->
+      @for (thread of commentThreads; track thread.comment.id) {
+      <ng-container
+        [ngTemplateOutlet]="commentNode"
+        [ngTemplateOutletContext]="{
+      $implicit: thread,
+      depth: 0,
+      rootNode: thread
+    }"
+      ></ng-container>
       }
     </div>
   </div>
 </div>
 } @else {
-  <div class="loading-state empty-state">
-    <p>找不到此筆災害物資需求。</p>
+<div class="loading-state empty-state">
+  <p>找不到此筆災害物資需求。</p>
 
-    <button
-      type="button"
-      class="back-button"
-      (click)="goBackToList()"
-    >
-      ← 返回需求清單
-    </button>
-  </div>
+  <button type="button" class="back-button" (click)="goBackToList()">← 返回需求清單</button>
+</div>
 }
