@@ -1,0 +1,427 @@
+// ==========================================
+// 首頁資訊區
+// 平台公告 + 最新消息
+// ==========================================
+
+.home-info-grid {
+  display: grid;
+
+  grid-template-columns: 2fr 3fr;
+
+  gap: 20px;
+
+  width: 100%;
+  max-width: 1400px;
+
+  margin: 30px auto 50px;
+
+  padding: 0 20px;
+
+  box-sizing: border-box;
+}
+
+// ==========================================
+// 平台公告
+// ==========================================
+
+.platform-announcements {
+  min-width: 0;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-default);
+
+  border-radius: var(--border-radius-main);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+  overflow: hidden;
+}
+
+
+// 標題
+
+.announcement-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  height: 55px;
+
+  padding: 0 20px;
+
+  box-sizing: border-box;
+
+  background-color: var(--bg-layer-1);
+
+  border-bottom: 1px solid var(--border-default);
+
+  color: var(--color-text-main);
+
+  font-size: 26px;
+
+  font-weight: 600;
+}
+
+
+.announcement-title i {
+  color: var(--color-brand-primary);
+
+  font-size: 26px;
+}
+
+
+// 公告列表
+
+.announcement-list {
+  height: 180px;
+
+  padding: 12px 20px 16px;
+
+  box-sizing: border-box;
+
+  overflow-y: auto;
+}
+
+
+// 單則公告
+
+.announcement-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  min-height: 45px;
+
+  padding: 8px 0;
+
+  box-sizing: border-box;
+
+  border-bottom: 2px dotted #cbd5df;
+
+  font-size: 16px;
+
+  color: var(--color-text-main);
+}
+
+
+.announcement-item:last-child {
+  border-bottom: none;
+}
+
+
+// 日期
+
+.announcement-date {
+  flex: 0 0 75px;
+
+  color: var(--color-brand-primary);
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+// 文字
+
+.announcement-text {
+  flex: 1;
+
+  line-height: 1.6;
+
+  color: var(--color-text-main);
+}
+
+
+// ==========================================
+// 最新消息
+// ==========================================
+
+.latest-news-section {
+  min-width: 0;
+}
+
+
+// 標題區
+
+.latest-news-header {
+  margin-bottom: 12px;
+}
+
+
+.latest-news-title {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+}
+
+
+.latest-news-title > i {
+  margin-top: 3px;
+
+  color: var(--color-brand-primary);
+
+  font-size: 24px;
+}
+
+
+.latest-news-title h2 {
+  margin: 0;
+
+  color: var(--color-text-main);
+
+  font-size: 26px;
+
+  font-weight: 600;
+}
+
+
+.latest-news-title p {
+  margin: 4px 0 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+// ==========================================
+// 最新消息列表
+// ==========================================
+
+.latest-news-list {
+  width: 100%;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-default);
+
+  border-radius: var(--border-radius-main);
+
+  overflow: hidden;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+
+// 單則消息
+
+.latest-news-item {
+  display: grid;
+
+  grid-template-columns: 75px 75px minmax(0, 1fr) 20px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 75px;
+
+  padding: 14px 16px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #edf0f2;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.latest-news-item:last-child {
+  border-bottom: none;
+}
+
+
+.latest-news-item:hover {
+  background-color: #f8fbfc;
+}
+
+
+// 日期
+
+.latest-news-date {
+  color: var(--color-brand-primary);
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+// 分類
+
+.latest-news-category {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: fit-content;
+
+  min-width: 56px;
+
+  padding: 5px 8px;
+
+  border-radius: 14px;
+
+  background-color: #eaf4f8;
+
+  color: var(--color-brand-primary);
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+// 內容
+
+.latest-news-content {
+  min-width: 0;
+}
+
+
+.latest-news-content h3 {
+  margin: 0 0 4px;
+
+  color: var(--color-text-main);
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+
+.latest-news-content p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+  display: -webkit-box;
+
+  -webkit-box-orient: vertical;
+
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+
+  overflow: hidden;
+}
+
+
+// 箭頭
+
+.latest-news-arrow {
+  color: var(--color-brand-primary);
+
+  font-size: 14px;
+
+  transition: transform 0.2s ease;
+}
+
+
+.latest-news-item:hover .latest-news-arrow {
+  transform: translateX(3px);
+}
+
+
+// ==========================================
+// RWD
+// ==========================================
+
+@media (max-width: 900px) {
+
+  .home-info-grid {
+    grid-template-columns: 1fr;
+
+    padding: 0 15px;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .announcement-title {
+    padding: 0 16px;
+
+    font-size: 22px;
+  }
+
+
+  .announcement-title i {
+    font-size: 22px;
+  }
+
+
+  .announcement-list {
+    height: 160px;
+
+    padding: 10px 16px;
+  }
+
+
+  .announcement-item {
+    font-size: 14px;
+  }
+
+
+  .announcement-date {
+    flex-basis: 68px;
+  }
+
+
+  .latest-news-title h2 {
+    font-size: 22px;
+  }
+
+
+  .latest-news-item {
+    grid-template-columns: 68px minmax(0, 1fr) 18px;
+
+    gap: 8px;
+
+    padding: 12px;
+  }
+
+
+  .latest-news-category {
+    display: none;
+  }
+
+
+  .latest-news-content h3 {
+    font-size: 15px;
+  }
+
+
+  .latest-news-content p {
+    font-size: 12px;
+  }
+
+}

@@ -1,0 +1,280 @@
+// ==========================================
+// 為什麼我們要做這個平台
+// ==========================================
+
+.about-platform {
+  width: 100%;
+  max-width: none;
+
+  margin: 30px 0 0;
+
+  padding: 40px 50px 45px;
+
+  box-sizing: border-box;
+
+  background-color: #eaf4f8;
+}
+
+
+// ==========================================
+// 標題
+// ==========================================
+
+.about-title {
+  max-width: 1400px;
+
+  margin: 0 auto 35px;
+
+  text-align: center;
+
+  color: var(--color-text-main);
+
+  font-size: 30px;
+
+  font-weight: 600;
+}
+
+
+// ==========================================
+// 內容區
+// ==========================================
+
+.about-content {
+  position: relative;
+
+  width: 100%;
+
+  max-width: 1400px;
+
+  min-height: 420px;
+
+  margin: 0 auto;
+}
+
+
+// ==========================================
+// 中間插圖
+// ==========================================
+
+.about-image {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 80%;
+
+  max-width: 1000px;
+
+  z-index: 1;
+}
+
+
+.about-image img {
+  display: block;
+
+  width: 100%;
+
+  height: auto;
+
+  object-fit: contain;
+}
+
+
+// ==========================================
+// 左下理念文字
+// ==========================================
+
+.about-message {
+  position: absolute;
+
+  left: 0;
+  bottom: 35px;
+
+  width: 30%;
+
+  z-index: 2;
+}
+
+
+.about-message p {
+  margin: 0;
+
+  color: var(--color-brand-primary);
+
+  font-size: 20px;
+
+  line-height: 1.65;
+
+  font-weight: 500;
+}
+
+
+// ==========================================
+// 右上平台介紹
+// ==========================================
+
+.about-introduction {
+  position: absolute;
+
+  top: 20px;
+  right: 0;
+
+  width: 28%;
+
+  z-index: 2;
+}
+
+
+.about-introduction p {
+  margin: 0;
+
+  color: var(--color-brand-primary);
+
+  font-size: 20px;
+
+  line-height: 1.7;
+
+  font-weight: 500;
+}
+
+
+.about-introduction .second-line {
+  display: inline-block;
+
+  margin-left: 3em;
+}
+
+
+// ==========================================
+// 了解更多
+// ==========================================
+
+.about-link {
+  position: absolute;
+
+  right: 0;
+  bottom: 10px;
+
+  z-index: 2;
+
+  color: var(--color-brand-primary);
+
+  font-size: 20px;
+
+  font-weight: 500;
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.about-link:hover {
+  color: var(--color-text-main);
+
+  transform: translateX(4px);
+}
+
+
+// ==========================================
+// RWD
+// ==========================================
+
+@media (max-width: 900px) {
+
+  .about-platform {
+    padding: 35px 25px 40px;
+  }
+
+  .about-content {
+    min-height: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 25px;
+  }
+
+  .about-image {
+    position: relative;
+
+    left: auto;
+    top: auto;
+
+    transform: none;
+
+    width: 100%;
+
+    max-width: 700px;
+
+    margin: 0 auto;
+
+    order: 1;
+  }
+
+  .about-message,
+  .about-introduction {
+    position: relative;
+
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+
+    width: 100%;
+
+    order: 2;
+  }
+
+  .about-link {
+    position: relative;
+
+    right: auto;
+    bottom: auto;
+
+    display: block;
+
+    width: fit-content;
+
+    margin-left: auto;
+
+    order: 3;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .about-platform {
+    padding: 30px 20px 35px;
+  }
+
+  .about-title {
+    margin-bottom: 25px;
+
+    font-size: 25px;
+  }
+
+  .about-message p,
+  .about-introduction p {
+    font-size: 17px;
+
+    line-height: 1.6;
+  }
+
+  .about-introduction .second-line {
+    margin-left: 2em;
+  }
+
+  .about-link {
+    font-size: 17px;
+  }
+
+}
