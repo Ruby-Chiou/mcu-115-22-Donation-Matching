@@ -22,7 +22,7 @@ interface CommentThreadNode {
   selector: 'app-disaster-supply-detail-page',
   imports: [FormsModule, NgClass, NgTemplateOutlet, SupplyDetailCarouselComponent],
   templateUrl: './donor-disaster-supply-detail-page.component.html',
-  styleUrl: './donor-disaster-supply-detail-page.component.scss',
+  styleUrls: ['./donor-disaster-supply-detail-page-A.component.scss', './donor-disaster-supply-detail-page-B.component.scss'],
 })
 export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000001';
