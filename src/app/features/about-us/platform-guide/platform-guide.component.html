@@ -1,359 +1,115 @@
-<div class="guide-page">
+<section class="platform-guide-page">
 
-  <!-- 頁面標題 -->
-  <section class="guide-header">
-    <div class="title-area">
-      <h1>平台導覽</h1>
-      <p>選擇你的身分，快速了解平台操作方式</p>
+  <!-- ==========================================
+       頁面標題
+  ========================================== -->
+
+  <header class="guide-hero">
+
+    <div class="guide-hero-content">
+
+
+      <h1>
+        平台導覽
+      </h1>
+
+      <p>
+        了解智慧捐助媒合平台的操作方式與使用流程
+      </p>
+
     </div>
+
+  </header>
+
+
+  <!-- ==========================================
+       公共導覽
+  ========================================== -->
+
+  <section class="guide-section">
+
+    <app-public-guide></app-public-guide>
+
   </section>
 
-<!-- 登入 / 註冊引導 -->
-<section class="account-section">
 
-  <div class="section-title">
-    <i class="fa-solid fa-right-to-bracket"></i>
-    <h2>開始使用平台</h2>
-  </div>
+  <!-- ==========================================
+       身分導覽
+  ========================================== -->
 
-  <p class="section-description">
-    已經有帳號可以直接登入，還沒有帳號則可以先完成註冊
-  </p>
+  <section class="guide-role-section">
+
+    <div class="section-heading">
 
 
-  <div class="account-cards">
 
-    <!-- 登入 -->
-    <div class="account-card login-card">
+      <h2>
+        依身份查看操作教學
+      </h2>
 
-      <div class="account-icon">
-        <i class="fa-solid fa-right-to-bracket"></i>
-      </div>
-
-      <div class="account-content">
-        <span class="account-label">已有帳號</span>
-
-        <h3>登入平台</h3>
-
-        <p>
-          登入後可以使用與你的身分相關的完整功能
-        </p>
-
-        <a
-          routerLink="/login"
-          class="account-button register-button"
-        >
-          登入
-          <i class="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
+      <p>
+        選擇你的使用身份，查看對應的完整操作方式
+      </p>
 
     </div>
 
+    <div class="guide-selector">
 
-    <!-- 註冊 -->
-    <div class="account-card register-card">
+  <button
+    type="button"
+    class="guide-selector-button"
+    [class.active]="selectedGuide() === 'donor'"
+    (click)="selectGuide('donor')"
+  >
+    <i class="fa-solid fa-hand-holding-heart"></i>
 
-      <div class="account-icon">
-        <i class="fa-solid fa-user-plus"></i>
-      </div>
+    <span>
+      捐助者導覽
+    </span>
 
-      <div class="account-content">
-        <span class="account-label">還沒有帳號？</span>
+    <i class="fa-solid fa-chevron-down arrow"></i>
+  </button>
 
-        <h3>註冊會員</h3>
 
-        <p>
-          建立帳號後，即可開始使用平台相關功能。
-        </p>
+  <button
+    type="button"
+    class="guide-selector-button"
+    [class.active]="selectedGuide() === 'agency'"
+    (click)="selectGuide('agency')"
+  >
+    <i class="fa-solid fa-building"></i>
 
-        <a
-          routerLink="/register"
-          class="account-button register-button"
-        >
-          立即註冊
-          <i class="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
+    <span>
+      受助者導覽
+    </span>
 
-    </div>
+    <i class="fa-solid fa-chevron-down arrow"></i>
+  </button>
 
-  </div>
+</div>
+
+    <!--
+      尚未登入：
+      顯示捐助者與受助者兩張鎖定卡
+
+      受助者登入：
+      只顯示受助者導覽
+    -->
+
+ @if (selectedGuide() === 'donor') {
+
+  <app-donor-guide></app-donor-guide>
+
+}
+
+@if (selectedGuide() === 'agency') {
+
+  <app-agency-guide
+    [currentRole]="currentRole()"
+  ></app-agency-guide>
+
+}
+
+  </section>
 
 </section>
-  <!-- 角色選擇 -->
-  <section class="role-section">
-
-    <div class="section-title">
-      <i class="fa-solid fa-users"></i>
-      <h2>你是誰？</h2>
-    </div>
-
-    <p class="section-description">
-      請選擇你的使用身分，查看對應的平台使用教學。
-    </p>
-
-
-    <div class="role-buttons">
-
-      <button
-        type="button"
-        class="role-card donor"
-        [class.active]="selectedRole === 'donor'"
-        (click)="selectRole('donor')"
-      >
-        <div class="role-icon">
-          <i class="fa-solid fa-hand-holding-heart"></i>
-        </div>
-
-        <div class="role-content">
-          <h3>捐助者</h3>
-          <p>我想提供物資，幫助有需要的人</p>
-        </div>
-
-        @if (selectedRole === 'donor') {
-          <i class="fa-solid fa-circle-check role-check"></i>
-        }
-      </button>
-
-
-      <button
-        type="button"
-        class="role-card recipient"
-        [class.active]="selectedRole === 'recipient'"
-        (click)="selectRole('recipient')"
-      >
-        <div class="role-icon">
-          <i class="fa-solid fa-building"></i>
-        </div>
-
-        <div class="role-content">
-          <h3>受助者</h3>
-          <p>我是社福機構，需要發布物資需求</p>
-        </div>
-
-        @if (selectedRole === 'recipient') {
-          <i class="fa-solid fa-circle-check role-check"></i>
-        }
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- 捐助者教學 -->
-  @if (selectedRole === 'donor') {
-
-    <section class="guide-section">
-
-      <div class="section-title">
-        <i class="fa-solid fa-hand-holding-heart"></i>
-        <h2>捐助者教學</h2>
-      </div>
-
-      <p class="section-description">
-        從找到需求、提交捐助，到寄出物資與查看物流，可以依照以下步驟完成。
-      </p>
-
-
-      <div class="step-list">
-
-        @for (step of donorSteps; track step.number) {
-
-          <div class="step-card">
-
-            <div class="step-number">
-              {{ step.number }}
-            </div>
-
-            <div class="step-icon">
-              <i [class]="step.icon"></i>
-            </div>
-
-            <div class="step-content">
-              <h3>{{ step.title }}</h3>
-              <p>{{ step.description }}</p>
-            </div>
-
-            @if (step.number < donorSteps.length) {
-              <div class="step-line"></div>
-            }
-
-          </div>
-
-        }
-
-      </div>
-
-    </section>
-
-
-    <!-- 捐助者功能 -->
-    <section class="guide-section">
-
-      <div class="section-title">
-        <i class="fa-solid fa-grid-2"></i>
-        <h2>捐助者常用功能</h2>
-      </div>
-
-      <p class="section-description">
-        可以從以下功能直接開始你的捐助流程。
-      </p>
-
-
-      <div class="feature-grid">
-
-        @for (feature of donorFeatures; track feature.title) {
-
-          <article class="feature-card">
-
-            <div class="feature-icon">
-              <i [class]="feature.icon"></i>
-            </div>
-
-            <div class="feature-content">
-
-              <h3>{{ feature.title }}</h3>
-
-              <p>
-                {{ feature.description }}
-              </p>
-
-              <a
-                [routerLink]="feature.link"
-                class="feature-link"
-              >
-                {{ feature.buttonText }}
-                <i class="fa-solid fa-arrow-right"></i>
-              </a>
-
-            </div>
-
-          </article>
-
-        }
-
-      </div>
-
-    </section>
-
-  }
-
-
-  <!-- 受助者教學 -->
-  @if (selectedRole === 'recipient') {
-
-    <section class="guide-section recipient-section">
-
-      <div class="section-title">
-        <i class="fa-solid fa-building"></i>
-        <h2>受助者教學</h2>
-      </div>
-
-      <p class="section-description">
-        社福機構可以透過以下流程發布需求、更新資訊與招募志工。
-      </p>
-
-
-      <div class="recipient-note">
-
-        <div class="recipient-note-icon">
-          <i class="fa-solid fa-circle-info"></i>
-        </div>
-
-        <div>
-          <h3>受助者使用說明</h3>
-          <p>
-            受助者需先完成平台身分驗證，通過審核後才能使用需求發布相關功能。
-          </p>
-        </div>
-
-      </div>
-
-
-      <div class="step-list">
-
-        @for (step of recipientSteps; track step.number) {
-
-          <div class="step-card">
-
-            <div class="step-number recipient-number">
-              {{ step.number }}
-            </div>
-
-            <div class="step-icon recipient-icon">
-              <i [class]="step.icon"></i>
-            </div>
-
-            <div class="step-content">
-              <h3>{{ step.title }}</h3>
-              <p>{{ step.description }}</p>
-            </div>
-
-            @if (step.number < recipientSteps.length) {
-              <div class="step-line"></div>
-            }
-
-          </div>
-
-        }
-
-      </div>
-
-    </section>
-
-
-    <!-- 受助者功能 -->
-    <section class="guide-section">
-
-      <div class="section-title">
-        <i class="fa-solid fa-grid-2"></i>
-        <h2>受助者常用功能</h2>
-      </div>
-
-      <p class="section-description">
-        以下功能協助社福機構管理需求與救助相關資訊。
-      </p>
-
-
-      <div class="feature-grid">
-
-        @for (feature of recipientFeatures; track feature.title) {
-
-          <article class="feature-card">
-
-            <div class="feature-icon recipient-feature-icon">
-              <i [class]="feature.icon"></i>
-            </div>
-
-            <div class="feature-content">
-
-              <h3>{{ feature.title }}</h3>
-
-              <p>
-                {{ feature.description }}
-              </p>
-
-              <a
-                [routerLink]="feature.link"
-                class="feature-link"
-              >
-                {{ feature.buttonText }}
-                <i class="fa-solid fa-arrow-right"></i>
-              </a>
-
-            </div>
-
-          </article>
-
-        }
-
-      </div>
-
-    </section>
-
-  }
-
-
-

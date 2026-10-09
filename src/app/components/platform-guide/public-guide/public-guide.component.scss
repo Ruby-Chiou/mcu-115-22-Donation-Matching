@@ -1,0 +1,177 @@
+.public-guide {
+  width: 100%;
+}
+
+
+.section-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 25px;
+}
+
+
+.section-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+
+  background-color: #eaf4f8;
+
+  color: var(--color-brand-primary);
+
+  font-size: 22px;
+}
+
+
+.section-title h2 {
+  margin: 0 0 5px;
+
+  color: var(--color-text-main);
+
+  font-size: 28px;
+}
+
+
+.section-title p {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: 15px;
+}
+
+
+// ==========================================
+// 使用流程
+// ==========================================
+
+.process-card {
+  padding: 30px;
+
+  border-radius: 20px;
+
+  background-color: #eaf4f8;
+}
+
+
+.process-card h3 {
+  margin: 0 0 25px;
+
+  color: var(--color-text-main);
+
+  text-align: center;
+
+  font-size: 22px;
+}
+
+
+.process-list {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+.process-item {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 130px;
+}
+
+
+.process-item span {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background-color: var(--color-brand-primary);
+
+  color: #fff;
+
+  font-weight: 700;
+}
+
+
+.process-item p {
+  margin: 0;
+
+  color: var(--color-text-main);
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+.process-arrow {
+  margin: 0 15px;
+
+  color: var(--color-brand-primary);
+}
+
+
+// ==========================================
+// RWD
+// ==========================================
+
+@media (max-width: 900px) {
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+
+  .process-list {
+    flex-wrap: wrap;
+
+    gap: 20px;
+  }
+
+
+  .process-arrow {
+    display: none;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .section-title {
+    align-items: flex-start;
+  }
+
+
+  .section-title h2 {
+    font-size: 23px;
+  }
+
+  .process-card {
+    padding: 22px;
+  }
+
+}
