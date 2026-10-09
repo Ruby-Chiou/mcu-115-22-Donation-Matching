@@ -211,7 +211,7 @@ export class SupplyBatchEditComponent implements OnInit {
   }
 
   trackByIndex(index: number): number {
-    return this.logic.trackByIndex(index);
+    return index;
   }
 
   openImagePreview(image: string, imageName: string): void {

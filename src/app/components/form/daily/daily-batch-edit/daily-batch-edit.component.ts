@@ -11,6 +11,7 @@ import { DailyBatchEditLogic } from '../../../logic/daily/daily-batch-edit.logic
   selector: 'app-daily-batch-edit',
   standalone: true,
   imports: [CommonModule, FormsModule, SupplyImagePreviewComponent, SupplyOffShelfComponent, SupplyOnShelfComponent],
+  providers: [DailyBatchEditLogic],
   templateUrl: './daily-batch-edit.component.html',
   styleUrls: [
     './daily-batch-edit-A.component.scss',

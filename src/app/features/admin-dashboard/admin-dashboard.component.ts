@@ -20,6 +20,8 @@ export class AdminDashboardComponent {
       items: [
         { name: '登入頁面', path: '/login', desc: '使用者登入' },
         { name: '註冊頁面', path: '/register', desc: '新帳號註冊' },
+        { name: '會員專區', path: '/member', desc: '會員專區' },
+      
       ],
     },
     {
@@ -30,6 +32,20 @@ export class AdminDashboardComponent {
         { name: '災害救助大廳', path: '/donor/disaster', desc: '急難救助需求瀏覽' },
         { name: '災害歷史紀錄', path: '/disaster/history', desc: '查看災害歷史紀錄' },
         { name: '歷史紀錄與進度追蹤', path: '/donor/history', desc: '查詢個人捐助歷史' },
+        { name: '物流追蹤', path: '/tracking', desc: '查詢物流追蹤' },
+
+      ],
+    },
+    {
+      title: '客服模組 (Customer Service)',
+      icon: 'help_center',
+      items: [
+
+        { name: '客服FAQ', path: '/customer-service/faq', desc: '查詢常見問題' },
+        { name: '客服AI聊天', path: '/customer-service/ai-chat', desc: '與AI客服聊天' },
+        { name: '平台介紹', path: '/intro', desc: '平台介紹' },
+        { name: '平台導覽', path: '/platform-guide', desc: '平台導覽' },
+        { name: '聯絡我們', path: '/contact-us', desc: '聯絡我們' },
       ],
     },
     {
