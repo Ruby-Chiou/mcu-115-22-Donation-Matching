@@ -15,6 +15,7 @@ import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-l
 import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
 import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
+import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 
 @Component({
   selector: 'app-daily-list',
@@ -91,6 +92,7 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private dailyDemandService: DailyDemandService,
+    private dailyCommentService: DailyCommentService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {
@@ -222,6 +224,7 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isLoading) {
       return;
     }
+
     this.isLoading = true;
     this.cdr.markForCheck();
 
@@ -235,11 +238,32 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
           }),
           takeUntil(this.destroy$)
         )
-        .subscribe((data) => {
-          this.demands = this.logic.mapDemands(data, (item) => this.dailyDemandService.updateDemand(item));
-          this.applyFilters(false);
-          this.isLoading = false;
-          this.cdr.detectChanges();
+        .subscribe(async (data) => {
+          try {
+            const mappedDemands = this.logic.mapDemands(data, (item) => this.dailyDemandService.updateDemand(item));
+
+            await Promise.all(
+              mappedDemands.map(async (item) => {
+                if (item.id == null) {
+                  item.messageCount = 0;
+                  return;
+                }
+
+                item.messageCount = await this.dailyCommentService.getCommentCount(Number(item.id));
+              })
+            );
+
+            this.demands = mappedDemands;
+            this.applyFilters(false);
+          } catch (error) {
+            console.error('載入日常需求或留言數量失敗：', error);
+            this.demands = [];
+            this.filteredDemands = [];
+            this.pagedDemands = [];
+          } finally {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+          }
         });
     } catch (error) {
       console.error('載入日常需求失敗：', error);

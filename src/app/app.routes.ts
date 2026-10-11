@@ -122,6 +122,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/data-list/daily/daily-detail/daily-detail.component').then((m) => m.DailyDetailComponent),
   },
   {
+    path: 'agency/daily-comment/:id',
+    loadComponent: () =>
+      import('./components/page/daily-comment-page/daily-comment-page.component').then((m) => m.DailyCommentPageComponent),
+  },
+  {
     path: 'agency/daily-batch-edit',
     loadComponent: () =>
       import('./components/form/daily/daily-batch-edit/daily-batch-edit.component').then((m) => m.DailyBatchEditComponent),
@@ -186,6 +191,11 @@ export const routes: Routes = [
     path: 'agency/volunteer-detail/:id',
     loadComponent: () =>
       import('./components/data-list/disaster/volunteer-detail/volunteer-detail.component').then((m) => m.VolunteerDetailComponent),
+  },
+  {
+    path: 'agency/volunteer-comments/:id',
+    loadComponent: () =>
+      import('./components/page/volunteer-comment-page/volunteer-comment-page.component').then((m) => m.VolunteerCommentPageComponent),
   },
   {
     path: 'agency/volunteer-batch-edit',

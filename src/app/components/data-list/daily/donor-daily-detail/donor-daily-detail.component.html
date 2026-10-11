@@ -182,22 +182,98 @@
 <div class="comment-section">
   <h2>留言區</h2>
 
+  <!-- 主留言輸入區 -->
   <div class="comment-form">
     <textarea [(ngModel)]="newComment" rows="4" placeholder="輸入你想說的話..."></textarea>
 
     <button type="button" class="comment-button" (click)="addComment()">發布留言</button>
   </div>
 
+  <!-- 留言列表 -->
   <div class="comment-list">
-    @for (comment of comments; track $index) {
-    <div class="comment">
-      <div class="comment-header">
-        <strong>{{ comment.user }}</strong>
-        <span>{{ comment.date }}</span>
-      </div>
+    <!-- 遞迴留言範本 -->
+    <ng-template #commentNode let-node let-depth="depth" let-rootNode="rootNode">
+      <div [ngClass]="depth === 0 ? 'comment' : 'reply'">
+        <!-- 留言者與時間 -->
+        <div class="comment-header">
+          <div class="comment-title">
+            @if (node.comment.parent_comment_id !== null) {
+            <strong>{{ node.comment.user_name }}</strong>
+            <span class="reply-title-text">回覆</span>
+            <strong class="reply-target-name"> {{ getReplyTargetName(node.comment.parent_comment_id) }} </strong>
+            } @else {
+            <strong>{{ node.comment.user_name }}</strong>
+            }
+          </div>
 
-      <p>{{ comment.content }}</p>
-    </div>
+          <span>{{ formatCommentDate(node.comment.created_at) }}</span>
+        </div>
+
+        <!-- 留言內容、愛心與回覆按鈕 -->
+        <div class="comment-content-row">
+          <p class="comment-text">{{ node.comment.content }}</p>
+
+          <div class="comment-actions">
+            <button type="button" class="like-button" [class.liked]="hasLiked(node.comment)" (click)="toggleLike(node.comment)">
+              <span class="material-symbols-outlined" [class.liked]="hasLiked(node.comment)">favorite</span>
+              <span>{{ node.comment.like_count ?? 0 }}</span>
+            </button>
+
+            <button type="button" class="comment-button reply-button" (click)="replyTo(node.comment)">回覆</button>
+          </div>
+        </div>
+
+        <!-- 回覆輸入框 -->
+        @if (replyingTo?.id === node.comment.id) {
+        <div class="reply-form">
+          <textarea [(ngModel)]="newComment" rows="3" placeholder="輸入回覆內容..."></textarea>
+
+          <div class="reply-form-actions">
+            <button type="button" class="comment-button reply-submit-button" (click)="addComment()">發布回覆</button>
+
+            <button type="button" class="reply-cancel-button" (click)="cancelReply()">取消</button>
+          </div>
+        </div>
+        }
+
+        <!-- 巢狀回覆 -->
+        @if (node.replies.length > 0) {
+        <div class="reply-list" [class.nested-replies]="depth > 0">
+          @for (childNode of node.replies; track childNode.comment.id) { @if ( rootNode.showAllReplies || childNode.comment.id ===
+          rootNode.replies[0]?.comment.id ) {
+          <ng-container
+            [ngTemplateOutlet]="commentNode"
+            [ngTemplateOutletContext]="{
+                    $implicit: childNode,
+                    depth: depth + 1,
+                    rootNode: rootNode
+                  }"
+          ></ng-container>
+          } }
+
+          <!-- 只有主留言顯示展開按鈕 -->
+          @if (depth === 0 && countDescendantReplies(node) > 1) {
+          <button type="button" class="show-replies-button" (click)="toggleReplies(node)">
+            @if (node.showAllReplies) { 收起回覆 } @else { 顯示更多回覆（{{ countDescendantReplies(node) - 1 }}） }
+          </button>
+          }
+        </div>
+        }
+      </div>
+    </ng-template>
+
+    <!-- 顯示所有主留言 -->
+    @for (thread of commentThreads; track thread.comment.id) {
+    <ng-container
+      [ngTemplateOutlet]="commentNode"
+      [ngTemplateOutletContext]="{
+          $implicit: thread,
+          depth: 0,
+          rootNode: thread
+        }"
+    ></ng-container>
+    } @empty {
+    <p class="no-comments">目前還沒有留言，歡迎成為第一位留言的人！</p>
     }
   </div>
 </div>

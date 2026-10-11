@@ -199,16 +199,8 @@
 
             <!-- 留言區 -->
             <td class="message-column">
-              <!-- 已上架：顯示留言數，而且可以點進去 -->
-              <a
-                *ngIf="item.status === '上架'"
-                [routerLink]="[
-      '/donor/daily/detail',
-      item.serialNo
-    ]"
-              >
-                {{ item.messageCount || 0 }}
-              </a>
+              <!-- 已上架：點擊後前往日常需求留言頁面 -->
+              <a *ngIf="item.status === '上架'" [routerLink]="['/agency/daily-comment', item.serialNo]"> {{ item.messageCount || 0 }} </a>
 
               <!-- 隱藏中：留言數固定顯示 0，不可以點 -->
               <span *ngIf="item.status === '隱藏'"> 0 </span>
@@ -262,8 +254,6 @@
       (pageChange)="goToPage($event)"
     ></app-pagination>
   </ng-container>
-
-  <!-- Modal 不放進 Loading 判斷 -->
 
   <!-- 刪除 Modal -->
   <app-supply-delete

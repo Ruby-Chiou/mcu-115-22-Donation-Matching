@@ -21,6 +21,7 @@ interface CommentThreadNode {
 })
 export class DisasterCommentPageComponent implements OnInit {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000002';
+  private readonly likingCommentIds = new Set<number>();
 
   demandId = 0;
 
@@ -181,19 +182,59 @@ export class DisasterCommentPageComponent implements OnInit {
   }
 
   async toggleLike(comment: DisasterComment): Promise<void> {
+    // 避免同一則留言在儲存期間重複送出
+    if (this.likingCommentIds.has(comment.id)) {
+      return;
+    }
+
+    this.likingCommentIds.add(comment.id);
+
+    // 先記錄原本狀態，失敗時才能還原
+    const originalLikeCount = comment.like_count;
+    const originalLikedUserIds = [...(comment.liked_user_ids ?? [])];
+
+    const alreadyLiked = originalLikedUserIds.includes(this.currentUserId);
+
+    // 立即更新畫面
+    if (alreadyLiked) {
+      comment.like_count = Math.max(0, (comment.like_count ?? 0) - 1);
+      comment.liked_user_ids = originalLikedUserIds.filter((id) => id !== this.currentUserId);
+    } else {
+      comment.like_count = (comment.like_count ?? 0) + 1;
+      comment.liked_user_ids = [...originalLikedUserIds, this.currentUserId];
+    }
+
+    this.cdr.detectChanges();
+
     try {
+      // 背景同步儲存到資料庫
       const updatedComment = await this.disasterCommentService.toggleLike(comment.id, this.currentUserId);
 
+      // 以資料庫回傳的結果確認最終狀態
       const index = this.comments.findIndex((item) => item.id === comment.id);
 
       if (index !== -1) {
-        this.comments[index] = updatedComment;
-        this.buildCommentThreads();
+        this.comments[index] = {
+          ...this.comments[index],
+          like_count: updatedComment.like_count,
+          liked_user_ids: updatedComment.liked_user_ids,
+        };
+
+        comment.like_count = updatedComment.like_count;
+        comment.liked_user_ids = updatedComment.liked_user_ids;
       }
 
       this.cdr.detectChanges();
     } catch (error) {
       console.error('[災害留言頁] 愛心操作失敗：', error);
+
+      // 儲存失敗，還原畫面
+      comment.like_count = originalLikeCount;
+      comment.liked_user_ids = originalLikedUserIds;
+
+      this.cdr.detectChanges();
+    } finally {
+      this.likingCommentIds.delete(comment.id);
     }
   }
 

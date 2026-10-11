@@ -6,12 +6,15 @@ import { FormsModule } from '@angular/forms';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { SupplyDetailCarouselComponent } from '../../../carousel/supply-detail-carousel/supply-detail-carousel.component';
+import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
+import { DailyComment } from '../../../../core/services/comments/daily-comment.service';
 
-interface Comment {
-  user: string;
-  date: string;
-  content: string;
+interface CommentThreadNode {
+  comment: DailyComment;
+  replies: CommentThreadNode[];
+  showAllReplies: boolean;
 }
+
 @Component({
   selector: 'app-donor-daily-detail',
   standalone: true,
@@ -20,6 +23,7 @@ interface Comment {
   styleUrl: './donor-daily-detail.component.scss',
 })
 export class DonorDailyDetailComponent implements OnInit, OnDestroy {
+  private readonly currentUserId = '00000000-0000-0000-0000-000000000011';
   demand?: DailyDemand;
   currentImageIndex = 0;
   private imageTimer?: ReturnType<typeof setInterval>;
@@ -29,7 +33,8 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private dailyDemandService: DailyDemandService,
-    private cdr: ChangeDetectorRef // 注入 ChangeDetectorRef 以強制觸發變更偵測
+    private dailyCommentService: DailyCommentService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -52,6 +57,8 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
         this.loadError = '找不到此筆物資需求。';
         return;
       }
+      // 載入目前日常需求的留言
+      await this.loadComments(id);
     } catch (error) {
       console.error('讀取物資需求資料失敗：', error);
 
@@ -197,38 +204,202 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
       .map(([key, value]) => `${key}：${value}`)
       .join('\n');
   }
+
   // =========================
   // 留言
   // =========================
   newComment = '';
-  comments: Comment[] = [
-    {
-      user: '王小明',
-      date: '2026/08/17',
-      content: '請問目前還需要礦泉水嗎？',
-    },
-    {
-      user: '陳小華',
-      date: '2026/08/16',
-      content: '已經準備好物資，希望可以幫助到災區。',
-    },
-  ];
-  addComment(): void {
-    if (!this.newComment.trim()) {
+
+  comments: DailyComment[] = [];
+
+  replyingTo: DailyComment | null = null;
+
+  // 主留言及其所有層級的回覆
+  commentThreads: CommentThreadNode[] = [];
+
+  // 載入留言
+  async loadComments(demandId: number): Promise<void> {
+    try {
+      this.comments = await this.dailyCommentService.getComments(demandId);
+      this.buildCommentThreads();
+    } catch (error) {
+      console.error('[日常留言] 載入留言失敗：', error);
+
+      this.comments = [];
+      this.commentThreads = [];
+    }
+  }
+
+  // 開始回覆
+  replyTo(comment: DailyComment): void {
+    this.replyingTo = comment;
+    this.newComment = '';
+
+    this.cdr.detectChanges();
+  }
+
+  // 取消回覆
+  cancelReply(): void {
+    this.replyingTo = null;
+    this.newComment = '';
+
+    this.cdr.detectChanges();
+  }
+
+  // 新增留言或回覆
+  async addComment(): Promise<void> {
+    const content = this.newComment.trim();
+
+    if (!content) {
       return;
     }
-    this.comments.unshift({
-      user: '目前使用者',
-      date: this.getToday(),
-      content: this.newComment.trim(),
-    });
-    this.newComment = '';
+
+    if (!this.demand?.id) {
+      console.error('[日常留言] 找不到需求 ID');
+      return;
+    }
+
+    try {
+      const newComment = await this.dailyCommentService.addComment(
+        this.demand.id,
+        null,
+        'donor',
+        '目前使用者',
+        content,
+        this.replyingTo?.id ?? null
+      );
+
+      this.comments = [newComment, ...this.comments];
+
+      this.buildCommentThreads();
+
+      this.newComment = '';
+      this.replyingTo = null;
+
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('[日常留言] 新增留言失敗：', error);
+    }
   }
-  getToday(): string {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}/${month}/${day}`;
+
+  // 按讚
+  // 按讚
+  async toggleLike(comment: DailyComment): Promise<void> {
+    console.log('[日常留言] 愛心按鈕已點擊', comment);
+
+    try {
+      const updatedComment = await this.dailyCommentService.toggleLike(comment.id, this.currentUserId);
+
+      console.log('[日常留言] 按讚更新結果：', updatedComment);
+
+      const index = this.comments.findIndex((item) => item.id === comment.id);
+
+      if (index !== -1) {
+        this.comments[index] = updatedComment;
+      }
+
+      this.buildCommentThreads();
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('[日常留言] 愛心操作失敗：', error);
+    }
+  }
+
+  // 判斷目前使用者是否已按讚
+  hasLiked(comment: DailyComment): boolean {
+    return comment.liked_user_ids?.includes(this.currentUserId) ?? false;
+  }
+
+  // 取得被回覆的留言者名稱
+  getReplyTargetName(parentCommentId: number): string {
+    const parentComment = this.comments.find((comment) => comment.id === parentCommentId);
+
+    return parentComment?.user_name ?? '原留言者';
+  }
+
+  // 格式化留言時間
+  formatCommentDate(date: string): string {
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) {
+      return date;
+    }
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+
+    return `${year}/${month}/${day} ${hours}:${minutes}`;
+  }
+
+  // 建立主留言與巢狀回覆
+  buildCommentThreads(): void {
+    const expandedStates = new Map<number, boolean>();
+
+    for (const thread of this.commentThreads) {
+      expandedStates.set(thread.comment.id, thread.showAllReplies);
+    }
+
+    const nodeMap = new Map<number, CommentThreadNode>();
+
+    // 先建立所有留言節點
+    for (const comment of this.comments) {
+      nodeMap.set(comment.id, {
+        comment,
+        replies: [],
+        showAllReplies: expandedStates.get(comment.id) ?? false,
+      });
+    }
+
+    const roots: CommentThreadNode[] = [];
+
+    // 依照 parent_comment_id 建立留言關係
+    for (const comment of this.comments) {
+      const node = nodeMap.get(comment.id);
+
+      if (!node) {
+        continue;
+      }
+
+      const parentId = comment.parent_comment_id;
+
+      if (parentId !== null && nodeMap.has(parentId)) {
+        nodeMap.get(parentId)!.replies.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+
+    // 主留言由新到舊排序
+    roots.sort((a, b) => new Date(b.comment.created_at).getTime() - new Date(a.comment.created_at).getTime());
+
+    // 各層回覆由舊到新排序
+    const sortReplies = (nodes: CommentThreadNode[]): void => {
+      nodes.sort((a, b) => new Date(a.comment.created_at).getTime() - new Date(b.comment.created_at).getTime());
+
+      for (const node of nodes) {
+        sortReplies(node.replies);
+      }
+    };
+
+    for (const root of roots) {
+      sortReplies(root.replies);
+    }
+
+    this.commentThreads = roots;
+  }
+
+  // 計算所有層級的後代回覆數量
+  countDescendantReplies(node: CommentThreadNode): number {
+    return node.replies.reduce((total, reply) => total + 1 + this.countDescendantReplies(reply), 0);
+  }
+
+  // 展開或收起主留言底下的回覆
+  toggleReplies(thread: CommentThreadNode): void {
+    thread.showAllReplies = !thread.showAllReplies;
+
+    this.cdr.detectChanges();
   }
 }

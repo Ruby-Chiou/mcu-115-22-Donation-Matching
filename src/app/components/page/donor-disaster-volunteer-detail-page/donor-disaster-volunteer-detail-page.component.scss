@@ -108,7 +108,6 @@
   font-size: 22px;
 }
 
-
 /* =========================
 需求單位
 ========================= */
@@ -223,118 +222,7 @@
   text-align: right;
 }
 
-/* =========================
-留言
-========================= */
-.comment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 25px;
-}
-.comment-form textarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  resize: vertical;
-  font-size: 15px;
-  font-family: inherit;
-}
-.comment-button {
-  align-self: flex-end;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  background: #005bac;
-  color: white;
-  cursor: pointer;
-}
-.comment-button:hover {
-  background: #004a8f;
-}
-
-/* =========================
-留言列表
-========================= */
-.comment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-.comment {
-  padding: 15px;
-  background: #f7f9fc;
-  border-radius: 10px;
-}
-.comment-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.comment-header span {
-  color: #999;
-  font-size: 14px;
-}
-.comment p {
-  margin: 0;
-  color: #555;
-  line-height: 1.6;
-}
-
-/* =========================
-報名按鈕
-========================= */
-.join-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 30px;
-}
-.join-button {
-  min-width: 220px;
-  padding: 15px 40px;
-  border: none;
-  border-radius: 10px;
-  background: #005bac;
-  color: white;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.join-button:hover {
-  transform: translateY(-2px);
-  background: #004a8f;
-}
-
-/* =========================
-RWD
-========================= */
-@media (max-width: 768px) {
-  .detail-main {
-    flex-direction: column;
-    gap: 25px;
-  }
-  .detail-image {
-    width: 100%;
-    height: 280px;
-    min-height: 0;
-  }
-  .quantity-info {
-    flex-direction: column;
-  }
-  .service-info {
-    grid-template-columns: 1fr;
-  }
-  .organization-item {
-    flex-direction: column;
-  }
-  .organization-item strong {
-    text-align: left;
-  }
-}
+//原版留言區
 .loading-state {
   min-height: 360px;
   width: 100%;
@@ -379,4 +267,468 @@ RWD
   to {
     transform: rotate(360deg);
   }
+}
+
+.join-button {
+  min-width: 220px;
+  padding: 15px 40px;
+  border: none;
+  border-radius: 10px;
+  background: #005bac;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.join-button:hover {
+  transform: translateY(-2px);
+  background: #004a8f;
+}
+
+/* =========================
+報名按鈕
+========================= */
+.join-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* =========================
+RWD
+========================= */
+@media (max-width: 768px) {
+  .detail-main {
+    flex-direction: column;
+    gap: 25px;
+  }
+  .detail-image {
+    width: 100%;
+    height: 280px;
+    min-height: 0;
+  }
+  .quantity-info {
+    flex-direction: column;
+  }
+  .service-info {
+    grid-template-columns: 1fr;
+  }
+  .organization-item {
+    flex-direction: column;
+  }
+  .organization-item strong {
+    text-align: left;
+  }
+}
+
+/* =========================
+   留言區：保留志工頁藍色風格
+========================= */
+
+.comment-section {
+  margin-top: 32px;
+}
+
+.comment-section > h2 {
+  color: #005bac;
+  margin-bottom: 20px;
+}
+
+/* =========================
+   新增留言與回覆輸入框
+========================= */
+
+.comment-form,
+.reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comment-form {
+  margin-bottom: 25px;
+}
+
+.comment-form textarea,
+.reply-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d4deeb;
+  border-radius: 8px;
+  font: inherit;
+  resize: vertical;
+  background: #fff;
+}
+
+.comment-form textarea:focus,
+.reply-form textarea:focus {
+  outline: none;
+  border-color: #005bac;
+  box-shadow: 0 0 0 2px rgba(0, 91, 172, 0.12);
+}
+
+/* 發布留言、發布回覆按鈕 */
+.comment-button {
+  align-self: flex-end;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #005bac;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  transition: background 0.2s;
+}
+
+.comment-button:hover {
+  background: #004a8f;
+}
+
+.comment-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   留言列表與主留言
+========================= */
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.comment {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px;
+  border: 1px solid #e2eaf4;
+  border-radius: 10px;
+  background: #f7f9fc;
+}
+
+/* 留言者與日期 */
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.reply .comment-author {
+  padding-left: 10px;
+}
+
+.comment-author strong {
+  color: #26364a;
+}
+
+.comment-date {
+  flex-shrink: 0;
+  color: #778399;
+  font-size: 14px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.reply-title-text {
+  color: #666;
+  font-size: 14px;
+}
+
+/* 回覆對象：保留淺藍底與藍色文字 */
+.comment-author .reply-target-name {
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: #e8f3ff;
+  color: #005bac;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* =========================
+   留言內容與右側操作區
+========================= */
+
+.comment-content-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.comment-content {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: #344054;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* 日期在上方，愛心與回覆按鈕依序排列在右側 */
+.comment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-width: 56px;
+}
+
+.comment-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 0;
+  border: none;
+  background: transparent;
+  color: #667085;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.comment-action:hover {
+  color: #005bac;
+}
+
+/* =========================
+   愛心與喜歡數
+========================= */
+
+.like-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: pink;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.like-action .material-symbols-outlined {
+  display: inline-block;
+  color: pink;
+  font-size: 24px;
+  line-height: 1;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-action .material-symbols-outlined.liked {
+  color: red;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-action span:last-child {
+  position: relative;
+  top: -2px;
+  color: #777;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* =========================
+   回覆按鈕：保留藍色
+========================= */
+
+.reply-action {
+  align-self: flex-end;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: #005bac;
+  color: #fff;
+  font-size: 14px;
+}
+
+.reply-action:hover {
+  background: #004a8f;
+  color: #fff;
+}
+
+/* =========================
+   回覆輸入區
+========================= */
+
+.reply-form {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #dce5f0;
+}
+
+.reply-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.reply-submit-button {
+  padding: 5px 12px;
+  font-size: 13px;
+}
+
+.cancel-reply-button {
+  padding: 5px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #475467;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.cancel-reply-button:hover {
+  background: #eef4fa;
+}
+
+/* =========================
+   巢狀回覆：仿照急難留言串
+   但保留志工原本的橘色連接線
+========================= */
+
+.reply-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  margin: 12px 0 0 12px;
+  padding-left: 18px;
+  box-sizing: border-box;
+}
+
+/* 子留言不使用主留言的淺藍框 */
+.reply {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+/* 第一層回覆的橘色垂直線 */
+.reply-list > .reply::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -9px;
+  width: 3px;
+  height: 22px;
+  background-color: #005bac;
+}
+
+/* 同一層還有其他回覆時，延長垂直線 */
+.reply-list > .reply:not(:last-child)::before {
+  height: 100%;
+}
+
+/* 第二層及更深的回覆：再往右縮排 */
+.reply-list.nested-replies {
+  margin-left: 8px;
+  padding-left: 18px;
+}
+
+/* 第二層及更深的回覆保留橘色直角連接線 */
+.reply-list.nested-replies > .reply::after {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: -9px;
+  width: 16px;
+  height: 2px;
+  background-color: #005bac;
+}
+
+/* 顯示更多／收起回覆 */
+.show-replies-button {
+  align-self: flex-end;
+  padding: 5px 0;
+  border: none;
+  background: transparent;
+  color: #005bac;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+}
+
+.show-replies-button:hover {
+  color: #004a8f;
+  text-decoration: underline;
+}
+
+/* =========================
+   RWD：留言區
+========================= */
+
+@media (max-width: 600px) {
+  .comment {
+    padding: 12px;
+  }
+
+  .comment-content-row {
+    gap: 12px;
+  }
+
+  .comment-actions {
+    min-width: 52px;
+  }
+
+  .reply-list {
+    margin-left: 8px;
+    padding-left: 14px;
+  }
+
+  .reply-list.nested-replies {
+    margin-left: 4px;
+    padding-left: 14px;
+  }
+
+  .comment-date {
+    font-size: 12px;
+  }
+}
+
+/* 沒有留言時的提示文字 */
+.no-comments {
+  text-align: center;
+  padding: 30px 20px;
+  color: #777;
+  font-size: 18px;
 }

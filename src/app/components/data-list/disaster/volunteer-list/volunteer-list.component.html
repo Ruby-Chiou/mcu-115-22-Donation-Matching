@@ -99,12 +99,13 @@
             <!-- 留言 -->
             <td class="message-column">
               <!-- 上架：可以點擊留言區 -->
+
               <a
                 *ngIf="item.displayStatus === '已上架'"
                 [routerLink]="[
-      '/donor/disaster/volunteer/detail',
-      item.serialNo
-    ]"
+    '/agency/volunteer-comments',
+    item.id
+  ]"
               >
                 {{ item.messageCount || 0 }}
               </a>
