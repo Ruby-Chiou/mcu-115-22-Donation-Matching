@@ -61,26 +61,6 @@
 </div>
 
 <app-donor-disaster-page></app-donor-disaster-page>
+<app-disaster-locations></app-disaster-locations>
 
-<section id="disaster-map-section" class="map-section" aria-labelledby="map-title">
-  <div class="map-sidebar">
-    <h2 id="map-title">災害救助地圖</h2>
-    <div class="location-list">
-      @for (location of volunteerList; track location.name) {
-        <article class="location-details" [class.active]="selectedLocation()?.name === location.name">
-          <h3>{{ location.name }}</h3>
-          <p><i class="fa-solid fa-location-dot"></i>{{ location.location }}</p>
-        <h4>目前需求</h4>
-        <ul>
-          @for (need of location.needs; track need) {
-            <li>{{ need }}</li>
-          }
-        </ul>
-          <button type="button" (click)="showLocation(location)">定位地圖</button>
-        </article>
-      }
-    </div>
-  </div>
-  <div id="disaster-map"></div>
-</section>
 
