@@ -1,1 +1,181 @@
-<p>agency-dashboard works!</p>
+<section class="agency-dashboard">
+  <header class="dashboard-header">
+    <div>
+      <h1>社福機構總控制台</h1>
+    </div>
+  </header>
+
+  <section aria-label="總覽統計">
+    <div class="summary-grid">
+      @for (card of cards; track card.title) { @if (card.isAvailable) {
+      <a class="summary-card" [class.emergency-card]="card.type === 'emergency'" [routerLink]="card.route">
+        <div class="card-top">
+          <i class="card-icon" [class]="card.icon" aria-hidden="true"></i>
+          <i class="fa-solid fa-arrow-right card-arrow" aria-hidden="true"></i>
+        </div>
+        <p class="card-title">{{ card.title }}</p>
+        @if (card.type === 'emergency') {
+        <div class="emergency-counts">
+          <div class="emergency-count">
+            <span class="emergency-label">物資需求</span>
+            <strong>
+              {{ card.materialCount ?? '—' }} @if (card.materialCount != null) {
+              <span>項</span>
+              }
+            </strong>
+          </div>
+
+          <div class="emergency-count">
+            <span class="emergency-label">志工需求</span>
+            <strong>
+              {{ card.volunteerCount ?? '—' }} @if (card.volunteerCount != null) {
+              <span>項</span>
+              }
+            </strong>
+          </div>
+        </div>
+        } @else {
+        <p class="card-value">{{ card.value ?? '—' }} @if (card.value != null) { <span>{{ card.unit }}</span> }</p>
+        }
+        <p class="card-description">{{ card.description }}</p>
+      </a>
+      } @else {
+      <article
+        class="summary-card is-coming-soon"
+        [class.emergency-card]="card.type === 'emergency'"
+        aria-disabled="true"
+      >
+        <div class="card-top">
+          <i class="card-icon" [class]="card.icon" aria-hidden="true"></i>
+          <span class="coming-soon-badge">建置中</span>
+        </div>
+        <p class="card-title">{{ card.title }}</p>
+        <p class="card-value card-value-unavailable">—</p>
+        <p class="card-description">{{ card.description }}</p>
+      </article>
+      } }
+    </div>
+  </section>
+
+  <section class="urgent-needs-section" aria-labelledby="urgent-needs-title">
+    @if (isRemindersLoading || remindersError || reminderGroups.length > 0) {
+    <div class="dashboard-reminders" role="region" aria-labelledby="reminders-title">
+      <h2 id="reminders-title" class="reminders-heading">
+        <i class="fa-solid fa-bell" aria-hidden="true"></i>
+        提醒
+      </h2>
+
+      @if (isRemindersLoading) {
+      <p class="reminders-status" role="status">正在載入提醒…</p>
+      } @else if (remindersError) {
+      <p class="reminders-status" role="alert">{{ remindersError }}</p>
+      } @else {
+      <div class="reminders-list">
+        @for (group of reminderGroups; track group.key) {
+        <div [class.is-emergency]="group.type === 'emergency'">
+          <h3 class="reminders-category-title">
+            <span class="reminders-category-label"> 【{{ group.label }}】 </span>
+            <span class="reminders-title-divider" aria-hidden="true"> ｜ </span>
+            <span>{{ group.title }}</span>
+          </h3>
+          <ul class="reminders-items">
+            @for (item of group.items; track item.id) {
+            <li>
+              <span class="reminders-item-name"> {{ item.name }} </span>
+              <span class="reminders-item-detail">
+                @switch (group.key) { @case ('daily-expiring') { {{ item.deadline | date: 'MM/dd' : '+0800' }} 預計下架，尚缺 {{
+                item.remaining }} {{ item.unit }} } @case ('daily-completed') { 剩餘需求為 0，請確認是否下架 } @case ('disaster-expiring') {
+                {{ item.deadline | date: 'MM/dd' : '+0800' }} 截止 } @case ('volunteer-expiring') { {{ item.deadline | date: 'MM/dd' :
+                '+0800' }} 預計下架 } }
+              </span>
+            </li>
+            }
+          </ul>
+        </div>
+        }
+      </div>
+      }
+    </div>
+    }
+
+    <div class="urgent-section-header">
+      <div>
+        <h2 id="urgent-needs-title">
+          <i class="fa-solid fa-box" aria-hidden="true"></i>
+          日常｜非常緊急需求
+        </h2>
+
+        <p class="urgent-section-description">優先掌握目前急需補足的日常物資</p>
+      </div>
+    </div>
+
+    @if (isUrgentNeedsLoading) {
+    <div class="urgent-empty-state" role="status">
+      <p>正在載入非常緊急需求…</p>
+    </div>
+    } @else if (urgentNeedsError) {
+    <div class="urgent-empty-state" role="alert">
+      <p>{{ urgentNeedsError }}</p>
+    </div>
+    } @else if (urgentDailyNeeds.length > 0) {
+    <div class="urgent-needs-list">
+      @for (need of urgentDailyNeeds; track need.id) {
+      @let progress = getReceivedProgress(need);
+      <a class="urgent-need-card" [routerLink]="['/agency/daily-detail', need.serialNo]" [attr.aria-label]="'查看需求詳情：' + need.item">
+        <span class="need-card-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+
+        <div class="need-heading">
+          <h3>{{ need.item }}</h3>
+        </div>
+
+        <div class="progress-information">
+          <p class="progress-quantity">
+            已收件
+            <strong> {{ need.receivedQuantity ?? '—' }} </strong>
+            ／需求
+            <strong>{{ need.requiredQuantity }}</strong>
+            {{ need.unit }}
+          </p>
+          <span class="progress-percentage">
+            @if (progress !== null) { {{ progress }}% } @else { 進度暫無 }
+          </span>
+        </div>
+
+        @if (progress !== null) {
+        <div
+          class="progress-track"
+          role="progressbar"
+          [attr.aria-label]="need.item + '收件進度'"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="progress"
+          [attr.aria-valuetext]="
+                      '已收件 ' +
+                      need.receivedQuantity +
+                      ' ' +
+                      need.unit +
+                      '，需求 ' +
+                      need.requiredQuantity +
+                      ' ' +
+                      need.unit
+                    "
+        >
+          <div class="progress-fill" [style.width.%]="progress"></div>
+        </div>
+        } @else {
+        <div class="progress-track" aria-hidden="true"></div>
+        }
+      </a>
+      }
+    </div>
+    } @else {
+    <div class="urgent-empty-state">
+      <i class="fa-solid fa-box-open" aria-hidden="true"></i>
+
+      <p>目前沒有非常緊急的日常物資需求</p>
+    </div>
+    }
+  </section>
+</section>
