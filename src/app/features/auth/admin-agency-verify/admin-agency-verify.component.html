@@ -1,1 +1,317 @@
-<p>admin-agency-verify works!</p>
+<div class="verify-page">
+  <div class="page-heading">
+    <div>
+
+      <h1>受助者身分審查</h1>
+
+    </div>
+
+
+  </div>
+
+  <!-- 統計卡片 -->
+  <section class="stats-grid">
+    <button
+      type="button"
+      class="stat-card"
+      [class.active]="selectedStatus === 'pending'"
+      (click)="selectedStatus = selectedStatus === 'pending' ? 'all' : 'pending'"
+    >
+      <span class="stat-icon pending-icon">◷</span>
+      <span class="stat-content">
+        <span class="stat-label">待審核申請</span>
+        <strong>{{ pendingCount }}</strong>
+        <span class="stat-hint">等待管理者確認</span>
+      </span>
+    </button>
+
+    <button
+      type="button"
+      class="stat-card"
+      [class.active]="selectedStatus === 'approved'"
+      (click)="selectedStatus = selectedStatus === 'approved' ? 'all' : 'approved'"
+    >
+      <span class="stat-icon approved-icon">✓</span>
+      <span class="stat-content">
+        <span class="stat-label">已驗證機構</span>
+        <strong>{{ approvedCount }}</strong>
+        <span class="stat-hint">資格確認完成</span>
+      </span>
+    </button>
+
+    <button
+      type="button"
+      class="stat-card"
+      [class.active]="selectedStatus === 'supplement'"
+      (click)="selectedStatus = selectedStatus === 'supplement' ? 'all' : 'supplement'"
+    >
+      <span class="stat-icon supplement-icon">!</span>
+      <span class="stat-content">
+        <span class="stat-label">待補件</span>
+        <strong>{{ supplementCount }}</strong>
+        <span class="stat-hint">需要補充資料</span>
+      </span>
+    </button>
+
+    <button
+      type="button"
+      class="stat-card"
+      [class.active]="selectedStatus === 'rejected'"
+      (click)="selectedStatus = selectedStatus === 'rejected' ? 'all' : 'rejected'"
+    >
+      <span class="stat-icon rejected-icon">×</span>
+      <span class="stat-content">
+        <span class="stat-label">未通過</span>
+        <strong>{{ rejectedCount }}</strong>
+        <span class="stat-hint">未符合審核要求</span>
+      </span>
+    </button>
+  </section>
+
+  <!-- 審核清單 -->
+  <section class="list-panel">
+    <div class="panel-heading">
+      <div>
+        <h2>機構申請清單</h2>
+        <p>查看申請資料並進行人工審核。</p>
+      </div>
+      <span class="result-count">
+        共 {{ filteredApplications.length }} 筆
+      </span>
+    </div>
+
+    <div class="toolbar">
+      <label class="search-box">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          [(ngModel)]="searchKeyword"
+          placeholder="搜尋機構名稱、電話、Email 或註冊字號"
+          aria-label="搜尋機構申請"
+        />
+      </label>
+
+      <select
+        [(ngModel)]="selectedStatus"
+        aria-label="依審核狀態篩選"
+        class="status-filter"
+      >
+        <option value="all">所有狀態</option>
+        <option value="pending">待審核</option>
+        <option value="approved">已驗證</option>
+        <option value="supplement">待補件</option>
+        <option value="rejected">未通過</option>
+      </select>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>申請機構</th>
+            <th>註冊字號</th>
+            <th>申請日期</th>
+            <th>審核狀態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let application of filteredApplications; trackBy: trackById"
+          >
+            <td>
+              <div class="agency-cell">
+                <span class="agency-avatar">
+                  {{ application.name.charAt(0) }}
+                </span>
+                <span class="agency-info">
+                  <strong>{{ application.name }}</strong>
+                  <small>{{ application.contact }}</small>
+                </span>
+              </div>
+            </td>
+
+            <td>
+              <span class="registration-number">
+                {{ application.registrationNumber }}
+              </span>
+            </td>
+
+            <td>{{ application.submittedAt }}</td>
+
+            <td>
+              <span class="status-badge" [ngClass]="'status-' + application.status">
+                <span class="status-dot"></span>
+                {{ getStatusLabel(application.status) }}
+              </span>
+            </td>
+
+            <td>
+              <button
+                type="button"
+                class="detail-button"
+                (click)="openApplication(application)"
+              >
+                查看詳情
+                <span aria-hidden="true">›</span>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredApplications.length === 0">
+            <td colspan="5" class="empty-state">
+              <span class="empty-icon">⌕</span>
+              <strong>找不到符合條件的申請</strong>
+              <span>請嘗試更換關鍵字或審核狀態。</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>顯示 {{ filteredApplications.length }} 筆申請資料</span>
+      <button
+        type="button"
+        class="clear-filter"
+        (click)="searchKeyword = ''; selectedStatus = 'all'"
+      >
+        清除搜尋條件
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- 申請詳情視窗 -->
+<div
+  class="modal-backdrop"
+  *ngIf="selectedApplication as application"
+  (click)="closeApplication()"
+>
+  <section
+    class="review-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="review-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="modal-header">
+      <div>
+        <span class="eyebrow">APPLICATION REVIEW</span>
+        <h2 id="review-title">機構申請詳情</h2>
+      </div>
+
+      <button
+        type="button"
+        class="close-button"
+        aria-label="關閉視窗"
+        (click)="closeApplication()"
+      >
+        ×
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <div class="application-summary">
+        <span class="agency-avatar large-avatar">
+          {{ application.name.charAt(0) }}
+        </span>
+        <div>
+          <h3>{{ application.name }}</h3>
+          <span
+            class="status-badge"
+            [ngClass]="'status-' + application.status"
+          >
+            <span class="status-dot"></span>
+            {{ getStatusLabel(application.status) }}
+          </span>
+        </div>
+      </div>
+
+      <h4 class="section-title">基本資料</h4>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span>聯絡人</span>
+          <strong>{{ application.contact }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>聯絡電話</span>
+          <strong>{{ application.phone }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>Email</span>
+          <strong>{{ application.email }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span>申請日期</span>
+          <strong>{{ application.submittedAt }}</strong>
+        </div>
+
+        <div class="detail-item full-width">
+          <span>社福機構註冊字號</span>
+          <strong>{{ application.registrationNumber }}</strong>
+        </div>
+      </div>
+
+      <h4 class="section-title">資格證明文件</h4>
+
+      <div class="document-card">
+        <span class="document-icon">PDF</span>
+        <div class="document-info">
+          <strong>{{ application.documentName }}</strong>
+          <small>範例文件名稱，尚未連接實際上傳檔案</small>
+        </div>
+        <span class="document-label">待確認</span>
+      </div>
+
+      <p class="document-notice">
+        正式版本將在此顯示機構上傳的證明文件，供管理者核對註冊字號及文件內容。
+      </p>
+
+      <div class="review-note">
+        <label for="reviewReason">
+          審核備註
+          <span *ngIf="application.status !== 'approved'">（補件或未通過時必填）</span>
+        </label>
+
+        <textarea
+          id="reviewReason"
+          [(ngModel)]="reviewReason"
+          rows="3"
+          placeholder="請填寫審核結果或需要補充的資料..."
+        ></textarea>
+      </div>
+    </div>
+
+    <footer class="modal-footer">
+      <button
+        type="button"
+        class="action-button reject-button"
+        (click)="reviewApplication('rejected')"
+      >
+        駁回申請
+      </button>
+
+      <button
+        type="button"
+        class="action-button supplement-button"
+        (click)="reviewApplication('supplement')"
+      >
+        要求補件
+      </button>
+
+      <button
+        type="button"
+        class="action-button approve-button"
+        (click)="reviewApplication('approved')"
+      >
+        ✓ 通過審核
+      </button>
+    </footer>
+  </section>
+</div>
