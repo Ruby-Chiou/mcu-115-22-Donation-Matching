@@ -2,9 +2,16 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
+
+interface NominatimSearchResult {
+  lat: string;
+  lon: string;
+  display_name: string;
+}
 
 @Component({
   selector: 'app-volunteer-form',
@@ -15,15 +22,12 @@ import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
 })
 export class VolunteerFormComponent implements OnInit {
   isEditMode = false;
-
+  isSaving = false;
+  private originalLocation = '';
   showCancelModal = false;
   showSuccessModal = false;
   successMessage = '';
 
-  /*
-   * editId 是 Supabase 資料庫主鍵 id。
-   * 不要把 serialNo 放在這裡。
-   */
   editId: number | null = null;
 
   invalidFields: string[] = [];
@@ -58,7 +62,8 @@ export class VolunteerFormComponent implements OnInit {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly volunteerDemandService: VolunteerDemandService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly http: HttpClient
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -118,6 +123,7 @@ export class VolunteerFormComponent implements OnInit {
       this.demand = structuredClone(target);
 
       this.editId = this.demand.id;
+      this.originalLocation = this.demand.location.trim();
 
       this.cdr.detectChanges();
 
@@ -189,7 +195,94 @@ export class VolunteerFormComponent implements OnInit {
     }
   }
 
+  private async getCoordinatesFromAddress(address: string): Promise<boolean> {
+    const originalAddress = address.trim().replace(/臺/g, '台');
+
+    if (!originalAddress) {
+      return false;
+    }
+
+    // 1. 去掉門牌號碼，優先搜尋道路或街道名稱
+    const withoutNumber = originalAddress.replace(/\d+(?:-\d+)?號.*$/, '').trim();
+
+    // 2. 去掉巷、弄後面的內容，進一步簡化地址
+    const roadOnly = withoutNumber.replace(/(?:巷|弄).*/, '').trim();
+
+    // 3. 如果地址有「段」，準備搜尋到段的地址
+    const roadMatch = withoutNumber.match(/^(.+?段)/);
+
+    // 優先搜尋簡化地址，找到後就直接使用座標
+    const searchAddresses: string[] = [];
+
+    if (withoutNumber) {
+      searchAddresses.push(withoutNumber);
+    }
+
+    if (roadOnly && !searchAddresses.includes(roadOnly)) {
+      searchAddresses.push(roadOnly);
+    }
+
+    if (roadMatch && !searchAddresses.includes(roadMatch[1])) {
+      searchAddresses.push(roadMatch[1]);
+    }
+
+    // 最後才搜尋完整地址，避免常見的門牌查詢浪費等待時間
+    if (!searchAddresses.includes(originalAddress)) {
+      searchAddresses.push(originalAddress);
+    }
+
+    for (const searchAddress of searchAddresses) {
+      try {
+        console.log('正在查詢志工服務地點：', searchAddress);
+
+        const results = await firstValueFrom(
+          this.http.get<NominatimSearchResult[]>('https://nominatim.openstreetmap.org/search', {
+            params: {
+              q: searchAddress,
+              format: 'jsonv2',
+              limit: '1',
+              countrycodes: 'tw',
+            },
+          })
+        );
+
+        if (results && results.length > 0) {
+          const latitude = Number(results[0].lat);
+          const longitude = Number(results[0].lon);
+
+          if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+            this.demand.latitude = latitude;
+            this.demand.longitude = longitude;
+
+            console.log('成功取得志工服務地點座標：', {
+              searchedAddress: searchAddress,
+              matchedAddress: results[0].display_name,
+              latitude,
+              longitude,
+            });
+
+            // 找到第一筆有效座標就立即結束，不再繼續搜尋
+            return true;
+          }
+        }
+
+        console.warn('這次搜尋沒有結果，嘗試下一種地址：', searchAddress);
+      } catch (error) {
+        console.error('查詢地址時發生錯誤：', searchAddress, error);
+      }
+    }
+
+    console.error('所有地址搜尋方式都失敗：', originalAddress);
+
+    return false;
+  }
+
   async onPublish(): Promise<void> {
+    // 正在儲存時，忽略重複點擊
+    if (this.isSaving) {
+      return;
+    }
+
     this.invalidFields = [];
 
     if (!this.demand.type) {
@@ -241,11 +334,24 @@ export class VolunteerFormComponent implements OnInit {
       return;
     }
 
+    this.isSaving = true;
+
     try {
+      // 只有新增需求、地址變更或缺少座標時，才重新查詢
+      const locationChanged = this.demand.location.trim() !== this.originalLocation;
+
+      const hasCoordinates = Number.isFinite(this.demand.latitude) && Number.isFinite(this.demand.longitude);
+
+      if (!this.isEditMode || locationChanged || !hasCoordinates) {
+        const coordinatesFound = await this.getCoordinatesFromAddress(this.demand.location);
+
+        if (!coordinatesFound) {
+          alert('無法取得服務地點的座標，請確認地點是否正確後再試一次。');
+          return;
+        }
+      }
+
       if (this.isEditMode) {
-        /*
-         * this.demand.id 是從 Supabase 載入時帶回的資料庫 id。
-         */
         const savedDemand = await this.volunteerDemandService.updateDemand(this.demand);
 
         this.demand = savedDemand;
@@ -253,8 +359,10 @@ export class VolunteerFormComponent implements OnInit {
         console.log('修改後的志工需求：', savedDemand);
 
         this.successMessage = '志工需求修改成功！';
-
         this.showSuccessModal = true;
+
+        // 強制更新畫面，顯示儲存成功視窗
+        this.cdr.detectChanges();
 
         return;
       }
@@ -290,6 +398,8 @@ export class VolunteerFormComponent implements OnInit {
       console.error('儲存志工需求失敗：', error);
 
       alert('儲存失敗，請稍後再試');
+    } finally {
+      this.isSaving = false;
     }
   }
 

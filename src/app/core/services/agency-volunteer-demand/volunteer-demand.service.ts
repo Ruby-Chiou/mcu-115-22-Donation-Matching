@@ -11,6 +11,8 @@ interface VolunteerDemandRow {
   people: number | null;
 
   location: string | null;
+  latitude: number | null;
+  longitude: number | null;
   condition: string | null;
   workContent: string | null;
   reason: string | null;
@@ -87,6 +89,8 @@ export class VolunteerDemandService {
       people: row.people ?? 0,
 
       location: row.location ?? '',
+      latitude: row.latitude ?? undefined,
+      longitude: row.longitude ?? undefined,
       condition: row.condition ?? '',
       workContent: row.workContent ?? '',
       reason: row.reason ?? '',
@@ -117,6 +121,8 @@ export class VolunteerDemandService {
       people: demand.people ?? null,
 
       location: demand.location,
+      latitude: demand.latitude ?? null,
+      longitude: demand.longitude ?? null,
       condition: demand.condition,
       workContent: demand.workContent,
       reason: demand.reason,

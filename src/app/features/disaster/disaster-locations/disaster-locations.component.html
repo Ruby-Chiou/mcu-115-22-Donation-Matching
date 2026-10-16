@@ -1,21 +1,32 @@
 <section id="disaster-map-section" class="map-section" aria-labelledby="map-title">
   <div class="map-sidebar">
     <h2 id="map-title">災害救助地圖</h2>
+
     <div class="location-list">
-      @for (location of volunteerList; track location.name) {
-        <article class="location-details" [class.active]="selectedLocation()?.name === location.name">
-          <h3>{{ location.name }}</h3>
-          <p><i class="fa-solid fa-location-dot"></i>{{ location.location }}</p>
+      @for (location of volunteerList; track location.id) {
+      <article class="location-details" [class.active]="selectedLocation()?.id === location.id">
+        <h3>{{ location.name }}</h3>
+
+        <p>
+          <i class="fa-solid fa-location-dot"></i>
+          {{ location.location }}
+        </p>
+
         <h4>目前需求</h4>
+
         <ul>
           @for (need of location.needs; track need) {
-            <li>{{ need }}</li>
+          <li>{{ need }}</li>
           }
         </ul>
-          <button type="button" (click)="showLocation(location)">定位地圖</button>
-        </article>
+
+        <button type="button" (click)="showLocation(location)">定位地圖</button>
+      </article>
+      } @empty {
+      <p>目前沒有可顯示的志工需求。</p>
       }
     </div>
   </div>
+
   <div id="disaster-map"></div>
 </section>
