@@ -460,3 +460,11 @@
 .show-replies-button:hover {
   text-decoration: underline;
 }
+
+/* 沒有留言時的提示文字 */
+.no-comments {
+  text-align: center;
+  padding: 30px 20px;
+  color: #777;
+  font-size: 18px;
+}

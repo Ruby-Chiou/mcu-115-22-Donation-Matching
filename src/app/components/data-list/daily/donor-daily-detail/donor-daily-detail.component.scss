@@ -391,3 +391,332 @@
     transform: rotate(360deg);
   }
 }
+
+/* 留言者名稱與回覆對象 */
+.comment-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.comment-title strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.reply-target {
+  color: #777;
+  font-size: 13px;
+}
+
+.reply-title-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.comment-title .reply-target-name {
+  color: #005bac;
+  font-weight: 700;
+  background: #e8f3ff;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+.comment-date {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #999;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* 留言標題與時間 */
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.comment-header span {
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* 留言列表 */
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 主留言卡片 */
+.comment {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 18px;
+  background: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+/* 留言內容與右側操作按鈕 */
+.comment-content-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.comment-content {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.6;
+  color: #444;
+  overflow-wrap: anywhere;
+}
+
+.comment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* 愛心按鈕 */
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.like-button .material-symbols-outlined {
+  color: pink;
+  font-size: 24px;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* 已按讚：紅色實心愛心 */
+.like-button .material-symbols-outlined.liked {
+  color: red;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-button span:last-child {
+  color: #777;
+  font-size: 16px;
+}
+
+/* 回覆按鈕 */
+.reply-button {
+  align-self: flex-end;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #ff6b35;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.reply-button:hover {
+  background: #e85a28;
+  color: #fff;
+}
+
+/* 回覆列表容器 */
+.reply-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 12px;
+  padding-left: 0;
+  box-sizing: border-box;
+}
+
+/* 子回覆：不另外加背景框 */
+.reply {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  padding: 8px 0 8px 28px;
+  margin-left: 12px;
+  width: auto;
+  background: transparent;
+  border: none;
+}
+
+/* 橘色垂直連接線 */
+.reply::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 2px;
+  height: 22px;
+  background-color: #ff6b35;
+}
+
+/* 第一層回覆不顯示橫線 */
+.reply-list:not(.nested-replies) > .reply::after {
+  display: none;
+}
+
+/* 第二層及以上的巢狀回覆顯示橫線 */
+.nested-replies > .reply::after {
+  display: block;
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 8px;
+  width: 16px;
+  height: 2px;
+  background-color: #ff6b35;
+}
+
+/* 非最後一筆回覆的垂直線延伸 */
+.reply:not(:last-child)::before {
+  height: 100%;
+}
+
+/* 第二層及以上的巢狀回覆縮排 */
+.nested-replies {
+  padding-left: 18px;
+}
+
+/* 回覆輸入框 */
+.reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.reply-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  font: inherit;
+}
+
+.reply-form textarea:focus {
+  border-color: #e68a3a;
+  outline: none;
+}
+
+/* 回覆輸入框按鈕 */
+.reply-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.reply-form .comment-button {
+  align-self: auto;
+}
+
+.reply-submit-button {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.reply-cancel-button {
+  padding: 5px 10px;
+  border: 1px solid #f3b27a;
+  border-radius: 6px;
+  background: #fff0e3;
+  color: #e58a45;
+  cursor: pointer;
+}
+
+.reply-cancel-button:hover {
+  background: #ffe3cc;
+  color: #d97832;
+}
+
+/* 顯示更多／收起回覆 */
+.show-replies-button {
+  align-self: flex-end;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: #005bac;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.show-replies-button:hover {
+  text-decoration: underline;
+}
+
+/* 尚無留言 */
+.no-comments {
+  margin: 0;
+  padding: 20px 0;
+  color: #888;
+  text-align: center;
+}
+
+/* 手機版留言排版 */
+@media (max-width: 700px) {
+  .comment-content-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .comment-actions {
+    align-self: flex-end;
+  }
+
+  .comment-header {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .comment-date {
+    text-align: right;
+  }
+
+  .nested-replies {
+    padding-left: 10px;
+  }
+
+  .reply-list {
+    margin-left: 6px;
+  }
+}

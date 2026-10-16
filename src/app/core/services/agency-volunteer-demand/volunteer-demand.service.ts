@@ -62,11 +62,38 @@ export class VolunteerDemandService {
 
     if (error) {
       console.error('讀取志工需求失敗：', error);
-
       throw error;
     }
 
-    this.demands = (data ?? []).map((row) => this.mapRowToDemand(row as VolunteerDemandRow));
+    // 只讀取主留言，不包含子回覆
+    const { data: comments, error: commentError } = await this.supabaseService.client
+      .from('volunteer_comments')
+      .select('demand_id')
+      .is('parent_comment_id', null);
+
+    if (commentError) {
+      console.error('讀取志工主留言數失敗：', commentError);
+      throw commentError;
+    }
+
+    // 依照需求資料庫 ID 統計主留言數
+    const rootCommentCounts = new Map<number, number>();
+
+    for (const comment of comments ?? []) {
+      const demandId = Number(comment.demand_id);
+
+      rootCommentCounts.set(demandId, (rootCommentCounts.get(demandId) ?? 0) + 1);
+    }
+
+    // 將實際主留言數放入 messageCount
+    this.demands = (data ?? []).map((row) => {
+      const demand = this.mapRowToDemand(row as VolunteerDemandRow);
+
+      return {
+        ...demand,
+        messageCount: rootCommentCounts.get(demand.id) ?? 0,
+      };
+    });
   }
 
   async waitUntilLoaded(): Promise<void> {

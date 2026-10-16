@@ -272,11 +272,13 @@
       <ng-container
         [ngTemplateOutlet]="commentNode"
         [ngTemplateOutletContext]="{
-      $implicit: thread,
-      depth: 0,
-      rootNode: thread
-    }"
+          $implicit: thread,
+          depth: 0,
+          rootNode: thread
+        }"
       ></ng-container>
+      } @empty {
+      <p class="no-comments">目前還沒有留言，歡迎成為第一位留言的人！</p>
       }
     </div>
   </div>
