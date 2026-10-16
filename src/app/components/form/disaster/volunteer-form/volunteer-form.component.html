@@ -9,7 +9,7 @@
     </div>
     <div class="edit-top-button-area">
       <button class="back-btn" (click)="onCancel()">取消</button>
-      <button class="save-btn" (click)="onPublish()">儲存</button>
+      <button class="save-btn" (click)="onPublish()" [disabled]="isSaving">儲存</button>
     </div>
   </div>
 
@@ -201,7 +201,7 @@
   <!-- 右下角按鈕 -->
   <div class="form-actions">
     <button type="button" class="cancel-btn" (click)="onCancel()">取消</button>
-    <button type="button" class="publish-btn" (click)="onPublish()">{{ isEditMode ? '儲存' : '發布需求' }}</button>
+    <button type="button" class="publish-btn" (click)="onPublish()" [disabled]="isSaving">{{ isEditMode ? '儲存' : '發布需求' }}</button>
   </div>
 </div>
 <div class="cancel-modal-backdrop" *ngIf="showCancelModal" role="presentation" (click)="closeCancelModal()">
