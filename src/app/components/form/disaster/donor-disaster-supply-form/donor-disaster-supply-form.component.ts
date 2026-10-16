@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -13,7 +13,6 @@ import { DisasterDemandService } from '../../../../core/services/agency-disaster
   styleUrl: './donor-disaster-supply-form.component.scss',
 })
 export class DonorDisasterSupplyFormComponent implements OnInit {
-
   demand: DisasterDemand | undefined;
   // 目前這筆需求最多可以捐多少
   maxDonationQuantity = 0;
@@ -38,30 +37,35 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private disasterDemandService: DisasterDemandService
+    private disasterDemandService: DisasterDemandService,
+    private cdr: ChangeDetectorRef
   ) {}
   // 初始化  //
-  ngOnInit(): void {
-    // 從網址取得 id
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!id) {
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
+    const id = Number(rawId);
+
+    if (!Number.isInteger(id) || id <= 0) {
       alert('找不到需求資料');
-      this.router.navigate(['/donor/disaster']);
+      void this.router.navigate(['/donor/disaster']);
       return;
     }
-    // 取得全部需求
-    const allDemands = this.disasterDemandService.getDemands();
-    // 如果你的 route id 對應 serialNo
-    this.demand = allDemands.find(
-      (d) => d.serialNo === id
-    );
-    if (!this.demand) {
-      alert('此需求不存在或已失效');
-      this.router.navigate(['/donor/disaster']);
-      return;
+
+    try {
+      const demand = await this.disasterDemandService.getDemandById(id);
+
+      if (!demand) {
+        alert('此需求不存在或已失效');
+        void this.router.navigate(['/donor/disaster']);
+        return;
+      }
+      
+      this.demand = demand;
+      this.maxDonationQuantity = demand.remaining ?? 0;
+      this.cdr.detectChanges();
+    } catch (error) {
+      alert('讀取需求或更新畫面失敗，請查看 Console');
     }
-    // 剩餘需求 = 最大可以捐贈數量
-    this.maxDonationQuantity = this.demand.remaining ?? 0;
   }
   // 優先程度 CSS  //
   getPriorityClass(priority: string | undefined): string {
@@ -78,10 +82,7 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   }
   // 是否需要上傳證明  //
   get needProofUpload(): boolean {
-    return (
-      this.needReceipt === 'yes' ||
-      this.needThankYou === 'yes'
-    );
+    return this.needReceipt === 'yes' || this.needThankYou === 'yes';
   }
   // 自動填入帳戶資料  //
   fillAccountInfo(): void {
@@ -133,8 +134,7 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   autoResize(event: Event): void {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
-    textarea.style.height =
-      textarea.scrollHeight + 'px';
+    textarea.style.height = textarea.scrollHeight + 'px';
   }
   // 選擇捐贈完成證明  //
   onProofSelected(event: Event): void {
@@ -151,49 +151,29 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       alert('請先選擇捐贈完成證明');
       return;
     }
-    console.log(
-      '捐贈完成證明：',
-      this.proofFile
-    );
-    alert(
-      '捐贈完成證明已上傳，等待受助單位確認。'
-    );
+    console.log('捐贈完成證明：', this.proofFile);
+    alert('捐贈完成證明已上傳，等待受助單位確認。');
   }
   // 提交捐贈表單  //
   submitForm(): void {
     // 基本資料檢查
-    if (
-      !this.donorName ||
-      !this.phone ||
-      !this.actualMaterial ||
-      !this.quantity ||
-      !this.needReceipt ||
-      !this.needThankYou
-    ) {
+    if (!this.donorName || !this.phone || !this.actualMaterial || !this.quantity || !this.needReceipt || !this.needThankYou) {
       alert('請填寫完整的捐贈資料');
       return;
     }
     // 檢查數量
-    if (
-      this.quantity < 1 ||
-      this.quantity > this.maxDonationQuantity
-    ) {
-      alert(
-        `捐贈數量不可超過剩餘需求 ${this.maxDonationQuantity} ${this.demand?.unit ?? ''}`
-      );
+    if (this.quantity < 1 || this.quantity > this.maxDonationQuantity) {
+      alert(`捐贈數量不可超過剩餘需求 ${this.maxDonationQuantity} ${this.demand?.unit ?? ''}`);
       return;
     }
     // 如果需要收據，必須填寫收據抬頭
-    if (
-      this.needReceipt === 'yes' &&
-      !this.receiptTitle.trim()
-    ) {
+    if (this.needReceipt === 'yes' && !this.receiptTitle.trim()) {
       alert('請填寫收據抬頭');
       return;
     }
     // 模擬送出資料    //
     console.log('捐贈申請資料：', {
-      demandId: this.demand?.serialNo,
+      demandId: this.demand?.id,
       donorName: this.donorName,
       phone: this.phone,
       actualMaterial: this.actualMaterial,
@@ -203,23 +183,17 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       receiptTitle: this.receiptTitle,
       taxId: this.taxId,
       needThankYou: this.needThankYou,
-      note: this.note
+      note: this.note,
     });
     // 顯示成功頁面
     this.submitted = true;
   }
   // 取消  //
   cancelForm(): void {
-
-    this.router.navigate([
-      '/donor/disaster'
-    ]);
+    this.router.navigate(['/donor/disaster']);
   }
   // 完成後返回災害救助//
   goToDisasterOpen(): void {
-
-    this.router.navigate([
-      '/donor/disaster'
-    ]);
+    this.router.navigate(['/donor/disaster']);
   }
 }
