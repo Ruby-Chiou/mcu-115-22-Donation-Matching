@@ -165,7 +165,7 @@ export class AgencyDashboardService {
       },
       {
         key: 'disaster-expiring',
-        label: '急難物資',
+        label: '災害物資',
         title: '募集即將截止',
         type: 'emergency',
         items: (disasterExpiring.data ?? []).map((row) => ({
@@ -178,7 +178,7 @@ export class AgencyDashboardService {
       },
       {
         key: 'volunteer-expiring',
-        label: '急難志工',
+        label: '災害志工',
         title: '即將下架',
         type: 'emergency',
         items: (volunteerExpiring.data ?? []).map((row) => ({

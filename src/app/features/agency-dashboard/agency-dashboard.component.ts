@@ -69,7 +69,7 @@ export class AgencyDashboardComponent implements OnInit {
       isAvailable: false,
     },
     {
-      title: '急難需求',
+      title: '災害需求',
       value: null,
       unit: '',
       description: '正在載入…',
@@ -177,12 +177,12 @@ export class AgencyDashboardComponent implements OnInit {
             description: '等待機構人工決定',
           };
 
-        case '急難需求':
+        case '災害需求':
           return {
             ...card,
             materialCount: summary.emergencyMaterialCount ?? 0,
             volunteerCount: summary.emergencyVolunteerCount ?? 0,
-            description: '目前已上架的急難救助需求',
+            description: '目前已上架的災害救助需求',
           };
 
         default:
