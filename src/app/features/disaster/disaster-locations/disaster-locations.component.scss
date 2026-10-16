@@ -1,0 +1,113 @@
+/* 右側三個框 */
+.right-menu {
+flex: 1;        // 改成跟左側一樣比例
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  .info-card {
+   flex: 1;        // 三個框平均分配高度
+  padding: 15px;
+
+    background-color: var(--bg-layer-1);
+    border-radius: var(--border-radius-main);
+    border: 1px solid var(--border-default);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+
+    cursor: pointer;
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+.map-section {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 520px;
+  margin-top: 40px;
+  background: var(--bg-layer-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--border-radius-main);
+  overflow: hidden;
+}
+
+.map-sidebar {
+  box-sizing: border-box;
+  flex: 0 0 360px;
+  width: 360px;
+  padding: 24px;
+  background: #fff;
+}
+
+.map-sidebar h2 {
+  margin: 0 0 20px;
+  color: #005bac;
+}
+
+.map-sidebar label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+.location-list {
+  display: grid;
+  gap: 12px;
+}
+
+.location-details {
+  padding: 12px;
+  color: var(--color-text-main);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+}
+
+.location-details.active {
+  border-color: #005bac;
+}
+
+.location-details h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.location-details p {
+  line-height: 1.6;
+}
+
+.location-details h4 {
+  margin: 20px 0 8px;
+}
+
+.location-details ul {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+.location-details button {
+  margin-top: 12px;
+  padding: 8px 12px;
+  color: #fff;
+  background: #005bac;
+  border: 0;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+}
+
+#disaster-map {
+  flex: 1;
+  min-width: 0;
+  min-height: 520px;
+}

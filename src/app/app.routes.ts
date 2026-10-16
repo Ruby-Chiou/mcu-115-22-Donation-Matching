@@ -58,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'daily-locations',
-    loadComponent: () => import('./features/daily-locations/daily-locations.component').then((m) => m.DailyLocationsComponent),
+    loadComponent: () => import('./features/daily/daily-locations/daily-locations.component').then((m) => m.DailyLocationsComponent),
   },
 
   {
