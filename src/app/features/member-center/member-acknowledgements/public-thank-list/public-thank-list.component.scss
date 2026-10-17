@@ -1,0 +1,88 @@
+.wall-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.wall-link {
+  color: #1565c0;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.state-text {
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--color-text-light);
+
+  &.error {
+    color: var(--color-error);
+  }
+}
+
+.thank-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.thank-card {
+  position: relative;
+  padding: 1.25rem 1rem 1rem;
+  border: 1px solid #f0d7df;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #fff7fa, #ffffff);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.card-label {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: var(--border-radius-pill);
+  background: #f8e4ea;
+  color: #b54b6a;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.donor-name {
+  color: var(--color-text-dark);
+  font-size: 1.15rem;
+  font-weight: 700;
+
+  span {
+    margin-left: 0.25rem;
+    color: var(--color-text-medium);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+}
+
+.donation-action {
+  margin: 0.5rem 0 0.2rem;
+  color: var(--color-text-light);
+  font-size: 0.85rem;
+}
+
+.donation-item {
+  color: #1565c0;
+  font-weight: 700;
+}
+
+.organization {
+  margin-top: 0.55rem;
+  color: var(--color-text-medium);
+  font-size: 0.92rem;
+}
+
+.published {
+  margin-top: 0.75rem;
+  color: var(--color-text-light);
+  font-size: 0.8rem;
+}

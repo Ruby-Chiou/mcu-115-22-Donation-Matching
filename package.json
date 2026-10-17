@@ -6,7 +6,14 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "supabase": "supabase",
+    "sb:login": "supabase login",
+    "sb:link": "supabase link --project-ref wxryryyiakzkeeoorlrq",
+    "sb:migration:list": "supabase migration list",
+    "sb:migration:new": "supabase migration new",
+    "sb:push": "supabase db push",
+    "sb:push:dry": "supabase db push --dry-run"
   },
   "private": true,
   "packageManager": "npm@11.11.0",
@@ -31,6 +38,7 @@
     "@types/leaflet": "^1.9.22",
     "jsdom": "^28.0.0",
     "prettier": "^3.9.8",
+    "supabase": "^2.121.0",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

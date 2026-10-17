@@ -3,17 +3,23 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { MemberMessageService } from '../../core/services/member-center/member-message.service';
-import { MemberCertificatesComponent } from './member-certificates/member-certificates.component';
+import { MemberAcknowledgementsComponent } from './member-acknowledgements/member-acknowledgements.component';
 import { MemberInboxComponent } from './member-inbox/member-inbox.component';
+import { MemberNotificationSettingsComponent } from './member-notification-settings/member-notification-settings.component';
 import { MemberProfileComponent } from './member-profile/member-profile.component';
 
-export type MemberTab = 'profile' | 'inbox' | 'certificates';
+export type MemberTab = 'profile' | 'inbox' | 'acknowledgements' | 'notifications';
 
-const MEMBER_TABS: MemberTab[] = ['profile', 'inbox', 'certificates'];
+const MEMBER_TABS: MemberTab[] = ['profile', 'inbox', 'acknowledgements', 'notifications'];
 
 @Component({
   selector: 'app-member-center',
-  imports: [MemberProfileComponent, MemberInboxComponent, MemberCertificatesComponent],
+  imports: [
+    MemberProfileComponent,
+    MemberInboxComponent,
+    MemberAcknowledgementsComponent,
+    MemberNotificationSettingsComponent,
+  ],
   templateUrl: './member-center.component.html',
   styleUrl: './member-center.component.scss',
 })
@@ -24,9 +30,9 @@ export class MemberCenterComponent {
   readonly activeTab = signal<MemberTab>('profile');
 
   constructor() {
-    // header 的鈴鐺會帶 ?tab=inbox 進來
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const tab = params.get('tab') as MemberTab | null;
+      const raw = params.get('tab');
+      const tab = (raw === 'certificates' ? 'acknowledgements' : raw) as MemberTab | null;
 
       if (tab && MEMBER_TABS.includes(tab)) {
         this.activeTab.set(tab);

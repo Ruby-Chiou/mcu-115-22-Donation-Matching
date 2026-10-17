@@ -22,6 +22,11 @@
         <input type="file" hidden [accept]="avatarAccept" [disabled]="isUploading()" (change)="onAvatarSelected($event)" />
       </label>
       <p class="hint">支援 JPG / PNG / WEBP，2MB 以內</p>
+
+      <div class="provider-chip" [attr.data-provider]="profile.loginProvider">
+        <i class="fa-solid fa-link"></i>
+        {{ providerLabels[profile.loginProvider] }}
+      </div>
     </aside>
 
     <div class="info-card">
@@ -37,17 +42,38 @@
           <dt>顯示名稱</dt>
           <dd>{{ profile.displayName }}</dd>
 
+          <dt>帳號名稱</dt>
+          <dd>{{ profile.accountName || '未設定' }}</dd>
+
+          <dt>真實姓名</dt>
+          <dd>{{ profile.fullName || '未填寫' }}</dd>
+
           <dt>聯絡電話</dt>
           <dd>{{ profile.phoneNumber || '未填寫' }}</dd>
+
+          <dt>所在縣市</dt>
+          <dd>{{ profile.city || '未填寫' }}</dd>
 
           <dt>Email</dt>
           <dd>{{ profile.email || '未綁定' }}</dd>
 
+          <dt>登入方式</dt>
+          <dd>{{ providerLabels[profile.loginProvider] }}</dd>
+
           <dt>身分</dt>
           <dd>捐助者</dd>
 
+          <dt>帳號狀態</dt>
+          <dd>正常</dd>
+
+          <dt>會員編號</dt>
+          <dd class="mono">{{ profile.uid }}</dd>
+
           <dt>註冊時間</dt>
           <dd>{{ profile.createdAt | date: 'yyyy/MM/dd HH:mm' }}</dd>
+
+          <dt>資料更新</dt>
+          <dd>{{ profile.updatedAt ? (profile.updatedAt | date: 'yyyy/MM/dd HH:mm') : '—' }}</dd>
         </dl>
       } @else {
         <form class="profile-form" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
@@ -57,9 +83,19 @@
             @if (hasError('displayName', 'required')) {
               <small class="field-error">請輸入顯示名稱</small>
             }
-            @if (hasError('displayName', 'maxlength')) {
-              <small class="field-error">顯示名稱最多 20 字</small>
+          </label>
+
+          <label class="field">
+            <span>帳號名稱</span>
+            <input type="text" formControlName="accountName" maxlength="20" placeholder="2–20 字，中英數或底線" />
+            @if (hasError('accountName', 'pattern')) {
+              <small class="field-error">請使用 2–20 字的中英數或底線</small>
             }
+          </label>
+
+          <label class="field">
+            <span>真實姓名</span>
+            <input type="text" formControlName="fullName" maxlength="40" placeholder="收據／感謝狀常用" />
           </label>
 
           <label class="field">
@@ -71,18 +107,29 @@
           </label>
 
           <label class="field">
+            <span>所在縣市</span>
+            <select formControlName="city">
+              <option value="">請選擇</option>
+              @for (city of profileService.cityOptions; track city) {
+                <option [value]="city">{{ city }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="field">
             <span>Email（不可修改）</span>
             <input type="email" [value]="profile.email" disabled />
           </label>
 
           <label class="field">
-            <span>身分（不可修改）</span>
-            <input type="text" value="捐助者" disabled />
+            <span>登入方式（不可修改）</span>
+            <input type="text" [value]="providerLabels[profile.loginProvider]" disabled />
+            <small class="field-hint">之後串接 Google／LINE／Facebook 時會自動更新</small>
           </label>
 
           <label class="field">
-            <span>註冊時間（不可修改）</span>
-            <input type="text" [value]="profile.createdAt | date: 'yyyy/MM/dd HH:mm'" disabled />
+            <span>身分（不可修改）</span>
+            <input type="text" value="捐助者" disabled />
           </label>
 
           <div class="form-actions">
@@ -138,6 +185,44 @@
             </div>
           </form>
         }
+      </div>
+
+      <div class="danger-section">
+        <div class="card-header">
+          <h2>帳號管理</h2>
+        </div>
+        <p class="danger-hint">
+          註銷後將清除個人資料並無法再登入；歷史捐贈紀錄仍會保留於系統（不再顯示您的個資）。此操作無法復原。
+        </p>
+        <button type="button" class="btn btn-danger" (click)="openDeleteConfirm()">註銷帳號</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showDeleteConfirm()) {
+  <div class="modal-backdrop" (click)="closeDeleteConfirm()">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="確認註銷帳號" (click)="$event.stopPropagation()">
+      <h3>確認註銷帳號？</h3>
+      <p>請輸入「<strong>確認註銷</strong>」以繼續。註銷後個人資料會被清除。</p>
+      <input
+        type="text"
+        class="confirm-input"
+        placeholder="請輸入：確認註銷"
+        [value]="deleteConfirmText()"
+        (input)="onDeleteConfirmInput($event)"
+        autocomplete="off"
+      />
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" (click)="closeDeleteConfirm()" [disabled]="isDeleting()">取消</button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          [disabled]="!canConfirmDelete() || isDeleting()"
+          (click)="confirmDeleteAccount()"
+        >
+          {{ isDeleting() ? '處理中...' : '確定註銷' }}
+        </button>
       </div>
     </div>
   </div>
