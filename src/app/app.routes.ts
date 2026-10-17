@@ -46,7 +46,7 @@ export const routes: Routes = [
   },
   {
     path: 'member',
-    loadComponent: () => import('./features/member-center/member-center.component').then((m) => m.MemberCenterComponent), // 會員專區(個人資料/收件匣/感謝狀)
+    loadComponent: () => import('./features/member-center/member-center.component').then((m) => m.MemberCenterComponent), // 會員專區(個人資料/收件匣/捐贈回饋)
   },
   {
     path: 'tracking',

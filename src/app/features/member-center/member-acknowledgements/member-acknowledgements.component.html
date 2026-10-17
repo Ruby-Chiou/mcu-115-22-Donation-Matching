@@ -1,0 +1,64 @@
+<div class="section-switch" role="tablist" aria-label="捐贈回饋分區">
+  <button
+    type="button"
+    role="tab"
+    class="section-button"
+    [class.active]="activeSection() === 'receipts'"
+    [attr.aria-selected]="activeSection() === 'receipts'"
+    (click)="selectSection('receipts')"
+  >
+    捐贈收據
+  </button>
+
+  <span class="section-divider" aria-hidden="true">|</span>
+
+  <button
+    type="button"
+    role="tab"
+    class="section-button"
+    [class.active]="activeSection() === 'certificates'"
+    [attr.aria-selected]="activeSection() === 'certificates'"
+    (click)="selectSection('certificates')"
+  >
+    感謝狀
+  </button>
+
+  <span class="section-divider" aria-hidden="true">|</span>
+
+  <button
+    type="button"
+    role="tab"
+    class="section-button"
+    [class.active]="activeSection() === 'public'"
+    [attr.aria-selected]="activeSection() === 'public'"
+    (click)="selectSection('public')"
+  >
+    公開感謝
+  </button>
+</div>
+
+<p class="section-hint">
+  @switch (activeSection()) {
+    @case ('receipts') {
+      系統依統一格式開立的捐贈收據，供您留存與列印。
+    }
+    @case ('certificates') {
+      社福機構上傳的 PDF／圖片，列表直接預覽（檔案存放於本專案 Supabase Storage，非外部網站）。
+    }
+    @case ('public') {
+      系統公開於感謝牆的致謝紀錄（顯示名稱已遮罩）。完整牆面請至「捐助感謝」。
+    }
+  }
+</p>
+
+@switch (activeSection()) {
+  @case ('receipts') {
+    <app-donation-receipt-list />
+  }
+  @case ('certificates') {
+    <app-agency-certificate-list />
+  }
+  @case ('public') {
+    <app-public-thank-list />
+  }
+}

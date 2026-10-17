@@ -1,0 +1,60 @@
+@if (isLoading()) {
+  <p class="state-text">感謝狀載入中...</p>
+} @else if (errorText()) {
+  <p class="state-text error">{{ errorText() }}</p>
+} @else {
+  <ul class="cert-grid">
+    @for (certificate of certificateService.certificates(); track certificate.id) {
+      <li class="cert-card">
+        <div class="preview-frame" aria-label="感謝狀預覽">
+          <span class="format-badge" [attr.data-format]="formatLabel(certificate.mimeType, certificate.fileName)">
+            {{ formatLabel(certificate.mimeType, certificate.fileName) }}
+          </span>
+
+          @if (isImage(certificate.mimeType)) {
+            <img [src]="certificate.fileUrl" [alt]="certificate.fileName" loading="lazy" />
+          } @else if (isPdf(certificate.mimeType)) {
+            <embed [src]="pdfPreviewUrl(certificate.fileUrl)" type="application/pdf" class="pdf-embed" />
+          } @else {
+            <div class="preview-fallback">
+              <i class="fa-solid fa-file"></i>
+              <span>無法內嵌預覽此格式（{{ formatLabel(certificate.mimeType, certificate.fileName) }}）</span>
+            </div>
+          }
+        </div>
+
+        <div class="card-body">
+          <div class="title-row">
+            <h3>{{ certificate.agencyName }}</h3>
+            <span class="format-chip">{{ formatLabel(certificate.mimeType, certificate.fileName) }}</span>
+          </div>
+          <p class="detail">{{ certificate.donationItem || '捐贈感謝狀' }}</p>
+          @if (certificate.note) {
+            <p class="note">{{ certificate.note }}</p>
+          }
+          <p class="meta">
+            <span class="file-name">{{ certificate.fileName }}</span>
+            <span>{{ certificate.uploadedAt | date: 'yyyy/MM/dd' }}</span>
+          </p>
+          <p class="action-hint">開啟：在瀏覽器新分頁查看　｜　下載：存到你的電腦</p>
+          <div class="card-actions">
+            <button type="button" class="btn btn-primary" (click)="openInNewTab(certificate)">
+              <i class="fa-solid fa-up-right-from-square"></i> 開啟完整檔案
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline"
+              [disabled]="downloadingId() === certificate.id"
+              (click)="downloadFile(certificate)"
+            >
+              <i class="fa-solid fa-download"></i>
+              {{ downloadingId() === certificate.id ? '下載中...' : '下載到電腦' }}
+            </button>
+          </div>
+        </div>
+      </li>
+    } @empty {
+      <li class="state-text">尚無機構上傳的感謝狀。申請感謝狀並經機構上傳後會出現在此。</li>
+    }
+  </ul>
+}

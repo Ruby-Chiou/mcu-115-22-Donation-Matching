@@ -1,0 +1,29 @@
+<div class="wall-toolbar">
+  <a routerLink="/thank-you-wall" class="wall-link">前往完整感謝牆</a>
+</div>
+
+@if (isLoading()) {
+  <p class="state-text">公開感謝載入中...</p>
+} @else if (errorText()) {
+  <p class="state-text error">{{ errorText() }}</p>
+} @else {
+  <div class="thank-grid">
+    @for (item of thankService.thanks(); track item.id) {
+      <article class="thank-card">
+        <span class="card-label">感謝</span>
+        <div class="donor-name">
+          {{ item.displayName }}
+          @if (item.honorific) {
+            <span>{{ item.honorific }}</span>
+          }
+        </div>
+        <div class="donation-action">捐贈</div>
+        <div class="donation-item">{{ item.donationItem }}</div>
+        <div class="organization">至{{ item.agencyName }}</div>
+        <div class="published">{{ item.publishedAt | date: 'yyyy/MM/dd' }}</div>
+      </article>
+    } @empty {
+      <p class="state-text">目前沒有已公開的感謝紀錄。</p>
+    }
+  </div>
+}

@@ -3,8 +3,10 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
 import { AVATAR_ACCEPT_TYPES, MemberProfileService } from '../../../core/services/member-center/member-profile.service';
+import { DONOR_LOGIN_PROVIDER_LABELS } from '../../../models/user/donor';
 
 const TW_MOBILE_PATTERN = /^09\d{8}$/;
+const ACCOUNT_NAME_PATTERN = /^[a-zA-Z0-9_\u4e00-\u9fff]{2,20}$/;
 
 const passwordMatchValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
   const newPassword = group.get('newPassword')?.value;
@@ -24,6 +26,7 @@ export class MemberProfileComponent implements OnInit {
   protected readonly profileService = inject(MemberProfileService);
 
   readonly avatarAccept = AVATAR_ACCEPT_TYPES.join(',');
+  readonly providerLabels = DONOR_LOGIN_PROVIDER_LABELS;
 
   readonly isLoading = signal(true);
   readonly loadError = signal('');
@@ -32,11 +35,17 @@ export class MemberProfileComponent implements OnInit {
   readonly isUploading = signal(false);
   readonly isChangingPassword = signal(false);
   readonly showPasswordForm = signal(false);
+  readonly showDeleteConfirm = signal(false);
+  readonly isDeleting = signal(false);
+  readonly deleteConfirmText = signal('');
   readonly notice = signal<{ type: 'success' | 'error'; text: string } | null>(null);
 
   readonly profileForm = this.fb.nonNullable.group({
     displayName: ['', [Validators.required, Validators.maxLength(20)]],
+    accountName: ['', [Validators.pattern(ACCOUNT_NAME_PATTERN)]],
+    fullName: ['', [Validators.maxLength(40)]],
     phoneNumber: ['', [Validators.pattern(TW_MOBILE_PATTERN)]],
+    city: [''],
   });
 
   readonly passwordForm = this.fb.nonNullable.group(
@@ -51,8 +60,8 @@ export class MemberProfileComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     try {
       await this.profileService.loadProfile();
-    } catch {
-      this.loadError.set('無法載入會員資料，請稍後再試。');
+    } catch (error) {
+      this.loadError.set(error instanceof Error ? error.message : '無法載入會員資料，請稍後再試。');
     } finally {
       this.isLoading.set(false);
     }
@@ -67,7 +76,10 @@ export class MemberProfileComponent implements OnInit {
 
     this.profileForm.reset({
       displayName: profile.displayName,
+      accountName: profile.accountName ?? '',
+      fullName: profile.fullName ?? '',
       phoneNumber: profile.phoneNumber ?? '',
+      city: profile.city ?? '',
     });
     this.notice.set(null);
     this.isEditing.set(true);
@@ -143,7 +155,46 @@ export class MemberProfileComponent implements OnInit {
     }
   }
 
-  hasError(controlName: 'displayName' | 'phoneNumber', errorCode: string): boolean {
+  openDeleteConfirm(): void {
+    this.deleteConfirmText.set('');
+    this.showDeleteConfirm.set(true);
+  }
+
+  closeDeleteConfirm(): void {
+    this.showDeleteConfirm.set(false);
+    this.deleteConfirmText.set('');
+  }
+
+  onDeleteConfirmInput(event: Event): void {
+    this.deleteConfirmText.set((event.target as HTMLInputElement).value);
+  }
+
+  canConfirmDelete(): boolean {
+    return this.deleteConfirmText().trim() === '確認註銷';
+  }
+
+  async confirmDeleteAccount(): Promise<void> {
+    if (!this.canConfirmDelete()) {
+      return;
+    }
+
+    this.isDeleting.set(true);
+
+    try {
+      await this.profileService.deleteAccount();
+      window.alert('帳號已註銷。感謝您曾使用本平台。');
+    } catch {
+      this.notice.set({ type: 'error', text: '註銷失敗，請稍後再試' });
+      this.showDeleteConfirm.set(false);
+    } finally {
+      this.isDeleting.set(false);
+    }
+  }
+
+  hasError(
+    controlName: 'displayName' | 'accountName' | 'fullName' | 'phoneNumber' | 'city',
+    errorCode: string
+  ): boolean {
     const control = this.profileForm.controls[controlName];
 
     return control.touched && control.hasError(errorCode);

@@ -1,35 +1,34 @@
 import { Injectable, inject, signal } from '@angular/core';
 
-import { DonationCertificate } from '../../../models/member/donation-certificate';
+import { DonationReceipt } from '../../../models/member/donation-receipt';
 import { SupabaseService } from '../database/supabase.service';
 import { MemberSessionService } from './member-session.service';
 
-interface DonationCertificateRow {
+interface DonationReceiptRow {
   id: number | string;
-  certificateNo: string;
+  receiptNo: string;
   donorUid: string;
   donorName: string | null;
+  receiptTitle: string | null;
   agencyName: string | null;
-  agencyRepresentative: string | null;
   donationItem: string | null;
   donationDate: string | null;
-  message: string | null;
   issuedAt: string | null;
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class DonationCertificateService {
-  private readonly tableName = 'donor_certificates';
+export class DonationReceiptService {
+  private readonly tableName = 'donor_receipts';
 
   private readonly supabaseService = inject(SupabaseService);
   private readonly session = inject(MemberSessionService);
 
-  private readonly certificatesSignal = signal<DonationCertificate[]>([]);
-  readonly certificates = this.certificatesSignal.asReadonly();
+  private readonly receiptsSignal = signal<DonationReceipt[]>([]);
+  readonly receipts = this.receiptsSignal.asReadonly();
 
-  async loadCertificates(): Promise<DonationCertificate[]> {
+  async loadReceipts(): Promise<DonationReceipt[]> {
     const uid = await this.session.getCurrentUid();
 
     const { data, error } = await this.supabaseService.client
@@ -39,27 +38,26 @@ export class DonationCertificateService {
       .order('issuedAt', { ascending: false });
 
     if (error) {
-      console.error('讀取感謝狀失敗：', error);
+      console.error('讀取捐贈收據失敗：', error);
       throw error;
     }
 
-    const certificates = (data ?? []).map((row) => this.mapRowToCertificate(row as DonationCertificateRow));
-    this.certificatesSignal.set(certificates);
+    const receipts = (data ?? []).map((row) => this.mapRow(row as DonationReceiptRow));
+    this.receiptsSignal.set(receipts);
 
-    return certificates;
+    return receipts;
   }
 
-  private mapRowToCertificate(row: DonationCertificateRow): DonationCertificate {
+  private mapRow(row: DonationReceiptRow): DonationReceipt {
     return {
       id: Number(row.id),
-      certificateNo: row.certificateNo,
+      receiptNo: row.receiptNo,
       donorUid: row.donorUid,
       donorName: row.donorName ?? '',
+      receiptTitle: row.receiptTitle ?? '',
       agencyName: row.agencyName ?? '',
-      agencyRepresentative: row.agencyRepresentative ?? '',
       donationItem: row.donationItem ?? '',
       donationDate: row.donationDate ?? '',
-      message: row.message ?? '',
       issuedAt: row.issuedAt ?? '',
     };
   }

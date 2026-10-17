@@ -1,0 +1,93 @@
+@if (isLoading()) {
+  <p class="state-text">設定載入中...</p>
+} @else if (errorText()) {
+  <p class="state-text error">{{ errorText() }}</p>
+} @else {
+  @if (notice(); as currentNotice) {
+    <div class="notice" [class.error]="currentNotice.type === 'error'" role="status">{{ currentNotice.text }}</div>
+  }
+
+  <p class="intro">
+    可自行決定哪些訊息要出現在站內收件匣，以及是否轉寄到私人信箱。
+    預設不濫寄 Email，避免信箱被平台訊息洗版；實際寄信排程會依此設定執行。
+  </p>
+
+  @if (profileService.profile(); as profile) {
+    <p class="email-hint">
+      通知信箱：
+      <strong>{{ profile.email || '尚未綁定 Email' }}</strong>
+      @if (!profile.email) {
+        <span>（請先於個人資料綁定後才能收到郵件）</span>
+      }
+    </p>
+  }
+
+  <form class="settings-form" [formGroup]="form" (ngSubmit)="save()">
+    <section class="panel">
+      <h2>站內通知（收件匣／小鈴鐺）</h2>
+      <p class="panel-desc">關閉後，該類別不會再出現未讀提示，仍可在收件匣手動查看歷史信件。</p>
+      <label class="check"><input type="checkbox" formControlName="inAppSystem" /> 系統通知</label>
+      <label class="check"><input type="checkbox" formControlName="inAppAgency" /> 機構訊息</label>
+      <label class="check"><input type="checkbox" formControlName="inAppDonation" /> 捐贈進度</label>
+    </section>
+
+    <section class="panel">
+      <h2>私人信箱通知</h2>
+      <label class="check master">
+        <input type="checkbox" formControlName="emailEnabled" />
+        啟用 Email 通知（寄到上方綁定信箱）
+      </label>
+
+      <fieldset class="sub-fields" [disabled]="!form.controls.emailEnabled.value">
+        <legend>要寄哪些類別</legend>
+        <label class="check"><input type="checkbox" formControlName="emailSystem" /> 系統通知</label>
+        <label class="check"><input type="checkbox" formControlName="emailAgency" /> 機構訊息</label>
+        <label class="check"><input type="checkbox" formControlName="emailDonation" /> 捐贈進度</label>
+
+        <label class="field">
+          <span>寄送頻率</span>
+          <select formControlName="emailDigestMode">
+            @for (mode of digestModes; track mode) {
+              <option [value]="mode">{{ digestLabels[mode] }}</option>
+            }
+          </select>
+        </label>
+        <p class="panel-desc">
+          「每日／每週彙整」會把多則訊息合併成一封，減少打擾；選「不寄信」則完全只留在站內。
+        </p>
+      </fieldset>
+    </section>
+
+    <section class="panel">
+      <h2>勿擾時段</h2>
+      <label class="check master">
+        <input type="checkbox" formControlName="quietHoursEnabled" />
+        啟用勿擾（此時段不寄即時信，改併入下次彙整）
+      </label>
+
+      <div class="quiet-row" [class.disabled]="!form.controls.quietHoursEnabled.value">
+        <label class="field">
+          <span>開始</span>
+          <input type="time" formControlName="quietHoursStart" />
+        </label>
+        <span class="tilde">～</span>
+        <label class="field">
+          <span>結束</span>
+          <input type="time" formControlName="quietHoursEnd" />
+        </label>
+      </div>
+      @if (form.controls.quietHoursStart.touched && form.controls.quietHoursStart.invalid) {
+        <small class="field-error">請輸入有效時間（例如 22:00）</small>
+      }
+    </section>
+
+    <div class="form-actions">
+      @if (settingsService.settings(); as settings) {
+        <span class="updated">上次更新：{{ settings.updatedAt | date: 'yyyy/MM/dd HH:mm' }}</span>
+      }
+      <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+        {{ isSaving() ? '儲存中...' : '儲存設定' }}
+      </button>
+    </div>
+  </form>
+}
