@@ -11,9 +11,26 @@ interface DonationReceiptRow {
   donorName: string | null;
   receiptTitle: string | null;
   agencyName: string | null;
+  agencyNameEn: string | null;
+  orgTaxId: string | null;
+  approvalNo: string | null;
+  donorIdNo: string | null;
+  donorAddress: string | null;
+  donorPhone: string | null;
   donationItem: string | null;
   donationDate: string | null;
+  note: string | null;
+  accountName: string | null;
+  postalAccount: string | null;
+  orgPhone: string | null;
+  orgFax: string | null;
+  orgEmail: string | null;
+  orgAddress: string | null;
+  handlerName: string | null;
   issuedAt: string | null;
+  donationId: string | null;
+  largeSealUrl: string | null;
+  smallSealUrl: string | null;
 }
 
 @Injectable({
@@ -56,9 +73,26 @@ export class DonationReceiptService {
       donorName: row.donorName ?? '',
       receiptTitle: row.receiptTitle ?? '',
       agencyName: row.agencyName ?? '',
+      agencyNameEn: row.agencyNameEn ?? '',
+      orgTaxId: row.orgTaxId ?? '',
+      approvalNo: row.approvalNo ?? '',
+      donorIdNo: row.donorIdNo ?? '',
+      donorAddress: row.donorAddress ?? '',
+      donorPhone: row.donorPhone ?? '',
       donationItem: row.donationItem ?? '',
       donationDate: row.donationDate ?? '',
+      note: row.note ?? '',
+      accountName: row.accountName ?? '',
+      postalAccount: row.postalAccount ?? '',
+      orgPhone: row.orgPhone ?? '',
+      orgFax: row.orgFax ?? '',
+      orgEmail: row.orgEmail ?? '',
+      orgAddress: row.orgAddress ?? '',
+      handlerName: row.handlerName ?? '',
       issuedAt: row.issuedAt ?? '',
+      donationId: row.donationId ?? undefined,
+      largeSealUrl: row.largeSealUrl ?? '',
+      smallSealUrl: row.smallSealUrl ?? '',
     };
   }
 }

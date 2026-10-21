@@ -5,35 +5,14 @@
 } @else {
   <ul class="receipt-grid">
     @for (receipt of receiptService.receipts(); track receipt.id) {
-      <li class="receipt-card" [class.is-printing]="printingId() === receipt.id">
-        <article class="receipt-sheet">
-          <header>
-            <p class="system-label">智慧捐助媒合平台 · 捐贈收據</p>
-            <h3>捐贈收據</h3>
-            <p class="receipt-no">{{ receipt.receiptNo }}</p>
-          </header>
-
-          <dl>
-            <dt>收據抬頭</dt>
-            <dd>{{ receipt.receiptTitle }}</dd>
-            <dt>捐助者</dt>
-            <dd>{{ receipt.donorName }}</dd>
-            <dt>受贈機構</dt>
-            <dd>{{ receipt.agencyName }}</dd>
-            <dt>捐贈內容</dt>
-            <dd>{{ receipt.donationItem }}</dd>
-            <dt>捐贈日期</dt>
-            <dd>{{ receipt.donationDate | date: 'yyyy/MM/dd' }}</dd>
-            <dt>開立日期</dt>
-            <dd>{{ receipt.issuedAt | date: 'yyyy/MM/dd' }}</dd>
-          </dl>
-
-          <footer>本收據由平台依統一格式開立</footer>
-        </article>
+      <li class="receipt-card">
+        <div #sheetHost>
+          <app-donation-receipt-sheet [sheet]="receipt" />
+        </div>
 
         <div class="card-actions no-print">
-          <button type="button" class="btn btn-primary" (click)="printReceipt(receipt)">
-            <i class="fa-solid fa-print"></i> 列印 / 存成 PDF
+          <button type="button" class="btn btn-primary" (click)="downloadPdf(sheetHost, receipt)">
+            <i class="fa-solid fa-file-pdf"></i> 下載 PDF
           </button>
         </div>
       </li>

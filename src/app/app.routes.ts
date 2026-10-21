@@ -46,7 +46,7 @@ export const routes: Routes = [
   },
   {
     path: 'member',
-    loadComponent: () => import('./features/member-center/member-center.component').then((m) => m.MemberCenterComponent), // 會員專區(個人資料/收件匣/捐贈回饋)
+    loadComponent: () => import('./features/member-center/member-center.component').then((m) => m.MemberCenterComponent), // 會員專區(個人資料/收件匣/捐贈回饋/捐助紀錄)
   },
   {
     path: 'tracking',
@@ -105,6 +105,20 @@ export const routes: Routes = [
     path: 'agency/receipt-review',
     loadComponent: () =>
       import('./features/agency-receipt-review/agency-receipt-review.component').then((m) => m.AgencyReceiptReviewComponent),
+  },
+  {
+    path: 'agency/receipt-review/:donationId/edit',
+    loadComponent: () =>
+      import('./features/agency-receipt-review/agency-receipt-form/agency-receipt-form.component').then(
+        (m) => m.AgencyReceiptFormComponent
+      ),
+  },
+  {
+    path: 'agency/receipt-review/:donationId/preview',
+    loadComponent: () =>
+      import('./features/agency-receipt-review/agency-receipt-preview/agency-receipt-preview.component').then(
+        (m) => m.AgencyReceiptPreviewComponent
+      ),
   },
 
   // 4.3 日常需求管理區

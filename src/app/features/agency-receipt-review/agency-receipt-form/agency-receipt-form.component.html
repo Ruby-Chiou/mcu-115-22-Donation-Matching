@@ -1,0 +1,162 @@
+<div class="workspace-title">
+  <h1>{{ task()?.receiptIssued ? '編輯捐贈收據' : '開立捐贈收據' }}</h1>
+</div>
+
+<div class="container">
+  @if (isLoading()) {
+    <p class="state-text">資料載入中...</p>
+  } @else if (!task()) {
+    <p class="error-text">{{ errorText() }}</p>
+    <a class="ghost-btn" routerLink="/agency/receipt-review">返回列表</a>
+  } @else if (task(); as current) {
+    <div class="edit-header">
+      <div class="info-tag">
+        <span>捐助者</span>
+        <strong>{{ current.donorName || '未填姓名' }}</strong>
+      </div>
+      <div class="info-tag">
+        <span>需求物資</span>
+        <strong>{{ current.demandItem }}</strong>
+      </div>
+      @if (current.receiptNo) {
+        <div class="info-tag">
+          <span>收據編號</span>
+          <strong>{{ current.receiptNo }}</strong>
+        </div>
+      }
+      @if (current.taxId) {
+        <div class="info-tag">
+          <span>統一編號</span>
+          <strong>{{ current.taxId }}</strong>
+        </div>
+      }
+
+      <div class="button-area">
+        <a class="ghost-btn" routerLink="/agency/receipt-review">取消</a>
+        <button type="button" class="ghost-btn" (click)="preview()">預覽</button>
+        <button type="button" class="save-btn" [disabled]="isSaving()" (click)="save()">
+          {{ isSaving() ? '儲存中...' : current.receiptIssued ? '儲存修正' : '開立收據' }}
+        </button>
+      </div>
+    </div>
+
+    @if (errorText()) {
+      <p class="error-text" role="alert">{{ errorText() }}</p>
+    }
+
+    <p class="hint">這裡的內容會出現在捐助者的收據上。填錯時可直接修改後再儲存，收據編號不會重編。</p>
+
+    <form class="form-box" (ngSubmit)="save()">
+      <h2>捐贈人</h2>
+      <div class="form-grid">
+        <label>
+          捐贈者
+          <input type="text" name="donorName" [(ngModel)]="draft.donorName" maxlength="40" required />
+        </label>
+        <label>
+          身分證／統編
+          <input type="text" name="donorIdNo" [(ngModel)]="draft.donorIdNo" maxlength="20" />
+        </label>
+        <label>
+          電話
+          <input type="text" name="donorPhone" [(ngModel)]="draft.donorPhone" maxlength="20" />
+        </label>
+        <label>
+          捐贈日期
+          <input type="date" name="donationDate" [(ngModel)]="draft.donationDate" required />
+        </label>
+        <label class="span-2">
+          收據地址
+          <input type="text" name="donorAddress" [(ngModel)]="draft.donorAddress" maxlength="80" />
+        </label>
+        <label class="span-2">
+          捐助事項
+          <input type="text" name="donationItem" [(ngModel)]="draft.donationItem" maxlength="120" required />
+        </label>
+        <label class="span-2">
+          備註
+          <input type="text" name="note" [(ngModel)]="draft.note" maxlength="120" />
+        </label>
+      </div>
+
+      <h2>受贈機構</h2>
+      <div class="form-grid">
+        <label>
+          機構名稱
+          <input type="text" name="agencyName" [(ngModel)]="draft.agencyName" maxlength="60" required />
+        </label>
+        <label>
+          英文名稱
+          <input type="text" name="agencyNameEn" [(ngModel)]="draft.agencyNameEn" maxlength="80" />
+        </label>
+        <label>
+          統一編號
+          <input type="text" name="orgTaxId" [(ngModel)]="draft.orgTaxId" maxlength="10" />
+        </label>
+        <label>
+          核准字號
+          <input type="text" name="approvalNo" [(ngModel)]="draft.approvalNo" maxlength="40" />
+        </label>
+        <label>
+          戶名
+          <input type="text" name="accountName" [(ngModel)]="draft.accountName" maxlength="60" />
+        </label>
+        <label>
+          劃撥帳號
+          <input type="text" name="postalAccount" [(ngModel)]="draft.postalAccount" maxlength="20" />
+        </label>
+        <label>
+          機構電話
+          <input type="text" name="orgPhone" [(ngModel)]="draft.orgPhone" maxlength="20" />
+        </label>
+        <label>
+          傳真
+          <input type="text" name="orgFax" [(ngModel)]="draft.orgFax" maxlength="20" />
+        </label>
+        <label>
+          Email
+          <input type="email" name="orgEmail" [(ngModel)]="draft.orgEmail" maxlength="80" />
+        </label>
+        <label>
+          經辦人
+          <input type="text" name="handlerName" [(ngModel)]="draft.handlerName" maxlength="20" />
+        </label>
+        <label class="span-2">
+          會址
+          <input type="text" name="orgAddress" [(ngModel)]="draft.orgAddress" maxlength="80" />
+        </label>
+      </div>
+
+      <h2>簽章</h2>
+
+      <div class="seal-fields">
+        <label>
+          機構大章
+          <input type="file" accept="image/png,image/jpeg,image/webp" (change)="onSealSelected('large', $event)" />
+          <span class="seal-box seal-large">
+            @if (largePreview()) {
+              <img [src]="largePreview()" alt="機構大章預覽" />
+            } @else {
+              <span>尚未上傳</span>
+            }
+          </span>
+        </label>
+
+        <label>
+          負責人小章
+          <input type="file" accept="image/png,image/jpeg,image/webp" (change)="onSealSelected('small', $event)" />
+          <span class="seal-box seal-small">
+            @if (smallPreview()) {
+              <img [src]="smallPreview()" alt="負責人小章預覽" />
+            } @else {
+              <span>尚未上傳</span>
+            }
+          </span>
+        </label>
+      </div>
+
+      <p class="readonly-line">建議使用透明背景 PNG，2MB 以內。大章為機構印信，小章為負責人職章。</p>
+      <p class="readonly-line">捐贈方式：{{ current.donationMethod || '—' }}　數量：{{ current.quantity }}　電話：{{ current.phone || '—' }}</p>
+    </form>
+  }
+</div>

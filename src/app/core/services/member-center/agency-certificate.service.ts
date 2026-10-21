@@ -15,6 +15,7 @@ interface AgencyCertificateRow {
   mimeType: string | null;
   note: string | null;
   uploadedAt: string | null;
+  donationId: string | null;
 }
 
 /** 機構上傳感謝狀：只負責讀取與展示，檔案內容不由系統排版 */
@@ -62,6 +63,7 @@ export class AgencyCertificateService {
       mimeType: row.mimeType ?? 'application/pdf',
       note: row.note ?? '',
       uploadedAt: row.uploadedAt ?? '',
+      donationId: row.donationId ?? undefined,
     };
   }
 }

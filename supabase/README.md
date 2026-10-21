@@ -171,6 +171,13 @@ npx supabase db push --include-seed
 | `20261018000001_member_center_core.sql` | 個人資料、站內信、大頭貼 bucket |
 | `20261018000002_member_acknowledgements.sql` | 收據、感謝狀檔、公開感謝 |
 | `20261018000003_member_notification_settings.sql` | 通知設定 |
+| `20261020000001_donor_donation_history.sql` | 捐助歷史：`donor_daily_donations.donor_uid` |
+| `20261021000001_agency_receipt_issuance.sql` | 收據／感謝狀對應 `donationId` |
+| `20261021000002_receipt_seals.sql` | 收據大章、小章網址 |
+| `20261021000003_receipt_detail_fields.sql` | 收據明細（統編、地址、戶名、經辦人） |
+| `20261021000004_public_thank_donation_link.sql` | 感謝牆對應捐助，並補上已通過的公開感謝 |
+| `20261021000005_donation_tracking_no.sql` | 捐助物流單號，供跑馬燈廣播 |
+| `20261021000006_receipt_demo_details.sql` | 示範收據補上預覽用明細 |
 
 ---
 

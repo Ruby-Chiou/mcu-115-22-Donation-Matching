@@ -15,6 +15,8 @@ export interface AgencyCertificate {
   mimeType: AgencyCertificateMime | string;
   note: string;
   uploadedAt: string;
+  /** 對應 donor_daily_donations.id，機構上傳時寫入 */
+  donationId?: string;
 }
 
 export function isImageCertificate(mimeType: string): boolean {

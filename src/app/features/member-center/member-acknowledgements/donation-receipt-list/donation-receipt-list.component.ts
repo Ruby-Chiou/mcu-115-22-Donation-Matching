@@ -1,16 +1,17 @@
-import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 
+import { DonationReceiptSheetComponent } from '../../../../components/receipt/donation-receipt-sheet/donation-receipt-sheet.component';
+import { downloadReceiptPdf } from '../../../../components/receipt/receipt-print';
 import { DonationReceiptService } from '../../../../core/services/member-center/donation-receipt.service';
 import { DonationReceipt } from '../../../../models/member/donation-receipt';
 
 /**
  * 捐贈收據：系統統一 HTML 版面（非外部圖片／套件）。
- * 列表卡片直接呈現收據預覽，可列印；不依賴第三方服務。
+ * 列表卡片直接呈現收據預覽。下載 PDF 只輸出收據紙張。
  */
 @Component({
   selector: 'app-donation-receipt-list',
-  imports: [DatePipe],
+  imports: [DonationReceiptSheetComponent],
   templateUrl: './donation-receipt-list.component.html',
   styleUrl: './donation-receipt-list.component.scss',
 })
@@ -19,7 +20,6 @@ export class DonationReceiptListComponent implements OnInit {
 
   readonly isLoading = signal(true);
   readonly errorText = signal('');
-  readonly printingId = signal<number | null>(null);
 
   async ngOnInit(): Promise<void> {
     try {
@@ -31,11 +31,13 @@ export class DonationReceiptListComponent implements OnInit {
     }
   }
 
-  printReceipt(receipt: DonationReceipt): void {
-    this.printingId.set(receipt.id);
-    window.setTimeout(() => {
-      window.print();
-      this.printingId.set(null);
-    }, 0);
+  downloadPdf(host: HTMLElement, receipt: DonationReceipt): void {
+    const paper = host.querySelector('.paper');
+
+    if (!(paper instanceof HTMLElement)) {
+      return;
+    }
+
+    downloadReceiptPdf(paper, receipt.receiptNo);
   }
 }

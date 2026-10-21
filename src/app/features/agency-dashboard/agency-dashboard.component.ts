@@ -53,11 +53,12 @@ export class AgencyDashboardComponent implements OnInit {
     {
       title: '待審核發票',
       value: null,
-      unit: '',
-      description: '功能建置中',
+      unit: '筆',
+      description: '正在載入…',
+      route: '/agency/receipt-review',
       icon: 'fa-solid fa-receipt',
       type: 'normal',
-      isAvailable: false,
+      isAvailable: true,
     },
     {
       title: '待確認收件',
@@ -175,6 +176,13 @@ export class AgencyDashboardComponent implements OnInit {
             ...card,
             value: summary.pendingItemReviewCount,
             description: '等待機構人工決定',
+          };
+
+        case '待審核發票':
+          return {
+            ...card,
+            value: summary.pendingReceiptReviewCount,
+            description: '待開立收據或上傳感謝狀',
           };
 
         case '災害需求':

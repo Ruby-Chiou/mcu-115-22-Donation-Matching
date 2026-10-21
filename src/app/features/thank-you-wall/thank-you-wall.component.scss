@@ -66,16 +66,22 @@
 
 
 // 感謝卡區域
+.wall-empty {
+  grid-column: 1 / -1;
+  margin: 1rem 0;
+  text-align: center;
+  color: var(--color-text-main);
+}
+
 .thank-you-list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
 
-  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 
-  gap: 24px;
+  max-height: 68vh;
 
-  max-height: 500px;
-
-  padding: 5px 5px 15px;
+  padding: 4px 4px 8px;
 
   overflow-y: auto;
 }
@@ -85,74 +91,82 @@
 // 感謝卡
 
 .thank-you-card {
-  min-height: 200px;
+  min-height: 0;
 
-  padding: 18px;
+  padding: 10px 16px;
 
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 8px 18px;
 
-  text-align: center;
+  text-align: left;
 
   background-color: var(--color-white);
 
-  border-radius: 25px;
+  border-radius: 12px;
 
   color: var(--color-text-main);
 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
+.card-who,
+.card-what {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+}
+
+.card-what {
+  justify-content: flex-start;
+  text-align: left;
+}
+
 
 // 「感謝」
 .card-label {
-  font-size: 20px;
-  margin-bottom: 5px;
+  font-size: 13px;
 }
 
 
 // 捐助者
 .donor-name {
-  font-size: 27px;
+  font-size: 16px;
   font-weight: 700;
 
   color: var(--color-brand-primary);
 
-  margin-bottom: 5px;
-
   span {
     color: var(--color-text-main);
-    font-size: 18px;
+    font-size: 13px;
     font-weight: 400;
-    margin-left: 5px;
+    margin-left: 4px;
   }
 }
 
 
 // 捐贈
 .donation-action {
-  font-size: 20px;
-  margin-bottom: 3px;
+  font-size: 13px;
 }
 
 
 // 物品
 .donation-item {
-  font-size: 27px;
+  font-size: 15px;
   font-weight: 700;
 
   color: var(--color-brand-primary);
-
-  margin-bottom: 8px;
 }
 
 
 // 機構
 .organization {
-  font-size: 20px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 

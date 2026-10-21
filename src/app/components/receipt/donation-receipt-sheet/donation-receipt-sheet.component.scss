@@ -1,0 +1,211 @@
+:host {
+  display: block;
+  color: #111;
+}
+
+.paper {
+  position: relative;
+  padding: 28px 36px 24px 52px;
+  border: 1px solid #d7d7d7;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 8%);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.copy-mark {
+  position: absolute;
+  top: 72px;
+  right: 8px;
+  margin: 0;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.15em;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.paper-head {
+  display: grid;
+  grid-template-columns: 1.1fr 1.4fr 0.8fr;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+
+.head-left p,
+.head-right p {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.head-center {
+  text-align: center;
+}
+
+.org-en {
+  margin: 0;
+  color: #b42318;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: italic;
+}
+
+h1 {
+  margin: 4px 0;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+}
+
+.doc-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+}
+
+.receipt-no-label {
+  font-weight: 700;
+}
+
+.receipt-no {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  th,
+  td {
+    border: 2px solid #111;
+    padding: 10px 12px;
+    vertical-align: middle;
+  }
+
+  th {
+    width: 18%;
+    background: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+
+    span {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+    }
+  }
+}
+
+.emphasis {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.item {
+  min-height: 72px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.note {
+  min-height: 48px;
+}
+
+.paper-foot {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.org-info p {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.thanks {
+  margin-top: 8px !important;
+  color: #b42318;
+  font-weight: 700;
+}
+
+.sign-block {
+  text-align: right;
+}
+
+.seals {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 16px;
+  min-height: 120px;
+}
+
+.seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b42318;
+  font-weight: 700;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.seal-large {
+  width: 120px;
+  height: 120px;
+  border: 2px solid #b42318;
+}
+
+.seal-small {
+  width: 84px;
+  height: 84px;
+  border: 2px solid #b42318;
+  border-radius: 50%;
+}
+
+.handler,
+.valid {
+  margin: 6px 0 0;
+  font-size: 14px;
+  text-align: right;
+}
+
+@media print {
+  .paper {
+    box-shadow: none;
+    border: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .paper {
+    padding: 20px 16px 16px;
+  }
+
+  .copy-mark {
+    position: static;
+    writing-mode: horizontal-tb;
+    margin-bottom: 8px;
+  }
+
+  .paper-head,
+  .paper-foot {
+    grid-template-columns: 1fr;
+  }
+
+  .emphasis,
+  .item {
+    font-size: 18px;
+  }
+}

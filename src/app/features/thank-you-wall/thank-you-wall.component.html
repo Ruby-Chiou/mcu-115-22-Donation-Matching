@@ -15,159 +15,32 @@
       </h2>
 
       <div class="thank-you-list">
-
-        <!-- 感謝卡 1 -->
-        <div class="thank-you-card">
-          <span class="card-label">感謝</span>
-
-          <div class="donor-name">
-            王*捐 <span>小姐</span>
-          </div>
-
-          <div class="donation-action">
-            捐贈
-          </div>
-
-          <div class="donation-item">
-            衣物 6箱
-          </div>
-
-          <div class="organization">
-            至某某社福機構
-          </div>
-        </div>
-
-
-        <!-- 感謝卡 2 -->
-        <div class="thank-you-card">
-          <span class="card-label">感謝</span>
-
-          <div class="donor-name">
-            黃*偉 <span>先生</span>
-          </div>
-
-          <div class="donation-action">
-            捐贈
-          </div>
-
-          <div class="donation-item">
-            礦泉水 5箱
-          </div>
-
-          <div class="organization">
-            至花蓮地震災區
-          </div>
-        </div>
-
-
-        <!-- 感謝卡 3 -->
-        <div class="thank-you-card">
-          <span class="card-label">感謝</span>
-
-          <div class="donor-name">
-            林*華 <span>小姐</span>
-          </div>
-
-          <div class="donation-action">
-            捐贈
-          </div>
-
-          <div class="donation-item">
-            白米 10包
-          </div>
-
-          <div class="organization">
-            至某某社福機構
-          </div>
-        </div>
-
-
-        <!-- 感謝卡 4 -->
-        <div class="thank-you-card">
-          <span class="card-label">感謝</span>
-
-          <div class="donor-name">
-            匿名捐贈者
-          </div>
-
-          <div class="donation-action">
-            捐贈
-          </div>
-
-          <div class="donation-item">
-            生活用品
-          </div>
-
-          <div class="organization">
-            至某某社福機構
-          </div>
-        </div>
-
-
-        <!-- 感謝卡 5 -->
-        <div class="thank-you-card">
-          <span class="card-label">感謝</span>
-
-          <div class="donor-name">
-            陳*明 <span>先生</span>
-          </div>
-
-          <div class="donation-action">
-            捐贈
-          </div>
-
-          <div class="donation-item">
-            防寒衣物 3箱
-          </div>
-
-          <div class="organization">
-            至花蓮地震災區
-          </div>
-        </div>
-
-
-        <!-- 感謝卡 6 -->
-        <div class="thank-you-card">
-          <span class="card-label">感謝</span>
-
-          <div class="donor-name">
-            李*婷 <span>小姐</span>
-          </div>
-
-          <div class="donation-action">
-            捐贈
-          </div>
-
-          <div class="donation-item">
-            文具用品 1箱
-          </div>
-
-          <div class="organization">
-            至某某社福機構
-          </div>
-        </div>
-
-        <!-- 感謝卡 7 -->
-        <div class="thank-you-card">
-          <span class="card-label">感謝</span>
-
-          <div class="donor-name">
-            王*國 <span>先生</span>
-          </div>
-
-          <div class="donation-action">
-            捐贈
-          </div>
-
-          <div class="donation-item">
-            泡麵 2箱
-          </div>
-
-          <div class="organization">
-            至花蓮地震災區
-          </div>
-        </div>
-
+        @if (isLoading()) {
+          <p class="wall-empty">感謝牆載入中...</p>
+        } @else if (errorText()) {
+          <p class="wall-empty">{{ errorText() }}</p>
+        } @else {
+          @for (item of thankService.wall(); track item.id) {
+            <article class="thank-you-card">
+              <div class="card-who">
+                <span class="card-label">感謝</span>
+                <div class="donor-name">
+                  {{ item.displayName }}
+                  @if (item.honorific) {
+                    <span>{{ item.honorific }}</span>
+                  }
+                </div>
+              </div>
+              <div class="card-what">
+                <span class="donation-action">捐贈</span>
+                <span class="donation-item">{{ item.donationItem }}</span>
+                <span class="organization">至{{ item.agencyName }}</span>
+              </div>
+            </article>
+          } @empty {
+            <p class="wall-empty">機構接受捐助後，會以遮罩姓名公開在這裡。</p>
+          }
+        }
       </div>
 
     </section>

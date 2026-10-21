@@ -31,12 +31,16 @@
   .thanks-content {
     display: inline-flex;
     align-items: center;
-    gap: 30px;
+    gap: 4.5rem;
     white-space: nowrap;
     font-size: 16px;
     letter-spacing: 0.5px;
 
-    animation: marquee 12s linear infinite;
+    animation-name: marquee;
+    animation-duration: 14s;
+    animation-timing-function: linear;
+    animation-iteration-count: 3;
+    animation-fill-mode: forwards;
 
   .thanks-item {
   display: inline-flex;

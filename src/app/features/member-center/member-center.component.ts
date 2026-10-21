@@ -3,14 +3,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { MemberMessageService } from '../../core/services/member-center/member-message.service';
+import { DonorHistoryComponent } from '../donor-history/donor-history.component';
 import { MemberAcknowledgementsComponent } from './member-acknowledgements/member-acknowledgements.component';
 import { MemberInboxComponent } from './member-inbox/member-inbox.component';
 import { MemberNotificationSettingsComponent } from './member-notification-settings/member-notification-settings.component';
 import { MemberProfileComponent } from './member-profile/member-profile.component';
 
-export type MemberTab = 'profile' | 'inbox' | 'acknowledgements' | 'notifications';
+export type MemberTab = 'profile' | 'inbox' | 'acknowledgements' | 'notifications' | 'history';
 
-const MEMBER_TABS: MemberTab[] = ['profile', 'inbox', 'acknowledgements', 'notifications'];
+const MEMBER_TABS: MemberTab[] = ['profile', 'inbox', 'acknowledgements', 'notifications', 'history'];
 
 @Component({
   selector: 'app-member-center',
@@ -19,6 +20,7 @@ const MEMBER_TABS: MemberTab[] = ['profile', 'inbox', 'acknowledgements', 'notif
     MemberInboxComponent,
     MemberAcknowledgementsComponent,
     MemberNotificationSettingsComponent,
+    DonorHistoryComponent,
   ],
   templateUrl: './member-center.component.html',
   styleUrl: './member-center.component.scss',

@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from '../database/supabase.service';
+import { AgencyReceiptIssuanceService } from '../agency/agency-receipt-issuance.service';
 
 export interface AgencyDashboardSummary {
   dailyDemandCount: number | null;
@@ -39,6 +40,8 @@ export interface DashboardReminderGroup {
   providedIn: 'root',
 })
 export class AgencyDashboardService {
+  private readonly receiptIssuanceService = inject(AgencyReceiptIssuanceService);
+
   constructor(private readonly supabaseService: SupabaseService) {}
 
   // 非常緊急日常需求
@@ -66,9 +69,16 @@ export class AgencyDashboardService {
 
   // 五張卡片統計
   async getSummary(): Promise<AgencyDashboardSummary> {
-    const [dailyDemandResult, pendingItemReviewResult, emergencyMaterialResult, emergencyVolunteerResult] = await Promise.all([
+    const [
+      dailyDemandResult,
+      pendingItemReviewResult,
+      pendingReceiptReviewResult,
+      emergencyMaterialResult,
+      emergencyVolunteerResult,
+    ] = await Promise.all([
       this.getPublishedDailyDemandCount(),
       this.getPendingItemReviewCount(),
+      this.receiptIssuanceService.countPending().catch(() => null),
       this.getPublishedEmergencyMaterialCount(),
       this.getPublishedEmergencyVolunteerCount(),
     ]);
@@ -76,7 +86,7 @@ export class AgencyDashboardService {
     return {
       dailyDemandCount: dailyDemandResult,
       pendingItemReviewCount: pendingItemReviewResult,
-      pendingReceiptReviewCount: null,
+      pendingReceiptReviewCount: pendingReceiptReviewResult,
       pendingReceivingCount: null,
       emergencyMaterialCount: emergencyMaterialResult,
       emergencyVolunteerCount: emergencyVolunteerResult,

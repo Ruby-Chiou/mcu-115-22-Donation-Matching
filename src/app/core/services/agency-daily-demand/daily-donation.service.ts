@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { firstValueFrom } from 'rxjs';
@@ -6,6 +6,8 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environment/environment';
 
 import { DonationFile, RecipientDonationReview } from '../../../models/agency/item-review';
+import { MemberSessionService } from '../member-center/member-session.service';
+import { PublicDonationThankService } from '../member-center/public-donation-thank.service';
 
 type DonationFileType = 'material_image' | 'material_video';
 
@@ -42,6 +44,9 @@ export class DonationService {
 
   private readonly supabase: SupabaseClient = createClient(environment.supabaseUrl, environment.supabasePublishableKey);
 
+  private readonly memberSession = inject(MemberSessionService);
+  private readonly publicThanks = inject(PublicDonationThankService);
+
   constructor(private readonly http: HttpClient) {}
 
   async createDonation(data: {
@@ -59,10 +64,13 @@ export class DonationService {
     materialFiles: File[];
     materialVideoFiles: File[];
   }) {
+    const donorUid = await this.resolveDonorUid();
+
     const { data: donation, error: donationError } = await this.supabase
       .from(this.tableName)
       .insert({
         demand_id: data.demandId,
+        donor_uid: donorUid,
         donor_name: data.donorName,
         phone: data.phone,
         actual_material: data.actualMaterial,
@@ -151,6 +159,15 @@ export class DonationService {
       .toLowerCase();
 
     return extension ? `${baseName}.${extension}` : baseName;
+  }
+
+  /** 登入會員或開發用 demo uid；訪客捐助則不寫入身分。 */
+  private async resolveDonorUid(): Promise<string | null> {
+    try {
+      return await this.memberSession.getCurrentUid();
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -367,6 +384,16 @@ export class DonationService {
       console.error('更新人工審核結果失敗：', error);
 
       throw error;
+    }
+
+    if (!isAccepted) {
+      return;
+    }
+
+    try {
+      await this.publicThanks.publishApprovedDonation(donationId);
+    } catch (publishError) {
+      console.error('公開到感謝牆失敗：', publishError);
     }
   }
 }

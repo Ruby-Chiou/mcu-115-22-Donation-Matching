@@ -1,0 +1,162 @@
+.preview-page {
+  width: min(980px, calc(100% - 48px));
+  margin: 48px auto 80px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ghost-btn,
+.save-btn {
+  padding: 10px 22px;
+  border-radius: 20px;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ghost-btn {
+  border: 1px solid #1565c0;
+  background: #fff;
+  color: #1565c0;
+}
+
+.save-btn {
+  border: 0;
+  background: #1565c0;
+  color: #fff;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.draft-note,
+.state-text {
+  color: #8d6e00;
+  line-height: 1.6;
+}
+
+.error-text {
+  color: #c62828;
+}
+
+.receipt-sheet {
+  padding: 40px 44px 32px;
+  border: 2px solid #1565c0;
+  border-radius: 12px;
+  background: #f7fbff;
+  font-size: 20px;
+
+  header {
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 10px 0;
+    color: #1565c0;
+    letter-spacing: 0.45em;
+    font-size: 40px;
+  }
+
+  .system-label,
+  .receipt-no {
+    margin: 0;
+    color: #475569;
+    font-size: 18px;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 128px 1fr;
+    row-gap: 16px;
+    margin: 0;
+    font-size: 20px;
+  }
+
+  dt {
+    color: #475569;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+    color: #0f172a;
+  }
+
+  footer {
+    margin-top: 28px;
+    color: #475569;
+    text-align: center;
+    font-size: 16px;
+  }
+}
+
+.seal-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 28px;
+  margin-top: 36px;
+}
+
+.seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  img {
+    object-fit: contain;
+  }
+
+  p {
+    margin: 0;
+    color: #475569;
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
+
+.seal-large img,
+.seal-large .seal-placeholder {
+  width: 150px;
+  height: 150px;
+}
+
+.seal-small img,
+.seal-small .seal-placeholder {
+  width: 96px;
+  height: 96px;
+}
+
+.seal-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #94a3b8;
+  border-radius: 50%;
+  color: #94a3b8;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .preview-page {
+    width: auto;
+    margin: 0;
+  }
+}

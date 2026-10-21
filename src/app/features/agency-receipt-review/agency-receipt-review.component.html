@@ -1,1 +1,152 @@
-<p>agency-receipt-review works!</p>
+<div class="workspace-title">
+  <h1>捐助發票與感謝狀</h1>
+</div>
+
+<div class="container">
+  <div class="top-action-bar">
+    <a class="ghost-btn" routerLink="/agency/dashboard">返回總控台</a>
+    <span class="pending-chip">待處理 {{ pendingCount() }} 筆</span>
+  </div>
+
+  <div class="toolbar-row">
+    <div class="filter-chips" role="tablist" aria-label="核發狀態篩選">
+      @for (option of filterOptions; track option.value) {
+        <button
+          type="button"
+          class="chip"
+          [class.active]="activeFilter() === option.value"
+          (click)="setFilter(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+
+    <input
+      type="search"
+      class="search-input"
+      placeholder="搜尋捐助者、物資或收據編號"
+      [value]="keyword()"
+      (input)="onKeywordInput($event)"
+    />
+  </div>
+
+  @if (errorText() && !uploadTask()) {
+    <p class="error-text" role="alert">{{ errorText() }}</p>
+  }
+
+  @if (notice()) {
+    <p class="notice-text" role="status">{{ notice() }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="state-text">清單載入中...</p>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        @if (filteredTasks().length === 0) {
+          <tr>
+            <td colspan="8" class="empty-message">
+              <div class="empty-title">目前沒有符合條件的核發項目</div>
+              <div class="empty-description">已通過審核且申請收據或感謝狀的捐助會出現在這裡。</div>
+            </td>
+          </tr>
+        } @else {
+          <thead>
+            <tr>
+              <th class="donor-column">捐助者</th>
+              <th class="item-column">捐贈內容</th>
+              <th class="qty-column">數量</th>
+              <th class="method-column">方式</th>
+              <th class="date-column">捐贈日期</th>
+              <th class="status-column">收據</th>
+              <th class="status-column">感謝狀</th>
+              <th class="operation-column">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (task of filteredTasks(); track task.donationId) {
+              <tr>
+                <td>{{ task.donorName || '未填姓名' }}</td>
+                <td class="item-column" [title]="task.actualMaterial || task.demandItem">
+                  <div class="item-text">{{ task.actualMaterial || task.demandItem }}</div>
+                </td>
+                <td>{{ task.quantity }}</td>
+                <td>{{ task.donationMethod || '—' }}</td>
+                <td>{{ task.donationDate | date: 'yyyy/MM/dd' }}</td>
+                <td [class.status-done]="task.receiptIssued" [class.status-wait]="task.needReceipt && !task.receiptIssued">
+                  {{ receiptStatus(task) }}
+                  @if (task.receiptNo) {
+                    <div class="sub">{{ task.receiptNo }}</div>
+                  }
+                </td>
+                <td [class.status-done]="task.certificateUploaded" [class.status-wait]="task.needThankYou && !task.certificateUploaded">
+                  {{ certificateStatus(task) }}
+                </td>
+                <td class="operation-column">
+                  <div class="operation-flex">
+                    @if (task.needReceipt) {
+                      <button type="button" (click)="goToEdit(task)">編輯</button>
+                      <button type="button" (click)="goToPreview(task)">預覽</button>
+                    }
+                    @if (task.needThankYou) {
+                      <button type="button" (click)="openUpload(task)">感謝狀</button>
+                    }
+                    @if (!task.needReceipt && !task.needThankYou) {
+                      <span class="muted">—</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        }
+      </table>
+    </div>
+  }
+</div>
+
+@if (uploadTask(); as task) {
+  <div class="modal-backdrop" (click)="closeUpload()">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="upload-title" (click)="$event.stopPropagation()">
+      <h2 id="upload-title">上傳感謝狀</h2>
+      <p class="modal-target">{{ task.donorName }} · {{ task.actualMaterial || task.demandItem }}</p>
+
+      @if (errorText()) {
+        <p class="error-text" role="alert">{{ errorText() }}</p>
+      }
+
+      <label class="field">
+        <span>受贈機構名稱</span>
+        <input type="text" [ngModel]="certificateAgencyName()" (ngModelChange)="certificateAgencyName.set($event)" maxlength="60" />
+      </label>
+
+      <label class="field">
+        <span>檔案（PDF / JPG / PNG / WEBP，8MB 內）</span>
+        <input type="file" [accept]="issuanceService.certificateAccept" (change)="onCertificateSelected($event)" />
+      </label>
+
+      @if (selectedFileName()) {
+        <p class="file-name">已選：{{ selectedFileName() }}</p>
+      }
+
+      <label class="field">
+        <span>備註（選填）</span>
+        <input
+          type="text"
+          [ngModel]="certificateNote()"
+          (ngModelChange)="certificateNote.set($event)"
+          maxlength="120"
+          placeholder="例如：紙本已寄出／電子檔"
+        />
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost-btn" (click)="closeUpload()" [disabled]="isUploading()">取消</button>
+        <button type="button" class="save-btn" (click)="uploadCertificate()" [disabled]="isUploading()">
+          {{ isUploading() ? '上傳中...' : '上傳' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

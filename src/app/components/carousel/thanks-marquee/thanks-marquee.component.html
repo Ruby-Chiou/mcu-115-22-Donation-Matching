@@ -1,31 +1,20 @@
 <!-- ========================================== -->
   <!-- 感謝跑馬燈 -->
   <!-- ========================================== -->
+  @if (marqueeItems().length && !finished()) {
   <div
   class="global-thanks-bar"
   [class.marquee-top]="isHeaderHidden"
 >
     <div class="thanks-track">
-      <div class="thanks-content">
-
-        <!-- 第一筆感謝紀錄 -->
-        <div class="thanks-item">
-          <i class="fa-solid fa-heart"></i>
-          <span>
-            感謝：<strong>王*捐</strong> 小姐捐助
-            <strong>衣物 6箱</strong> 至 某某社福機構
-          </span>
-        </div>
-
-        <!-- 第二筆感謝紀錄 -->
-        <div class="thanks-item">
-          <i class="fa-solid fa-heart"></i>
-          <span>
-            感謝：<strong>黃*偉</strong> 先生捐助
-            <strong>礦泉水 5箱</strong> 至 花蓮地震災區
-          </span>
-        </div>
-
+      <div class="thanks-content" [style.animation-duration.s]="scrollSeconds()" (animationend)="onMarqueeEnd($event)">
+        @for (item of marqueeItems(); track item.id) {
+          <div class="thanks-item">
+            <i class="fa-solid fa-heart"></i>
+            <span>感謝 <strong>{{ item.displayName }}</strong> 寄出 {{ item.donationItem }}</span>
+          </div>
+        }
       </div>
     </div>
   </div>
+  }

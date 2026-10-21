@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { PublicDonationThankService } from '../../../core/services/member-center/public-donation-thank.service';
 import { ThanksMarqueeComponent } from './thanks-marquee.component';
 
 describe('ThanksMarqueeComponent', () => {
@@ -9,6 +10,15 @@ describe('ThanksMarqueeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ThanksMarqueeComponent],
+      providers: [
+        {
+          provide: PublicDonationThankService,
+          useValue: {
+            broadcasts: () => [],
+            loadBroadcasts: async () => [],
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ThanksMarqueeComponent);

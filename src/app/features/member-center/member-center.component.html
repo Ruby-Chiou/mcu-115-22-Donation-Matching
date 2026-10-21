@@ -53,6 +53,19 @@
   >
     捐贈回饋
   </button>
+
+  <span class="switch-divider" aria-hidden="true"> | </span>
+
+  <button
+    type="button"
+    role="tab"
+    class="switch-button"
+    [class.active]="activeTab() === 'history'"
+    [attr.aria-selected]="activeTab() === 'history'"
+    (click)="selectTab('history')"
+  >
+    捐助紀錄
+  </button>
 </div>
 
 <section class="member-content">
@@ -64,5 +77,7 @@
   <app-member-acknowledgements />
   } @case ('notifications') {
   <app-member-notification-settings />
+  } @case ('history') {
+  <app-donor-history [embedded]="true" />
   } }
 </section>

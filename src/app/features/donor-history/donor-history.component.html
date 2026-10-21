@@ -1,1 +1,269 @@
-<p>donor-history works!</p>
+@if (!embedded()) {
+  <div class="workspace-title">
+    <h1>捐助歷史與進度</h1>
+    <p>查看您送出的日常捐助紀錄、審核狀態與進度。</p>
+  </div>
+}
+
+@if (embedded()) {
+  <p class="section-hint">依登入身分顯示您的日常捐助紀錄與審核進度。物流單號請至「配送查詢」。</p>
+}
+
+<div class="history-toolbar">
+  <div class="filter-chips" role="tablist" aria-label="捐助狀態篩選">
+    @for (option of filterOptions; track option.value) {
+      <button
+        type="button"
+        class="chip"
+        role="tab"
+        [class.active]="activeFilter() === option.value"
+        [attr.aria-selected]="activeFilter() === option.value"
+        (click)="setFilter(option.value)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+
+  <input
+    type="search"
+    class="search-input"
+    placeholder="搜尋物資、需求或收件人"
+    [value]="keyword()"
+    (input)="onKeywordInput($event)"
+  />
+</div>
+
+@if (errorText()) {
+  <p class="error-text" role="alert">{{ errorText() }}</p>
+}
+
+@if (isLoading()) {
+  <p class="state-text">捐助紀錄載入中...</p>
+} @else {
+  <div class="history-layout">
+    <ul class="record-list">
+      @for (record of filteredRecords(); track record.id) {
+        <li
+          class="record-item"
+          [class.selected]="selectedId() === record.id"
+          (click)="selectRecord(record)"
+        >
+          <div class="record-top">
+            <span class="material">{{ record.actualMaterial }}</span>
+            <span class="status-badge" [attr.data-tone]="statusTone(record.status)">
+              {{ statusLabels[record.status] }}
+            </span>
+          </div>
+          <div class="record-meta">
+            <span>需求：{{ record.demandItem }}</span>
+            <span>{{ record.createdAt | date: 'yyyy/MM/dd HH:mm' }}</span>
+          </div>
+          <div class="record-sub">
+            <span>{{ record.quantity }} {{ record.donationMethod ? '· ' + record.donationMethod : '' }}</span>
+            @if (record.recipient) {
+              <span>收件：{{ record.recipient }}</span>
+            }
+          </div>
+        </li>
+      } @empty {
+        <li class="empty">
+          尚無符合條件的捐助紀錄。
+          <a routerLink="/donor/daily">前往日常捐助</a>
+        </li>
+      }
+    </ul>
+
+    <div class="detail-panel">
+      @if (selectedRecord(); as record) {
+        <article class="detail-card">
+          <header>
+            <h3>{{ record.actualMaterial }}</h3>
+            <span class="status-badge" [attr.data-tone]="statusTone(record.status)">
+              {{ statusLabels[record.status] }}
+            </span>
+          </header>
+
+          <ol class="progress-track" aria-label="捐助進度">
+            @for (step of progressSteps(record); track step.label) {
+              <li [class.done]="step.done" [class.current]="step.current">
+                <span class="dot" aria-hidden="true"></span>
+                <span>{{ step.label }}</span>
+              </li>
+            }
+          </ol>
+
+          <dl class="detail-list">
+            <dt>需求物資</dt>
+            <dd>{{ record.demandItem }}</dd>
+
+            @if (record.demandCategory) {
+              <dt>類別</dt>
+              <dd>{{ record.demandCategory }}</dd>
+            }
+
+            <dt>捐贈數量</dt>
+            <dd>{{ record.quantity }}</dd>
+
+            <dt>捐贈方式</dt>
+            <dd>{{ record.donationMethod || '—' }}</dd>
+
+            <dt>提交時間</dt>
+            <dd>{{ record.createdAt | date: 'yyyy/MM/dd HH:mm' }}</dd>
+
+            @if (record.recipient) {
+              <dt>收件人</dt>
+              <dd>{{ record.recipient }}</dd>
+            }
+
+            @if (record.address) {
+              <dt>收件地址</dt>
+              <dd>{{ record.address }}</dd>
+            }
+
+            <dt>AI 審核</dt>
+            <dd>
+              @if (record.aiDecision === 'accepted') {
+                通過
+              } @else if (record.aiDecision === 'rejected') {
+                不通過
+              } @else {
+                尚未完成
+              }
+              @if (record.aiCheckedAt) {
+                <span class="muted">（{{ record.aiCheckedAt | date: 'MM/dd HH:mm' }}）</span>
+              }
+              @if (record.aiReason) {
+                <p class="reason">{{ record.aiReason }}</p>
+              }
+            </dd>
+
+            <dt>機構審核</dt>
+            <dd>
+              @if (record.status === 'human_approved') {
+                已接受
+              } @else if (record.status === 'human_rejected') {
+                不接受
+              } @else {
+                尚未決定
+              }
+              @if (record.humanCheckedAt) {
+                <span class="muted">（{{ record.humanCheckedAt | date: 'MM/dd HH:mm' }}）</span>
+              }
+              @if (record.humanReason) {
+                <p class="reason">{{ record.humanReason }}</p>
+              }
+            </dd>
+
+            <dt>回饋需求</dt>
+            <dd>
+              收據：{{ record.needReceipt ? '需要' : '不需要' }}　
+              感謝狀：{{ record.needThankYou ? '需要' : '不需要' }}
+            </dd>
+
+            @if (record.note) {
+              <dt>備註</dt>
+              <dd>{{ record.note }}</dd>
+            }
+          </dl>
+
+          @if (record.status === 'human_approved' && record.donationMethod === '寄送') {
+            <form class="tracking-form" (submit)="$event.preventDefault(); saveTracking(record)">
+              <label for="tracking-no">物流單號</label>
+              <input
+                id="tracking-no"
+                [value]="trackingDraft()"
+                (input)="onTrackingInput($event)"
+                placeholder="寄出後填上單號"
+                autocomplete="off"
+              />
+              <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
+                {{ trackingSaving() ? '上傳中...' : record.trackingNo ? '更新單號' : '上傳單號' }}
+              </button>
+              <p class="shortcut-hint">物資審核已通過。上傳物流單號後，才會在全站跑馬燈廣播。</p>
+              @if (trackingMessage()) {
+                <p class="tracking-message">{{ trackingMessage() }}</p>
+              }
+            </form>
+          }
+
+          <div class="detail-actions">
+            <a class="btn btn-outline" [routerLink]="['/donor/daily/detail', record.demandId]">查看原需求</a>
+            <a class="btn btn-primary" routerLink="/tracking">配送查詢</a>
+            <button type="button" class="btn btn-outline" [disabled]="!receiptOf(record)" (click)="openViewer('receipt')">
+              查看捐助發票
+            </button>
+            <button type="button" class="btn btn-outline" [disabled]="!certificateOf(record)" (click)="openViewer('certificate')">
+              查看感謝狀
+            </button>
+            <button type="button" class="btn btn-outline" [disabled]="!publicThankOf(record)" (click)="openViewer('public')">
+              查看系統公開捐助
+            </button>
+          </div>
+          <p class="shortcut-hint">尚未開立的發票、感謝狀或公開感謝，按鈕會先停用。</p>
+        </article>
+      } @else {
+        <p class="state-text">請從左側選擇一筆捐助紀錄</p>
+      }
+    </div>
+  </div>
+
+  @if (viewerKind(); as kind) {
+    @if (selectedRecord(); as record) {
+      <div class="viewer-backdrop" (click)="closeViewer()">
+        <div class="viewer-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+          <header class="viewer-head">
+            <h3>
+              @switch (kind) {
+                @case ('receipt') { 捐助發票 }
+                @case ('certificate') { 感謝狀 }
+                @case ('public') { 系統公開捐助 }
+              }
+            </h3>
+            <button type="button" class="btn btn-outline" (click)="closeViewer()">關閉</button>
+          </header>
+
+          @switch (kind) {
+            @case ('receipt') {
+              @if (receiptOf(record); as receipt) {
+                <div #sheetHost class="viewer-sheet">
+                  <app-donation-receipt-sheet [sheet]="receipt" />
+                </div>
+                <div class="viewer-actions">
+                  <button type="button" class="btn btn-primary" (click)="downloadPdf(sheetHost, receipt)">下載 PDF</button>
+                </div>
+              }
+            }
+            @case ('certificate') {
+              @if (certificateOf(record); as certificate) {
+                <p class="viewer-caption">{{ certificate.agencyName }}　{{ certificate.donationItem }}</p>
+                @if (isImageCertificate(certificate.mimeType)) {
+                  <img class="viewer-file" [src]="certificate.fileUrl" [alt]="certificate.fileName" />
+                } @else if (isPdfCertificate(certificate.mimeType)) {
+                  <embed class="viewer-file" [src]="pdfUrl(certificate.fileUrl)" type="application/pdf" />
+                }
+                <div class="viewer-actions">
+                  <a class="btn btn-primary" [href]="certificate.fileUrl" target="_blank" rel="noopener">開啟完整檔案</a>
+                </div>
+              }
+            }
+            @case ('public') {
+              @if (publicThankOf(record); as item) {
+                <article class="public-card">
+                  <span class="card-label">感謝</span>
+                  <p class="donor-name">{{ item.displayName }} {{ item.honorific }}</p>
+                  <p>捐贈 {{ item.donationItem }}</p>
+                  <p>至{{ item.agencyName }}</p>
+                  <p class="muted">{{ item.publishedAt | date: 'yyyy/MM/dd' }}</p>
+                </article>
+                <div class="viewer-actions">
+                  <a class="btn btn-primary" routerLink="/thank-you-wall">前往感謝牆</a>
+                </div>
+              }
+            }
+          }
+        </div>
+      </div>
+    }
+  }
+}
