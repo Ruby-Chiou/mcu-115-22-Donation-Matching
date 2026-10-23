@@ -15,18 +15,23 @@ insert into public.donor_receipts
   (
     "receiptNo", "donorUid", "donorName", "receiptTitle", "agencyName", "donationItem", "donationDate",
     "agencyNameEn", "orgTaxId", "approvalNo", "donorIdNo", "donorAddress", "donorPhone", "note",
-    "accountName", "postalAccount", "orgPhone", "orgFax", "orgEmail", "orgAddress", "handlerName"
+    "accountName", "postalAccount", "orgPhone", "orgFax", "orgEmail", "orgAddress", "handlerName",
+    "donorEmail", "handoverMethod", "completedOn", "lineItems"
   )
 values
   (
     'RC-2026-0001', 'dev-donor-001', '測試捐助者', '測試捐助者', '陽光兒童之家', '冬季衣物 20 件', '2026-10-01',
     'Sunshine Children Home', '87654321', '衛部救字第1150001234號', 'A123456789', '台北市中正區示範路1號', '0912345678', '冬季衣物，供安置使用',
-    '陽光兒童之家', '12345678', '02-2345-6789', '02-2345-6790', 'sunshine@example.org', '台北市大安區希望路10號', '林小安'
+    '陽光兒童之家', '12345678', '02-2345-6789', '02-2345-6790', 'sunshine@example.org', '台北市大安區希望路10號', '林小安',
+    'donor@example.com', '寄送', '2026-10-01',
+    '[{"name":"冬季衣物","quantity":20,"unit":"件","estimatedPrice":150}]'::jsonb
   ),
   (
     'RC-2026-0002', 'dev-donor-001', '測試捐助者', '測試捐助者', '長青關懷協會', '成人紙尿褲 10 箱', '2026-09-15',
     'Evergreen Care Association', '11223344', '衛部救字第1140005678號', 'A123456789', '台北市中正區示範路1號', '0912345678', '成人紙尿褲，供長照使用',
-    '長青關懷協會', '87654321', '02-8765-4321', '02-8765-4322', 'evergreen@example.org', '新北市板橋區長青街20號', '陳志明'
+    '長青關懷協會', '87654321', '02-8765-4321', '02-8765-4322', 'evergreen@example.org', '新北市板橋區長青街20號', '陳志明',
+    'donor@example.com', '面交', '2026-09-15',
+    '[{"name":"成人紙尿褲","quantity":10,"unit":"箱","estimatedPrice":450}]'::jsonb
   )
 on conflict ("receiptNo") do nothing;
 

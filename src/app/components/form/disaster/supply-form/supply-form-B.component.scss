@@ -127,32 +127,36 @@
 }
 
 .button-area button {
-  padding: 8px 18px;
-  border: none;
-  border-radius: 15px;
+  min-height: 44px;
+  min-width: 88px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
   cursor: pointer;
-  color: white;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-/*按鈕顏色*/
-.save-btn {
-  background-color: var(--color-brand-primary);
-  color: white;
+.button-area .save-btn {
+  background: #1565c0;
+  color: #fff;
 }
 
-.back-btn {
-  background-color: #64b5f6;
-  color: #0d47a1;
+.button-area .back-btn {
+  border: 2px solid #1565c0;
+  background: #fff;
+  color: #1565c0;
 }
 
 .back-btn:hover {
-  background-color: #42a5f5;
+  background: #e3f2fd;
+  opacity: 1;
 }
 
-.button-area button:hover {
-  opacity: 0.85;
+.save-btn:hover {
+  background: #0d47a1;
+  opacity: 1;
 }
 
 /*必填標記與提示*/
@@ -236,8 +240,9 @@
 /* 物資狀態區（與服務對象區完全對稱）*/
 .condition-area {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: 114px;
+  gap: 24px 32px;
   margin-top: 35px;
   margin-bottom: 35px;
 }
@@ -248,31 +253,31 @@
 }
 
 .custom-condition-section {
-  width: calc(100% - 380px);
-  flex-shrink: 0;
+  flex: 1 1 280px;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .custom-condition-list {
   display: grid;
-  grid-template-columns: repeat(2, 440px);
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column;
-  column-gap: 30px;
-  row-gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px 20px;
+  width: 100%;
 }
 
 .custom-condition-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 440px;
-  height: 42px;
-  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
 }
 
 .custom-condition-input {
-  width: 320px !important;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  width: auto !important;
+  min-width: 0;
   margin-bottom: 0 !important;
 }
 

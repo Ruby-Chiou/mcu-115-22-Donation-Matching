@@ -77,27 +77,27 @@
 
             <th style="width: 4%">編號</th>
 
-            <th class="item-column" style="width: 12%">需求物</th>
+            <th class="item-column" style="width: 11%">需求物</th>
 
-            <th class="category-column" style="width: 8.5%">類別</th>
+            <th class="category-column" style="width: 10%">類別</th>
 
-            <th style="width: 7%">需求數量</th>
+            <th style="width: 5.5%">需求數量</th>
 
             <th style="width: 7%">緊急優先度</th>
 
-            <th style="width: 7%">剩餘需求</th>
+            <th style="width: 5.5%">剩餘需求</th>
 
-            <th style="width: 7%">接收方式</th>
+            <th style="width: 5.5%">接收方式</th>
 
-            <th class="created-time-column" style="width: 6.5%">建立日期</th>
+            <th class="created-time-column" style="width: 7%">建立日期</th>
 
-            <th class="published-time-column" style="width: 6.5%">上架日期</th>
+            <th class="published-time-column" style="width: 7%">上架日期</th>
 
-            <th class="off-shelf-time-column" style="width: 7.5%">預計下架日期</th>
+            <th class="off-shelf-time-column" style="width: 8.5%">預計下架日期</th>
 
-            <th class="message-column" style="width: 4.5%">留言區</th>
+            <th class="message-column" style="width: 6%">留言區</th>
 
-            <th class="operation-column" style="width: 19%">操作</th>
+            <th class="operation-column" style="width: 19.5%">操作</th>
           </tr>
         </thead>
 
@@ -124,14 +124,17 @@
             <td>{{ item.amount }} {{ item.unit }}</td>
 
             <!-- 優先度 -->
-            <td
-              [ngClass]="{
-                'normal': item.priority === '普通',
-                'urgent': item.priority === '緊急',
-                'very-urgent': item.priority === '非常緊急'
-              }"
-            >
-              {{ item.priority }}
+            <td>
+              <span
+                class="priority-pill"
+                [ngClass]="{
+                  'normal': item.priority === '普通',
+                  'urgent': item.priority === '緊急',
+                  'very-urgent': item.priority === '非常緊急'
+                }"
+              >
+                {{ item.priority }}
+              </span>
             </td>
 
             <!-- 剩餘需求 -->
@@ -213,13 +216,13 @@
             <td class="operation-column">
               <div class="operation-flex">
                 <!-- 查看 -->
-                <button (click)="goToDetail(item.serialNo)">查看</button>
+                <button type="button" class="op-btn op-view" (click)="goToDetail(item.serialNo)">查看</button>
 
                 <!-- 編輯 -->
-                <button (click)="goToEdit(item.id!)">編輯</button>
+                <button type="button" class="op-btn op-edit" (click)="goToEdit(item.id!)">編輯</button>
 
                 <!-- 刪除 -->
-                <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
+                <button type="button" class="op-btn op-delete" (click)="openDeleteModal(item.id!)">刪除</button>
 
                 <!-- 狀態下拉選單 -->
                 <select

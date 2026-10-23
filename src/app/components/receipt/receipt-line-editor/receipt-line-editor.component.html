@@ -1,0 +1,25 @@
+<div class="line-editor">
+  @for (line of lines(); track $index) {
+    <div class="line-row">
+      <label>
+        品項
+        <input [value]="line.name" maxlength="40" (input)="patch($index, 'name', inputValue($event))" />
+      </label>
+      <label>
+        數量
+        <input type="number" min="1" step="1" [value]="line.quantity" (input)="patchQuantity($index, inputValue($event))" />
+      </label>
+      <label>
+        單位
+        <input [value]="line.unit" maxlength="10" (input)="patch($index, 'unit', inputValue($event))" />
+      </label>
+      <label>
+        預估單價
+        <input type="number" min="0" step="1" [value]="line.estimatedPrice ?? ''" (input)="patchPrice($index, inputValue($event))" />
+      </label>
+      <button type="button" (click)="removeLine($index)" [disabled]="lines().length === 1">移除</button>
+    </div>
+  }
+
+  <button type="button" class="add-line" (click)="addLine()">新增一筆物資</button>
+</div>

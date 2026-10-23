@@ -46,14 +46,15 @@
       <table>
         @if (filteredTasks().length === 0) {
           <tr>
-            <td colspan="8" class="empty-message">
+            <td colspan="9" class="empty-message">
               <div class="empty-title">目前沒有符合條件的核發項目</div>
-              <div class="empty-description">已通過審核且申請收據或感謝狀的捐助會出現在這裡。</div>
+              <div class="empty-description">已通過審核的捐助都會留在這裡。沒有申請收據或感謝狀的也會保留，方便交叉比對。</div>
             </td>
           </tr>
         } @else {
           <thead>
             <tr>
+              <th class="serial-column">序號</th>
               <th class="donor-column">捐助者</th>
               <th class="item-column">捐贈內容</th>
               <th class="qty-column">數量</th>
@@ -65,8 +66,9 @@
             </tr>
           </thead>
           <tbody>
-            @for (task of filteredTasks(); track task.donationId) {
+            @for (task of filteredTasks(); track task.donationId; let index = $index) {
               <tr>
+                <td class="serial-column">{{ index + 1 }}</td>
                 <td>{{ task.donorName || '未填姓名' }}</td>
                 <td class="item-column" [title]="task.actualMaterial || task.demandItem">
                   <div class="item-text">{{ task.actualMaterial || task.demandItem }}</div>
@@ -74,23 +76,27 @@
                 <td>{{ task.quantity }}</td>
                 <td>{{ task.donationMethod || '—' }}</td>
                 <td>{{ task.donationDate | date: 'yyyy/MM/dd' }}</td>
-                <td [class.status-done]="task.receiptIssued" [class.status-wait]="task.needReceipt && !task.receiptIssued">
-                  {{ receiptStatus(task) }}
+                <td>
+                  <span class="status-pill" [class.done]="task.receiptIssued" [class.wait]="task.needReceipt && !task.receiptIssued">
+                    {{ receiptStatus(task) }}
+                  </span>
                   @if (task.receiptNo) {
                     <div class="sub">{{ task.receiptNo }}</div>
                   }
                 </td>
-                <td [class.status-done]="task.certificateUploaded" [class.status-wait]="task.needThankYou && !task.certificateUploaded">
-                  {{ certificateStatus(task) }}
+                <td>
+                  <span class="status-pill" [class.done]="task.certificateUploaded" [class.wait]="task.needThankYou && !task.certificateUploaded">
+                    {{ certificateStatus(task) }}
+                  </span>
                 </td>
                 <td class="operation-column">
                   <div class="operation-flex">
                     @if (task.needReceipt) {
-                      <button type="button" (click)="goToEdit(task)">編輯</button>
-                      <button type="button" (click)="goToPreview(task)">預覽</button>
+                      <button type="button" class="op-btn op-edit" (click)="goToEdit(task)">編輯</button>
+                      <button type="button" class="op-btn op-preview" (click)="goToPreview(task)">預覽</button>
                     }
                     @if (task.needThankYou) {
-                      <button type="button" (click)="openUpload(task)">感謝狀</button>
+                      <button type="button" class="op-btn op-thanks" (click)="openUpload(task)">感謝狀</button>
                     }
                     @if (!task.needReceipt && !task.needThankYou) {
                       <span class="muted">—</span>

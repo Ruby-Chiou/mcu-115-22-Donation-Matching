@@ -5,10 +5,13 @@ import { CommonModule } from '@angular/common';
 
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
+import { DonorReceiptRequestComponent } from '../../../receipt/donor-receipt-request/donor-receipt-request.component';
+import { MemberProfileService } from '../../../../core/services/member-center/member-profile.service';
+import { ReceiptLineItem, emptyReceiptLine, validateDonorReceiptRequest } from '../../../../core/receipt/donation-receipt-document';
 
 @Component({
   selector: 'app-donor-disaster-supply-form',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, DonorReceiptRequestComponent],
   templateUrl: './donor-disaster-supply-form.component.html',
   styleUrl: './donor-disaster-supply-form.component.scss',
 })
@@ -27,8 +30,14 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   quantity: number | null = null;
   note = '';
   needReceipt = '';
-  receiptTitle = '';
-  taxId = '';
+  donorEmail = '';
+  donorIdNo = '';
+  receiptLines: ReceiptLineItem[] = [];
+  receiptAgreed = false;
+  handoverMethod = '寄送';
+  private profileName = '';
+  private profilePhone = '';
+  private profileEmail = '';
   needThankYou = '';
   proofFile: File | null = null;
   proofFileName = '';
@@ -38,6 +47,7 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private disasterDemandService: DisasterDemandService,
+    private profileService: MemberProfileService,
     private cdr: ChangeDetectorRef
   ) {}
   // 初始化  //
@@ -62,6 +72,7 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       
       this.demand = demand;
       this.maxDonationQuantity = demand.remaining ?? 0;
+      await this.loadProfileDefaults();
       this.cdr.detectChanges();
     } catch (error) {
       alert('讀取需求或更新畫面失敗，請查看 Console');
@@ -87,11 +98,60 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   // 自動填入帳戶資料  //
   fillAccountInfo(): void {
     if (this.useAccountInfo) {
-      this.donorName = this.accountName;
-      this.phone = this.accountPhone;
+      this.donorName = this.profileName || this.accountName;
+      this.phone = this.profilePhone || this.accountPhone;
+      if (!this.donorEmail) {
+        this.donorEmail = this.profileEmail;
+      }
     } else {
       this.donorName = '';
       this.phone = '';
+    }
+  }
+
+  onNeedReceiptChange(value: string): void {
+    this.needReceipt = value;
+
+    if (value !== 'yes') {
+      this.receiptAgreed = false;
+      return;
+    }
+
+    if (!this.donorName) {
+      this.donorName = this.profileName;
+    }
+
+    if (!this.phone) {
+      this.phone = this.profilePhone;
+    }
+
+    if (!this.donorEmail) {
+      this.donorEmail = this.profileEmail;
+    }
+
+    if (this.receiptLines.length === 0) {
+      this.receiptLines = [emptyReceiptLine(this.actualMaterial || this.demand?.item || '', this.quantity && this.quantity > 0 ? this.quantity : 1)];
+    }
+  }
+
+  private async loadProfileDefaults(): Promise<void> {
+    try {
+      const profile = await this.profileService.loadProfile();
+      this.profileName = profile.fullName || profile.displayName || '';
+      this.profilePhone = profile.phoneNumber || '';
+      this.profileEmail = profile.email || '';
+
+      if (!this.donorName) {
+        this.donorName = this.profileName;
+      }
+
+      if (!this.phone) {
+        this.phone = this.profilePhone;
+      }
+
+      this.donorEmail = this.donorEmail || this.profileEmail;
+    } catch {
+      // 未登入時改由捐助者自行填寫。
     }
   }
   // 限制捐贈數量  //
@@ -166,10 +226,21 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       alert(`捐贈數量不可超過剩餘需求 ${this.maxDonationQuantity} ${this.demand?.unit ?? ''}`);
       return;
     }
-    // 如果需要收據，必須填寫收據抬頭
-    if (this.needReceipt === 'yes' && !this.receiptTitle.trim()) {
-      alert('請填寫收據抬頭');
-      return;
+    if (this.needReceipt === 'yes') {
+      const receiptError = validateDonorReceiptRequest({
+        donorName: this.donorName,
+        donorPhone: this.phone,
+        donorEmail: this.donorEmail,
+        donorIdNo: this.donorIdNo,
+        lines: this.receiptLines,
+        handoverMethod: this.handoverMethod,
+        agreed: this.receiptAgreed,
+      });
+
+      if (receiptError) {
+        alert(receiptError);
+        return;
+      }
     }
     // 模擬送出資料    //
     console.log('捐贈申請資料：', {
@@ -180,8 +251,9 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       quantity: this.quantity,
       unit: this.demand?.unit,
       needReceipt: this.needReceipt,
-      receiptTitle: this.receiptTitle,
-      taxId: this.taxId,
+      donorEmail: this.donorEmail,
+      donorIdNo: this.donorIdNo,
+      receiptLines: this.receiptLines,
       needThankYou: this.needThankYou,
       note: this.note,
     });

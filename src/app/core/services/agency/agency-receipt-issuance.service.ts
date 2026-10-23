@@ -1,8 +1,26 @@
 import { Injectable, inject, signal } from '@angular/core';
 
 import { environment } from '../../../../environment/environment';
+import {
+  DonationReceiptDocument,
+  normalizeDonorId,
+  lineFromItemText,
+  packReceiptLogistics,
+  parseReceiptLines,
+  readReceiptLogistics,
+  ReceiptLineItem,
+  receiptPdfFileName,
+  receiptQuantityTotal,
+  summarizeReceiptLines,
+  validateAgencyReceiptIssue,
+} from '../../receipt/donation-receipt-document';
+import { DonationReceiptPdfService } from '../../receipt/donation-receipt-pdf.service';
+import { isTaiwanId } from '../../receipt/taiwan-id';
+import { pdfBlob } from '../../receipt/receipt-file-download';
 import { AgencyReceiptTask, IssuedDonationReceipt, ReceiptDraft, ReceiptSealFiles } from '../../../models/agency/receipt-issuance';
+import { AGENCY_OFFICE } from '../../../models/user/agency';
 import { SupabaseService } from '../database/supabase.service';
+import { MemberMessageService } from '../member-center/member-message.service';
 import { PublicDonationThankService } from '../member-center/public-donation-thank.service';
 
 interface DonationRow {
@@ -10,21 +28,26 @@ interface DonationRow {
   donor_uid: string | null;
   donor_name: string | null;
   phone: string | null;
+  donor_email: string | null;
+  donor_id_no: string | null;
   demand_id: number;
   actual_material: string | null;
   quantity: number | null;
   donation_method: string | null;
   receipt_title: string | null;
+  receipt_lines: unknown;
   tax_id: string | null;
   need_receipt: boolean | null;
   need_thank_you: boolean | null;
   status: string;
   created_at: string;
+  tracking_no: string | null;
 }
 
 interface DemandRow {
   id: number;
   item: string | null;
+  address: string | null;
 }
 
 interface ReceiptRow {
@@ -34,25 +57,22 @@ interface ReceiptRow {
   donorName: string | null;
   receiptTitle: string | null;
   agencyName: string | null;
-  agencyNameEn: string | null;
-  orgTaxId: string | null;
-  approvalNo: string | null;
   donorIdNo: string | null;
-  donorAddress: string | null;
   donorPhone: string | null;
+  donorEmail: string | null;
   donationItem: string | null;
   donationDate: string | null;
-  note: string | null;
-  accountName: string | null;
-  postalAccount: string | null;
   orgPhone: string | null;
-  orgFax: string | null;
-  orgEmail: string | null;
   orgAddress: string | null;
-  handlerName: string | null;
   issuedAt: string | null;
   largeSealUrl: string | null;
   smallSealUrl: string | null;
+  lineItems: unknown;
+  handoverMethod: string | null;
+  completedOn: string | null;
+  pdfUrl: string | null;
+  pdfFileName: string | null;
+  note: string | null;
 }
 
 interface CertificateRow {
@@ -74,15 +94,18 @@ export class AgencyReceiptIssuanceService {
   private readonly receiptTable = 'donor_receipts';
   private readonly certificateTable = 'agency_uploaded_certificates';
   private readonly certificateBucket = 'agency-certificates';
+  private readonly receiptBucket = 'donor-receipts';
 
   private readonly supabaseService = inject(SupabaseService);
   private readonly publicThanks = inject(PublicDonationThankService);
+  private readonly receiptPdf = inject(DonationReceiptPdfService);
+  private readonly messages = inject(MemberMessageService);
 
   private readonly tasksSignal = signal<AgencyReceiptTask[]>([]);
   readonly tasks = this.tasksSignal.asReadonly();
 
   readonly certificateAccept = CERTIFICATE_ACCEPT.join(',');
-  readonly defaultAgencyName = '示範社福機構';
+  readonly defaultAgencyName = AGENCY_OFFICE.agencyName;
 
   async loadTasks(): Promise<AgencyReceiptTask[]> {
     const { data, error } = await this.supabaseService.client
@@ -93,20 +116,23 @@ export class AgencyReceiptIssuanceService {
         donor_uid,
         donor_name,
         phone,
+        donor_email,
+        donor_id_no,
         demand_id,
         actual_material,
         quantity,
         donation_method,
         receipt_title,
+        receipt_lines,
         tax_id,
         need_receipt,
         need_thank_you,
         status,
-        created_at
+        created_at,
+        tracking_no
       `
       )
       .eq('status', 'human_approved')
-      .or('need_receipt.eq.true,need_thank_you.eq.true')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -125,19 +151,33 @@ export class AgencyReceiptIssuanceService {
     const tasks = rows.map((row) => {
       const receipt = receiptMap.get(row.id);
       const certificate = certificateMap.get(row.id);
+      const fallbackQuantity = row.quantity && row.quantity > 0 ? row.quantity : 1;
+      const issuedLines = receipt
+        ? parseReceiptLines(receipt.lineItems, receipt.donationItem ?? '', fallbackQuantity)
+        : [];
+      const demand = demandMap.get(row.demand_id);
+      const storedLogistics = readReceiptLogistics(receipt?.note);
+      const receiptLines = issuedLines.some((line) => line.name)
+        ? issuedLines
+        : this.linesFromDonation(row, demand?.item ?? '');
 
       return {
         donationId: row.id,
         donorUid: row.donor_uid ?? environment.memberDemoUid ?? '',
         donorName: row.donor_name ?? '',
         phone: row.phone ?? '',
+        donorEmail: row.donor_email ?? '',
+        donorIdNo: row.donor_id_no || row.tax_id || '',
         demandId: row.demand_id,
-        demandItem: demandMap.get(row.demand_id) ?? '（需求已移除）',
+        demandItem: demand?.item || '（需求已移除）',
         actualMaterial: row.actual_material ?? '',
-        quantity: row.quantity ?? 0,
+        quantity: receiptQuantityTotal(receiptLines) || row.quantity || 0,
         donationMethod: row.donation_method ?? '',
+        deliveryAddress: demand?.address || storedLogistics.deliveryAddress,
+        logisticsCarrier: storedLogistics.logisticsCarrier,
+        trackingNo: row.tracking_no || storedLogistics.trackingNo,
+        receiptLines,
         receiptTitle: row.receipt_title || row.donor_name || '',
-        taxId: row.tax_id ?? '',
         needReceipt: !!row.need_receipt,
         needThankYou: !!row.need_thank_you,
         receiptIssued: !!receipt,
@@ -162,36 +202,59 @@ export class AgencyReceiptIssuanceService {
 
   draftFromTask(task: AgencyReceiptTask): ReceiptDraft {
     const receipt = task.receipt;
+    const lines = receipt?.lines.length ? receipt.lines : this.linesFromTask(task);
 
     return {
       donorName: receipt?.donorName || task.donorName,
-      receiptTitle: receipt?.receiptTitle || task.receiptTitle || task.donorName,
-      agencyName: receipt?.agencyName || this.defaultAgencyName,
-      agencyNameEn: receipt?.agencyNameEn ?? '',
-      orgTaxId: receipt?.orgTaxId ?? '',
-      approvalNo: receipt?.approvalNo ?? '',
-      donorIdNo: receipt?.donorIdNo || task.taxId,
-      donorAddress: receipt?.donorAddress ?? '',
       donorPhone: receipt?.donorPhone || task.phone,
-      donationItem: receipt?.donationItem || this.describeDonation(task),
-      donationDate: (receipt?.donationDate || task.donationDate).slice(0, 10),
-      note: receipt?.note ?? '',
-      accountName: receipt?.accountName ?? '',
-      postalAccount: receipt?.postalAccount ?? '',
-      orgPhone: receipt?.orgPhone ?? '',
-      orgFax: receipt?.orgFax ?? '',
-      orgEmail: receipt?.orgEmail ?? '',
-      orgAddress: receipt?.orgAddress ?? '',
-      handlerName: receipt?.handlerName ?? '',
-      largeSealUrl: receipt?.largeSealUrl ?? '',
-      smallSealUrl: receipt?.smallSealUrl ?? '',
+      donorEmail: receipt?.donorEmail || task.donorEmail,
+      donorIdNo: receipt?.donorIdNo || task.donorIdNo,
+      receiptTitle: receipt?.receiptTitle || task.receiptTitle || task.donorName,
+      agencyName: AGENCY_OFFICE.agencyName,
+      agencyAddress: AGENCY_OFFICE.officeAddress,
+      agencyPhone: AGENCY_OFFICE.agencyPhone,
+      deliveryAddress: task.deliveryAddress,
+      logisticsCarrier: task.logisticsCarrier,
+      trackingNo: task.trackingNo,
+      lines,
+      handoverMethod: task.donationMethod || receipt?.handoverMethod || '',
+      completedOn: (receipt?.completedOn || task.donationDate).slice(0, 10),
+      orgSealUrl: receipt?.orgSealUrl ?? '',
+      officerSealUrl: receipt?.officerSealUrl ?? '',
     };
   }
 
+  /** 把目前留存的開啟密碼寄到捐助者收件匣。信件內容就是密碼，編輯頁本身不顯示。 */
+  async sendReceiptPassword(task: AgencyReceiptTask): Promise<void> {
+    if (!task.receiptIssued || !task.receipt) {
+      throw new Error('收據尚未開立，還不能寄送開啟密碼');
+    }
+
+    if (!task.donorUid) {
+      throw new Error('這位捐助者沒有會員帳號，無法寄到收件匣');
+    }
+
+    const password = normalizeDonorId(task.receipt.donorIdNo);
+
+    if (!isTaiwanId(password)) {
+      throw new Error('留存的身分證字號無效，請先更正再寄送');
+    }
+
+    const receiptNo = task.receipt.receiptNo;
+
+    await this.messages.sendMessage({
+      recipientUid: task.donorUid,
+      recipientName: task.donorName || '捐助者',
+      subject: `收據 ${receiptNo} 的開啟密碼`,
+      content: `您的捐贈收據（${receiptNo}）開啟密碼是：${password}\n請用這個密碼開啟 PDF，不要把這封信轉給其他人。`,
+    });
+  }
+
   /**
-   * 尚未開立時新增收據；已開立時更新內容，收據編號與開立日期維持不變。
+   * 寫入收據內容後產生加密 PDF，並把檔案留在捐助者的收據紀錄。
+   * 已開立的收據沿用原編號與開立日期。
    */
-  async saveReceipt(task: AgencyReceiptTask, draft: ReceiptDraft, seals: ReceiptSealFiles = { largeSeal: null, smallSeal: null }): Promise<void> {
+  async saveReceipt(task: AgencyReceiptTask, draft: ReceiptDraft, seals: ReceiptSealFiles = { orgSeal: null, officerSeal: null }): Promise<void> {
     if (!task.needReceipt) {
       throw new Error('此筆捐助未申請收據');
     }
@@ -201,33 +264,63 @@ export class AgencyReceiptIssuanceService {
     }
 
     const donorName = draft.donorName.trim();
+    const donorIdNo = normalizeDonorId(draft.donorIdNo);
+    const lines = draft.lines.map((line) => ({
+      name: line.name.trim(),
+      quantity: Number(line.quantity),
+      unit: line.unit.trim(),
+      estimatedPrice: line.estimatedPrice === null ? null : Number(line.estimatedPrice),
+    }));
+    const issueError = validateAgencyReceiptIssue({
+      donorName,
+      donorPhone: draft.donorPhone,
+      donorEmail: draft.donorEmail,
+      donorIdNo,
+      agencyName: draft.agencyName,
+      agencyAddress: draft.agencyAddress,
+      agencyPhone: draft.agencyPhone,
+      lines,
+      handoverMethod: draft.handoverMethod,
+      completedOn: draft.completedOn,
+    });
+
+    if (issueError) {
+      throw new Error(issueError);
+    }
+
+    const handoverMethod = draft.handoverMethod.trim();
+    const logisticsCarrier = handoverMethod === '寄送' ? draft.logisticsCarrier.trim() : '';
+    const trackingNo = handoverMethod === '寄送' ? draft.trackingNo.trim() : '';
+
+    if (handoverMethod === '寄送' && !logisticsCarrier) {
+      throw new Error('寄送的收據請選擇物流公司');
+    }
+
+    const donationItem = summarizeReceiptLines(lines);
     const payload = {
       donorName,
-      receiptTitle: draft.receiptTitle.trim() || donorName,
+      receiptTitle: donorName,
       agencyName: draft.agencyName.trim(),
-      agencyNameEn: draft.agencyNameEn.trim(),
-      orgTaxId: draft.orgTaxId.trim(),
-      approvalNo: draft.approvalNo.trim(),
-      donorIdNo: draft.donorIdNo.trim(),
-      donorAddress: draft.donorAddress.trim(),
+      donorIdNo,
       donorPhone: draft.donorPhone.trim(),
-      donationItem: draft.donationItem.trim(),
-      donationDate: draft.donationDate,
-      note: draft.note.trim(),
-      accountName: draft.accountName.trim(),
-      postalAccount: draft.postalAccount.trim(),
-      orgPhone: draft.orgPhone.trim(),
-      orgFax: draft.orgFax.trim(),
-      orgEmail: draft.orgEmail.trim(),
-      orgAddress: draft.orgAddress.trim(),
-      handlerName: draft.handlerName.trim(),
-      largeSealUrl: await this.resolveSealUrl(draft.largeSealUrl, seals.largeSeal, task.donationId, 'large'),
-      smallSealUrl: await this.resolveSealUrl(draft.smallSealUrl, seals.smallSeal, task.donationId, 'small'),
+      donorEmail: draft.donorEmail.trim(),
+      donationItem,
+      donationDate: draft.completedOn,
+      orgPhone: draft.agencyPhone.trim(),
+      orgAddress: draft.agencyAddress.trim(),
+      note: packReceiptLogistics({
+        deliveryAddress: draft.deliveryAddress,
+        logisticsCarrier,
+        trackingNo,
+      }),
+      lineItems: lines,
+      handoverMethod,
+      completedOn: draft.completedOn,
+      largeSealUrl: await this.resolveSealUrl(draft.orgSealUrl, seals.orgSeal, task.donationId, 'org'),
+      smallSealUrl: await this.resolveSealUrl(draft.officerSealUrl, seals.officerSeal, task.donationId, 'officer'),
     };
-
-    if (!payload.donorName || !payload.receiptTitle || !payload.agencyName || !payload.donationItem || !payload.donationDate) {
-      throw new Error('請填寫收據抬頭、捐助者、受贈機構、捐贈內容與捐贈日期');
-    }
+    const issuedAt = task.receipt?.issuedAt || new Date().toISOString();
+    const receiptNo = task.receipt?.receiptNo ?? (await this.createReceiptNo());
 
     if (task.receipt) {
       const { error } = await this.supabaseService.client.from(this.receiptTable).update(payload).eq('id', task.receipt.id);
@@ -239,16 +332,43 @@ export class AgencyReceiptIssuanceService {
     } else {
       const { error } = await this.supabaseService.client.from(this.receiptTable).insert({
         ...payload,
-        receiptNo: await this.createReceiptNo(),
+        receiptNo,
         donationId: task.donationId,
         donorUid: task.donorUid,
-        issuedAt: new Date().toISOString(),
+        issuedAt,
       });
 
       if (error) {
         console.error('開立收據失敗：', error);
         throw error;
       }
+    }
+
+    if (handoverMethod === '寄送') {
+      const { error: trackingError } = await this.supabaseService.client
+        .from(this.donationTable)
+        .update({
+          tracking_no: trackingNo || null,
+          ...(trackingNo ? { tracking_uploaded_at: new Date().toISOString() } : {}),
+        })
+        .eq('id', task.donationId);
+
+      if (trackingError) {
+        console.error('寫入物流資料失敗：', trackingError);
+        throw trackingError;
+      }
+    }
+
+    const stored = await this.storeReceiptPdf(task, receiptNo, issuedAt, payload);
+
+    const { error: pdfError } = await this.supabaseService.client
+      .from(this.receiptTable)
+      .update({ pdfUrl: stored.url, pdfFileName: stored.fileName })
+      .eq('donationId', task.donationId);
+
+    if (pdfError) {
+      console.error('寫入收據檔案位置失敗：', pdfError);
+      throw pdfError;
     }
 
     try {
@@ -344,18 +464,22 @@ export class AgencyReceiptIssuanceService {
   }
 
   isDone(task: AgencyReceiptTask): boolean {
+    if (!task.needReceipt && !task.needThankYou) {
+      return false;
+    }
+
     return !this.isPending(task);
   }
 
-  private async loadDemandMap(demandIds: number[]): Promise<Map<number, string>> {
+  private async loadDemandMap(demandIds: number[]): Promise<Map<number, { item: string; address: string }>> {
     const uniqueIds = [...new Set(demandIds.filter((id) => Number.isInteger(id) && id > 0))];
-    const map = new Map<number, string>();
+    const map = new Map<number, { item: string; address: string }>();
 
     if (uniqueIds.length === 0) {
       return map;
     }
 
-    const { data, error } = await this.supabaseService.client.from(this.demandTable).select('id, item').in('id', uniqueIds);
+    const { data, error } = await this.supabaseService.client.from(this.demandTable).select('id, item, address').in('id', uniqueIds);
 
     if (error) {
       console.error('讀取需求物資失敗：', error);
@@ -363,7 +487,7 @@ export class AgencyReceiptIssuanceService {
     }
 
     for (const row of (data ?? []) as DemandRow[]) {
-      map.set(row.id, row.item ?? '');
+      map.set(row.id, { item: row.item ?? '', address: row.address ?? '' });
     }
 
     return map;
@@ -379,7 +503,7 @@ export class AgencyReceiptIssuanceService {
     const { data, error } = await this.supabaseService.client
       .from(this.receiptTable)
       .select(
-        'id, donationId, receiptNo, donorName, receiptTitle, agencyName, agencyNameEn, orgTaxId, approvalNo, donorIdNo, donorAddress, donorPhone, donationItem, donationDate, note, accountName, postalAccount, orgPhone, orgFax, orgEmail, orgAddress, handlerName, issuedAt, largeSealUrl, smallSealUrl'
+        'id, donationId, receiptNo, donorName, receiptTitle, agencyName, donorIdNo, donorPhone, donorEmail, donationItem, donationDate, orgPhone, orgAddress, issuedAt, largeSealUrl, smallSealUrl, lineItems, handoverMethod, completedOn, pdfUrl, pdfFileName, note'
       )
       .in('donationId', donationIds);
 
@@ -446,53 +570,121 @@ export class AgencyReceiptIssuanceService {
     return `${prefix}${String(nextSeq).padStart(4, '0')}`;
   }
 
-  private describeDonation(task: AgencyReceiptTask): string {
-    const material = task.actualMaterial || task.demandItem;
-    const method = task.donationMethod ? `（${task.donationMethod}）` : '';
+  private linesFromDonation(row: DonationRow, demandItem: string): ReceiptLineItem[] {
+    const parsed = parseReceiptLines(row.receipt_lines);
 
-    return `${material} ${task.quantity}${method}`.trim();
+    if (parsed.some((line) => line.name)) {
+      return parsed;
+    }
+
+    return [lineFromItemText(row.actual_material || demandItem, row.quantity && row.quantity > 0 ? row.quantity : 1)];
+  }
+
+  private linesFromTask(task: AgencyReceiptTask): ReceiptLineItem[] {
+    if (task.receiptLines.length > 0 && task.receiptLines.some((line) => line.name)) {
+      return task.receiptLines.map((line) => ({
+        ...line,
+        quantity: line.quantity > 0 ? line.quantity : task.quantity || 1,
+      }));
+    }
+
+    return [lineFromItemText(task.actualMaterial || task.demandItem, task.quantity > 0 ? task.quantity : 1)];
   }
 
   private mapReceipt(row: ReceiptRow): IssuedDonationReceipt {
+    const completedOn = (row.completedOn || row.donationDate || '').slice(0, 10);
+
     return {
       id: row.id,
       receiptNo: row.receiptNo,
       donorName: row.donorName ?? '',
+      donorPhone: row.donorPhone ?? '',
+      donorEmail: row.donorEmail ?? '',
+      donorIdNo: row.donorIdNo ?? '',
       receiptTitle: row.receiptTitle ?? '',
       agencyName: row.agencyName ?? '',
-      agencyNameEn: row.agencyNameEn ?? '',
-      orgTaxId: row.orgTaxId ?? '',
-      approvalNo: row.approvalNo ?? '',
-      donorIdNo: row.donorIdNo ?? '',
-      donorAddress: row.donorAddress ?? '',
-      donorPhone: row.donorPhone ?? '',
+      agencyAddress: row.orgAddress ?? '',
+      agencyPhone: row.orgPhone ?? '',
+      lines: parseReceiptLines(row.lineItems, row.donationItem ?? ''),
+      handoverMethod: row.handoverMethod ?? '',
+      completedOn,
+      ...readReceiptLogistics(row.note),
       donationItem: row.donationItem ?? '',
-      donationDate: row.donationDate ?? '',
-      note: row.note ?? '',
-      accountName: row.accountName ?? '',
-      postalAccount: row.postalAccount ?? '',
-      orgPhone: row.orgPhone ?? '',
-      orgFax: row.orgFax ?? '',
-      orgEmail: row.orgEmail ?? '',
-      orgAddress: row.orgAddress ?? '',
-      handlerName: row.handlerName ?? '',
       issuedAt: row.issuedAt ?? '',
-      largeSealUrl: row.largeSealUrl ?? '',
-      smallSealUrl: row.smallSealUrl ?? '',
+      orgSealUrl: row.largeSealUrl ?? '',
+      officerSealUrl: row.smallSealUrl ?? '',
+      pdfUrl: row.pdfUrl ?? '',
+      pdfFileName: row.pdfFileName ?? '',
     };
   }
 
-  private async resolveSealUrl(currentUrl: string, file: File | null, donationId: string, kind: 'large' | 'small'): Promise<string> {
+  private async storeReceiptPdf(
+    task: AgencyReceiptTask,
+    receiptNo: string,
+    issuedAt: string,
+    payload: {
+      donorName: string;
+      donorPhone: string;
+      donorEmail: string;
+      agencyName: string;
+      orgAddress: string;
+      orgPhone: string;
+      lineItems: ReceiptLineItem[];
+      handoverMethod: string;
+      completedOn: string;
+      note: string;
+      largeSealUrl: string;
+      smallSealUrl: string;
+      donorIdNo: string;
+    },
+  ): Promise<{ url: string; fileName: string }> {
+    const document: DonationReceiptDocument = {
+      receiptNo,
+      issuedOn: issuedAt.slice(0, 10),
+      donorName: payload.donorName,
+      donorPhone: payload.donorPhone,
+      donorEmail: payload.donorEmail,
+      agencyName: payload.agencyName,
+      agencyAddress: payload.orgAddress,
+      agencyPhone: payload.orgPhone,
+      ...readReceiptLogistics(payload.note),
+      lines: payload.lineItems,
+      handoverMethod: payload.handoverMethod,
+      completedOn: payload.completedOn,
+      orgSealUrl: payload.largeSealUrl,
+      officerSealUrl: payload.smallSealUrl,
+    };
+    const file = await this.receiptPdf.createProtectedFile(document, payload.donorIdNo);
+    const storagePath = `${task.donorUid}/${task.donationId}/donation-receipt.pdf`;
+    const { error } = await this.supabaseService.client.storage.from(this.receiptBucket).upload(storagePath, pdfBlob(file.bytes), {
+      contentType: 'application/pdf',
+      upsert: true,
+    });
+
+    if (error) {
+      console.error('留存收據 PDF 失敗：', error);
+      throw error;
+    }
+
+    const { data } = this.supabaseService.client.storage.from(this.receiptBucket).getPublicUrl(storagePath);
+
+    return {
+      url: `${data.publicUrl}?v=${Date.now()}`,
+      fileName: file.fileName || receiptPdfFileName(receiptNo),
+    };
+  }
+
+  private async resolveSealUrl(currentUrl: string, file: File | null, donationId: string, kind: 'org' | 'officer'): Promise<string> {
     if (!file) {
       return currentUrl.startsWith('blob:') ? '' : currentUrl;
     }
 
     if (!SEAL_ACCEPT.includes(file.type)) {
-      throw new Error('大小章僅支援 PNG、JPG、WEBP');
+      throw new Error('章印僅支援 PNG、JPG、WEBP');
     }
 
     if (file.size > SEAL_MAX_BYTES) {
-      throw new Error('大小章圖片不可超過 2MB');
+      throw new Error('章印圖片不可超過 2MB');
     }
 
     const extension = file.name.includes('.') ? (file.name.split('.').pop()?.toLowerCase() ?? 'png') : 'png';

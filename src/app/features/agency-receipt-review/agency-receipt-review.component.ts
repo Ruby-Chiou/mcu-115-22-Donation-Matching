@@ -41,6 +41,10 @@ export class AgencyReceiptReviewComponent implements OnInit {
     const keyword = this.keyword().trim().toLowerCase();
 
     return this.issuanceService.tasks().filter((task) => {
+      if (filter === 'UNFINISHED' && !this.issuanceService.isPending(task)) {
+        return false;
+      }
+
       if (filter === 'NEED_RECEIPT' && !(task.needReceipt && !task.receiptIssued)) {
         return false;
       }

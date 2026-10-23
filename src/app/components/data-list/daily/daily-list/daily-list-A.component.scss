@@ -5,7 +5,11 @@
 }
 
 .container {
-  padding: 20px 30px 120px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  padding: 8px 16px 16px;
 }
 
 /* 頂部按鈕區（獨立在右上方） */
@@ -16,19 +20,19 @@
 }
 
 .add-btn {
-  padding: 8px 22px;
+  min-height: 44px;
+  padding: 0 22px;
   border: 0;
-  border-radius: 20px;
+  border-radius: 999px;
   cursor: pointer;
-  background: var(--color-brand-primary);
-  color: var(--color-white);
+  background: #1565c0;
+  color: #fff;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 700;
   white-space: nowrap;
-  transition: opacity 0.2s;
 
   &:hover {
-    opacity: 0.85;
+    background: #0d47a1;
   }
 }
 
@@ -73,17 +77,23 @@
   margin-left: 15px;
 
   button {
-    padding: 8px 18px;
+    min-height: 42px;
+    padding: 0 18px;
     border: 0;
-    border-radius: 15px;
-    background: var(--color-brand-primary);
+    border-radius: 999px;
+    background: #1565c0;
     color: #fff;
     font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
+
+    &:hover {
+      background: #0d47a1;
+    }
   }
 
   .batch-delete-btn {
-    background: #d32f2f;
+    background: #c62828;
 
     &:hover {
       background: #b71c1c;
@@ -98,43 +108,53 @@
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
-  border-radius: 12px;
+  border: 1px solid #e3ebf5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgb(21 101 192 / 8%);
 }
 
 table {
   width: 100%;
-  min-width: 1250px; /* 降低最低寬度門檻，避免嚴重超出視窗 */
+  min-width: 0;
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 12px;
   overflow: hidden;
   table-layout: fixed;
 }
 
 th,
 td {
-  height: 100px;
-  padding: 8px 4px;
-  border: 1px solid #ddd;
+  height: 52px;
+  padding: 4px;
+  border-bottom: 1px solid #e8eef5;
+  overflow: hidden;
   text-align: center;
-  font-size: 15px;
+  font-size: 13px;
   vertical-align: middle;
   box-sizing: border-box;
 }
 
-tbody tr {
-  height: 100px;
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover td {
+  background: #f8fbff;
 }
 
 th {
-  height: 55px;
-  padding: 8px 4px;
-  background: #e3f2fd;
+  height: 44px;
+  padding: 4px;
+  background: #f3f8fd;
+  color: #1565c0;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .checkbox-column {
-  padding: 16px 4px;
+  padding: 4px;
   white-space: nowrap;
 
   input {
@@ -145,22 +165,22 @@ th {
 }
 
 .item-column {
-  padding: 16px 8px;
+  padding: 4px;
   text-align: center !important;
   vertical-align: middle;
 
   .item-text {
     display: -webkit-box;
     width: 100%;
-    height: 44.8px;
+    max-height: 39px;
     max-width: 100%;
     margin: 0 auto;
     overflow: hidden;
 
-    font-size: 15px;
+    font-size: 13px;
     line-height: 1.4;
     text-align: center !important;
-    word-break: break-all;
+    word-break: keep-all;
 
     /* 兩行省略 */
     -webkit-box-orient: vertical;
@@ -173,31 +193,76 @@ th {
 }
 
 .operation-column {
-  padding: 8px 4px;
+  overflow: hidden;
+  padding: 4px;
+  white-space: nowrap;
 }
 
-/* 操作區彈性排列優化 */
 .operation-flex {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  gap: 6px; /* 稍微縮小間距，確保完整顯示 */
-
-  button {
-    flex-shrink: 0;
-    padding: 6px 8px; /* 縮減水平 padding 避免爆開 */
-  }
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 
   select {
-    flex-shrink: 0;
-    width: 88px;
-    height: 34px;
-    border: 1px solid #ccc;
+    flex: 1 1 4.2em;
+    width: auto;
+    min-width: 0;
+    max-width: 4.8em;
+    height: 30px;
+    border: 0;
     border-radius: 8px;
-    font-size: 13.5px;
+    font-size: 12px;
+    font-weight: 700;
     text-align: center;
     text-align-last: center;
     cursor: pointer;
+  }
+}
+
+.op-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.op-view {
+  border: 2px solid #1565c0;
+  background: #fff;
+  color: #1565c0;
+
+  &:hover {
+    background: #e3f2fd;
+  }
+}
+
+.op-edit {
+  background: #1565c0;
+  color: #fff;
+
+  &:hover {
+    background: #0d47a1;
+  }
+}
+
+.op-delete {
+  background: #c62828;
+  color: #fff;
+
+  &:hover {
+    background: #b71c1c;
   }
 }
 
@@ -207,7 +272,7 @@ th {
 }
 
 .status-hide {
-  background: #fff8e1;
+  background: #fff4ce;
   color: #8d6e00;
 }
 
@@ -216,28 +281,38 @@ th {
   color: #c62828;
 }
 
-td button {
-  padding: 6px 10px;
-  border: 0;
-  border-radius: 8px;
-  background: var(--color-brand-primary);
-  color: var(--color-white);
-  font-size: 14px;
-  font-weight: 500;
+.message-column {
+  overflow: hidden;
   white-space: nowrap;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.85;
-  }
 }
 
-td .delete-btn {
-  background: #d32f2f;
+.message-column a {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 700;
+  text-decoration: none;
+}
 
-  &:hover {
-    background: #b71c1c;
-  }
+.priority-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .empty-message {
@@ -285,14 +360,17 @@ tbody tr:last-child td {
 }
 
 .normal {
-  color: #333;
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .urgent {
-  color: #f57c00;
+  background: #fff4ce;
+  color: #e65100;
 }
 
 .very-urgent {
-  color: #d32f2f;
+  background: #ffebee;
+  color: #c62828;
   font-weight: 700;
 }

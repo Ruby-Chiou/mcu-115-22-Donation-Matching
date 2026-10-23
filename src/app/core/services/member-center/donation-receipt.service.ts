@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 
+import { parseReceiptLines, readReceiptLogistics } from '../../receipt/donation-receipt-document';
 import { DonationReceipt } from '../../../models/member/donation-receipt';
 import { SupabaseService } from '../database/supabase.service';
 import { MemberSessionService } from './member-session.service';
@@ -11,26 +12,23 @@ interface DonationReceiptRow {
   donorName: string | null;
   receiptTitle: string | null;
   agencyName: string | null;
-  agencyNameEn: string | null;
-  orgTaxId: string | null;
-  approvalNo: string | null;
   donorIdNo: string | null;
-  donorAddress: string | null;
   donorPhone: string | null;
+  donorEmail: string | null;
   donationItem: string | null;
   donationDate: string | null;
-  note: string | null;
-  accountName: string | null;
-  postalAccount: string | null;
   orgPhone: string | null;
-  orgFax: string | null;
-  orgEmail: string | null;
   orgAddress: string | null;
-  handlerName: string | null;
   issuedAt: string | null;
   donationId: string | null;
   largeSealUrl: string | null;
   smallSealUrl: string | null;
+  lineItems: unknown;
+  handoverMethod: string | null;
+  completedOn: string | null;
+  note: string | null;
+  pdfUrl: string | null;
+  pdfFileName: string | null;
 }
 
 @Injectable({
@@ -66,33 +64,31 @@ export class DonationReceiptService {
   }
 
   private mapRow(row: DonationReceiptRow): DonationReceipt {
+    const issuedAt = row.issuedAt ?? '';
+
     return {
       id: Number(row.id),
       receiptNo: row.receiptNo,
       donorUid: row.donorUid,
       donorName: row.donorName ?? '',
+      donorPhone: row.donorPhone ?? '',
+      donorEmail: row.donorEmail ?? '',
       receiptTitle: row.receiptTitle ?? '',
       agencyName: row.agencyName ?? '',
-      agencyNameEn: row.agencyNameEn ?? '',
-      orgTaxId: row.orgTaxId ?? '',
-      approvalNo: row.approvalNo ?? '',
+      agencyAddress: row.orgAddress ?? '',
+      agencyPhone: row.orgPhone ?? '',
+      ...readReceiptLogistics(row.note),
+      lines: parseReceiptLines(row.lineItems, row.donationItem ?? ''),
+      handoverMethod: row.handoverMethod ?? '',
+      completedOn: (row.completedOn || row.donationDate || '').slice(0, 10),
+      issuedOn: issuedAt.slice(0, 10),
+      orgSealUrl: row.largeSealUrl ?? '',
+      officerSealUrl: row.smallSealUrl ?? '',
       donorIdNo: row.donorIdNo ?? '',
-      donorAddress: row.donorAddress ?? '',
-      donorPhone: row.donorPhone ?? '',
-      donationItem: row.donationItem ?? '',
-      donationDate: row.donationDate ?? '',
-      note: row.note ?? '',
-      accountName: row.accountName ?? '',
-      postalAccount: row.postalAccount ?? '',
-      orgPhone: row.orgPhone ?? '',
-      orgFax: row.orgFax ?? '',
-      orgEmail: row.orgEmail ?? '',
-      orgAddress: row.orgAddress ?? '',
-      handlerName: row.handlerName ?? '',
-      issuedAt: row.issuedAt ?? '',
+      issuedAt,
       donationId: row.donationId ?? undefined,
-      largeSealUrl: row.largeSealUrl ?? '',
-      smallSealUrl: row.smallSealUrl ?? '',
+      pdfUrl: row.pdfUrl ?? '',
+      pdfFileName: row.pdfFileName ?? '',
     };
   }
 }

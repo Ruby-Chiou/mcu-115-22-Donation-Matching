@@ -146,31 +146,37 @@
 }
 
 .button-area button {
-  padding: 8px 18px;
+  min-height: 44px;
+  min-width: 88px;
+  padding: 0 20px;
   border: 0;
-  border-radius: 15px;
+  border-radius: 12px;
   cursor: pointer;
-  color: #fff;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-.back-btn {
-  background: #64b5f6;
-  color: #0d47a1;
+.button-area .back-btn {
+  border: 2px solid #1565c0;
+  background: #fff;
+  color: #1565c0;
 }
 
-.save-btn {
-  background: var(--color-brand-primary);
+.button-area .save-btn {
+  border: 0;
+  background: #1565c0;
+  color: #fff;
 }
 
-.save-btn:hover,
-.button-area button:hover {
-  opacity: 0.85;
+.save-btn:hover {
+  background: #0d47a1;
+  opacity: 1;
 }
 
 .back-btn:hover {
-  background: #42a5f5;
+  background: #e3f2fd;
+  opacity: 1;
 }
 
 .required {
@@ -252,8 +258,9 @@
 .service-target-area {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: 114px;
+  gap: 24px 32px;
   margin-bottom: 35px;
 }
 
@@ -263,7 +270,8 @@
   top: -5px;
   left: -12px;
   z-index: 0;
-  width: 850px;
+  right: -12px;
+  width: auto;
   height: calc(100% + 10px);
   border: 2px solid #d32f2f;
   border-radius: 12px;

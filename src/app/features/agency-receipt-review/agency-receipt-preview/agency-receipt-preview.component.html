@@ -2,7 +2,9 @@
   <div class="toolbar no-print">
     <a class="ghost-btn" routerLink="/agency/receipt-review">返回列表</a>
     <a class="ghost-btn" [routerLink]="['/agency/receipt-review', donationId(), 'edit']">返回編輯</a>
-    <button type="button" class="save-btn" (click)="downloadPdf()" [disabled]="!preview()">下載 PDF</button>
+    <button type="button" class="save-btn" (click)="downloadPdf()" [disabled]="!preview() || isDownloading()">
+      {{ isDownloading() ? '準備 PDF...' : '下載 PDF' }}
+    </button>
   </div>
 
   @if (isLoading()) {
@@ -11,7 +13,10 @@
     <p class="error-text">{{ errorText() }}</p>
   } @else if (preview(); as sheet) {
     @if (isDraft()) {
-      <p class="draft-note no-print">這是目前表單內容的預覽。若尚未按「開立收據」或「儲存修正」，捐助者還看不到最新內容。</p>
+      <p class="draft-note no-print">這是目前表單內容的預覽。按下載會直接存成加密 PDF，開啟密碼是身分證字號。尚未按「同意開立」前，捐助者的會員收據不會更新。</p>
+    }
+    @if (downloadError()) {
+      <p class="error-text">{{ downloadError() }}</p>
     }
 
     <app-donation-receipt-sheet [sheet]="sheet" />

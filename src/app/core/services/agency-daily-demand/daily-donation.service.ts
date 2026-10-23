@@ -61,6 +61,9 @@ export class DonationService {
     needThankYou: boolean;
     receiptTitle: string | null;
     taxId: string | null;
+    donorEmail: string | null;
+    donorIdNo: string | null;
+    receiptLines: { name: string; quantity: number; unit: string; estimatedPrice: number | null }[] | null;
     materialFiles: File[];
     materialVideoFiles: File[];
   }) {
@@ -81,6 +84,9 @@ export class DonationService {
         need_thank_you: data.needThankYou,
         receipt_title: data.receiptTitle,
         tax_id: data.taxId,
+        donor_email: data.donorEmail,
+        donor_id_no: data.donorIdNo,
+        receipt_lines: data.receiptLines,
         status: 'pending_ai_review',
       })
       .select()

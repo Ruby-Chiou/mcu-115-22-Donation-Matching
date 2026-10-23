@@ -226,12 +226,18 @@
           @switch (kind) {
             @case ('receipt') {
               @if (receiptOf(record); as receipt) {
-                <div #sheetHost class="viewer-sheet">
+                <div class="viewer-sheet">
                   <app-donation-receipt-sheet [sheet]="receipt" />
                 </div>
                 <div class="viewer-actions">
-                  <button type="button" class="btn btn-primary" (click)="downloadPdf(sheetHost, receipt)">下載 PDF</button>
+                  <p class="shortcut-hint">開啟密碼是身分證字號，按鈕會直接下載檔案。</p>
+                  <button type="button" class="btn btn-primary" [disabled]="downloadingReceipt()" (click)="downloadPdf(receipt)">
+                    {{ downloadingReceipt() ? '準備 PDF...' : '下載 PDF' }}
+                  </button>
                 </div>
+                @if (downloadError()) {
+                  <p class="shortcut-hint">{{ downloadError() }}</p>
+                }
               }
             }
             @case ('certificate') {

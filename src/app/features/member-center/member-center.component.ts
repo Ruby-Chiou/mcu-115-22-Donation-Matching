@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { MemberMessageService } from '../../core/services/member-center/member-message.service';
 import { DonorHistoryComponent } from '../donor-history/donor-history.component';
@@ -27,6 +27,7 @@ const MEMBER_TABS: MemberTab[] = ['profile', 'inbox', 'acknowledgements', 'notif
 })
 export class MemberCenterComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   protected readonly messageService = inject(MemberMessageService);
 
   readonly activeTab = signal<MemberTab>('profile');
@@ -43,6 +44,10 @@ export class MemberCenterComponent {
   }
 
   selectTab(tab: MemberTab): void {
-    this.activeTab.set(tab);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+    });
   }
 }

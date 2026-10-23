@@ -120,17 +120,29 @@
 
 .card-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.download-hint {
+  margin: 0;
+  color: var(--color-text-light);
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
 .btn {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.45rem 1rem;
-  border-radius: var(--border-radius-pill);
+  padding: 0.45rem 0.9rem;
+  border-radius: 4px;
   font: inherit;
+  font-size: 0.95rem;
   font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
 }
 

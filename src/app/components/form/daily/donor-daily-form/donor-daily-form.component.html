@@ -154,40 +154,28 @@
         </label>
         <div class="radio-group">
           <label class="radio-option">
-            <input type="radio" name="needReceipt" value="yes" [(ngModel)]="needReceipt" required class="no-error-border" />
+            <input type="radio" name="needReceipt" value="yes" [ngModel]="needReceipt" (ngModelChange)="onNeedReceiptChange($event)" required class="no-error-border" />
             <span> 需要 </span>
           </label>
           <label class="radio-option">
-            <input type="radio" name="needReceipt" value="no" [(ngModel)]="needReceipt" class="no-error-border" />
+            <input type="radio" name="needReceipt" value="no" [ngModel]="needReceipt" (ngModelChange)="onNeedReceiptChange($event)" class="no-error-border" />
             <span> 不需要 </span>
           </label>
         </div>
       </div>
       <!-- 需要收據才顯示 -->
       @if (needReceipt === 'yes') {
-      <div class="receipt-box">
-        <div class="form-group">
-          <label>
-            收據抬頭
-            <span>*</span>
-          </label>
-          <input
-            type="text"
-            name="receiptTitle"
-            [(ngModel)]="receiptTitle"
-            placeholder="請輸入收據抬頭"
-            [required]="needReceipt === 'yes'"
-            class="no-error-border"
-          />
-        </div>
-        <div class="form-group">
-          <label>
-            統一編號
-            <span class="optional"> （非必填） </span>
-          </label>
-          <input type="text" name="taxId" [(ngModel)]="taxId" placeholder="若需要請輸入統一編號" />
-        </div>
-      </div>
+      <app-donor-receipt-request
+        [donorName]="donorName"
+        [donorPhone]="phone"
+        [handoverMethod]="donationMethod"
+        [suggestedItem]="actualMaterial || demand?.item || ''"
+        [suggestedQuantity]="quantity || 1"
+        [(donorEmail)]="donorEmail"
+        [(donorIdNo)]="donorIdNo"
+        [(lines)]="receiptLines"
+        [(agreed)]="receiptAgreed"
+      />
       }
       <!-- 感謝狀-->
       <div class="section-title">

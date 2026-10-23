@@ -1,13 +1,17 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { ReceiptLineEditorComponent } from '../../../components/receipt/receipt-line-editor/receipt-line-editor.component';
+import { emptyReceiptLine } from '../../../core/receipt/donation-receipt-document';
+import { isTaiwanId, maskTaiwanId, normalizeTaiwanId } from '../../../core/receipt/taiwan-id';
 import { AgencyReceiptIssuanceService } from '../../../core/services/agency/agency-receipt-issuance.service';
-import { AgencyReceiptTask, ReceiptDraft } from '../../../models/agency/receipt-issuance';
+import { AgencyReceiptTask, RECEIPT_CARRIERS, ReceiptDraft } from '../../../models/agency/receipt-issuance';
 
 @Component({
   selector: 'app-agency-receipt-form',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, NgTemplateOutlet, RouterLink, ReceiptLineEditorComponent],
   templateUrl: './agency-receipt-form.component.html',
   styleUrl: './agency-receipt-form.component.scss',
 })
@@ -18,38 +22,43 @@ export class AgencyReceiptFormComponent implements OnInit {
 
   readonly isLoading = signal(true);
   readonly isSaving = signal(false);
+  readonly isSendingPassword = signal(false);
+  readonly correctingId = signal(false);
   readonly errorText = signal('');
+  readonly passwordNotice = signal('');
   readonly task = signal<AgencyReceiptTask | null>(null);
-
-  readonly largePreview = signal('');
-  readonly smallPreview = signal('');
+  readonly orgPreview = signal('');
+  readonly officerPreview = signal('');
+  readonly carriers = RECEIPT_CARRIERS;
 
   draft: ReceiptDraft = {
     donorName: '',
+    donorPhone: '',
+    donorEmail: '',
+    donorIdNo: '',
     receiptTitle: '',
     agencyName: '',
-    agencyNameEn: '',
-    orgTaxId: '',
-    approvalNo: '',
-    donorIdNo: '',
-    donorAddress: '',
-    donorPhone: '',
-    donationItem: '',
-    donationDate: '',
-    note: '',
-    accountName: '',
-    postalAccount: '',
-    orgPhone: '',
-    orgFax: '',
-    orgEmail: '',
-    orgAddress: '',
-    handlerName: '',
-    largeSealUrl: '',
-    smallSealUrl: '',
+    agencyAddress: '',
+    agencyPhone: '',
+    deliveryAddress: '',
+    logisticsCarrier: '',
+    trackingNo: '',
+    lines: [emptyReceiptLine()],
+    handoverMethod: '',
+    completedOn: '',
+    orgSealUrl: '',
+    officerSealUrl: '',
   };
 
-  private largeSeal: File | null = null;
-  private smallSeal: File | null = null;
+  correctedId = '';
+
+  private storedIdNo = '';
+  private orgSeal: File | null = null;
+  private officerSeal: File | null = null;
+
+  maskedId(): string {
+    return maskTaiwanId(this.storedIdNo);
+  }
 
   async ngOnInit(): Promise<void> {
     const donationId = this.route.snapshot.paramMap.get('donationId') ?? '';
@@ -64,8 +73,9 @@ export class AgencyReceiptFormComponent implements OnInit {
 
       this.task.set(task);
       this.draft = this.issuanceService.draftFromTask(task);
-      this.largePreview.set(this.draft.largeSealUrl);
-      this.smallPreview.set(this.draft.smallSealUrl);
+      this.storedIdNo = this.draft.donorIdNo;
+      this.orgPreview.set(this.draft.orgSealUrl);
+      this.officerPreview.set(this.draft.officerSealUrl);
     } catch {
       this.errorText.set('無法載入收據資料，請稍後再試。');
     } finally {
@@ -80,22 +90,76 @@ export class AgencyReceiptFormComponent implements OnInit {
       return;
     }
 
+    if (this.correctingId()) {
+      const nextId = normalizeTaiwanId(this.correctedId);
+
+      if (!isTaiwanId(nextId)) {
+        this.errorText.set('更正後的身分證字號格式不正確');
+        return;
+      }
+
+      this.draft.donorIdNo = nextId;
+    } else {
+      this.draft.donorIdNo = this.storedIdNo;
+    }
+
     this.isSaving.set(true);
     this.errorText.set('');
 
     try {
       const wasIssued = task.receiptIssued;
+      const idChanged = normalizeTaiwanId(this.draft.donorIdNo) !== normalizeTaiwanId(this.storedIdNo);
       await this.issuanceService.saveReceipt(task, this.draft, {
-        largeSeal: this.largeSeal,
-        smallSeal: this.smallSeal,
+        orgSeal: this.orgSeal,
+        officerSeal: this.officerSeal,
       });
       await this.router.navigate(['/agency/receipt-review'], {
-        state: { notice: wasIssued ? '收據內容已更新。' : '收據已開立，可再從列表進入編輯或預覽。' },
+        state: {
+          notice: idChanged
+            ? '收據已用更正後的身分證字號重做。捐助者要改用新字號開啟 PDF。'
+            : wasIssued
+              ? '收據已更新，加密 PDF 已重新留存。'
+              : '收據已開立，加密 PDF 已存入捐助者的會員收據。',
+        },
       });
     } catch (error) {
       this.errorText.set(error instanceof Error ? error.message : '儲存失敗，請稍後再試。');
     } finally {
       this.isSaving.set(false);
+    }
+  }
+
+  startIdCorrection(): void {
+    this.correctingId.set(true);
+    this.correctedId = '';
+    this.passwordNotice.set('');
+    this.errorText.set('');
+  }
+
+  cancelIdCorrection(): void {
+    this.correctingId.set(false);
+    this.correctedId = '';
+    this.draft.donorIdNo = this.storedIdNo;
+  }
+
+  async sendPassword(): Promise<void> {
+    const task = this.task();
+
+    if (!task) {
+      return;
+    }
+
+    this.isSendingPassword.set(true);
+    this.passwordNotice.set('');
+    this.errorText.set('');
+
+    try {
+      await this.issuanceService.sendReceiptPassword(task);
+      this.passwordNotice.set('開啟密碼已寄到捐助者的收件匣，這一頁不會顯示完整字號。');
+    } catch (error) {
+      this.errorText.set(error instanceof Error ? error.message : '無法寄送開啟密碼，請稍後再試。');
+    } finally {
+      this.isSendingPassword.set(false);
     }
   }
 
@@ -110,14 +174,15 @@ export class AgencyReceiptFormComponent implements OnInit {
       state: {
         draft: {
           ...this.draft,
-          largeSealUrl: this.largePreview(),
-          smallSealUrl: this.smallPreview(),
+          donorIdNo: this.correctingId() ? normalizeTaiwanId(this.correctedId) : this.storedIdNo,
+          orgSealUrl: this.orgPreview(),
+          officerSealUrl: this.officerPreview(),
         },
       },
     });
   }
 
-  onSealSelected(kind: 'large' | 'small', event: Event): void {
+  onSealSelected(kind: 'org' | 'officer', event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
 
@@ -126,13 +191,13 @@ export class AgencyReceiptFormComponent implements OnInit {
     }
 
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-      this.errorText.set('大小章僅支援 PNG、JPG、WEBP');
+      this.errorText.set('章印僅支援 PNG、JPG、WEBP');
       input.value = '';
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      this.errorText.set('大小章圖片不可超過 2MB');
+      this.errorText.set('章印圖片不可超過 2MB');
       input.value = '';
       return;
     }
@@ -140,13 +205,13 @@ export class AgencyReceiptFormComponent implements OnInit {
     const previewUrl = URL.createObjectURL(file);
     this.errorText.set('');
 
-    if (kind === 'large') {
-      this.largeSeal = file;
-      this.largePreview.set(previewUrl);
+    if (kind === 'org') {
+      this.orgSeal = file;
+      this.orgPreview.set(previewUrl);
       return;
     }
 
-    this.smallSeal = file;
-    this.smallPreview.set(previewUrl);
+    this.officerSeal = file;
+    this.officerPreview.set(previewUrl);
   }
 }

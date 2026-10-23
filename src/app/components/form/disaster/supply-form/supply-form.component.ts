@@ -377,7 +377,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     }
 
     if (this.fromDetail) {
-      this.router.navigate(['/agency/supply-detail', this.demand.serialNo]);
+      this.router.navigate(['/agency/supply-detail', this.demand.id]);
     } else {
       this.router.navigate(['/agency/disaster']);
     }

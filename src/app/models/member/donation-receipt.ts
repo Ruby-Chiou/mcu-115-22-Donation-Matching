@@ -1,34 +1,16 @@
-/** 收據紙本上要印出的欄位 */
-export interface DonationReceiptView {
-  receiptNo: string;
-  donationDate: string;
-  agencyName: string;
-  agencyNameEn: string;
-  orgTaxId: string;
-  approvalNo: string;
-  donorName: string;
-  donorIdNo: string;
-  donorAddress: string;
-  donorPhone: string;
-  donationItem: string;
-  note: string;
-  accountName: string;
-  postalAccount: string;
-  orgPhone: string;
-  orgFax: string;
-  orgEmail: string;
-  orgAddress: string;
-  handlerName: string;
-  largeSealUrl: string;
-  smallSealUrl: string;
-}
+import { DonationReceiptDocument } from '../../core/receipt/donation-receipt-document';
 
-/** 系統開立的捐贈收據（統一格式） */
+/** 畫面上的收據，欄位與下載的 PDF 相同。 */
+export type DonationReceiptView = DonationReceiptDocument;
+
+/** 系統留存的捐贈收據。身分證字號只做 PDF 密碼，不印在文件上。 */
 export interface DonationReceipt extends DonationReceiptView {
   id: number;
   donorUid: string;
+  donorIdNo: string;
   receiptTitle: string;
   issuedAt: string;
-  /** 對應 donor_daily_donations.id，機構核發時寫入 */
   donationId?: string;
+  pdfUrl: string;
+  pdfFileName: string;
 }

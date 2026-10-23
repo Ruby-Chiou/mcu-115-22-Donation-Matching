@@ -1,0 +1,69 @@
+.receipt-request {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 16px;
+  border: 1px solid #d6e4f0;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.intro,
+small {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.readonly-grid {
+  display: grid;
+  gap: 6px;
+
+  p {
+    margin: 0;
+  }
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 700;
+}
+
+input[type='email'],
+input[type='text'] {
+  padding: 12px 14px;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 500;
+}
+
+.lines-head,
+.preview-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+h3 {
+  margin: 0;
+}
+
+button {
+  padding: 8px 14px;
+  border: 1px solid #005bac;
+  border-radius: 8px;
+  background: #fff;
+  color: #005bac;
+  font: inherit;
+  cursor: pointer;
+}
+
+.agree {
+  flex-direction: row;
+  align-items: center;
+  font-weight: 600;
+}

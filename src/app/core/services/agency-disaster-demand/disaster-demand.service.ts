@@ -131,7 +131,7 @@ export class DisasterDemandService {
 
       conditions: this.toConditions(row.conditionDescription),
 
-      customConditions: [],
+      customConditions: this.toCustomConditions(row.conditionDescription),
 
       priority: row.priority as DisasterDemand['priority'],
 
@@ -197,7 +197,7 @@ export class DisasterDemandService {
 
       imageFileNames: demand.imageFileNames ?? [],
 
-      conditionDescription: demand.conditions ?? {},
+      conditionDescription: this.conditionsToStored(demand),
 
       priority: demand.priority,
 
@@ -239,18 +239,90 @@ export class DisasterDemandService {
     return [];
   }
 
+  private readonly conditionKeys: Array<keyof DisasterDemand['conditions']> = ['全新', '二手', '有擦痕', '過期', '毀損'];
+
   private toConditions(value: unknown): DisasterDemand['conditions'] {
+    const conditions: DisasterDemand['conditions'] = {
+      全新: '',
+      二手: '',
+      有擦痕: '',
+      過期: '',
+      毀損: '',
+    };
+
     if (value && typeof value === 'object' && !Array.isArray(value)) {
-      return value as DisasterDemand['conditions'];
+      for (const key of this.conditionKeys) {
+        const result = (value as Record<string, unknown>)[key];
+        if (result === '接受' || result === '不接受' || result === '') {
+          conditions[key] = result;
+        }
+      }
+
+      return conditions;
+    }
+
+    for (const entry of this.conditionEntries(value)) {
+      const parsed = this.parseConditionEntry(entry);
+      if (parsed) {
+        conditions[parsed.name] = parsed.result;
+      }
+    }
+
+    return conditions;
+  }
+
+  private toCustomConditions(value: unknown): string[] {
+    return this.conditionEntries(value).filter((entry) => !this.parseConditionEntry(entry));
+  }
+
+  private conditionsToStored(demand: DisasterDemand): string[] {
+    const stored = this.conditionKeys
+      .filter((key) => demand.conditions?.[key] === '接受' || demand.conditions?.[key] === '不接受')
+      .map((key) => `${key}:${demand.conditions[key]}`);
+
+    for (const custom of demand.customConditions ?? []) {
+      const text = custom.trim();
+      if (text) {
+        stored.push(text);
+      }
+    }
+
+    return stored;
+  }
+
+  private conditionEntries(value: unknown): string[] {
+    if (Array.isArray(value)) {
+      return value.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean);
+    }
+
+    if (typeof value === 'string') {
+      return value
+        .split('、')
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    return [];
+  }
+
+  private parseConditionEntry(entry: string): { name: keyof DisasterDemand['conditions']; result: '接受' | '不接受' } | null {
+    const separatorIndex = entry.includes(':') ? entry.indexOf(':') : entry.indexOf('：');
+    const name = (separatorIndex === -1 ? entry : entry.slice(0, separatorIndex)).trim();
+    const rawResult = separatorIndex === -1 ? '' : entry.slice(separatorIndex + 1).trim();
+    const result = rawResult === '✔' ? '接受' : rawResult === '✘' ? '不接受' : rawResult;
+
+    if (!this.isConditionKey(name) || (result !== '接受' && result !== '不接受')) {
+      return null;
     }
 
     return {
-      全新: '不接受',
-      二手: '不接受',
-      有擦痕: '不接受',
-      過期: '不接受',
-      毀損: '不接受',
+      name,
+      result,
     };
+  }
+
+  private isConditionKey(value: string): value is keyof DisasterDemand['conditions'] {
+    return (this.conditionKeys as readonly string[]).includes(value);
   }
 
   async addDemand(demand: CreateDisasterDemand): Promise<void> {

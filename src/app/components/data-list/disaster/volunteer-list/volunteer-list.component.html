@@ -43,19 +43,20 @@
       </div>
 
       <!-- 志工需求表格 -->
+      <div class="table-wrapper">
       <table class="volunteer-table">
         <thead>
           <tr>
-            <th class="checkbox-column" style="width: 5%">選取</th>
+            <th class="checkbox-column" style="width: 4%">選取</th>
             <th style="width: 5%">編號</th>
-            <th class="category-column" style="width: 10%">需求類型</th>
-            <th class="category-column" style="width: 9%">需求人數</th>
+            <th class="category-column" style="width: 16%">需求類型</th>
+            <th class="category-column" style="width: 8%">需求人數</th>
             <th style="width: 10%">緊急優先度</th>
-            <th class="created-time-column" style="width: 9%">建立日期</th>
-            <th class="published-time-column" style="width: 9%">上架日期</th>
-            <th class="off-shelf-time-column" style="width: 10%">預計下架日期</th>
-            <th class="message-column" style="width: 7%">留言區</th>
-            <th class="operation-column" style="width: 26%">操作</th>
+            <th class="created-time-column" style="width: 10%">建立日期</th>
+            <th class="published-time-column" style="width: 10%">上架日期</th>
+            <th class="off-shelf-time-column" style="width: 11%">預計下架日期</th>
+            <th class="message-column" style="width: 6%">留言區</th>
+            <th class="operation-column" style="width: 20%">操作</th>
           </tr>
         </thead>
 
@@ -77,14 +78,17 @@
             <td>{{ item.people ?? 0 }} 人</td>
 
             <!-- 優先度 -->
-            <td
-              [ngClass]="{
-            'normal': item.priority === '普通',
-            'urgent': item.priority === '緊急',
-            'very-urgent': item.priority === '非常緊急'
-          }"
-            >
-              {{ item.priority }}
+            <td>
+              <span
+                class="priority-pill"
+                [ngClass]="{
+                  'normal': item.priority === '普通',
+                  'urgent': item.priority === '緊急',
+                  'very-urgent': item.priority === '非常緊急'
+                }"
+              >
+                {{ item.priority }}
+              </span>
             </td>
 
             <!-- 建立日期 -->
@@ -120,9 +124,9 @@
             <!-- 操作 -->
             <td class="operation-column">
               <div class="operation-flex">
-                <button (click)="goToDetail(item.id!)">查看</button>
-                <button (click)="goToEdit(item.id!)">編輯</button>
-                <button class="delete-btn" (click)="openDeleteModal(item.id!)">刪除</button>
+                <button type="button" class="op-btn op-view" (click)="goToDetail(item.id!)">查看</button>
+                <button type="button" class="op-btn op-edit" (click)="goToEdit(item.id!)">編輯</button>
+                <button type="button" class="op-btn op-delete" (click)="openDeleteModal(item.id!)">刪除</button>
 
                 <select
                   [value]="item.displayStatus"
@@ -151,6 +155,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
 
       <app-pagination
         [pageSize]="pageSize"

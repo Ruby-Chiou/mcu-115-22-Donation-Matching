@@ -1,81 +1,81 @@
 @if (sheet(); as sheet) {
   <article class="paper">
-    <p class="copy-mark">第一聯：捐助人留存</p>
-
     <header class="paper-head">
-      <div class="head-left">
-        <p>統一編號：{{ sheet.orgTaxId || '—' }}</p>
-        <p>核准字號：{{ sheet.approvalNo || '—' }}</p>
-        <p>捐贈日期：{{ sheet.donationDate ? (sheet.donationDate | date: 'yyyy/MM/dd') : '—' }}</p>
-      </div>
-
-      <div class="head-center">
-        <p class="org-en">{{ sheet.agencyNameEn || 'Donation Receipt' }}</p>
-        <h1>{{ sheet.agencyName || '受贈機構' }}</h1>
-        <p class="doc-title">捐贈收據</p>
-      </div>
-
-      <div class="head-right">
-        <p class="receipt-no-label">收據編號</p>
-        <p class="receipt-no">{{ sheet.receiptNo || '尚未開立' }}</p>
-      </div>
+      <h1>捐贈收據</h1>
+      <p>收據編號　{{ sheet.receiptNo || '尚未開立' }}</p>
+      <p>開立日期　{{ formatDate(sheet.issuedOn) }}</p>
     </header>
 
-    <table class="detail-table">
+    <section>
+      <h2>捐助者</h2>
+      <p>姓名　{{ sheet.donorName || '—' }}</p>
+      <p>電話　{{ sheet.donorPhone || '—' }}</p>
+      <p>Email　{{ sheet.donorEmail || '—' }}</p>
+    </section>
+
+    <section>
+      <h2>受贈機構</h2>
+      <p>名稱　{{ sheet.agencyName || '—' }}</p>
+      <p>會址　{{ sheet.agencyAddress || '—' }}</p>
+      <p>電話　{{ sheet.agencyPhone || '—' }}</p>
+      <p>配送地址　{{ sheet.deliveryAddress || '—' }}</p>
+    </section>
+
+    <table>
+      <thead>
+        <tr>
+          <th>品項</th>
+          <th>數量</th>
+          <th>單位</th>
+          <th>預估單價</th>
+          <th>小計</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr>
-          <th>捐贈者<br /><span>Name</span></th>
-          <td class="emphasis">{{ sheet.donorName || '—' }}</td>
-          <th>身分證／統編<br /><span>ID</span></th>
-          <td class="emphasis">{{ sheet.donorIdNo || '—' }}</td>
-        </tr>
-        <tr>
-          <th>收據地址<br /><span>Address</span></th>
-          <td>{{ sheet.donorAddress || '—' }}</td>
-          <th>電話<br /><span>TEL</span></th>
-          <td>{{ sheet.donorPhone || '—' }}</td>
-        </tr>
-        <tr>
-          <th>捐助事項<br /><span>Amount / Item</span></th>
-          <td class="item" colspan="3">{{ sheet.donationItem || '—' }}</td>
-        </tr>
-        <tr>
-          <th>備註<br /><span>P.S.</span></th>
-          <td class="note" colspan="3">{{ sheet.note || '' }}</td>
-        </tr>
+        @for (line of sheet.lines; track $index) {
+          <tr>
+            <td>{{ line.name || '—' }}</td>
+            <td>{{ line.quantity || '—' }}</td>
+            <td>{{ line.unit || '—' }}</td>
+            <td>{{ formatPrice(line.estimatedPrice) }}</td>
+            <td>{{ formatPrice(lineSubtotal(line)) }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">尚未填寫物資</td>
+          </tr>
+        }
       </tbody>
     </table>
 
-    <footer class="paper-foot">
-      <div class="org-info">
-        <p>戶名：{{ sheet.accountName || sheet.agencyName || '—' }}</p>
-        <p>劃撥帳號：{{ sheet.postalAccount || '—' }}</p>
-        <p>電話：{{ sheet.orgPhone || '—' }}　傳真：{{ sheet.orgFax || '—' }}</p>
-        <p>Email：{{ sheet.orgEmail || '—' }}</p>
-        <p>會址：{{ sheet.orgAddress || '—' }}</p>
-        <p class="thanks">感謝您的捐助，讓更多需要幫助的人獲得協助。</p>
-      </div>
+    <div class="totals">
+      <p>合計數量　{{ quantityLabel(sheet.lines) }}</p>
+      <p>預估總價　{{ formatPrice(priceTotal(sheet.lines)) }}</p>
+    </div>
 
-      <div class="sign-block">
-        <div class="seals">
-          <div class="seal seal-large">
-            @if (sheet.largeSealUrl) {
-              <img [src]="sheet.largeSealUrl" alt="機構大章" />
-            } @else {
-              <span>大章</span>
-            }
-          </div>
-          <div class="seal seal-small">
-            @if (sheet.smallSealUrl) {
-              <img [src]="sheet.smallSealUrl" alt="負責人小章" />
-            } @else {
-              <span>小章</span>
-            }
-          </div>
-        </div>
-        <p class="handler">簽章　經辦人：{{ sheet.handlerName || '—' }}</p>
-        <p class="valid">本收據須列印包含經辦人名字及收據編號始為有效</p>
+    <p>接送方式　{{ sheet.handoverMethod || '—' }}</p>
+    @if (sheet.handoverMethod === '寄送') {
+      <p>物流公司　{{ sheet.logisticsCarrier || '—' }}</p>
+      <p>物流單號　{{ sheet.trackingNo || '—' }}</p>
+    }
+    <p>捐贈完成日期　{{ formatDate(sheet.completedOn) }}</p>
+
+    <footer>
+      <div class="seal">
+        @if (sheet.orgSealUrl) {
+          <img [src]="sheet.orgSealUrl" alt="機構章" />
+        } @else {
+          <span>機構章</span>
+        }
+      </div>
+      <div class="seal">
+        @if (sheet.officerSealUrl) {
+          <img [src]="sheet.officerSealUrl" alt="負責人簽章" />
+        } @else {
+          <span>負責人簽章</span>
+        }
       </div>
     </footer>
+    <p class="note">本收據須經機構章與負責人簽章後生效。</p>
   </article>
 }

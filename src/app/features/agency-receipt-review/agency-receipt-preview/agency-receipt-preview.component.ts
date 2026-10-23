@@ -1,8 +1,8 @@
-import { Component, ElementRef, OnInit, inject, signal } from '@angular/core';
-import { downloadReceiptPdf } from '../../../components/receipt/receipt-print';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { DonationReceiptSheetComponent } from '../../../components/receipt/donation-receipt-sheet/donation-receipt-sheet.component';
+import { DonationReceiptPdfService } from '../../../core/receipt/donation-receipt-pdf.service';
 import { AgencyReceiptIssuanceService } from '../../../core/services/agency/agency-receipt-issuance.service';
 import { ReceiptDraft } from '../../../models/agency/receipt-issuance';
 import { DonationReceiptView } from '../../../models/member/donation-receipt';
@@ -15,14 +15,17 @@ import { DonationReceiptView } from '../../../models/member/donation-receipt';
 })
 export class AgencyReceiptPreviewComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly host = inject(ElementRef<HTMLElement>);
   private readonly issuanceService = inject(AgencyReceiptIssuanceService);
+  private readonly receiptPdf = inject(DonationReceiptPdfService);
 
   readonly isLoading = signal(true);
+  readonly isDownloading = signal(false);
   readonly errorText = signal('');
+  readonly downloadError = signal('');
   readonly preview = signal<DonationReceiptView | null>(null);
   readonly isDraft = signal(false);
   readonly donationId = signal('');
+  private readonly password = signal('');
 
   async ngOnInit(): Promise<void> {
     const donationId = this.route.snapshot.paramMap.get('donationId') ?? '';
@@ -40,28 +43,24 @@ export class AgencyReceiptPreviewComponent implements OnInit {
       const source = incomingDraft ?? this.issuanceService.draftFromTask(task);
 
       this.isDraft.set(!task.receipt || !!incomingDraft);
+      this.password.set(source.donorIdNo);
       this.preview.set({
         receiptNo: task.receipt?.receiptNo ?? '尚未開立',
-        donationDate: source.donationDate,
-        agencyName: source.agencyName,
-        agencyNameEn: source.agencyNameEn,
-        orgTaxId: source.orgTaxId,
-        approvalNo: source.approvalNo,
+        issuedOn: task.receipt?.issuedAt.slice(0, 10) ?? '',
         donorName: source.donorName,
-        donorIdNo: source.donorIdNo,
-        donorAddress: source.donorAddress,
         donorPhone: source.donorPhone,
-        donationItem: source.donationItem,
-        note: source.note,
-        accountName: source.accountName,
-        postalAccount: source.postalAccount,
-        orgPhone: source.orgPhone,
-        orgFax: source.orgFax,
-        orgEmail: source.orgEmail,
-        orgAddress: source.orgAddress,
-        handlerName: source.handlerName,
-        largeSealUrl: source.largeSealUrl,
-        smallSealUrl: source.smallSealUrl,
+        donorEmail: source.donorEmail,
+        agencyName: source.agencyName,
+        agencyAddress: source.agencyAddress,
+        agencyPhone: source.agencyPhone,
+        deliveryAddress: source.deliveryAddress,
+        logisticsCarrier: source.logisticsCarrier,
+        trackingNo: source.trackingNo,
+        lines: source.lines,
+        handoverMethod: source.handoverMethod,
+        completedOn: source.completedOn,
+        orgSealUrl: source.orgSealUrl,
+        officerSealUrl: source.officerSealUrl,
       });
     } catch {
       this.errorText.set('無法載入收據預覽，請稍後再試。');
@@ -70,13 +69,22 @@ export class AgencyReceiptPreviewComponent implements OnInit {
     }
   }
 
-  downloadPdf(): void {
-    const paper = this.host.nativeElement.querySelector('.paper');
+  async downloadPdf(): Promise<void> {
+    const sheet = this.preview();
 
-    if (!(paper instanceof HTMLElement)) {
+    if (!sheet) {
       return;
     }
 
-    downloadReceiptPdf(paper, this.preview()?.receiptNo ?? '');
+    this.isDownloading.set(true);
+    this.downloadError.set('');
+
+    try {
+      await this.receiptPdf.downloadProtected(sheet, this.password());
+    } catch (error) {
+      this.downloadError.set(error instanceof Error ? error.message : '無法下載 PDF');
+    } finally {
+      this.isDownloading.set(false);
+    }
   }
 }

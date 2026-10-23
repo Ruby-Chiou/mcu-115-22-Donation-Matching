@@ -6,9 +6,12 @@ import { ChangeDetectorRef } from '@angular/core';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { AiReviewResult, DonationService } from '../../../../core/services/agency-daily-demand/daily-donation.service';
+import { DonorReceiptRequestComponent } from '../../../receipt/donor-receipt-request/donor-receipt-request.component';
+import { MemberProfileService } from '../../../../core/services/member-center/member-profile.service';
+import { ReceiptLineItem, emptyReceiptLine, validateDonorReceiptRequest } from '../../../../core/receipt/donation-receipt-document';
 @Component({
   selector: 'app-donor-daily-form',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DonorReceiptRequestComponent],
   templateUrl: './donor-daily-form.component.html',
   styleUrl: './donor-daily-form.component.scss',
 })
@@ -32,6 +35,7 @@ export class DonorDailyFormComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly demandService: DailyDemandService,
     private readonly donationService: DonationService,
+    private readonly profileService: MemberProfileService,
     private readonly cdr: ChangeDetectorRef
   ) {
     this.demandId = Number(this.route.snapshot.paramMap.get('id'));
@@ -53,11 +57,36 @@ export class DonorDailyFormComponent implements OnInit {
         return;
       }
 
-      // 若希望捐贈者表單預先帶入需求資料，可在這裡設定。
-      // 例如：
-      // this.actualMaterial = this.demand.item;
+      await this.loadProfileDefaults();
     } catch (error) {
       console.error('讀取捐贈表單需求資料失敗：', error);
+    }
+  }
+
+  private profileName = '';
+  private profilePhone = '';
+  private profileEmail = '';
+
+  private async loadProfileDefaults(): Promise<void> {
+    try {
+      const profile = await this.profileService.loadProfile();
+      this.profileName = profile.fullName || profile.displayName || '';
+      this.profilePhone = profile.phoneNumber || '';
+      this.profileEmail = profile.email || '';
+
+      if (!this.donorName) {
+        this.donorName = this.profileName;
+      }
+
+      if (!this.phone) {
+        this.phone = this.profilePhone;
+      }
+
+      if (!this.donorEmail) {
+        this.donorEmail = this.profileEmail;
+      }
+    } catch {
+      // 未登入時改由捐助者自行填寫。
     }
   }
   cancelForm(): void {
@@ -74,8 +103,10 @@ export class DonorDailyFormComponent implements OnInit {
   note = '';
   needReceipt = '';
   needThankYou = '';
-  receiptTitle = '';
-  taxId = '';
+  donorEmail = '';
+  donorIdNo = '';
+  receiptLines: ReceiptLineItem[] = [];
+  receiptAgreed = false;
   proofFile: File | null = null;
   proofFileName = '';
   // 捐贈完成證明
@@ -85,8 +116,11 @@ export class DonorDailyFormComponent implements OnInit {
   // 自動填入帳戶資料
   fillAccountInfo() {
     if (this.useAccountInfo) {
-      this.donorName = this.accountName;
-      this.phone = this.accountPhone;
+      this.donorName = this.profileName || this.accountName;
+      this.phone = this.profilePhone || this.accountPhone;
+      if (!this.donorEmail) {
+        this.donorEmail = this.profileEmail;
+      }
     } else {
       this.donorName = '';
       this.phone = '';
@@ -151,9 +185,21 @@ export class DonorDailyFormComponent implements OnInit {
       return;
     }
 
-    if (this.needReceipt === 'yes' && !this.receiptTitle) {
-      alert('請填寫收據抬頭');
-      return;
+    if (this.needReceipt === 'yes') {
+      const receiptError = validateDonorReceiptRequest({
+        donorName: this.donorName,
+        donorPhone: this.phone,
+        donorEmail: this.donorEmail,
+        donorIdNo: this.donorIdNo,
+        lines: this.receiptLines,
+        handoverMethod: this.donationMethod,
+        agreed: this.receiptAgreed,
+      });
+
+      if (receiptError) {
+        alert(receiptError);
+        return;
+      }
     }
 
     if (!this.quantity || this.quantity <= 0) {
@@ -183,8 +229,11 @@ export class DonorDailyFormComponent implements OnInit {
         note: this.note,
         needReceipt: this.needReceipt === 'yes',
         needThankYou: this.needThankYou === 'yes',
-        receiptTitle: this.needReceipt === 'yes' ? this.receiptTitle : null,
-        taxId: this.taxId || null,
+        receiptTitle: this.needReceipt === 'yes' ? this.donorName : null,
+        taxId: this.needReceipt === 'yes' ? this.donorIdNo : null,
+        donorEmail: this.needReceipt === 'yes' ? this.donorEmail : null,
+        donorIdNo: this.needReceipt === 'yes' ? this.donorIdNo : null,
+        receiptLines: this.needReceipt === 'yes' ? this.receiptLines : null,
         materialFiles: this.materialFiles,
         materialVideoFiles: this.materialVideoFiles,
       });
@@ -327,5 +376,30 @@ export class DonorDailyFormComponent implements OnInit {
 
   removeVideo(index: number): void {
     this.materialVideoFiles.splice(index, 1);
+  }
+
+  onNeedReceiptChange(value: string): void {
+    this.needReceipt = value;
+
+    if (value !== 'yes') {
+      this.receiptAgreed = false;
+      return;
+    }
+
+    if (!this.donorName && this.profileName) {
+      this.donorName = this.profileName;
+    }
+
+    if (!this.phone && this.profilePhone) {
+      this.phone = this.profilePhone;
+    }
+
+    if (!this.donorEmail) {
+      this.donorEmail = this.profileEmail;
+    }
+
+    if (this.receiptLines.length === 0) {
+      this.receiptLines = [emptyReceiptLine(this.actualMaterial || this.demand?.item || '', this.quantity && this.quantity > 0 ? this.quantity : 1)];
+    }
   }
 }

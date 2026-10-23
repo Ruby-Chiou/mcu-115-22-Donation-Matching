@@ -3,16 +3,18 @@
 } @else if (errorText()) {
   <p class="state-text error">{{ errorText() }}</p>
 } @else {
+  @if (downloadError()) {
+    <p class="state-text error">{{ downloadError() }}</p>
+  }
   <ul class="receipt-grid">
     @for (receipt of receiptService.receipts(); track receipt.id) {
       <li class="receipt-card">
-        <div #sheetHost>
-          <app-donation-receipt-sheet [sheet]="receipt" />
-        </div>
+        <app-donation-receipt-sheet [sheet]="receipt" />
 
         <div class="card-actions no-print">
-          <button type="button" class="btn btn-primary" (click)="downloadPdf(sheetHost, receipt)">
-            <i class="fa-solid fa-file-pdf"></i> 下載 PDF
+          <p class="download-hint">開啟密碼是身分證字號，按鈕會直接下載檔案。</p>
+          <button type="button" class="btn btn-primary" [disabled]="downloadingId() === receipt.id" (click)="downloadPdf(receipt)">
+            <i class="fa-solid fa-file-pdf"></i> {{ downloadingId() === receipt.id ? '準備 PDF...' : '下載 PDF' }}
           </button>
         </div>
       </li>

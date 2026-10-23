@@ -170,19 +170,24 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/agency/supply-form']);
   }
 
-  goToDetail(serialNo: number | undefined): void {
-    if (serialNo == null || !Number.isInteger(Number(serialNo))) {
-      console.error('無法前往災害物資詳細頁，需求編號不正確：', serialNo);
+  goToDetail(id: number | undefined): void {
+    if (id == null || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+      console.error('無法前往災害物資詳細頁，資料庫 id 不正確：', id);
       return;
     }
 
-    this.router.navigate(['/agency/supply-detail', serialNo]);
+    this.router.navigate(['/agency/supply-detail', id]);
   }
 
-  goToEdit(serialNo: number): void {
+  goToEdit(id: number | undefined): void {
+    if (id == null || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+      console.error('無法前往災害物資編輯頁，資料庫 id 不正確：', id);
+      return;
+    }
+
     this.saveListPosition();
     sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-edit', serialNo]);
+    this.router.navigate(['/agency/supply-edit', id]);
   }
 
   saveListPosition(): void {

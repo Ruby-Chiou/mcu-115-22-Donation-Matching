@@ -4,7 +4,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 
 import { DonationReceiptSheetComponent } from '../../components/receipt/donation-receipt-sheet/donation-receipt-sheet.component';
-import { downloadReceiptPdf } from '../../components/receipt/receipt-print';
+import { receiptPdfFileName } from '../../core/receipt/donation-receipt-document';
+import { DonationReceiptPdfService } from '../../core/receipt/donation-receipt-pdf.service';
 import { AgencyCertificateService } from '../../core/services/member-center/agency-certificate.service';
 import { DonationReceiptService } from '../../core/services/member-center/donation-receipt.service';
 import { DonorDonationHistoryService } from '../../core/services/member-center/donor-donation-history.service';
@@ -35,6 +36,7 @@ export class DonorHistoryComponent implements OnInit {
   private readonly receiptService = inject(DonationReceiptService);
   private readonly certificateService = inject(AgencyCertificateService);
   private readonly thankService = inject(PublicDonationThankService);
+  private readonly receiptPdf = inject(DonationReceiptPdfService);
   private readonly sanitizer = inject(DomSanitizer);
 
   protected readonly isImageCertificate = isImageCertificate;
@@ -45,6 +47,8 @@ export class DonorHistoryComponent implements OnInit {
 
   readonly isLoading = signal(true);
   readonly errorText = signal('');
+  readonly downloadError = signal('');
+  readonly downloadingReceipt = signal(false);
   readonly activeFilter = signal<DonationHistoryFilter>('ALL');
   readonly keyword = signal('');
   readonly selectedId = signal<string | null>(null);
@@ -162,14 +166,24 @@ export class DonorHistoryComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  downloadPdf(host: HTMLElement, receipt: DonationReceipt): void {
-    const paper = host.querySelector('.paper');
+  async downloadPdf(receipt: DonationReceipt): Promise<void> {
+    this.downloadError.set('');
+    this.downloadingReceipt.set(true);
 
-    if (!(paper instanceof HTMLElement)) {
-      return;
+    try {
+      const fileName = receipt.pdfFileName || receiptPdfFileName(receipt.receiptNo);
+
+      if (receipt.pdfUrl) {
+        await this.receiptPdf.downloadStored(receipt.pdfUrl, fileName);
+        return;
+      }
+
+      await this.receiptPdf.downloadProtected(receipt, receipt.donorIdNo);
+    } catch (error) {
+      this.downloadError.set(error instanceof Error ? error.message : '無法下載 PDF');
+    } finally {
+      this.downloadingReceipt.set(false);
     }
-
-    downloadReceiptPdf(paper, receipt.receiptNo);
   }
 
   statusTone(status: DonorDonationHistory['status']): string {

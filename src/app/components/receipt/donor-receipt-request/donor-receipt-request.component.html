@@ -1,0 +1,39 @@
+<div class="receipt-request">
+  <p class="intro">以下資料會先自動帶入。請核對物資明細與預估價格，預覽無誤後再同意送出。機構章與完成日期由受贈單位開立時補上。</p>
+
+  <div class="readonly-grid">
+    <p>姓名　<strong>{{ donorName() || '請先填寫上方姓名' }}</strong></p>
+    <p>電話　<strong>{{ donorPhone() || '請先填寫上方電話' }}</strong></p>
+    <p>接送方式　<strong>{{ handoverMethod() || '請先選擇寄送或面交' }}</strong></p>
+  </div>
+
+  <label>
+    Email
+    <input type="email" maxlength="80" [value]="donorEmail()" (input)="donorEmail.set(inputValue($event))" />
+  </label>
+
+  <label>
+    身分證字號
+    <input type="text" maxlength="10" [value]="donorIdNo()" (input)="donorIdNo.set(inputValue($event))" autocomplete="off" />
+    <small>只用來作為下載 PDF 的開啟密碼，不會印在收據上。</small>
+  </label>
+
+  <div class="lines-head">
+    <h3>捐贈物資</h3>
+    <button type="button" (click)="useSuggestedItem()">帶入上方填寫的物資</button>
+  </div>
+  <app-receipt-line-editor [lines]="lines()" (linesChange)="lines.set($event)" />
+
+  <div class="preview-actions">
+    <button type="button" (click)="togglePreview()">{{ showPreview() ? '收合預覽' : '預覽收據' }}</button>
+  </div>
+
+  @if (showPreview()) {
+    <app-donation-receipt-sheet [sheet]="previewSheet()" />
+  }
+
+  <label class="agree">
+    <input type="checkbox" [checked]="agreed()" (change)="agreed.set(checkedValue($event))" />
+    <span>我已核對收據內容，同意送出這份收據申請</span>
+  </label>
+</div>
