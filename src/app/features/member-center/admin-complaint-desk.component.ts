@@ -9,7 +9,7 @@ import { SupportComplaint, SupportComplaintService, SupportReply } from '../../c
   selector: 'app-admin-complaint-desk',
   imports: [DatePipe, FormsModule],
   templateUrl: './admin-complaint-desk.component.html',
-  styleUrl: '../admin-desk.scss',
+  styleUrl: './admin-complaint-desk.component.scss',
 })
 export class AdminComplaintDeskComponent implements OnInit {
   private readonly complaints = inject(SupportComplaintService);

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, from } from 'rxjs';
 
 import { VolunteerDemand } from '../../../models/agency/volunteer-demand';
+import { DemandRepository } from '../../demands/demand-repository';
 import { SupabaseService } from '../database/supabase.service';
 interface VolunteerDemandRow {
   id: number | string;
@@ -34,7 +35,7 @@ interface VolunteerDemandRow {
 @Injectable({
   providedIn: 'root',
 })
-export class VolunteerDemandService {
+export class VolunteerDemandService implements DemandRepository<VolunteerDemand> {
   private readonly tableName = 'agency_disaster_volunteer_items';
 
   private demands: VolunteerDemand[] = [];

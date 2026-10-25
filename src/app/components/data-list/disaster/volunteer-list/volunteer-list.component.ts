@@ -7,14 +7,12 @@ import { VolunteerDemandService } from '../../../../core/services/agency-volunte
 import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/volunteer-demand';
 
 import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
-import { VolunteerDeleteComponent } from '../../../modal/delete/volunteer-delete/volunteer-delete.component';
+import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
 import { PaginationComponent } from '../../../pagination/pagination.component';
 
 import { VolunteerSearchBarComponent } from '../../../search-bar/volunteer-search-bar/volunteer-search-bar.component';
 import { VolunteerFilterComponent, VolunteerFilterState } from '../../../filter/volunteer-filter/volunteer-filter.component';
 import { VolunteerSortBarComponent, SortType } from '../../../sort-bar/volunteer-sort-bar/volunteer-sort-bar.component';
-import { VolunteerOnShelfComponent } from '../../../modal/shelf/volunteer-on-shelf/volunteer-on-shelf.component';
-import { VolunteerOffShelfComponent } from '../../../modal/shelf/volunteer-off-shelf/volunteer-off-shelf.component';
 
 @Component({
   selector: 'app-volunteer-list',
@@ -24,12 +22,10 @@ import { VolunteerOffShelfComponent } from '../../../modal/shelf/volunteer-off-s
     FormsModule,
     RouterLink,
     PaginationComponent,
-    VolunteerDeleteComponent,
+    ConfirmModalComponent,
     VolunteerSearchBarComponent,
     VolunteerSortBarComponent,
     VolunteerFilterComponent,
-    VolunteerOffShelfComponent,
-    VolunteerOnShelfComponent,
     SupplyLoadingComponent,
   ],
   templateUrl: './volunteer-list.component.html',
@@ -474,6 +470,22 @@ export class VolunteerListComponent {
 
   closeDeleteModal() {
     this.showDeleteModal = false;
+  }
+
+  async confirmDelete(): Promise<void> {
+    if (this.deleteIds.length === 0) {
+      return;
+    }
+
+    try {
+      for (const id of this.deleteIds) {
+        await this.VolunteerDemandService.deleteDemand(id);
+      }
+      this.onDeleted();
+    } catch (error) {
+      console.error('刪除志工需求失敗：', error);
+      alert('刪除失敗，請確認資料是否存在或是否具有刪除權限。');
+    }
   }
 
   onDeleted() {

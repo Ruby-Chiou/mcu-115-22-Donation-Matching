@@ -8,8 +8,8 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { DonationService } from '../../../core/services/agency-daily-demand/daily-donation.service';
 
-import { AgencyDonorContactComponent } from '../../agency-donor-contact/agency-donor-contact.component';
-import { DonationRecordLinksComponent } from '../../agency-record-links/donation-record-links.component';
+import { AgencyDonorContactComponent } from '../../agency/agency-donor-contact/agency-donor-contact.component';
+import { DonationRecordLinksComponent } from '../../agency/agency-record-links/donation-record-links.component';
 import { DonationFile, RecipientDonationReview } from '../../../models/agency/item-review';
 
 @Component({

@@ -1,13 +1,13 @@
 //這裡是顏色命名處，可全域使用
 :root {
   /* 核心招牌色*/
-  --color-brand-primary: var(--mat-sys-primary);
+  --color-brand-primary: #005cbb;
   --color-brand-primary-light: #3f93e2;
   --color-brand-primary-dark: #2b74c4;
 
   /* 2. 文字色 */
-  --color-text-main: var(--mat-sys-on-surface);
-  --color-text-muted: var(--mat-sys-on-surface-variant);
+  --color-text-main: #1a1c1c;
+  --color-text-muted: #44474e;
   --color-text-dark: #163a53;
   --color-text-medium: #27506b;
   --color-text-light: #638096;
@@ -23,7 +23,7 @@
   --bg-gradient-end: #fdf8f0;
 
   /* 4. 邊框與分隔線 */
-  --border-default: var(--mat-sys-outline-variant);
+  --border-default: #c4c6d0;
   --border-light: #d7e4ef;
   --border-lighter: #e2eef6;
   --border-lightest: #e1eef8;
@@ -42,5 +42,5 @@
   --shadow-xl: 0 20px 60px rgba(12, 45, 75, 0.16);
 
   //導覽列背景色
-  --nav-bg: var(--mat-sys-surface);
+  --nav-bg: #ffffff;
 }

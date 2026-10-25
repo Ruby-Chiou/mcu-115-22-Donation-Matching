@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, from } from 'rxjs';
 
 import { DisasterDemand, CreateDisasterDemand } from '../../../models/agency/disaster-demand';
+import { DemandRepository } from '../../demands/demand-repository';
 import { SupabaseService } from '../database/supabase.service';
 
 interface DisasterDemandRow {
@@ -52,7 +53,7 @@ interface DisasterDemandRow {
 @Injectable({
   providedIn: 'root',
 })
-export class DisasterDemandService {
+export class DisasterDemandService implements DemandRepository<DisasterDemand> {
   private readonly tableName = 'agency_disaster_supply_items';
 
   private demands: DisasterDemand[] = [];

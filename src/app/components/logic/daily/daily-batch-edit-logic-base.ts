@@ -1,14 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { EditableDailyDemand } from '../../../models/agency/daily-demand';
-
-interface NominatimSearchResult {
-  lat: string;
-  lon: string;
-  display_name: string;
-}
 
 export type DailyTextField =
   'item' | 'amountDescription' | 'reason' | 'description' | 'brand' | 'note' | 'unit' | 'recipient' | 'address' | 'phone';
@@ -61,66 +54,23 @@ export class DailyBatchEditLogicBase {
 
   constructor(
     protected readonly service: DailyDemandService,
-    protected readonly router: Router,
-    protected readonly http: HttpClient
+    protected readonly router: Router
   ) {}
 
   async getCoordinatesFromAddress(address: string, demand: EditableDailyDemand): Promise<boolean> {
-    const url = 'https://nominatim.openstreetmap.org/search';
-
-    const originalAddress = address.trim();
-
-    if (!originalAddress) {
-      return false;
-    }
-
-    let roadAddress = originalAddress.replace(/臺/g, '台');
-
-    roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
-
-    roadAddress = roadAddress.trim();
-    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
-    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
-    roadAddress = roadAddress.trim();
-
+    const roadAddress = taiwanRoadName(address);
     if (!roadAddress) {
       return false;
     }
 
-    const roadParams = {
-      q: `${roadAddress}, Taiwan`,
-      format: 'jsonv2',
-      limit: '1',
-      countrycodes: 'tw',
-    };
-
-    try {
-      const roadResults = await firstValueFrom(
-        this.http.get<NominatimSearchResult[]>(url, {
-          params: roadParams,
-        })
-      );
-
-      if (!roadResults || roadResults.length === 0) {
-        return false;
-      }
-
-      const roadResult = roadResults[0];
-
-      const latitude = Number(roadResult.lat);
-      const longitude = Number(roadResult.lon);
-
-      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-        return false;
-      }
-
-      demand.latitude = latitude;
-      demand.longitude = longitude;
-
-      return true;
-    } catch {
+    const point = await geocodeTaiwan(roadAddress);
+    if (!point) {
       return false;
     }
+
+    demand.latitude = point.latitude;
+    demand.longitude = point.longitude;
+    return true;
   }
 
   isManualOffShelf(demand: EditableDailyDemand): boolean {

@@ -1,0 +1,301 @@
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
+import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
+import { DisasterDemand } from '../../../../models/agency/disaster-demand';
+
+import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
+import { SupplyImagePreviewComponent } from '../../../../components/modal/image-preview/supply-image-preview/supply-image-preview.component';
+
+@Component({
+  selector: 'app-supply-detail',
+  imports: [CommonModule, RouterLink, ConfirmModalComponent, SupplyImagePreviewComponent],
+  templateUrl: './supply-detail.component.html',
+  styleUrl: './supply-detail.component.scss',
+})
+export class SupplyDetailComponent implements OnInit, AfterViewInit {
+  demand?: DisasterDemand;
+  showDeleteModal: boolean = false;
+  listNumber?: number;
+  showImagePreview = false;
+  previewImage = '';
+  previewImageName = '';
+
+  constructor(
+    private route: ActivatedRoute,
+    private service: DisasterDemandService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  async ngOnInit(): Promise<void> {
+    const rawId = this.route.snapshot.paramMap.get('id');
+    const id = Number(rawId);
+
+    console.log('[SupplyDetailComponent] 取得路由參數：', {
+      rawId,
+      id,
+    });
+
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[SupplyDetailComponent] 網址中的災害物資 id 不正確：', rawId);
+
+      return;
+    }
+
+    try {
+      const loadedDemand = await this.service.getDemandById(id);
+
+      console.log('[SupplyDetailComponent] Service 回傳資料：', loadedDemand);
+
+      if (!loadedDemand) {
+        console.error('[SupplyDetailComponent] 找不到災害物資需求，id：', id);
+
+        return;
+      }
+
+      this.demand = loadedDemand;
+
+      this.cdr.detectChanges();
+
+      console.log('[SupplyDetailComponent] 已設定 this.demand，已觸發畫面更新：', this.demand);
+
+      console.log('[SupplyDetailComponent] 處理條件後 this.demand：', this.demand);
+    } catch (error) {
+      console.error('[SupplyDetailComponent] 載入災害物資需求失敗：', error);
+    }
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant',
+      });
+    }, 100);
+  }
+
+  // 開啟刪除視窗
+  openDeleteModal() {
+    this.showDeleteModal = true;
+  }
+
+  // 關閉刪除視窗
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+  }
+
+  // 刪除完成後返回列表
+  async confirmDelete(): Promise<void> {
+    const ids = this.getDeleteIds();
+    if (ids.length === 0) {
+      return;
+    }
+
+    try {
+      for (const id of ids) {
+        await this.service.deleteDemand(id);
+      }
+      this.onDeleted();
+    } catch (error) {
+      console.error('刪除災害需求失敗：', error);
+      alert('刪除失敗，請確認資料是否存在或是否具有刪除權限。');
+    }
+  }
+
+  onDeleted() {
+    this.showDeleteModal = false;
+    this.router.navigate(['/agency/disaster']);
+  }
+
+  goBack() {
+    this.router.navigate(['/agency/disaster']);
+  }
+
+  // 開啟圖片預覽
+  openImagePreview(image: string, imageName: string) {
+    this.previewImage = image;
+    this.previewImageName = imageName;
+    this.showImagePreview = true;
+  }
+
+  // 關閉圖片預覽
+  closeImagePreview() {
+    this.showImagePreview = false;
+    this.previewImage = '';
+    this.previewImageName = '';
+  }
+
+  getDeleteIds(): number[] {
+    return this.demand?.serialNo != null ? [this.demand.serialNo] : [];
+  }
+
+  // 檢查是否有有效填寫的其他物品狀態
+  hasCustomConditions(): boolean {
+    return (
+      Array.isArray(this.demand?.customConditions) &&
+      this.demand.customConditions.some((condition: string) => condition && condition.trim() !== '')
+    );
+  }
+
+  // 取得其他物品狀態文字
+  getCustomConditions(): string {
+    return this.demand?.customConditions?.filter((condition) => condition && condition.trim()).join('、') || '無';
+  }
+
+  // 檢查是否有設定聯絡時間
+  hasContactTime(): boolean {
+    if (!this.demand) {
+      return false;
+    }
+
+    if (this.demand.contactTimeDifferent) {
+      return !!(
+        this.demand.weekdayMorning ||
+        this.demand.weekdayAfternoon ||
+        this.demand.weekdayEvening ||
+        this.demand.weekendMorning ||
+        this.demand.weekendAfternoon ||
+        this.demand.weekendEvening
+      );
+    }
+
+    return !!(this.demand.contactTimeMorning || this.demand.contactTimeAfternoon || this.demand.contactTimeEvening);
+  }
+
+  // 取得聯絡時間文字
+  getContactTimeText(): string {
+    if (!this.demand) {
+      return '無';
+    }
+
+    const result: string[] = [];
+
+    // 不區分平日、假日
+    if (!this.demand.contactTimeDifferent) {
+      const times: string[] = [];
+
+      if (this.demand.contactTimeMorning) {
+        times.push('上午 08:00～12:00');
+      }
+
+      if (this.demand.contactTimeAfternoon) {
+        times.push('下午 12:00～18:00');
+      }
+
+      if (this.demand.contactTimeEvening) {
+        times.push('晚上 18:00～22:00');
+      }
+
+      if (times.length > 0) {
+        result.push(`時段：${times.join('、')}`);
+      }
+
+      return result.join(' ｜ ') || '無';
+    }
+
+    // 區分平日、假日
+    const weekdayTimes: string[] = [];
+    const weekendTimes: string[] = [];
+
+    if (this.demand.weekdayMorning) {
+      weekdayTimes.push('上午 08:00～12:00');
+    }
+
+    if (this.demand.weekdayAfternoon) {
+      weekdayTimes.push('下午 12:00～18:00');
+    }
+
+    if (this.demand.weekdayEvening) {
+      weekdayTimes.push('晚上 18:00～22:00');
+    }
+
+    if (this.demand.weekendMorning) {
+      weekendTimes.push('上午 08:00～12:00');
+    }
+
+    if (this.demand.weekendAfternoon) {
+      weekendTimes.push('下午 12:00～18:00');
+    }
+
+    if (this.demand.weekendEvening) {
+      weekendTimes.push('晚上 18:00～22:00');
+    }
+
+    if (weekdayTimes.length > 0) {
+      result.push(`平日：${weekdayTimes.join('、')}`);
+    }
+
+    if (weekendTimes.length > 0) {
+      result.push(`假日：${weekendTimes.join('、')}`);
+    }
+
+    return result.join(' ｜ ') || '無';
+  }
+  // 判斷接受 / 不接受顏色
+  getConditionClass(condition?: string) {
+    if (condition === '接受') {
+      return 'accept';
+    }
+
+    if (condition === '不接受') {
+      return 'reject';
+    }
+
+    return '';
+  }
+
+  // 顯示符號
+  getConditionIcon(condition?: string) {
+    if (condition === '接受') {
+      return '✔';
+    }
+
+    if (condition === '不接受') {
+      return '✘';
+    }
+
+    return '';
+  }
+
+  // 取得接受物資狀態文字
+  getConditionsText(): string {
+    if (!this.demand) {
+      return '無';
+    }
+
+    const conditions = [
+      {
+        name: '全新',
+        value: this.demand.conditions['全新'],
+      },
+      {
+        name: '二手',
+        value: this.demand.conditions['二手'],
+      },
+      {
+        name: '有擦痕',
+        value: this.demand.conditions['有擦痕'],
+      },
+      {
+        name: '過期',
+        value: this.demand.conditions['過期'],
+      },
+      {
+        name: '毀損',
+        value: this.demand.conditions['毀損'],
+      },
+    ];
+
+    return (
+      conditions
+        .filter((condition) => condition.value)
+        .map(
+          (condition) =>
+            `${condition.name}：<span class="${condition.value === '接受' ? 'accept' : 'reject'}">${this.getConditionIcon(condition.value)}</span> ${condition.value}`
+        )
+        .join(' ｜ ') || '無'
+    );
+  }
+}

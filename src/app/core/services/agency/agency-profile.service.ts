@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 
+import { geocodeTaiwan } from '../../map/geocoding';
 import { normalizeWebsiteUrl } from '../../map/map-links';
 import { AgencyProfile } from '../../../models/user/agency';
 import { AgencyAccessService } from './agency-access.service';
@@ -338,27 +339,11 @@ export class AgencyProfileService {
       return null;
     }
 
-    try {
-      const url = new URL('https://nominatim.openstreetmap.org/search');
-      url.searchParams.set('format', 'jsonv2');
-      url.searchParams.set('limit', '1');
-      url.searchParams.set('countrycodes', 'tw');
-      url.searchParams.set('q', address);
-      const response = await fetch(url, { signal: AbortSignal.timeout(4000) });
-      if (!response.ok) {
-        return null;
-      }
-
-      const rows = (await response.json()) as Array<{ lat?: string; lon?: string }>;
-      const latitude = Number(rows[0]?.lat);
-      const longitude = Number(rows[0]?.lon);
-      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-        return null;
-      }
-
-      return { latitude, longitude };
-    } catch {
+    const point = await geocodeTaiwan(address);
+    if (!point) {
       return null;
     }
+
+    return { latitude: point.latitude, longitude: point.longitude };
   }
 }

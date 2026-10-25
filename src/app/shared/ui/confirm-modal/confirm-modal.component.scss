@@ -1,0 +1,84 @@
+.modal-backdrop,
+.off-shelf-overlay,
+.on-shelf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-box,
+.off-shelf-modal,
+.on-shelf-modal {
+  width: min(460px, calc(100% - 40px));
+  padding: 28px 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+
+  h2 {
+    margin: 0 0 16px;
+    font-size: 22px;
+    color: #333;
+  }
+
+  p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #555;
+  }
+}
+
+.modal-actions,
+.off-shelf-actions,
+.on-shelf-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+button {
+  min-width: 96px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.cancel-btn,
+.back-btn {
+  background: #eceff3;
+  color: #333;
+}
+
+.confirm-btn,
+.confirm-off-btn {
+  background: #b42318;
+  color: #fff;
+}
+
+.hide-btn {
+  background: #0056b3;
+  color: #fff;
+}
+
+.hidden-status {
+  color: #0056b3;
+  font-weight: 700;
+}
+
+.warning-text {
+  color: #8a4b08;
+}
+
+.system-note {
+  font-size: 13px;
+  color: #777;
+}

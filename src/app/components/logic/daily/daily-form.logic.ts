@@ -1,16 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DailyDemand } from '../../../models/agency/daily-demand';
 import { DailyFormLogicBase } from './daily-form-logic-base';
-
-interface NominatimSearchResult {
-  lat: string;
-  lon: string;
-  display_name: string;
-}
 
 export interface DailyFormSaveResult {
   scrollTarget?:
@@ -19,8 +12,8 @@ export interface DailyFormSaveResult {
 
 @Injectable()
 export class DailyFormLogic extends DailyFormLogicBase {
-  constructor(dailyDemandService: DailyDemandService, router: Router, route: ActivatedRoute, httpClient: HttpClient) {
-    super(dailyDemandService, router, route, httpClient);
+  constructor(dailyDemandService: DailyDemandService, router: Router, route: ActivatedRoute) {
+    super(dailyDemandService, router, route);
   }
 
   async ngOnInit(): Promise<void> {
@@ -228,64 +221,19 @@ export class DailyFormLogic extends DailyFormLogicBase {
   }
 
   async getCoordinatesFromAddress(address: string): Promise<boolean> {
-    const url = 'https://nominatim.openstreetmap.org/search';
-
-    const originalAddress = address.trim();
-
-    if (!originalAddress) {
-      return false;
-    }
-
-    let roadAddress = originalAddress.replace(/臺/g, '台');
-
-    roadAddress = roadAddress.replace(/\d+(?:-\d+)?(?:之\d+)?號.*$/, '');
-
-    roadAddress = roadAddress.trim();
-
-    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
-
-    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
-
-    roadAddress = roadAddress.trim();
-
+    const roadAddress = taiwanRoadName(address);
     if (!roadAddress) {
       return false;
     }
 
-    const roadParams = {
-      q: `${roadAddress}, Taiwan`,
-      format: 'jsonv2',
-      limit: '1',
-      countrycodes: 'tw',
-    };
-
-    try {
-      const roadResults = await firstValueFrom(
-        this.httpClient.get<NominatimSearchResult[]>(url, {
-          params: roadParams,
-        })
-      );
-
-      if (!roadResults || roadResults.length === 0) {
-        return false;
-      }
-
-      const roadResult = roadResults[0];
-
-      const latitude = Number(roadResult.lat);
-      const longitude = Number(roadResult.lon);
-
-      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-        return false;
-      }
-
-      this.demand.latitude = latitude;
-      this.demand.longitude = longitude;
-
-      return true;
-    } catch {
+    const point = await geocodeTaiwan(roadAddress);
+    if (!point) {
       return false;
     }
+
+    this.demand.latitude = point.latitude;
+    this.demand.longitude = point.longitude;
+    return true;
   }
 
   async save(): Promise<DailyFormSaveResult> {

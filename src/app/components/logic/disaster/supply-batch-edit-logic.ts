@@ -1,14 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
 import { DisasterDemandService } from '../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../models/agency/disaster-demand';
-
-interface NominatimSearchResult {
-  lat: string;
-  lon: string;
-  display_name: string;
-}
 
 export interface SupplyBatchEditState {
   showOffShelfWarning: boolean;
@@ -23,8 +16,7 @@ export interface SaveAllResult {
 export class SupplyBatchEditLogic {
   constructor(
     private readonly service: DisasterDemandService,
-    private readonly router: Router,
-    private readonly http: HttpClient
+    private readonly router: Router
   ) {}
 
   loadEditDemands(): EditableDisasterDemand[] {
@@ -79,76 +71,19 @@ export class SupplyBatchEditLogic {
   }
 
   async getCoordinatesFromAddress(address: string, demand: EditableDisasterDemand): Promise<boolean> {
-    const url = 'https://nominatim.openstreetmap.org/search';
-    const originalAddress = address.trim();
-
-    if (!originalAddress) {
-      return false;
-    }
-    let roadAddress = originalAddress.replace(/臺/g, '台');
-    roadAddress = roadAddress.replace(/\d+(?:-\d+)?號.*$/, '');
-    roadAddress = roadAddress.trim();
-    roadAddress = roadAddress.replace(/^.*?[市縣]/, '');
-    roadAddress = roadAddress.replace(/^.*?[區鄉鎮市]/, '');
-    roadAddress = roadAddress.trim();
-    console.log('================================');
-    console.log('搜尋道路');
-    console.log('原始地址：', originalAddress);
-    console.log('道路名稱：', roadAddress);
-
+    const roadAddress = taiwanRoadName(address);
     if (!roadAddress) {
-      console.warn('無法從地址取得道路名稱：', originalAddress);
-      console.log('================================');
-
       return false;
     }
-    const roadParams = {
-      q: `${roadAddress}, Taiwan`,
-      format: 'jsonv2',
-      limit: '1',
-      countrycodes: 'tw',
-    };
-    try {
-      const roadResults = await firstValueFrom(
-        this.http.get<NominatimSearchResult[]>(url, {
-          params: roadParams,
-        })
-      );
-      console.log('Nominatim 道路搜尋回傳結果：', roadResults);
 
-      if (!roadResults || roadResults.length === 0) {
-        console.warn('找不到道路：', roadAddress);
-        console.log('================================');
-
-        return false;
-      }
-
-      const roadResult = roadResults[0];
-      const latitude = Number(roadResult.lat);
-      const longitude = Number(roadResult.lon);
-
-      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-        console.warn('道路回傳的經緯度無效：', roadResult);
-        console.log('================================');
-        return false;
-      }
-      demand.latitude = latitude;
-      demand.longitude = longitude;
-      console.log('道路定位成功');
-      console.log('原始地址：', originalAddress);
-      console.log('搜尋道路：', roadAddress);
-      console.log('緯度：', latitude);
-      console.log('經度：', longitude);
-      console.log('找到的位置：', roadResult.display_name);
-      console.log('================================');
-
-      return true;
-    } catch (error) {
-      console.error('道路搜尋失敗：', error);
-      console.log('================================');
-
+    const point = await geocodeTaiwan(roadAddress);
+    if (!point) {
       return false;
     }
+
+    demand.latitude = point.latitude;
+    demand.longitude = point.longitude;
+    return true;
   }
 
   setContactTimeDifferent(demand: EditableDisasterDemand, different: boolean): void {

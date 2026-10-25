@@ -16,7 +16,8 @@ import {
   validateAgencyReceiptIssue,
 } from '../../receipt/donation-receipt-document';
 import { DonationReceiptPdfService } from '../../receipt/donation-receipt-pdf.service';
-import { AuthSessionService } from '../auth/auth-session.service';
+import { AgencyCertificateUploadService } from './agency-certificate-upload.service';
+import { AgencyMemberMessageService } from './agency-member-message.service';
 import { pdfBlob } from '../../receipt/receipt-file-download';
 import { AgencyReceiptTask, IssuedDonationReceipt, ReceiptDraft, ReceiptSealFiles } from '../../../models/agency/receipt-issuance';
 import { AGENCY_OFFICE } from '../../../models/user/agency';
@@ -99,9 +100,10 @@ export class AgencyReceiptIssuanceService {
   private readonly receiptBucket = 'donor-receipts';
 
   private readonly supabaseService = inject(SupabaseService);
-  private readonly auth = inject(AuthSessionService);
   private readonly publicThanks = inject(PublicDonationThankService);
   private readonly receiptPdf = inject(DonationReceiptPdfService);
+  private readonly messages = inject(AgencyMemberMessageService);
+  private readonly certificates = inject(AgencyCertificateUploadService);
 
   private readonly tasksSignal = signal<AgencyReceiptTask[]>([]);
   readonly tasks = this.tasksSignal.asReadonly();
@@ -247,39 +249,11 @@ export class AgencyReceiptIssuanceService {
   }
 
   async contactDonor(donorUid: string, donorName: string, content: string): Promise<void> {
-    const message = content.trim();
-
-    if (!donorUid) {
-      throw new Error('這筆沒有會員帳號，無法用站內信聯絡');
-    }
-
-    if (message.length < 2) {
-      throw new Error('請先寫下要聯絡的內容');
-    }
-
-    await this.notifyDonor({ donorUid, donorName }, '關於你的捐助', message);
+    await this.messages.sendToDonor(donorUid, donorName, '關於你的捐助', content);
   }
 
   private async notifyDonor(target: { donorUid: string; donorName: string }, subject: string, content: string): Promise<void> {
-    const senderUid = this.auth.principal().userId;
-
-    if (!senderUid) {
-      throw new Error('請先登入受助機構帳號');
-    }
-
-    const { error } = await this.supabaseService.client.from('member_messages').insert({
-      recipientUid: target.donorUid,
-      recipientName: target.donorName || '捐助者',
-      senderUid,
-      senderName: this.auth.principal().displayName || '受助機構',
-      category: 'AGENCY',
-      subject,
-      content,
-    });
-
-    if (error) {
-      throw new Error('站內信沒有送出，請稍後再試。');
-    }
+    await this.messages.sendToDonor(target.donorUid, target.donorName, subject, content);
   }
 
   /**
@@ -413,72 +387,17 @@ export class AgencyReceiptIssuanceService {
   }
 
   async uploadCertificate(task: AgencyReceiptTask, agencyName: string, file: File, note: string): Promise<void> {
-    if (!task.needThankYou) {
-      throw new Error('此筆捐助未申請感謝狀');
-    }
-
-    if (!task.donorUid) {
-      throw new Error('缺少捐助者會員編號，無法上傳感謝狀');
-    }
-
-    const trimmedAgency = agencyName.trim();
-
-    if (!trimmedAgency) {
-      throw new Error('請填寫受贈機構名稱');
-    }
-
-    if (!CERTIFICATE_ACCEPT.includes(file.type)) {
-      throw new Error('僅支援 PDF、JPG、PNG、WEBP');
-    }
-
-    if (file.size > CERTIFICATE_MAX_BYTES) {
-      throw new Error('檔案大小不可超過 8MB');
-    }
-
-    const extension = file.name.includes('.') ? (file.name.split('.').pop()?.toLowerCase() ?? 'bin') : 'bin';
-    const storagePath = `${task.donorUid}/${task.donationId}/${Date.now()}.${extension}`;
-
-    const { error: uploadError } = await this.supabaseService.client.storage
-      .from(this.certificateBucket)
-      .upload(storagePath, file, { contentType: file.type, upsert: false });
-
-    if (uploadError) {
-      console.error('上傳感謝狀失敗：', uploadError);
-      throw uploadError;
-    }
-
-    const { data: urlData } = this.supabaseService.client.storage.from(this.certificateBucket).getPublicUrl(storagePath);
-
-    if (task.certificateUploaded) {
-      const { error: deleteError } = await this.supabaseService.client
-        .from(this.certificateTable)
-        .delete()
-        .eq('donationId', task.donationId);
-
-      if (deleteError) {
-        console.error('清除舊感謝狀紀錄失敗：', deleteError);
-        throw deleteError;
-      }
-    }
-
-    const { error } = await this.supabaseService.client.from(this.certificateTable).insert({
+    await this.certificates.upload({
       donationId: task.donationId,
       donorUid: task.donorUid,
-      agencyName: trimmedAgency,
+      needThankYou: task.needThankYou,
+      alreadyUploaded: task.certificateUploaded,
+      agencyName,
       donationItem: task.actualMaterial || task.demandItem,
       donationDate: task.donationDate,
-      fileUrl: urlData.publicUrl,
-      fileName: file.name,
-      mimeType: file.type,
-      note: note.trim(),
-      uploadedAt: new Date().toISOString(),
+      file,
+      note,
     });
-
-    if (error) {
-      console.error('寫入感謝狀紀錄失敗：', error);
-      throw error;
-    }
-
     await this.loadTasks();
   }
 

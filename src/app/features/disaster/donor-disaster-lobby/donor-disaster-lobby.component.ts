@@ -3,8 +3,8 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
-import { DonorDisasterPageComponent } from '../../../components/page/donor-disaster-page/donor-disaster-page.component';
-import { DisasterLocationsComponent } from '../../../features/disaster/disaster-locations/disaster-locations.component';
+import { DonorDisasterPageComponent } from '../pages/donor-disaster-page/donor-disaster-page.component';
+import { DisasterLocationsComponent } from '../disaster-locations/disaster-locations.component';
 
 interface DisasterItem {
   image: string;

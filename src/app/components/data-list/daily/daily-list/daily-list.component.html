@@ -258,29 +258,25 @@
     ></app-pagination>
   </ng-container>
 
-  <!-- 刪除 Modal -->
-  <app-supply-delete
+  <app-confirm-modal
     *ngIf="showDeleteModal"
-    [demandIds]="deleteIds"
-    [deleteType]="deleteType"
-    [demandType]="'daily'"
-    (closed)="closeDeleteModal()"
-    (deleted)="onDeleted()"
-  >
-  </app-supply-delete>
+    message="確定要刪除此筆日常需求嗎？"
+    (cancelled)="closeDeleteModal()"
+    (confirmed)="confirmDelete()"
+  ></app-confirm-modal>
 
-  <!-- 手動下架提示 -->
-  <app-supply-off-shelf
+  <app-confirm-modal
     *ngIf="showOffShelfWarning"
-    (closed)="cancelManualOffShelf()"
-    (hide)="hideInsteadOfOffShelf()"
+    mode="off-shelf"
+    (cancelled)="cancelManualOffShelf()"
+    (alternate)="hideInsteadOfOffShelf()"
     (confirmed)="confirmManualOffShelf()"
-  ></app-supply-off-shelf>
+  ></app-confirm-modal>
 
-  <!-- 已手動下架，禁止重新上架提示 -->
-  <app-supply-on-shelf
+  <app-confirm-modal
     *ngIf="showOnShelfWarning"
-    (closed)="closeOnShelfWarning()"
+    mode="blocked-on-shelf"
+    (cancelled)="closeOnShelfWarning()"
     (confirmed)="closeOnShelfWarning()"
-  ></app-supply-on-shelf>
+  ></app-confirm-modal>
 </div>

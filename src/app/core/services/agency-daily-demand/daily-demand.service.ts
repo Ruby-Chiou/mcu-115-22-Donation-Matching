@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 
 import { DailyDemand, CreateDailyDemand, DailyConditions } from '../../../models/agency/daily-demand';
+import { DemandRepository } from '../../demands/demand-repository';
 import { SupabaseService } from '../database/supabase.service';
 
 interface DailyDemandRow {
@@ -53,7 +54,7 @@ interface DailyDemandRow {
 @Injectable({
   providedIn: 'root',
 })
-export class DailyDemandService {
+export class DailyDemandService implements DemandRepository<DailyDemand> {
   private readonly tableName = 'agency_daily_supply_items';
 
   private demands: DailyDemand[] = [];

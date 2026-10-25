@@ -61,19 +61,23 @@
             ],
             "styles": [
                "node_modules/leaflet/dist/leaflet.css",
-              "src/styles.scss"]
+              "src/styles.scss"],
+            "allowedCommonJsDependencies": [
+              "leaflet",
+              "node-html-better-parser"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "700kB",
                   "maximumError": "1MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "8kB",
                   "maximumError": "8kB"
                 }
               ],

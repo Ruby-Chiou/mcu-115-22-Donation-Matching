@@ -12,9 +12,7 @@ import { DailySearchBarComponent } from '../../../search-bar/daily-search-bar/da
 import { DailyFilterComponent } from '../../../filter/daily-filter/daily-filter.component';
 import { DailySortBarComponent, SortType } from '../../../sort-bar/daily-sort-bar/daily-sort-bar.component';
 import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
-import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
-import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
-import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
+import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
 import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 
 @Component({
@@ -24,9 +22,7 @@ import { DailyCommentService } from '../../../../core/services/comments/daily-co
     CommonModule,
     FormsModule,
     RouterLink,
-    SupplyDeleteComponent,
-    SupplyOffShelfComponent,
-    SupplyOnShelfComponent,
+    ConfirmModalComponent,
     SupplyLoadingComponent,
     PaginationComponent,
     DailySearchBarComponent,
@@ -397,6 +393,22 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   closeDeleteModal(): void {
     this.showDeleteModal = false;
+  }
+
+  async confirmDelete(): Promise<void> {
+    if (this.deleteIds.length === 0) {
+      return;
+    }
+
+    try {
+      for (const id of this.deleteIds) {
+        await this.dailyDemandService.deleteDemand(id);
+      }
+      await this.onDeleted();
+    } catch (error) {
+      console.error('刪除物資需求失敗：', error);
+      alert('刪除失敗，請確認資料是否存在或是否具有刪除權限。');
+    }
   }
 
   async onDeleted(): Promise<void> {

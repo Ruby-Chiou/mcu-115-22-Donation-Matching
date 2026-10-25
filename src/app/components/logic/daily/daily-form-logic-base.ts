@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../models/agency/daily-demand';
@@ -7,7 +6,6 @@ export class DailyFormLogicBase {
   protected readonly dailyDemandService: DailyDemandService;
   protected readonly router: Router;
   protected readonly route: ActivatedRoute;
-  protected readonly httpClient: HttpClient;
 
   isEditMode = false;
   submitted = false;
@@ -93,11 +91,10 @@ export class DailyFormLogicBase {
     category: '',
   };
 
-  constructor(dailyDemandService: DailyDemandService, router: Router, route: ActivatedRoute, httpClient: HttpClient) {
+  constructor(dailyDemandService: DailyDemandService, router: Router, route: ActivatedRoute) {
     this.dailyDemandService = dailyDemandService;
     this.router = router;
     this.route = route;
-    this.httpClient = httpClient;
   }
 
   get isManualOffShelf(): boolean {

@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
@@ -9,8 +8,8 @@ export type { DailyTextField } from './daily-batch-edit-logic-base';
 
 @Injectable()
 export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
-  constructor(service: DailyDemandService, router: Router, http: HttpClient) {
-    super(service, router, http);
+  constructor(service: DailyDemandService, router: Router) {
+    super(service, router);
   }
 
   init(): void {

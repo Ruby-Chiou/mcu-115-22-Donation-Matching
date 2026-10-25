@@ -6,13 +6,11 @@ import { Subscription } from 'rxjs';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand, DisplayStatus } from '../../../../models/agency/disaster-demand';
 import { PaginationComponent } from '../../../pagination/pagination.component';
-import { SupplyLoadingComponent } from '../../../../components/loading/supply-loading/supply-loading.component';
-import { SupplyDeleteComponent } from '../../../modal/delete/supply-delete/supply-delete.component';
+import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
+import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
 import { SupplySearchBarComponent } from '../../../search-bar/supply-search-bar/supply-search-bar.component';
 import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply-filter/supply-filter.component';
 import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
-import { SupplyOnShelfComponent } from '../../../modal/shelf/supply-on-shelf/supply-on-shelf.component';
-import { SupplyOffShelfComponent } from '../../../modal/shelf/supply-off-shelf/supply-off-shelf.component';
 import { DisasterListLogic, DisasterListItem } from '../../../logic/disaster/disaster-list-logic';
 import { DisasterCommentService } from '../../../../core/services/comments/disaster-comment.service';
 
@@ -23,9 +21,7 @@ import { DisasterCommentService } from '../../../../core/services/comments/disas
     CommonModule,
     FormsModule,
     RouterLink,
-    SupplyDeleteComponent,
-    SupplyOffShelfComponent,
-    SupplyOnShelfComponent,
+    ConfirmModalComponent,
     PaginationComponent,
     SupplySearchBarComponent,
     SupplySortBarComponent,
@@ -352,6 +348,22 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   closeDeleteModal(): void {
     this.showDeleteModal = false;
+  }
+
+  async confirmDelete(): Promise<void> {
+    if (this.deleteIds.length === 0) {
+      return;
+    }
+
+    try {
+      for (const id of this.deleteIds) {
+        await this.disasterDemandService.deleteDemand(id);
+      }
+      await this.onDeleted();
+    } catch (error) {
+      console.error('刪除物資需求失敗：', error);
+      alert('刪除失敗，請確認資料是否存在或是否具有刪除權限。');
+    }
   }
 
   async onDeleted(): Promise<void> {

@@ -166,24 +166,25 @@
       ></app-pagination>
     </div>
   </ng-container>
-  <app-volunteer-delete
+  <app-confirm-modal
     *ngIf="showDeleteModal"
-    [demandIds]="deleteIds"
-    [deleteType]="deleteType"
-    (closed)="closeDeleteModal()"
-    (deleted)="onDeleted()"
-  ></app-volunteer-delete>
+    message="確定要刪除此筆志工需求嗎？"
+    (cancelled)="closeDeleteModal()"
+    (confirmed)="confirmDelete()"
+  ></app-confirm-modal>
 
-  <app-volunteer-off-shelf
+  <app-confirm-modal
     *ngIf="showOffShelfWarning"
-    (closed)="cancelManualOffShelf()"
-    (hide)="hideInsteadOfOffShelf()"
+    mode="off-shelf"
+    (cancelled)="cancelManualOffShelf()"
+    (alternate)="hideInsteadOfOffShelf()"
     (confirmed)="confirmManualOffShelf()"
-  ></app-volunteer-off-shelf>
+  ></app-confirm-modal>
 
-  <app-volunteer-on-shelf
+  <app-confirm-modal
     *ngIf="showOnShelfWarning"
-    (closed)="closeOnShelfWarning()"
+    mode="blocked-on-shelf"
+    (cancelled)="closeOnShelfWarning()"
     (confirmed)="closeOnShelfWarning()"
-  ></app-volunteer-on-shelf>
+  ></app-confirm-modal>
 </div>

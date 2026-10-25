@@ -13,4 +13,6 @@ export const environment = {
    * 後端再呼叫 OpenRouter，並把結果寫回資料庫。
    */
   aiReviewApiUrl: 'https://mcu-115-22-donation-matching-backend.onrender.com',
+  aiChatApiUrl: 'https://mcu-115-22-donation-matching-backend.onrender.com/api/assistant/chat',
+  aiInspectionApiUrl: 'http://127.0.0.1:8000',
 };

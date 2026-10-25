@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { environment } from '../../../../environment/environment';
 
 import { DonationFile, RecipientDonationReview } from '../../../models/agency/item-review';
+import { SupabaseService } from '../database/supabase.service';
 import { MemberSessionService } from '../member-center/member-session.service';
 import { PublicDonationThankService } from '../member-center/public-donation-thank.service';
 
@@ -38,7 +38,11 @@ export class DonationService {
 
   private readonly bucketName = 'donation-files';
 
-  private readonly supabase: SupabaseClient = createClient(environment.supabaseUrl, environment.supabasePublishableKey);
+  private readonly supabaseService = inject(SupabaseService);
+
+  private get supabase() {
+    return this.supabaseService.client;
+  }
 
   private readonly memberSession = inject(MemberSessionService);
   private readonly publicThanks = inject(PublicDonationThankService);

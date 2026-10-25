@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environment/environment';
 import { InspectionResult } from '../../models/ai-inspection/inspection-reault';
 
 @Injectable({
@@ -9,7 +10,7 @@ import { InspectionResult } from '../../models/ai-inspection/inspection-reault';
 export class InspectionService {
   private http = inject(HttpClient);
 
-  private apiUrl = 'http://127.0.0.1:8000';
+  private apiUrl = environment.aiInspectionApiUrl;
 
   inspectImage(image: File, itemCondition: 'new' | 'used'): Observable<InspectionResult> {
     const formData = new FormData();
