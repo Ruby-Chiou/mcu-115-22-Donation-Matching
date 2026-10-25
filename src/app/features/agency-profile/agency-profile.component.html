@@ -20,7 +20,7 @@
           <h2>公開展示</h2>
           <a [routerLink]="previewLink()">到前台查看</a>
         </div>
-        <p class="card-note">這些欄位會出現在受助機構專區，以及需求詳情頁的機構卡片。</p>
+        <p class="card-note">這些欄位會出現在受助機構專區、捐助地圖，以及需求詳情頁的機構卡片。官方網站會做成可點的連結。</p>
 
         <div class="grid">
           <label class="field">
@@ -46,6 +46,11 @@
           <label class="field">
             <span>公開聯絡電話</span>
             <input type="tel" name="contactPhone" [(ngModel)]="draft.contactPhone" maxlength="30" />
+          </label>
+
+          <label class="field wide">
+            <span>官方網站</span>
+            <input type="url" name="websiteUrl" [(ngModel)]="draft.websiteUrl" maxlength="200" placeholder="https://" />
           </label>
 
           <label class="field wide">

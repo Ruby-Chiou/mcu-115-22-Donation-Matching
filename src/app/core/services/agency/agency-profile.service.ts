@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 
+import { normalizeWebsiteUrl } from '../../map/map-links';
 import { AgencyProfile } from '../../../models/user/agency';
 import { SupabaseService } from '../database/supabase.service';
 import { MemberSessionService } from '../member-center/member-session.service';
@@ -56,6 +57,7 @@ export interface AgencyProfileDraft {
   serviceTargets: string[];
   mission: string;
   background: string;
+  websiteUrl: string;
 }
 
 interface AgencyProfileRow {
@@ -84,6 +86,9 @@ interface AgencyProfileRow {
   serviceTargets: string[] | null;
   mission: string | null;
   background: string | null;
+  websiteUrl?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   accountStatus: string | null;
   createdAt: string | null;
   updatedAt: string | null;
@@ -123,36 +128,54 @@ export class AgencyProfileService {
     const current = this.requireProfile();
     const introImages = draft.introImages.map((item) => item.trim()).filter(Boolean).slice(0, AGENCY_INTRO_IMAGE_LIMIT);
     const serviceTargets = draft.serviceTargets.map((item) => item.trim()).filter(Boolean);
+    const websiteUrl = normalizeWebsiteUrl(draft.websiteUrl);
+    if (websiteUrl == null) {
+      throw new Error('官方網站請填寫 http 或 https 網址');
+    }
 
-    const { data, error } = await this.supabase.client
-      .from(this.tableName)
-      .update({
-        agencyName: draft.agencyName.trim(),
-        registrationNumber: draft.registrationNumber.trim(),
-        representative: draft.representative.trim(),
-        contactPhone: draft.contactPhone.trim(),
-        defaultAddress: draft.defaultAddress.trim(),
-        contactPersonName: draft.contactPersonName.trim(),
-        contactPersonTitle: draft.contactPersonTitle.trim(),
-        department: draft.department.trim(),
-        contactPersonPhone: draft.contactPersonPhone.trim(),
-        contactPersonEmail: draft.contactPersonEmail.trim(),
-        verificationDocumentUrl: draft.verificationDocumentUrl.trim(),
-        consentToContact: draft.consentToContact,
-        city: draft.city.trim(),
-        image: draft.image.trim(),
-        introImages,
-        establishedYear: draft.establishedYear.trim(),
-        registrationLabel: draft.registrationLabel.trim(),
-        serviceArea: draft.serviceArea.trim(),
-        serviceTargets,
-        mission: draft.mission.trim(),
-        background: draft.background.trim(),
-        updatedAt: new Date().toISOString(),
-      })
-      .eq('uid', current.uid)
-      .select('*')
-      .single();
+    const address = draft.defaultAddress.trim();
+    const addressChanged = address !== current.defaultAddress.trim();
+    const point = addressChanged ? await this.lookupCoordinates(address) : null;
+
+    const payload = {
+      agencyName: draft.agencyName.trim(),
+      registrationNumber: draft.registrationNumber.trim(),
+      representative: draft.representative.trim(),
+      contactPhone: draft.contactPhone.trim(),
+      defaultAddress: address,
+      contactPersonName: draft.contactPersonName.trim(),
+      contactPersonTitle: draft.contactPersonTitle.trim(),
+      department: draft.department.trim(),
+      contactPersonPhone: draft.contactPersonPhone.trim(),
+      contactPersonEmail: draft.contactPersonEmail.trim(),
+      verificationDocumentUrl: draft.verificationDocumentUrl.trim(),
+      consentToContact: draft.consentToContact,
+      city: draft.city.trim(),
+      image: draft.image.trim(),
+      introImages,
+      establishedYear: draft.establishedYear.trim(),
+      registrationLabel: draft.registrationLabel.trim(),
+      serviceArea: draft.serviceArea.trim(),
+      serviceTargets,
+      mission: draft.mission.trim(),
+      background: draft.background.trim(),
+      websiteUrl,
+      latitude: addressChanged ? (point?.latitude ?? null) : current.latitude,
+      longitude: addressChanged ? (point?.longitude ?? null) : current.longitude,
+      updatedAt: new Date().toISOString(),
+    };
+
+    let { data, error } = await this.supabase.client.from(this.tableName).update(payload).eq('uid', current.uid).select('*').single();
+
+    if (error && this.missingMapColumn(error)) {
+      const { websiteUrl: _website, latitude: _latitude, longitude: _longitude, ...legacy } = payload;
+      const retry = await this.supabase.client.from(this.tableName).update(legacy).eq('uid', current.uid).select('*').single();
+      data = retry.data;
+      error = retry.error;
+      if (!error && websiteUrl) {
+        throw new Error('其他資料已儲存，但資料庫還沒有官方網站欄位，請先套用最新遷移。');
+      }
+    }
 
     if (error) {
       console.error('儲存機構資料失敗：', error);
@@ -212,6 +235,7 @@ export class AgencyProfileService {
       serviceTargets: [...profile.serviceTargets],
       mission: profile.mission,
       background: profile.background,
+      websiteUrl: profile.websiteUrl,
     };
   }
 
@@ -278,6 +302,43 @@ export class AgencyProfileService {
       serviceTargets: row.serviceTargets ?? [],
       mission: row.mission ?? '',
       background: row.background ?? '',
+      websiteUrl: row.websiteUrl ?? '',
+      latitude: row.latitude != null && Number.isFinite(Number(row.latitude)) ? Number(row.latitude) : null,
+      longitude: row.longitude != null && Number.isFinite(Number(row.longitude)) ? Number(row.longitude) : null,
     };
+  }
+
+  private missingMapColumn(error: { code?: string; message?: string }): boolean {
+    const message = error.message ?? '';
+    return error.code === 'PGRST204' || error.code === '42703' || /websiteUrl|latitude|longitude/.test(message);
+  }
+
+  private async lookupCoordinates(address: string): Promise<{ latitude: number; longitude: number } | null> {
+    if (!address || address.includes('示範路')) {
+      return null;
+    }
+
+    try {
+      const url = new URL('https://nominatim.openstreetmap.org/search');
+      url.searchParams.set('format', 'jsonv2');
+      url.searchParams.set('limit', '1');
+      url.searchParams.set('countrycodes', 'tw');
+      url.searchParams.set('q', address);
+      const response = await fetch(url, { signal: AbortSignal.timeout(4000) });
+      if (!response.ok) {
+        return null;
+      }
+
+      const rows = (await response.json()) as Array<{ lat?: string; lon?: string }>;
+      const latitude = Number(rows[0]?.lat);
+      const longitude = Number(rows[0]?.lon);
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return null;
+      }
+
+      return { latitude, longitude };
+    } catch {
+      return null;
+    }
   }
 }

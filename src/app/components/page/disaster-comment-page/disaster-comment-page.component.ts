@@ -1,10 +1,13 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { DisasterCommentService } from '../../../core/services/comments/disaster-comment.service';
 import { DisasterComment } from '../../../core/services/comments/disaster-comment.service';
+import { CommentAuthorChipComponent } from '../../comment/comment-author-chip.component';
+import { commentAuthor, commentWriteError, withCommentPreviews } from '../../comment/comment-author.data';
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 
 interface CommentThreadNode {
   comment: DisasterComment;
@@ -15,12 +18,14 @@ interface CommentThreadNode {
 @Component({
   selector: 'app-disaster-comment-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CommentAuthorChipComponent],
   templateUrl: './disaster-comment-page.component.html',
   styleUrl: './disaster-comment-page.component.scss',
 })
 export class DisasterCommentPageComponent implements OnInit {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000002';
+  private readonly auth = inject(AuthSessionService);
+  commentNotice = '';
   private readonly likingCommentIds = new Set<number>();
 
   demandId = 0;
@@ -79,17 +84,18 @@ export class DisasterCommentPageComponent implements OnInit {
     } catch (error) {
       console.error('[災害留言頁] 載入留言失敗：', error);
 
-      this.loadError = '讀取留言失敗，請稍後再試。';
       this.comments = [];
-      this.commentThreads = [];
+      this.commentNotice = '真實留言暫時讀不到，下面仍是示範的一問一答。';
+      this.buildCommentThreads();
     }
   }
 
   buildCommentThreads(): void {
+    const comments = withCommentPreviews(this.comments, this.demandId);
     const nodeMap = new Map<number, CommentThreadNode>();
 
     // 先將每一則留言建立成節點
-    this.comments.forEach((comment) => {
+    comments.forEach((comment) => {
       nodeMap.set(comment.id, {
         comment,
         replies: [],
@@ -100,7 +106,7 @@ export class DisasterCommentPageComponent implements OnInit {
     const parentComments: CommentThreadNode[] = [];
 
     // 再依照 parent_comment_id 建立留言關係
-    this.comments.forEach((comment) => {
+    comments.forEach((comment) => {
       const node = nodeMap.get(comment.id);
 
       if (!node) {
@@ -146,23 +152,54 @@ export class DisasterCommentPageComponent implements OnInit {
   async addComment(): Promise<void> {
     const content = this.newComment.trim();
 
+    this.commentNotice = '';
+
     if (!content) {
+      this.commentNotice = '請先輸入留言內容。';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.demandId) {
-      console.error('[災害留言頁] 找不到需求 ID');
+      this.commentNotice = '找不到這筆需求，留言沒有送出。';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const author = commentAuthor(this.auth.principal(), 'agency');
+    const parentId = this.replyingTo?.id ?? null;
+
+    if (parentId !== null && parentId < 0) {
+      this.comments = [
+        {
+          id: -Date.now(),
+          demand_id: this.demandId,
+          user_id: author.userId,
+          user_role: author.role,
+          user_name: author.name,
+          content,
+          created_at: new Date().toISOString(),
+          parent_comment_id: parentId,
+          like_count: 0,
+          liked_user_ids: [],
+        },
+        ...this.comments,
+      ];
+      this.newComment = '';
+      this.replyingTo = null;
+      this.buildCommentThreads();
+      this.cdr.detectChanges();
       return;
     }
 
     try {
       const newComment = await this.disasterCommentService.addComment(
         this.demandId,
-        null,
-        'agency',
-        '目前使用者',
+        author.userId,
+        author.role,
+        author.name,
         content,
-        this.replyingTo?.id ?? null
+        parentId,
       );
 
       this.comments = [newComment, ...this.comments];
@@ -174,6 +211,8 @@ export class DisasterCommentPageComponent implements OnInit {
       this.cdr.detectChanges();
     } catch (error) {
       console.error('[災害留言頁] 新增留言失敗：', error);
+      this.commentNotice = commentWriteError(error);
+      this.cdr.detectChanges();
     }
   }
 
@@ -239,7 +278,7 @@ export class DisasterCommentPageComponent implements OnInit {
   }
 
   getReplyTargetName(parentCommentId: number): string {
-    const parentComment = this.comments.find((comment) => comment.id === parentCommentId);
+    const parentComment = withCommentPreviews(this.comments, this.demandId).find((comment) => comment.id === parentCommentId);
 
     return parentComment?.user_name ?? '原留言者';
   }

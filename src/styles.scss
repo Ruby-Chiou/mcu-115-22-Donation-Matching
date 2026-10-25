@@ -20,6 +20,37 @@ html {
   );
 }
 
+.leaflet-div-icon.font-marker {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+}
+
+.font-marker i {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+}
+
+.font-marker-agency i {
+  color: #d93025;
+}
+
+.font-marker-volunteer i {
+  color: #0f766e;
+}
+
+.font-marker-user {
+  align-items: center;
+}
+
+.font-marker-user i {
+  color: #005bac;
+  font-size: 28px;
+}
+
 body {
   color-scheme: light;
   background-color: var(--mat-sys-surface);

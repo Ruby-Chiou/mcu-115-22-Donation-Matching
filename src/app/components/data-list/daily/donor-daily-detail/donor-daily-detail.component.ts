@@ -8,6 +8,9 @@ import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { SupplyDetailCarouselComponent } from '../../../carousel/supply-detail-carousel/supply-detail-carousel.component';
 import { BeneficiaryPublicProfileService } from '../../../../core/services/agency/beneficiary-public-profile.service';
 import { BeneficiaryPanelComponent } from '../../../card/beneficiary-panel/beneficiary-panel.component';
+import { CommentAuthorChipComponent } from '../../../comment/comment-author-chip.component';
+import { commentAuthor, commentWriteError, withCommentPreviews } from '../../../comment/comment-author.data';
+import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
 import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 import { DailyComment } from '../../../../core/services/comments/daily-comment.service';
 import { AuthRedirectService } from '../../../../core/services/auth/auth-redirect.service';
@@ -21,19 +24,22 @@ interface CommentThreadNode {
 @Component({
   selector: 'app-donor-daily-detail',
   standalone: true,
-  imports: [RouterLink, CommonModule, RouterModule, FormsModule, SupplyDetailCarouselComponent, BeneficiaryPanelComponent],
+  imports: [RouterLink, CommonModule, RouterModule, FormsModule, SupplyDetailCarouselComponent, BeneficiaryPanelComponent, CommentAuthorChipComponent],
   templateUrl: './donor-daily-detail.component.html',
   styleUrl: './donor-daily-detail.component.scss',
 })
 export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000011';
   private readonly authRedirect = inject(AuthRedirectService);
+  private readonly auth = inject(AuthSessionService);
   protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
   demand?: DailyDemand;
   currentImageIndex = 0;
   private imageTimer?: ReturnType<typeof setInterval>;
   isLoading = true;
   loadError = '';
+  commentNotice = '';
+  commentSending = false;
 
   get beneficiary() {
     return this.beneficiaryProfiles.findForPlace(this.demand?.recipient ?? '', this.demand?.address ?? '');
@@ -245,7 +251,7 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
       console.error('[日常留言] 載入留言失敗：', error);
 
       this.comments = [];
-      this.commentThreads = [];
+      this.buildCommentThreads();
     }
   }
 
@@ -268,42 +274,79 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   // 新增留言或回覆
   async addComment(): Promise<void> {
     const content = this.newComment.trim();
+    this.commentNotice = '';
 
     if (!content) {
+      this.commentNotice = '請先輸入留言內容。';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.demand?.id) {
-      console.error('[日常留言] 找不到需求 ID');
+      this.commentNotice = '找不到這筆需求，留言沒有送出。';
+      this.cdr.detectChanges();
       return;
     }
+
+    const author = commentAuthor(this.auth.principal(), 'donor');
+    const parentId = this.replyingTo?.id ?? null;
+
+    if (parentId !== null && parentId < 0) {
+      this.comments = [
+        {
+          id: -Date.now(),
+          demand_id: this.demand.id,
+          user_id: author.userId,
+          user_role: author.role,
+          user_name: author.name,
+          content,
+          created_at: new Date().toISOString(),
+          parent_comment_id: parentId,
+          like_count: 0,
+          liked_user_ids: [],
+        },
+        ...this.comments,
+      ];
+      this.newComment = '';
+      this.replyingTo = null;
+      this.buildCommentThreads();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.commentSending = true;
+    this.cdr.detectChanges();
 
     try {
       const newComment = await this.dailyCommentService.addComment(
         this.demand.id,
-        null,
-        'donor',
-        '目前使用者',
+        author.userId,
+        author.role,
+        author.name,
         content,
-        this.replyingTo?.id ?? null
+        parentId,
       );
 
       this.comments = [newComment, ...this.comments];
-
-      this.buildCommentThreads();
-
       this.newComment = '';
       this.replyingTo = null;
-
-      this.cdr.detectChanges();
+      this.buildCommentThreads();
     } catch (error) {
       console.error('[日常留言] 新增留言失敗：', error);
+      this.commentNotice = commentWriteError(error);
+    } finally {
+      this.commentSending = false;
+      this.cdr.detectChanges();
     }
   }
 
   // 按讚
   // 按讚
   async toggleLike(comment: DailyComment): Promise<void> {
+    if (comment.id < 0) {
+      return;
+    }
+
     console.log('[日常留言] 愛心按鈕已點擊', comment);
 
     try {
@@ -331,7 +374,7 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
 
   // 取得被回覆的留言者名稱
   getReplyTargetName(parentCommentId: number): string {
-    const parentComment = this.comments.find((comment) => comment.id === parentCommentId);
+    const parentComment = withCommentPreviews(this.comments, this.demand?.id ?? 0).find((comment) => comment.id === parentCommentId);
 
     return parentComment?.user_name ?? '原留言者';
   }
@@ -361,10 +404,11 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
       expandedStates.set(thread.comment.id, thread.showAllReplies);
     }
 
+    const comments = withCommentPreviews(this.comments, this.demand?.id ?? 0);
     const nodeMap = new Map<number, CommentThreadNode>();
 
     // 先建立所有留言節點
-    for (const comment of this.comments) {
+    for (const comment of comments) {
       nodeMap.set(comment.id, {
         comment,
         replies: [],
@@ -375,7 +419,7 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
     const roots: CommentThreadNode[] = [];
 
     // 依照 parent_comment_id 建立留言關係
-    for (const comment of this.comments) {
+    for (const comment of comments) {
       const node = nodeMap.get(comment.id);
 
       if (!node) {

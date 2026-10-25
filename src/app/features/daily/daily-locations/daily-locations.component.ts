@@ -1,32 +1,26 @@
-import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
 
-// 修正 Leaflet 預設 Marker 圖示遺失的問題
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png'
-});
+import { BeneficiaryPublicProfileService } from '../../../core/services/agency/beneficiary-public-profile.service';
+import { BeneficiaryPublicProfile } from '../../../models/agency/beneficiary-public-profile';
+import { addTaiwanBasemap, fontMarkerIcon, releaseLeafletContainer } from '../../../core/map/leaflet-map';
+import { appHref, escapeHtml, googleMapsSearchUrl } from '../../../core/map/map-links';
+import { TAIWAN_CITY_VIEWS, TaiwanCityView, sameTaiwanCity, taiwanCityView } from '../../../core/map/taiwan-cities';
 
-export interface VolunteerItem {
+interface MapPlace {
   name: string;
+  city: string;
   location: string;
-  lat: number;
-  lng: number;
-  needs: string[];
-}
-
-export interface CityItem {
-  name: string;
-  lat: number;
-  lng: number;
-  zoom: number;
+  lat: number | null;
+  lng: number | null;
+  details: string[];
+  websiteUrl: string;
+  mapsUrl: string;
+  profileUrl: string;
+  distanceKm: number | null;
+  distanceLabel: string;
 }
 
 @Component({
@@ -37,226 +31,311 @@ export interface CityItem {
   styleUrl: './daily-locations.component.scss',
 })
 export class DailyLocationsComponent implements AfterViewInit, OnDestroy {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
+  private readonly profiles = inject(BeneficiaryPublicProfileService);
 
-  map!: L.Map;
-  currentMarkers: L.Marker[] = [];
-  geoJsonData: any = null;
-  geojsonLayer: L.GeoJSON | null = null;
-  private resizeObserver!: ResizeObserver;
+  private map?: L.Map;
+  private markers = new Map<string, L.Marker>();
+  private userMarker?: L.Marker;
+  private viewKey = '';
+  private geoJsonData: object | null = null;
+  private geojsonLayer: L.GeoJSON | null = null;
+  private resizeObserver?: ResizeObserver;
+  private stopBasemap?: () => void;
 
-  // 目前頁面側邊欄顯示的需求機構清單
-  displayList: VolunteerItem[] = [];
+  protected readonly cityList: TaiwanCityView[] = TAIWAN_CITY_VIEWS;
+  protected readonly ready = this.profiles.ready;
+  protected readonly loadError = this.profiles.loadError;
+  protected readonly selectedCity = signal('');
+  protected readonly displayList = signal<MapPlace[]>([]);
+  protected readonly listMessage = signal('機構資料載入中...');
+  protected readonly locatePrompt = signal<'ask' | 'pending' | 'hidden'>('ask');
+  protected readonly locateNote = signal('');
+  protected readonly userPoint = signal<{ lat: number; lng: number } | null>(null);
 
-  // 需求地點清單
-  volunteerList: VolunteerItem[] = [
-    {
-      name: '華山基金會',
-      location: '台北市士林區中正路420號7樓',
-      lat: 25.093419,
-      lng: 121.519570,
-      needs: ['清潔用品']
-    },
-    {
-      name: '勵馨基金會',
-      location: '台北市大安區羅斯福路二段75號8樓',
-      lat: 25.026359,
-      lng: 121.523107,
-      needs: ['奶粉']
-    },
-    {
-      name: '台灣關愛基金會',
-      location: '高雄市三民區本揚里黃興路39號',
-      lat: 22.646324,
-      lng: 120.343439,
-      needs: ['嬰幼童用品']
-    }
-  ];
-
-  // 縣市清單
-  cityList: CityItem[] = [
-    // 直轄市
-    { name: '臺北市', lat: 25.0330, lng: 121.5654, zoom: 12 },
-    { name: '新北市', lat: 24.9157, lng: 121.6739, zoom: 11 },
-    { name: '桃園市', lat: 24.9936, lng: 121.3010, zoom: 11 },
-    { name: '臺中市', lat: 24.1477, lng: 120.6736, zoom: 11 },
-    { name: '臺南市', lat: 22.9999, lng: 120.2270, zoom: 11 },
-    { name: '高雄市', lat: 22.6273, lng: 120.3014, zoom: 11 },
-
-    // 北部縣市
-    { name: '基隆市', lat: 25.1283, lng: 121.7419, zoom: 13 },
-    { name: '新竹市', lat: 24.8138, lng: 120.9675, zoom: 13 },
-    { name: '新竹縣', lat: 24.8387, lng: 121.0177, zoom: 11 },
-    { name: '宜蘭縣', lat: 24.7570, lng: 121.7530, zoom: 11 },
-
-    // 中部縣市
-    { name: '苗栗縣', lat: 24.5602, lng: 120.8214, zoom: 11 },
-    { name: '彰化縣', lat: 24.0518, lng: 120.5161, zoom: 11 },
-    { name: '南投縣', lat: 23.9610, lng: 120.9719, zoom: 10 },
-    { name: '雲林縣', lat: 23.7092, lng: 120.4313, zoom: 11 },
-
-    // 南部縣市
-    { name: '嘉義市', lat: 23.4801, lng: 120.4491, zoom: 13 },
-    { name: '嘉義縣', lat: 23.4588, lng: 120.5740, zoom: 11 },
-    { name: '屏東縣', lat: 22.5519, lng: 120.5487, zoom: 10 },
-
-    // 東部縣市
-    { name: '花蓮縣', lat: 23.9872, lng: 121.6016, zoom: 10 },
-    { name: '臺東縣', lat: 22.7583, lng: 121.1444, zoom: 10 },
-
-    // 離島地區
-    { name: '澎湖縣', lat: 23.5711, lng: 119.5793, zoom: 11 },
-    { name: '金門縣', lat: 24.4493, lng: 118.3766, zoom: 12 },
-    { name: '連江縣', lat: 26.1505, lng: 119.9499, zoom: 12 }
-  ];
-
-  ngAfterViewInit() {
-    this.map = L.map('map').setView([23.7, 120.9], 7);
-
-    L.tileLayer(
-      'https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}',
-      { attribution: '國土測繪中心' }
-    ).addTo(this.map);
-
-    this.http.get('https://raw.githubusercontent.com/g0v/twgeojson/master/json/twCounty2010.geo.json')
-      .subscribe({
-        next: (data: any) => {
-          this.geoJsonData = data;
-        },
-        error: (err) => console.error('GeoJSON 載入失敗:', err)
-      });
-
-    const mapEl = document.getElementById('map');
-    if (mapEl) {
-      this.resizeObserver = new ResizeObserver(() => {
-        if (this.map) {
-          this.map.invalidateSize();
-        }
-      });
-      this.resizeObserver.observe(mapEl);
-    }
-
-    this.displayList = [...this.volunteerList];
-    this.renderMarkers(this.displayList);
-  }
-
-  ngOnDestroy() {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-    }
-    if (this.map) {
-      this.map.remove();
-    }
-  }
-
-  clearMarkers() {
-    this.currentMarkers.forEach(marker => this.map.removeLayer(marker));
-    this.currentMarkers = [];
-  }
-
-  renderMarkers(items: VolunteerItem[]) {
-    this.clearMarkers();
-
-    items.forEach(item => {
-      const marker = L.marker([item.lat, item.lng])
-        .addTo(this.map)
-        .bindPopup(`
-          <b>${item.name}</b><br><br>
-          <i class="fa-solid fa-location-dot"></i>
-          <b>${item.location}</b><br><br>
-          <b>目前需要幫助：</b><br>
-          ・${item.needs.join('<br>・')}
-        `);
-
-      this.currentMarkers.push(marker);
+  constructor() {
+    void this.profiles.ensureLoaded();
+    effect(() => {
+      const ready = this.profiles.ready();
+      const rows = this.profiles.profiles();
+      const city = this.selectedCity();
+      const user = this.userPoint();
+      if (!this.map) {
+        return;
+      }
+      this.renderPlaces(rows, city, ready, user);
     });
   }
 
-  // 繪製與高亮縣市邊界圖層
-  highlightCityBoundary(cityName: string) {
-    if (this.geojsonLayer) {
+  ngAfterViewInit(): void {
+    const host = document.getElementById('map');
+    if (!host) {
+      return;
+    }
+
+    releaseLeafletContainer(host);
+    this.map = L.map(host, { fadeAnimation: false, zoomAnimation: false }).setView([23.7, 120.9], 7);
+    this.renderPlaces(this.profiles.profiles(), this.selectedCity(), this.profiles.ready(), this.userPoint());
+    this.stopBasemap = addTaiwanBasemap(this.map);
+
+    this.http.get<object>('https://raw.githubusercontent.com/g0v/twgeojson/master/json/twCounty2010.geo.json').subscribe({
+      next: (data) => {
+        this.geoJsonData = data;
+        const city = this.selectedCity();
+        if (city) {
+          this.highlightCityBoundary(city);
+        }
+      },
+      error: (err) => console.error('GeoJSON 載入失敗:', err),
+    });
+
+    this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
+    this.resizeObserver.observe(host);
+    this.map.invalidateSize();
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.stopBasemap?.();
+    this.map?.remove();
+    this.map = undefined;
+  }
+
+  selectCity(event: Event): void {
+    const target = event.target as HTMLSelectElement | null;
+    this.selectedCity.set(target?.value ?? '');
+  }
+
+  skipLocate(): void {
+    this.locatePrompt.set('hidden');
+    this.locateNote.set('未定位。可改選縣市，或稍後再按「定位我的位置」。');
+  }
+
+  allowLocate(): void {
+    if (!navigator.geolocation) {
+      this.locatePrompt.set('hidden');
+      this.locateNote.set('這台裝置沒有提供定位，仍可依縣市查看機構。');
+      return;
+    }
+
+    this.locatePrompt.set('pending');
+    this.locateNote.set('');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.userPoint.set({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        this.locatePrompt.set('hidden');
+        this.locateNote.set('已依你的位置，由近到遠排列附近的社福機構。');
+      },
+      () => {
+        this.locatePrompt.set('hidden');
+        this.locateNote.set('沒有取得位置。可以再按一次「定位我的位置」，或改選縣市。');
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
+    );
+  }
+
+  focusLocation(item: MapPlace): void {
+    if (!this.map || item.lat == null || item.lng == null) {
+      return;
+    }
+
+    this.map.setView([item.lat, item.lng], 15);
+    this.markers.get(item.name)?.openPopup();
+  }
+
+  private renderPlaces(
+    rows: BeneficiaryPublicProfile[],
+    cityName: string,
+    ready: boolean,
+    user: { lat: number; lng: number } | null,
+  ): void {
+    if (!this.map) {
+      return;
+    }
+
+    const places = rows.map((profile) => this.toPlace(profile, user));
+    const visible = cityName ? places.filter((place) => sameTaiwanCity(place.city, cityName)) : places;
+    if (user) {
+      visible.sort((left, right) => (left.distanceKm ?? Number.POSITIVE_INFINITY) - (right.distanceKm ?? Number.POSITIVE_INFINITY));
+    }
+    this.displayList.set(visible);
+
+    if (!ready) {
+      this.listMessage.set('機構資料載入中...');
+    } else if (this.loadError()) {
+      this.listMessage.set(this.loadError());
+    } else if (cityName) {
+      this.listMessage.set('這個縣市目前沒有受助機構。');
+    } else {
+      this.listMessage.set('目前沒有可顯示的受助機構。');
+    }
+
+    this.clearMarkers();
+    visible.forEach((place) => {
+      if (!this.map || place.lat == null || place.lng == null) {
+        return;
+      }
+
+      const marker = L.marker([place.lat, place.lng], { icon: fontMarkerIcon('agency') }).addTo(this.map).bindPopup(this.popup(place));
+      this.markers.set(place.name, marker);
+    });
+    this.syncUserMarker(user);
+    this.applyView(cityName, user, visible);
+  }
+
+  private applyView(cityName: string, user: { lat: number; lng: number } | null, visible: MapPlace[]): void {
+    if (!this.map) {
+      return;
+    }
+
+    const key = user && !cityName ? `user:${user.lat.toFixed(4)},${user.lng.toFixed(4)}` : cityName ? `city:${cityName}` : 'all';
+    if (key === this.viewKey) {
+      return;
+    }
+    this.viewKey = key;
+
+    if (user && !cityName) {
+      this.clearBoundary();
+      this.map.setView([user.lat, user.lng], 12);
+      return;
+    }
+
+    if (!cityName) {
+      this.clearBoundary();
+      if (visible.length > 0) {
+        const points = visible.filter((place) => place.lat != null && place.lng != null).map((place) => [place.lat, place.lng] as [number, number]);
+        if (points.length > 0) {
+          this.map.fitBounds(L.latLngBounds(points), { padding: [24, 24], maxZoom: 11 });
+        }
+      } else {
+        this.map.setView([23.7, 120.9], 7);
+      }
+      return;
+    }
+
+    const city = taiwanCityView(cityName);
+    if (city) {
+      this.map.setView([city.lat, city.lng], city.zoom);
+    }
+    this.highlightCityBoundary(cityName);
+  }
+
+  private syncUserMarker(user: { lat: number; lng: number } | null): void {
+    this.userMarker?.remove();
+    this.userMarker = undefined;
+    if (!this.map || !user) {
+      return;
+    }
+
+    this.userMarker = L.marker([user.lat, user.lng], { icon: fontMarkerIcon('user'), zIndexOffset: 1000 })
+      .addTo(this.map)
+      .bindPopup('你的位置');
+  }
+
+  private toPlace(profile: BeneficiaryPublicProfile, user: { lat: number; lng: number } | null): MapPlace {
+    const city = taiwanCityView(profile.city);
+    const lat = profile.latitude ?? city?.lat ?? null;
+    const lng = profile.longitude ?? city?.lng ?? null;
+    const location = profile.address.trim() || profile.city;
+
+    const kilometers = user && lat != null && lng != null ? distanceKm(user.lat, user.lng, lat, lng) : null;
+
+    return {
+      name: profile.organizationName,
+      city: profile.city,
+      location,
+      lat,
+      lng,
+      details: profile.serviceTargets,
+      websiteUrl: profile.websiteUrl,
+      mapsUrl: googleMapsSearchUrl(location, lat, lng),
+      profileUrl: appHref(`/donor/beneficiaries/${encodeURIComponent(profile.organizationName)}`),
+      distanceKm: kilometers,
+      distanceLabel: kilometers == null ? '' : formatDistance(kilometers),
+    };
+  }
+
+  private popup(place: MapPlace): string {
+    const needs = place.details.length ? place.details.map((item) => `・${escapeHtml(item)}`).join('<br>') : '尚未公開';
+    const website = place.websiteUrl
+      ? `<a href="${escapeHtml(place.websiteUrl)}" target="_blank" rel="noopener noreferrer">官方網站</a>`
+      : '尚未提供官網';
+
+    return `
+      <b>${escapeHtml(place.name)}</b><br><br>
+      ${escapeHtml(place.location)}<br><br>
+      <b>服務對象</b><br>${needs}<br><br>
+      <a href="${escapeHtml(place.mapsUrl)}" target="_blank" rel="noopener noreferrer">Google 地圖</a>
+      ｜ ${website}
+      ｜ <a href="${escapeHtml(place.profileUrl)}">機構資料</a>
+    `;
+  }
+
+  private clearMarkers(): void {
+    this.markers.forEach((marker) => this.map?.removeLayer(marker));
+    this.markers.clear();
+  }
+
+  private clearBoundary(): void {
+    if (this.geojsonLayer && this.map) {
       this.map.removeLayer(this.geojsonLayer);
       this.geojsonLayer = null;
     }
+  }
 
-    if (!this.geoJsonData || !cityName) return;
+  private highlightCityBoundary(cityName: string): void {
+    this.clearBoundary();
+    if (!this.map || !this.geoJsonData || !cityName) {
+      return;
+    }
 
     const altName = cityName.replace('臺', '台');
-
-    this.geojsonLayer = L.geoJSON(this.geoJsonData, {
+    this.geojsonLayer = L.geoJSON(this.geoJsonData as never, {
       filter: (feature) => {
-        const props = feature.properties || {};
-        const geoName = props.COUNTYNAME || props.COUNTY_NAME || props.COUNTYSTRING || props.name || '';
-
-        // 1. 完全比對 (優先比對正確的全稱，避免嘉義縣/嘉義市混淆)
+        const props = (feature.properties ?? {}) as Record<string, string>;
+        const geoName = props['COUNTYNAME'] || props['COUNTY_NAME'] || props['COUNTYSTRING'] || props['name'] || '';
         if (geoName === cityName || geoName === altName) {
           return true;
         }
-
-        // 2. 針對「桃園」等升格縣市的特殊比對
         if (cityName.includes('桃園')) {
           return geoName.includes('桃園');
         }
-
-        return geoName.includes(cityName) || geoName.includes(altName);
+        return false;
       },
       style: {
         color: '#2563eb',
         weight: 3,
         opacity: 0.8,
         fillColor: '#99c3f7',
-        fillOpacity: 0.25
-      }
+        fillOpacity: 0.25,
+      },
     }).addTo(this.map);
 
     if (this.geojsonLayer.getLayers().length > 0) {
-      this.map.fitBounds(this.geojsonLayer.getBounds(), {
-        padding: [20, 20],
-        maxZoom: 13
-      });
+      this.map.fitBounds(this.geojsonLayer.getBounds(), { padding: [20, 20], maxZoom: 12 });
     }
   }
+}
 
-  selectCity(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    if (!target) return;
+function distanceKm(fromLat: number, fromLng: number, toLat: number, toLng: number): number {
+  const earthRadiusKm = 6371;
+  const latDelta = ((toLat - fromLat) * Math.PI) / 180;
+  const lngDelta = ((toLng - fromLng) * Math.PI) / 180;
+  const from = (fromLat * Math.PI) / 180;
+  const to = (toLat * Math.PI) / 180;
+  const arc = Math.sin(latDelta / 2) ** 2 + Math.cos(from) * Math.cos(to) * Math.sin(lngDelta / 2) ** 2;
+  return earthRadiusKm * 2 * Math.asin(Math.sqrt(arc));
+}
 
-    const cityName = target.value;
-
-    if (!cityName) {
-      if (this.geojsonLayer) {
-        this.map.removeLayer(this.geojsonLayer);
-        this.geojsonLayer = null;
-      }
-      this.map.setView([23.7, 120.9], 7);
-      this.displayList = [...this.volunteerList];
-      this.renderMarkers(this.displayList);
-      return;
-    }
-
-    this.highlightCityBoundary(cityName);
-
-    const keyword = cityName.replace('臺', '台');
-
-    // 精準篩選地點 (避免嘉義市匹配到嘉義縣)
-    const filteredList = this.volunteerList.filter(item => {
-      const nameMatch = item.name.includes(cityName) || item.name.includes(keyword);
-      const locationMatch = item.location.includes(cityName) || item.location.includes(keyword);
-      return nameMatch || locationMatch;
-    });
-
-    this.displayList = filteredList.length > 0 ? filteredList : this.volunteerList;
-    this.renderMarkers(this.displayList);
+function formatDistance(kilometers: number): string {
+  if (kilometers < 1) {
+    return `約 ${Math.max(1, Math.round(kilometers * 1000))} 公尺`;
   }
-
-  focusLocation(item: VolunteerItem) {
-    this.map.setView([item.lat, item.lng], 15);
-    const targetMarker = this.currentMarkers.find(m => {
-      const latlng = m.getLatLng();
-      return latlng.lat === item.lat && latlng.lng === item.lng;
-    });
-    if (targetMarker) {
-      targetMarker.openPopup();
-    }
+  if (kilometers < 10) {
+    return `約 ${kilometers.toFixed(1)} 公里`;
   }
+  return `約 ${Math.round(kilometers)} 公里`;
 }

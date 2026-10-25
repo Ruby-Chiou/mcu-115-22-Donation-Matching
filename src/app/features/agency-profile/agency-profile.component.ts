@@ -80,7 +80,7 @@ export class AgencyProfileComponent implements OnInit {
       this.showNotice('已儲存。公開欄位會出現在受助機構專區與需求詳情。', false);
     } catch (error) {
       console.error(error);
-      this.showNotice('儲存失敗，請稍後再試。', true);
+      this.showNotice(error instanceof Error && error.message ? error.message : '儲存失敗，請稍後再試。', true);
     } finally {
       this.saving.set(false);
     }

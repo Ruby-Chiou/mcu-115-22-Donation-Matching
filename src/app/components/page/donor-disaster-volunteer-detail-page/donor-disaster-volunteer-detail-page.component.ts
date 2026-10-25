@@ -6,6 +6,9 @@ import { Location } from '@angular/common';
 
 import { BeneficiaryPublicProfileService } from '../../../core/services/agency/beneficiary-public-profile.service';
 import { BeneficiaryPanelComponent } from '../../card/beneficiary-panel/beneficiary-panel.component';
+import { CommentAuthorChipComponent } from '../../comment/comment-author-chip.component';
+import { commentAuthor, commentWriteError, withCommentPreviews } from '../../comment/comment-author.data';
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { AGENCY_OFFICE } from '../../../models/user/agency';
 import { VolunteerDemandService } from '../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand } from '../../../models/agency/volunteer-demand';
@@ -20,12 +23,15 @@ interface CommentThreadNode {
 
 @Component({
   selector: 'app-donor-disaster-volunteer-detail-page',
-  imports: [CommonModule, FormsModule, BeneficiaryPanelComponent],
+  imports: [CommonModule, FormsModule, BeneficiaryPanelComponent, CommentAuthorChipComponent],
   templateUrl: './donor-disaster-volunteer-detail-page.component.html',
   styleUrl: './donor-disaster-volunteer-detail-page.component.scss',
 })
 export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
   private readonly authRedirect = inject(AuthRedirectService);
+  private readonly auth = inject(AuthSessionService);
+  commentNotice = '';
+  commentSending = false;
   protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
 
   get beneficiary() {
@@ -115,7 +121,7 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
     } catch (error) {
       console.error('[志工留言] 載入留言失敗：', error);
       this.comments = [];
-      this.commentThreads = [];
+      this.buildCommentThreads();
     }
   }
 
@@ -129,10 +135,11 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
       expandedStates.set(thread.comment.id, thread.showAllReplies);
     }
 
+    const comments = withCommentPreviews(this.comments, this.volunteer?.id ?? 0);
     const nodeMap = new Map<number, CommentThreadNode>();
 
     // 先替每一筆留言建立節點
-    for (const comment of this.comments) {
+    for (const comment of comments) {
       nodeMap.set(comment.id, {
         comment,
         replies: [],
@@ -143,7 +150,7 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
     const roots: CommentThreadNode[] = [];
 
     // 依照 parent_comment_id 建立父子關係
-    for (const comment of this.comments) {
+    for (const comment of comments) {
       const node = nodeMap.get(comment.id);
 
       if (!node) {
@@ -182,26 +189,60 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
   async addComment(): Promise<void> {
     const isReply = this.replyingTo !== null;
     const content = (isReply ? this.replyContent : this.newComment).trim();
+    this.commentNotice = '';
 
     if (!content) {
+      this.commentNotice = '請先輸入留言內容。';
+      this.cdr.detectChanges();
       return;
     }
 
     const demandId = this.volunteer?.id;
 
     if (demandId == null) {
-      console.error('[志工留言] 找不到志工需求 ID');
+      this.commentNotice = '找不到這筆需求，留言沒有送出。';
+      this.cdr.detectChanges();
       return;
     }
+
+    const author = commentAuthor(this.auth.principal(), 'donor');
+    const parentId = this.replyingTo?.id ?? null;
+
+    if (parentId !== null && parentId < 0) {
+      this.comments = [
+        ...this.comments,
+        {
+          id: -Date.now(),
+          demand_id: demandId,
+          user_id: author.userId,
+          user_role: author.role,
+          user_name: author.name,
+          content,
+          created_at: new Date().toISOString(),
+          parent_comment_id: parentId,
+          like_count: 0,
+          liked_user_ids: [],
+        },
+      ];
+      this.replyContent = '';
+      this.newComment = '';
+      this.replyingTo = null;
+      this.buildCommentThreads();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.commentSending = true;
+    this.cdr.detectChanges();
 
     try {
       const comment = await this.volunteerCommentService.addComment(
         demandId,
-        this.currentUserId,
-        'donor',
-        '目前使用者',
+        author.userId,
+        author.role,
+        author.name,
         content,
-        this.replyingTo?.id ?? null
+        parentId,
       );
 
       this.comments = [...this.comments, comment];
@@ -214,9 +255,12 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
       }
 
       this.buildCommentThreads();
-      this.cdr.detectChanges();
     } catch (error) {
       console.error('[志工留言] 新增失敗：', error);
+      this.commentNotice = commentWriteError(error);
+    } finally {
+      this.commentSending = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -292,7 +336,7 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
 
   // 取得回覆對象名稱
   getReplyTargetName(parentCommentId: number): string {
-    return this.comments.find((comment) => comment.id === parentCommentId)?.user_name ?? '原留言';
+    return withCommentPreviews(this.comments, this.volunteer?.id ?? 0).find((comment) => comment.id === parentCommentId)?.user_name ?? '原留言';
   }
 
   // 格式化留言日期

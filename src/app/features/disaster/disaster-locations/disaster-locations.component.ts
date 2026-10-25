@@ -1,14 +1,9 @@
-import { Component, AfterViewInit, signal, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, signal, inject } from '@angular/core';
 import * as L from 'leaflet';
 
 import { VolunteerDemandService } from '../../../core/services/agency-volunteer-demand/volunteer-demand.service';
-
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-});
+import { addTaiwanBasemap, fontMarkerIcon, releaseLeafletContainer } from '../../../core/map/leaflet-map';
+import { escapeHtml, googleMapsSearchUrl } from '../../../core/map/map-links';
 
 interface VolunteerMapLocation {
   id: number;
@@ -17,6 +12,7 @@ interface VolunteerMapLocation {
   lat: number;
   lng: number;
   needs: string[];
+  mapsUrl: string;
 }
 
 @Component({
@@ -26,108 +22,113 @@ interface VolunteerMapLocation {
   templateUrl: './disaster-locations.component.html',
   styleUrl: './disaster-locations.component.scss',
 })
-export class DisasterLocationsComponent implements AfterViewInit {
+export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
   private readonly volunteerDemandService = inject(VolunteerDemandService);
 
-  private map!: L.Map;
-  private currentMarkers: L.Marker[] = [];
+  private map?: L.Map;
+  private markers = new Map<number, L.Marker>();
+  private resizeObserver?: ResizeObserver;
+  private stopBasemap?: () => void;
 
   protected volunteerList: VolunteerMapLocation[] = [];
-
   protected readonly selectedLocation = signal<VolunteerMapLocation | null>(null);
+  protected readonly loading = signal(true);
 
   ngAfterViewInit(): void {
-    this.map = L.map('disaster-map');
+    const host = document.getElementById('disaster-map');
+    if (!host) {
+      this.loading.set(false);
+      return;
+    }
 
-    L.tileLayer('https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}', {
-      attribution: '國土測繪中心',
-    }).addTo(this.map);
+    releaseLeafletContainer(host);
+    this.map = L.map(host, { fadeAnimation: false, zoomAnimation: false }).setView([23.7, 120.9], 7);
+    this.stopBasemap = addTaiwanBasemap(this.map);
+    this.resizeObserver = new ResizeObserver(() => this.map?.invalidateSize());
+    this.resizeObserver.observe(host);
+    this.map.invalidateSize();
 
-    // 從資料服務載入志工需求
     void this.loadVolunteerLocations();
+  }
 
-    setTimeout(() => {
-      this.map.invalidateSize();
-    }, 500);
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.stopBasemap?.();
+    this.map?.remove();
+    this.map = undefined;
+  }
+
+  protected showLocation(location: VolunteerMapLocation): void {
+    if (!this.map) {
+      return;
+    }
+
+    this.selectedLocation.set(location);
+    this.map.flyTo([location.lat, location.lng], 15);
+    this.markers.get(location.id)?.openPopup();
   }
 
   private async loadVolunteerLocations(): Promise<void> {
-    try {
-      // 等待志工需求資料載入完成
-      await this.volunteerDemandService.waitUntilLoaded();
-
-      const demands = this.volunteerDemandService.getVolunteers();
-
-      // 取得具有有效經緯度的需求
-      this.volunteerList = demands
-        .filter(
-          (demand) =>
-            demand.latitude != null &&
-            demand.longitude != null &&
-            Number.isFinite(Number(demand.latitude)) &&
-            Number.isFinite(Number(demand.longitude))
-        )
-        .map((demand) => ({
+    const demands = await this.volunteerDemandService.listPublishedForMap();
+    this.volunteerList = demands
+      .filter(
+        (demand) =>
+          demand.latitude != null &&
+          demand.longitude != null &&
+          Number.isFinite(Number(demand.latitude)) &&
+          Number.isFinite(Number(demand.longitude)),
+      )
+      .map((demand) => {
+        const lat = Number(demand.latitude);
+        const lng = Number(demand.longitude);
+        return {
           id: Number(demand.id),
           name: demand.type || `志工需求 ${demand.serialNo}`,
           location: demand.location,
-          lat: Number(demand.latitude),
-          lng: Number(demand.longitude),
+          lat,
+          lng,
           needs: (demand.workContent || '')
             .split(/[\n,，、;；]+/)
             .map((item) => item.trim())
             .filter((item) => item.length > 0),
-        }));
+          mapsUrl: googleMapsSearchUrl(demand.location, lat, lng),
+        };
+      });
 
-      // 地圖仍顯示全部需求的標記
-      this.showMarkers(this.volunteerList, '志工需求');
+    this.showMarkers(this.volunteerList);
+    this.loading.set(false);
 
-      // 地圖初始範圍依照全部需求計算
-      if (this.volunteerList.length > 0) {
-        const bounds = L.latLngBounds(this.volunteerList.map((item) => [item.lat, item.lng] as [number, number]));
-
-        this.map.fitBounds(bounds, {
-          padding: [50, 50],
-          maxZoom: 13,
-        });
-      }
-    } catch (error) {
-      console.error('載入地圖志工需求失敗：', error);
+    if (!this.map || this.volunteerList.length === 0) {
+      return;
     }
+
+    this.map.fitBounds(
+      L.latLngBounds(this.volunteerList.map((item) => [item.lat, item.lng] as [number, number])),
+      { padding: [50, 50], maxZoom: 12 },
+    );
   }
 
-  // 定位至選定需求，地圖上的全部標記仍保留
-  protected showLocation(location: VolunteerMapLocation): void {
-    this.selectedLocation.set(location);
+  private showMarkers(items: VolunteerMapLocation[]): void {
+    if (!this.map) {
+      return;
+    }
 
-    this.map.flyTo([location.lat, location.lng], 15);
-
-    const index = this.volunteerList.findIndex((item) => item.id === location.id);
-
-    this.currentMarkers[index]?.openPopup();
-  }
-
-  private showMarkers(items: VolunteerMapLocation[], title: string): void {
-    this.clearMarkers();
+    this.markers.forEach((marker) => this.map?.removeLayer(marker));
+    this.markers.clear();
 
     items.forEach((item) => {
-      const marker = L.marker([item.lat, item.lng]).addTo(this.map).bindPopup(`
-          <b>${item.name}</b><br><br>
-          <b>${item.location}</b><br><br>
-          <b>${title}</b><br><br>
-          <b>需要：</b><br>
-          ・${item.needs.join('<br>・')}
+      if (!this.map) {
+        return;
+      }
+
+      const needs = item.needs.length ? item.needs.map((need) => `・${escapeHtml(need)}`).join('<br>') : '尚未填寫';
+      const marker = L.marker([item.lat, item.lng], { icon: fontMarkerIcon('volunteer') }).addTo(this.map).bindPopup(`
+          <b>${escapeHtml(item.name)}</b><br><br>
+          ${escapeHtml(item.location)}<br><br>
+          <b>需要</b><br>${needs}<br><br>
+          <a href="${escapeHtml(item.mapsUrl)}" target="_blank" rel="noopener noreferrer">用 Google 地圖開啟</a>
         `);
-
-      this.currentMarkers.push(marker);
+      this.markers.set(item.id, marker);
     });
-  }
-
-  private clearMarkers(): void {
-    this.currentMarkers.forEach((marker) => {
-      this.map.removeLayer(marker);
-    });
-
-    this.currentMarkers = [];
   }
 }

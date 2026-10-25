@@ -32,6 +32,12 @@
 .comment-form textarea:focus {
   border-color: #ff6b35;
 }
+.comment-notice {
+  margin: 0;
+  color: #9a3412;
+  font-size: 14px;
+}
+
 /* 發布留言 */
 .comment-button {
   align-self: flex-end;

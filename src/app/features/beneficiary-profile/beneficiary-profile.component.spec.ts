@@ -19,6 +19,10 @@ const sample = (organizationName: string, city: string): BeneficiaryPublicProfil
   mission: '在地服務',
   background: '公開介紹',
   verified: true,
+  address: `${city}示範路1號`,
+  websiteUrl: '',
+  latitude: null,
+  longitude: null,
 });
 
 describe('BeneficiaryProfileComponent', () => {

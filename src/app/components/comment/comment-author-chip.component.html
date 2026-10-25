@@ -1,0 +1,89 @@
+<button type="button" class="author-chip" [attr.data-role]="role" (click)="toggle($event)">
+  <span class="avatar" aria-hidden="true">{{ initial }}</span>
+  <span class="name">{{ name }}</span>
+</button>
+
+@if (open()) {
+  <div class="peek-backdrop" (click)="close()"></div>
+  <section class="peek-card" role="dialog" aria-modal="true" [attr.aria-label]="name + '的概略資料'" (click)="$event.stopPropagation()">
+    <button type="button" class="close" (click)="close()" aria-label="關閉">×</button>
+    <div class="peek-head">
+      <span class="avatar large" [attr.data-role]="role" aria-hidden="true">{{ initial }}</span>
+      <div>
+        <h3>{{ name }}</h3>
+        <p class="role" [attr.data-kind]="kindAttr">{{ roleLabel }}</p>
+      </div>
+    </div>
+
+    @if (cardLoading()) {
+      <p class="hint">公開資料載入中...</p>
+    } @else if (card(); as loaded) {
+      @if (loaded.type === 'agency') {
+        <span class="city">{{ loaded.profile.city || '尚未公開服務縣市' }}</span>
+        <dl class="facts">
+          @for (field of agencyFields(); track field.label) {
+            <div>
+              <dt>{{ field.label }}</dt>
+              <dd>{{ field.value }}</dd>
+            </div>
+          }
+        </dl>
+        @if (loaded.profile.organizationName.trim()) {
+          <button type="button" class="profile-link" (click)="openPublicProfile()">查看完整公開資料</button>
+        }
+      } @else {
+        <dl class="facts">
+          <div>
+            <dt>所在縣市</dt>
+            <dd>{{ loaded.city || '尚未公開所在縣市' }}</dd>
+          </div>
+        </dl>
+        <h4>公開的捐助感謝</h4>
+        @if (loaded.thanks.length === 0) {
+          <p class="hint">尚未設定公開的感謝紀錄。</p>
+        } @else {
+          <ul class="thanks">
+            @for (thank of loaded.thanks; track thank.publishedAt + thank.item) {
+              <li>
+                <strong>{{ thank.item }}</strong>
+                <span>至{{ thank.agencyName }}</span>
+                @if (thankDate(thank.publishedAt)) {
+                  <time>{{ thankDate(thank.publishedAt) }}</time>
+                }
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+
+    @if (!userId) {
+      <p class="hint">這則留言沒有綁定會員，不能私訊。</p>
+    } @else if (isSelf) {
+      <p class="hint">這是你自己的留言。</p>
+    } @else if (!composing()) {
+      <button type="button" class="message-btn" (click)="startMessage()">
+        {{ isGuest ? '登入後私訊' : '平台內私訊' }}
+      </button>
+    } @else {
+      <form class="compose" (ngSubmit)="send()">
+        <label>
+          主旨
+          <input name="subject" [(ngModel)]="subject" maxlength="100" required />
+        </label>
+        <label>
+          內容
+          <textarea name="content" [(ngModel)]="content" rows="4" maxlength="2000" required placeholder="只會出現在對方的站內信箱"></textarea>
+        </label>
+        <div class="compose-actions">
+          <button type="submit" [disabled]="sending()">{{ sending() ? '送出中...' : '送出私訊' }}</button>
+          <button type="button" class="ghost" (click)="composing.set(false)">取消</button>
+        </div>
+      </form>
+    }
+
+    @if (notice()) {
+      <p class="notice" [class.error]="noticeIsError()">{{ notice() }}</p>
+    }
+  </section>
+}

@@ -1,6 +1,7 @@
 <section id="disaster-map-section" class="map-section" aria-labelledby="map-title">
   <div class="map-sidebar">
     <h2 id="map-title">災害救助地圖</h2>
+    <p class="map-note">這裡標的是目前上架的志工需求地點，不是捐助地圖上的受助機構。地圖會先顯示全台，資料到了再縮到這些點。</p>
 
     <div class="location-list">
       @for (location of volunteerList; track location.id) {
@@ -23,7 +24,7 @@
         <button type="button" (click)="showLocation(location)">定位地圖</button>
       </article>
       } @empty {
-      <p>目前沒有可顯示的志工需求。</p>
+      <p>{{ loading() ? '志工需求載入中...' : '目前沒有可顯示的志工需求。' }}</p>
       }
     </div>
   </div>

@@ -6,6 +6,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SupplyDetailCarouselComponent } from '../../carousel/supply-detail-carousel/supply-detail-carousel.component';
 import { BeneficiaryPublicProfileService } from '../../../core/services/agency/beneficiary-public-profile.service';
 import { BeneficiaryPanelComponent } from '../../card/beneficiary-panel/beneficiary-panel.component';
+import { CommentAuthorChipComponent } from '../../comment/comment-author-chip.component';
+import { commentAuthor, commentWriteError, withCommentPreviews } from '../../comment/comment-author.data';
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { AGENCY_OFFICE } from '../../../models/user/agency';
 
 import { DisasterDemandService } from '../../../core/services/agency-disaster-demand/disaster-demand.service';
@@ -24,13 +27,16 @@ interface CommentThreadNode {
 
 @Component({
   selector: 'app-disaster-supply-detail-page',
-  imports: [FormsModule, NgClass, NgTemplateOutlet, SupplyDetailCarouselComponent, BeneficiaryPanelComponent],
+  imports: [FormsModule, NgClass, NgTemplateOutlet, SupplyDetailCarouselComponent, BeneficiaryPanelComponent, CommentAuthorChipComponent],
   templateUrl: './donor-disaster-supply-detail-page.component.html',
   styleUrls: ['./donor-disaster-supply-detail-page-A.component.scss', './donor-disaster-supply-detail-page-B.component.scss'],
 })
 export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000001';
   private readonly authRedirect = inject(AuthRedirectService);
+  private readonly auth = inject(AuthSessionService);
+  commentNotice = '';
+  commentSending = false;
   protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
 
   get beneficiary() {
@@ -121,7 +127,7 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
       console.error('[災害留言] 載入留言失敗：', error);
 
       this.comments = [];
-      this.commentThreads = [];
+      this.buildCommentThreads();
     }
   }
 
@@ -195,27 +201,57 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
 
   async addComment(): Promise<void> {
     const content = this.newComment.trim();
+    this.commentNotice = '';
 
     if (!content) {
+      this.commentNotice = '請先輸入留言內容。';
+      this.cdr.detectChanges();
       return;
     }
 
     if (!this.demand?.id) {
-      console.error('[災害留言] 找不到需求 ID');
+      this.commentNotice = '找不到這筆需求，留言沒有送出。';
+      this.cdr.detectChanges();
       return;
     }
 
-    try {
-      console.log('[災害留言] 開始新增留言');
+    const author = commentAuthor(this.auth.principal(), 'donor');
+    const parentId = this.replyingTo?.id ?? null;
 
-      // 新增留言，並取得剛剛新增成功的留言資料
+    if (parentId !== null && parentId < 0) {
+      this.comments = [
+        {
+          id: -Date.now(),
+          demand_id: this.demand.id,
+          user_id: author.userId,
+          user_role: author.role,
+          user_name: author.name,
+          content,
+          created_at: new Date().toISOString(),
+          parent_comment_id: parentId,
+          like_count: 0,
+          liked_user_ids: [],
+        },
+        ...this.comments,
+      ];
+      this.newComment = '';
+      this.replyingTo = null;
+      this.buildCommentThreads();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.commentSending = true;
+    this.cdr.detectChanges();
+
+    try {
       const newComment = await this.disasterCommentService.addComment(
         this.demand.id,
-        null,
-        'donor',
-        '目前使用者',
+        author.userId,
+        author.role,
+        author.name,
         content,
-        this.replyingTo?.id ?? null
+        parentId,
       );
 
       console.log('[災害留言] 新增成功：', newComment);
@@ -228,15 +264,21 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
 
       // 清空輸入框
       this.newComment = '';
-
-      // 確保畫面立即更新
-      this.cdr.detectChanges();
+      this.replyingTo = null;
     } catch (error) {
       console.error('[災害留言] 新增留言失敗：', error);
+      this.commentNotice = commentWriteError(error);
+    } finally {
+      this.commentSending = false;
+      this.cdr.detectChanges();
     }
   }
 
   async toggleLike(comment: DisasterComment): Promise<void> {
+    if (comment.id < 0) {
+      return;
+    }
+
     try {
       const updatedComment = await this.disasterCommentService.toggleLike(comment.id, this.currentUserId);
 
@@ -262,7 +304,7 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
 
   // 取得被回覆的留言者名稱
   getReplyTargetName(parentCommentId: number): string {
-    const parentComment = this.comments.find((comment) => comment.id === parentCommentId);
+    const parentComment = withCommentPreviews(this.comments, this.demand?.id ?? 0).find((comment) => comment.id === parentCommentId);
 
     return parentComment?.user_name ?? '原留言者';
   }
@@ -291,10 +333,11 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
       expandedStates.set(thread.comment.id, thread.showAllReplies);
     }
 
+    const comments = withCommentPreviews(this.comments, this.demand?.id ?? 0);
     const nodeMap = new Map<number, CommentThreadNode>();
 
     // 1. 先替每一筆留言建立節點
-    for (const comment of this.comments) {
+    for (const comment of comments) {
       nodeMap.set(comment.id, {
         comment,
         replies: [],
@@ -305,7 +348,7 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
     const roots: CommentThreadNode[] = [];
 
     // 2. 依照 parent_comment_id 將回覆放到正確的留言底下
-    for (const comment of this.comments) {
+    for (const comment of comments) {
       const node = nodeMap.get(comment.id);
 
       if (!node) {

@@ -4,6 +4,14 @@
     <h1>捐助地圖</h1>
     <h3><i class="fa-solid fa-triangle-exclamation"></i>僅提供受助單位註冊地址</h3>
     <h3>非可送貨之地點</h3>
+    <p class="sidebar-note">標記與左側名單來自受助機構公開資料。可開 Google 地圖看位置，有填官網的單位也能直接連過去。</p>
+    @if (locateNote()) {
+      <p class="sidebar-note">{{ locateNote() }}</p>
+    }
+    <button type="button" class="locate-button" (click)="allowLocate()" [disabled]="locatePrompt() === 'pending'">
+      <i class="fa-solid fa-location-crosshairs"></i>
+      {{ locatePrompt() === 'pending' ? '定位中...' : '定位我的位置' }}
+    </button>
 
     <select
       class="location-select"
@@ -17,8 +25,48 @@
         </option>
       }
     </select>
+
+    <div class="org-list">
+      @for (item of displayList(); track item.name) {
+        <article class="org-card">
+          <a class="org-name" [routerLink]="['/donor/beneficiaries', item.name]">{{ item.name }}</a>
+          @if (item.distanceLabel) {
+            <p class="distance"><i class="fa-solid fa-person-walking"></i> {{ item.distanceLabel }}</p>
+          }
+          <p>{{ item.location }}</p>
+          <div class="org-links">
+            @if (item.mapsUrl) {
+              <a [href]="item.mapsUrl" target="_blank" rel="noopener noreferrer">Google 地圖</a>
+            }
+            @if (item.websiteUrl) {
+              <a [href]="item.websiteUrl" target="_blank" rel="noopener noreferrer">官方網站</a>
+            } @else {
+              <span>尚未提供官網</span>
+            }
+          </div>
+          <button type="button" (click)="focusLocation(item)" [disabled]="item.lat == null">定位</button>
+        </article>
+      } @empty {
+        <p class="empty">{{ listMessage() }}</p>
+      }
+    </div>
   </div>
 
-  <div id="map"></div>
+  <div class="map-wrap">
+    @if (locatePrompt() !== 'hidden') {
+      <div class="locate-dialog" role="dialog" aria-labelledby="locate-title">
+        <h2 id="locate-title">要看住家附近的社福機構嗎？</h2>
+        <p>可以定位這台裝置的位置，把離你比較近的機構排在前面。位置只用在這張地圖上，不會上傳。</p>
+        <div class="locate-actions">
+          <button type="button" (click)="allowLocate()" [disabled]="locatePrompt() === 'pending'">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            {{ locatePrompt() === 'pending' ? '定位中...' : '定位我的位置' }}
+          </button>
+          <button type="button" class="ghost" (click)="skipLocate()" [disabled]="locatePrompt() === 'pending'">先不要</button>
+        </div>
+      </div>
+    }
+    <div id="map"></div>
+  </div>
 
 </div>

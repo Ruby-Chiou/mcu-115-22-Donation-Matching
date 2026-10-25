@@ -200,7 +200,12 @@
     <h2>留言區</h2>
     <div class="comment-form">
       <textarea [(ngModel)]="newComment" rows="4" placeholder="輸入你想說的話..."> </textarea>
-      <button type="button" class="comment-button" (click)="addComment()">發布留言</button>
+      @if (commentNotice) {
+      <p class="comment-notice">{{ commentNotice }}</p>
+      }
+      <button type="button" class="comment-button" (click)="addComment()" [disabled]="commentSending">
+        {{ commentSending ? '發布中...' : '發布留言' }}
+      </button>
     </div>
     <div class="comment-list">
       <!-- 顯示遞迴留言範本 -->
@@ -209,12 +214,10 @@
           <!-- 留言者與時間 -->
           <div class="comment-header">
             <div class="comment-title">
+              <app-comment-author [userId]="node.comment.user_id" [name]="node.comment.user_name" [role]="node.comment.user_role" />
               @if (node.comment.parent_comment_id) {
-              <strong>{{ node.comment.user_name }}</strong>
               <span class="reply-title-text">回覆</span>
               <strong class="reply-target-name"> {{ getReplyTargetName(node.comment.parent_comment_id) }} </strong>
-              } @else {
-              <strong>{{ node.comment.user_name }}</strong>
               }
             </div>
 

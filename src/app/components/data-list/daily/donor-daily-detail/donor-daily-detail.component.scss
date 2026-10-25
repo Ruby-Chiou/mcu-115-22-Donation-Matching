@@ -234,6 +234,12 @@ app-beneficiary-panel {
   border-color: #ff6b35;
 }
 
+.comment-notice {
+  margin: 0;
+  color: #9a3412;
+  font-size: 14px;
+}
+
 .comment-button {
   align-self: flex-end;
   padding: 10px 24px;
@@ -248,6 +254,11 @@ app-beneficiary-panel {
 
 .comment-button:hover {
   background: #e85a28;
+}
+
+.comment-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .comment-list {

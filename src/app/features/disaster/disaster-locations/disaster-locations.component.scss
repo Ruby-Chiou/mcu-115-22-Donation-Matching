@@ -55,8 +55,15 @@
 }
 
 .map-sidebar h2 {
-  margin: 0 0 20px;
+  margin: 0 0 8px;
   color: #005bac;
+}
+
+.map-note {
+  margin: 0;
+  color: #5d7282;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .map-sidebar label {
@@ -144,7 +151,9 @@
 
 #disaster-map {
   flex: 1;
-  min-width: 0;
+  width: auto;
+  height: 700px;
+  min-width: 280px;
   min-height: 520px;
 }
 

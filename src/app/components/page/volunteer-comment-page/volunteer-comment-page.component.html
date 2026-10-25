@@ -17,6 +17,9 @@
 
   <!-- 留言內容 -->
   <div *ngIf="!isLoading && !loadError" class="comment-section">
+    @if (commentNotice) {
+    <p class="comment-notice">{{ commentNotice }}</p>
+    }
     <!-- 沒有留言 -->
     <div *ngIf="commentThreads.length === 0" class="empty-message">目前還沒有留言。</div>
     <!-- 留言串 -->
@@ -25,13 +28,11 @@
         <div [ngClass]="depth === 0 ? 'comment' : 'reply'">
           <div class="comment-header">
             <div class="comment-title">
-              @if (node.comment.parent_comment_id !== null) {
-              <strong>{{ node.comment.user_name }}</strong>
-              <span class="reply-title-text">回覆</span>
-              <strong class="reply-target-name"> {{ getReplyTargetName(node.comment.parent_comment_id) }} </strong>
-              } @else {
-              <strong>{{ node.comment.user_name }}</strong>
-              }
+            <app-comment-author [userId]="node.comment.user_id" [name]="node.comment.user_name" [role]="node.comment.user_role" />
+            @if (node.comment.parent_comment_id !== null) {
+            <span class="reply-title-text">回覆</span>
+            <strong class="reply-target-name"> {{ getReplyTargetName(node.comment.parent_comment_id) }} </strong>
+            }
             </div>
             <span>{{ formatCommentDate(node.comment.created_at) }}</span>
           </div>

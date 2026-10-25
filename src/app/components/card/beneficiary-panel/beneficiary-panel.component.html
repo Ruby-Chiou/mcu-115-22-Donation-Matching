@@ -12,7 +12,11 @@
   @for (field of fields(); track field.label) {
     <div class="panel-row">
       <h3>{{ field.label }}</h3>
-      <p>{{ field.value }}</p>
+      @if (field.href) {
+        <p><a [href]="field.href" target="_blank" rel="noopener noreferrer">{{ field.value }}</a></p>
+      } @else {
+        <p>{{ field.value }}</p>
+      }
     </div>
   }
 </section>

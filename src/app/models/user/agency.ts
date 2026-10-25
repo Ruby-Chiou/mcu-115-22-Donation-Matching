@@ -26,6 +26,9 @@ export interface AgencyProfile extends UserBase {
   serviceTargets: string[];
   mission: string;
   background: string;
+  websiteUrl: string;
+  latitude: number | null;
+  longitude: number | null;
   updatedAt?: Date;
 }
 

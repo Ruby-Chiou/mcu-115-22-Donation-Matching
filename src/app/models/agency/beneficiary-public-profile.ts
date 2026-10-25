@@ -13,4 +13,10 @@ export interface BeneficiaryPublicProfile {
   mission: string;
   background: string;
   verified: boolean;
+  /** 登記地址。捐助地圖與機構卡片共用這一行。 */
+  address: string;
+  /** 機構自己填的官方網站。空字串代表尚未提供。 */
+  websiteUrl: string;
+  latitude: number | null;
+  longitude: number | null;
 }

@@ -179,6 +179,30 @@ export class VolunteerDemandService {
     return this.demands.filter((demand) => demand.status === '上架');
   }
 
+  /**
+   * 地圖只需要座標與需求摘要，不等待全表留言統計。
+   * 失敗時回傳空陣列，地圖仍先畫出台灣。
+   */
+  async listPublishedForMap(): Promise<VolunteerDemand[]> {
+    try {
+      const { data, error } = await this.supabaseService.client
+        .from(this.tableName)
+        .select('id, serialNo, type, location, latitude, longitude, workContent, status')
+        .eq('status', '上架')
+        .abortSignal(AbortSignal.timeout(8000));
+
+      if (error) {
+        console.error('讀取地圖志工需求失敗：', error);
+        return [];
+      }
+
+      return (data ?? []).map((row) => this.mapRowToDemand(row as VolunteerDemandRow));
+    } catch (error) {
+      console.error('讀取地圖志工需求失敗：', error);
+      return [];
+    }
+  }
+
   getDemandsFromServer(): Observable<VolunteerDemand[]> {
     return from(this.reload().then(() => [...this.demands]));
   }
