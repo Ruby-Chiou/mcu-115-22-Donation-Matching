@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+.access-banner,
+.access-note {
+  width: min(1080px, calc(100% - 32px));
+  margin: 16px auto 0;
+}
+
+.access-banner article {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 12px 14px;
+  border: 1px solid #f3d19c;
+  border-radius: 12px;
+  background: #fff8eb;
+  color: #163a53;
+}
+
+.access-banner p,
+.access-note {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.access-banner div {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: #005bac;
+  color: #fff;
+  cursor: pointer;
+}
+
+button.quiet {
+  background: #fff;
+  color: #9f1239;
+  border: 1px solid #f3d19c;
+}
+
+button:disabled {
+  opacity: 0.55;
+}

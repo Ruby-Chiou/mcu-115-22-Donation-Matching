@@ -372,6 +372,10 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# 聯絡表單用公開的 publishable key 呼叫，該 key 不是 JWT，所以改在函式內確認登入者。
+[functions.notify-support-complaint]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

@@ -75,6 +75,34 @@
   font-weight: 700;
 }
 
+.visibility-state {
+  margin: 0.75rem 0 0.4rem;
+  color: var(--color-text-medium);
+  font-size: 0.85rem;
+}
+
+.visibility-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+
+  button {
+    padding: 0.25rem 0.55rem;
+    border: 1px solid #f0d7df;
+    border-radius: 999px;
+    background: #fff;
+    color: #b54b6a;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+}
+
 .organization {
   margin-top: 0.55rem;
   color: var(--color-text-medium);

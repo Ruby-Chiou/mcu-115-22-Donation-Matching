@@ -161,11 +161,40 @@
               感謝狀：{{ record.needThankYou ? '需要' : '不需要' }}
             </dd>
 
+            <dt>感謝牆</dt>
+            <dd>{{ record.thankPublic ? '公開' : '只有自己看得到' }}，{{ record.thankNameMode === 'full' ? '全名' : '匿名' }}</dd>
+
             @if (record.note) {
               <dt>備註</dt>
               <dd>{{ record.note }}</dd>
             }
           </dl>
+
+          <form class="tracking-form" (submit)="$event.preventDefault(); saveVisibility(record)">
+            <p class="shortcut-hint">感謝牆可以改成匿名或全名，也可以改成不公開。公開頁會跟著這筆捐助更新。</p>
+            <label>
+              <input type="radio" name="history-name-mode" value="masked" [checked]="nameModeDraft() === 'masked'" (change)="nameModeDraft.set('masked')" />
+              匿名
+            </label>
+            <label>
+              <input type="radio" name="history-name-mode" value="full" [checked]="nameModeDraft() === 'full'" (change)="nameModeDraft.set('full')" />
+              全名
+            </label>
+            <label>
+              <input type="radio" name="history-public" value="public" [checked]="publicDraft()" (change)="publicDraft.set(true)" />
+              公開
+            </label>
+            <label>
+              <input type="radio" name="history-public" value="private" [checked]="!publicDraft()" (change)="publicDraft.set(false)" />
+              只有自己看得到
+            </label>
+            <button type="submit" class="btn btn-primary" [disabled]="visibilitySaving()">
+              {{ visibilitySaving() ? '儲存中...' : '儲存顯示方式' }}
+            </button>
+            @if (visibilityMessage()) {
+              <p class="tracking-message">{{ visibilityMessage() }}</p>
+            }
+          </form>
 
           @if (record.status === 'human_approved' && record.donationMethod === '寄送') {
             <form class="tracking-form" (submit)="$event.preventDefault(); saveTracking(record)">

@@ -73,6 +73,24 @@
   color: var(--color-text-main);
 }
 
+.board-notices {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.board-notice {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #7c2d12;
+  text-align: left;
+
+  p {
+    margin: 4px 0 0;
+  }
+}
+
 .thank-you-list {
   display: flex;
   flex-direction: column;

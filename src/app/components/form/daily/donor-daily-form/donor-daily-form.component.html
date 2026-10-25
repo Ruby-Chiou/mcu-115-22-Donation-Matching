@@ -199,6 +199,43 @@
           </label>
         </div>
       </div>
+      <div class="section-title">
+        <span>公開</span>
+        公開感謝
+      </div>
+      <div class="form-group">
+        <label>
+          感謝牆要怎麼顯示你的姓名？
+          <span>*</span>
+        </label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="thankNameMode" value="masked" [(ngModel)]="thankNameMode" required class="no-error-border" />
+            <span>匿名，例如 {{ maskedPreview }}</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="thankNameMode" value="full" [(ngModel)]="thankNameMode" class="no-error-border" />
+            <span>全名</span>
+          </label>
+        </div>
+        <small class="input-hint">之後可以在會員專區的捐助紀錄改。</small>
+      </div>
+      <div class="form-group">
+        <label>
+          這筆要不要出現在公開感謝牆？
+          <span>*</span>
+        </label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="thankPublic" value="public" [(ngModel)]="thankPublic" required class="no-error-border" />
+            <span>公開</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="thankPublic" value="private" [(ngModel)]="thankPublic" class="no-error-border" />
+            <span>只有自己看得到</span>
+          </label>
+        </div>
+      </div>
       <!-- 其他資訊 -->
       <div class="section-title">
         <span> {{ (demand?.receiveMethod?.['寄送'] && demand?.receiveMethod?.['面交']) ? 4 : 5 }} </span>
@@ -259,6 +296,13 @@
         <p>
           捐贈人：
           <strong> {{ donorName }} </strong>
+        </p>
+        <p>
+          感謝牆：
+          <strong>
+            {{ thankPublic === 'public' ? '公開' : '只有自己看得到' }}，
+            {{ thankNameMode === 'full' ? donorName : maskedPreview }}
+          </strong>
         </p>
         <p>
           照片：

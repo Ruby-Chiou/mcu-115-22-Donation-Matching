@@ -263,7 +263,24 @@ const appRoutes: Routes = [
     path: 'admin/dashboard',
     loadComponent: () => import('./features/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
   },
-
+  {
+    path: 'admin/donors',
+    loadComponent: () => import('./features/admin-donors/admin-donors.component').then((m) => m.AdminDonorsComponent),
+  },
+  {
+    path: 'admin/donors/:uid',
+    loadComponent: () => import('./features/admin-donors/admin-donor-detail.component').then((m) => m.AdminDonorDetailComponent),
+  },
+  {
+    path: 'admin/donors/:uid/:kind/:id',
+    loadComponent: () =>
+      import('./features/admin-donors/admin-donor-record.component').then((m) => m.AdminDonorRecordComponent),
+  },
+  {
+    path: 'admin/announcements',
+    loadComponent: () =>
+      import('./features/admin-announcements/admin-announcements.component').then((m) => m.AdminAnnouncementsComponent),
+  },
   //6.客服
   {
     path: 'customer-service/ai-chat',

@@ -1,0 +1,51 @@
+<section class="desk">
+  <header>
+    <p class="eyebrow">管理者</p>
+    <h1>捐助者帳號</h1>
+    <p class="lead">點一位捐助者會打開這個人的頁面，可以看資料、動態、私訊，或調整感謝牆與黑名單。</p>
+  </header>
+
+  <div class="toolbar">
+    <label class="grow">
+      搜尋
+      <input type="search" name="keyword" [(ngModel)]="keyword" placeholder="姓名或信箱" />
+    </label>
+    <label>
+      狀態
+      <select name="statusFilter" [(ngModel)]="statusFilter">
+        <option value="all">全部</option>
+        <option value="ACTIVE">使用中</option>
+        <option value="SUSPENDED">已停用</option>
+        <option value="DELETED">已註銷</option>
+      </select>
+    </label>
+  </div>
+
+  @if (notice()) {
+    <p class="notice" [class.error]="noticeError()">{{ notice() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="empty">帳號載入中...</p>
+  } @else {
+    <ul class="records">
+      @for (donor of visible(); track donor.uid) {
+        <li>
+          <a class="record-link" [routerLink]="['/admin/donors', donor.uid]">
+            <strong>{{ donor.displayName || donor.email || '未命名捐助者' }}</strong>
+            <span>{{ donor.email || '沒有信箱' }}</span>
+            <span class="badge" [class.stopped]="donor.accountStatus !== 'ACTIVE'">{{ statusLabel(donor.accountStatus) }}</span>
+            @if (mark(donor.uid).thank) {
+              <span class="badge">感謝牆</span>
+            }
+            @if (mark(donor.uid).blacklist) {
+              <span class="badge stopped">黑名單</span>
+            }
+          </a>
+        </li>
+      } @empty {
+        <li class="empty">沒有符合條件的捐助者。</li>
+      }
+    </ul>
+  }
+</section>

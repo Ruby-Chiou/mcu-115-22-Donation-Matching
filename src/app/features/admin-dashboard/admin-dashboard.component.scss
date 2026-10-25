@@ -1,109 +1,280 @@
-.admin-dashboard-container {
-  padding: 24px;
-  max-width: 1350px; // 放大容器寬度
-  margin: 0 auto;
-
-  h1 {
-    font-size: 28px;
-    margin-bottom: 6px;
-    color: var(--color-text-main);
-    font-weight: 600;
-    text-align: center;
-  }
-
-  .subtitle {
-    color: var(--color-text-muted);
-    margin-bottom: 24px;
-    font-size: 15px;
-    text-align: center;
-  }
-
-  .section-group {
-    margin-bottom: 28px;
-
-    h2 {
-      font-size: 20px;
-      border-bottom: 1px solid var(--border-default);
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-      color: var(--color-text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .section-icon {
-        color: var(--color-brand-primary);
-        font-size: 24px;
-      }
-    }
-
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-
-      .nav-card {
-        background: var(--color-white);
-        border: 1px solid var(--border-default);
-        border-radius: var(--border-radius-main);
-        padding: 16px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          transform: translateY(-2px);
-          background: var(--bg-layer-1);
-          border-color: var(--color-brand-primary);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        h3 {
-          font-size: 18px; // 放大字體
-          margin: 0 0 6px 0;
-          color: var(--color-brand-primary);
-          font-weight: 600;
-        }
-
-        p {
-          font-size: 15px; // 放大字體
-          color: var(--color-text-muted);
-          margin: 0 0 10px 0;
-          line-height: 1.4;
-        }
-
-        .path-tag {
-          font-size: 13px;
-          background: var(--bg-layer-0);
-          color: var(--color-text-muted);
-          padding: 3px 6px;
-          border-radius: 4px;
-          font-family: monospace;
-          border: 1px solid var(--border-default);
-        }
-      }
-    }
-  }
+:host {
+  display: block;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-/* ==========================================
-   📌 未來 RWD 響應式擴充管道 (保留區)
-   未來如果要做平板或手機，直接取消下方註解並調整即可
-   ========================================== */
+.desk {
+  box-sizing: border-box;
+  width: min(1080px, calc(100% - 32px));
+  max-width: 100%;
+  margin: 28px auto 64px;
+  color: var(--color-text-main, #163a53);
+}
 
-/* 平板尺寸 (例如寬度小於 1024px 時，改為一列 3 個) */
-/*
-@media (max-width: 1024px) {
-  .admin-dashboard-container .section-group .card-grid {
-    grid-template-columns: repeat(3, 1fr);
+.desk * {
+  box-sizing: border-box;
+}
+
+.intro h1,
+.channels h2,
+.later h2,
+.columns h2,
+.channels h3 {
+  margin: 0 0 8px;
+  color: #163a53;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #005bac;
+  font-weight: 700;
+}
+
+.lead,
+.note,
+.notice,
+.empty {
+  margin: 0 0 16px;
+  color: #526579;
+  line-height: 1.7;
+}
+
+.modes,
+.links,
+.pages,
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.modes {
+  margin: 8px 0 20px;
+}
+
+button,
+.modes button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: #e7f1fb;
+  color: #005bac;
+  cursor: pointer;
+  font: inherit;
+}
+
+.modes button.active,
+.servers button.active {
+  background: #005bac;
+  color: #fff;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 22px;
+}
+
+.stat,
+.pages a,
+.pages p,
+.columns a,
+.links a {
+  min-width: 0;
+  border: 1px solid #d7e4ef;
+  border-radius: 14px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+}
+
+.stat {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+}
+
+.stat strong {
+  color: #163a53;
+  font-size: 28px;
+}
+
+.stat small,
+.pages span,
+.columns span,
+.servers small {
+  color: #526579;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.columns ul,
+.servers {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+
+.columns a,
+.links a,
+.pages a,
+.pages p {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+}
+
+.columns a:hover,
+.pages a:hover,
+.links a:hover,
+.stat:hover {
+  border-color: #005bac;
+}
+
+.later {
+  margin-top: 22px;
+}
+
+.links a {
+  color: #005bac;
+  font-weight: 700;
+}
+
+.rail {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.rail aside,
+.channels {
+  min-width: 0;
+}
+
+.rail label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+  color: #27506b;
+  font-weight: 700;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid #d7e4ef;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+input.invalid {
+  border-color: #e11d48;
+  background: #fff1f2;
+}
+
+.form-alert {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid #e11d48;
+  border-radius: 8px;
+  background: #fff1f2;
+  color: #9f1239;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.form-alert.ok {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.reason {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 10px;
+  color: #27506b;
+  font-weight: 700;
+}
+
+.servers {
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+}
+
+.servers button {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  border-radius: 14px;
+  padding: 8px;
+  background: #fff;
+  color: #163a53;
+  text-align: left;
+  border: 1px solid #d7e4ef;
+}
+
+.servers button strong,
+.servers button small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e7f1fb;
+  color: #005bac;
+  font-weight: 700;
+}
+
+.servers button.active .mark {
+  border-radius: 12px;
+  background: #fff;
+  color: #005bac;
+}
+
+.channels section {
+  margin-top: 16px;
+}
+
+.pages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pages p {
+  margin: 0;
+  background: #f8fbfe;
+}
+
+@media (max-width: 800px) {
+  .stats,
+  .columns,
+  .rail,
+  .pages {
+    grid-template-columns: 1fr;
+  }
+
+  .servers {
+    max-height: 280px;
   }
 }
-*/
-
-/* 手機尺寸 (例如寬度小於 768px 時，改為一列 1 或 2 個) */
-/*
-@media (max-width: 768px) {
-  .admin-dashboard-container .section-group .card-grid {
-    grid-template-columns: repeat(1, 1fr);
-  }
-}
-*/

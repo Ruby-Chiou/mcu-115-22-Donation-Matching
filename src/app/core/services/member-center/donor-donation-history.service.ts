@@ -19,6 +19,8 @@ interface DonationHistoryRow {
   human_reason: string | null;
   need_receipt: boolean | null;
   need_thank_you: boolean | null;
+  thank_name_mode: string | null;
+  thank_public: boolean | null;
   note: string | null;
   created_at: string;
   ai_checked_at: string | null;
@@ -70,6 +72,8 @@ export class DonorDonationHistoryService {
         human_reason,
         need_receipt,
         need_thank_you,
+        thank_name_mode,
+        thank_public,
         note,
         created_at,
         ai_checked_at,
@@ -141,6 +145,8 @@ export class DonorDonationHistoryService {
       humanReason: row.human_reason,
       needReceipt: !!row.need_receipt,
       needThankYou: !!row.need_thank_you,
+      thankNameMode: row.thank_name_mode === 'full' ? 'full' : 'masked',
+      thankPublic: row.thank_public !== false,
       note: row.note ?? '',
       createdAt: row.created_at,
       aiCheckedAt: row.ai_checked_at,

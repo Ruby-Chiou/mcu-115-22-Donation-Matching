@@ -74,7 +74,7 @@
         平台通知
       </h2>
       <ul>
-        @for (item of announcements; track item.date + item.text) {
+        @for (item of announcements(); track item.date + item.text) {
           <li>
             <time>{{ item.date }}</time>
             <p>{{ item.text }}</p>

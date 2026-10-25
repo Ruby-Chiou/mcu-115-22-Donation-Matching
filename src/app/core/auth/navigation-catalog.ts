@@ -86,13 +86,27 @@ function agencyPublicFront(disasterOpen: boolean): NavItem {
   return { name: '前台頁面', link: '/donor/daily', sub };
 }
 
-const ADMIN_AREA: NavItem = {
-  name: '管理作業',
+const ADMIN_OVERVIEW: NavItem = {
+  name: '總覽',
   link: '/admin/dashboard',
+  sub: [],
+};
+
+const ADMIN_REVIEW: NavItem = {
+  name: '審核',
+  link: '/admin/agency-verify',
   sub: [
-    { name: '總覽中心', link: '/admin/dashboard' },
-    { name: '機構審核', link: '/admin/agency-verify' },
+    { name: '受助者審核', link: '/admin/agency-verify' },
     { name: '企業審核', link: '/admin/company-verify' },
+  ],
+};
+
+const ADMIN_PLATFORM: NavItem = {
+  name: '平台',
+  link: '/admin/donors',
+  sub: [
+    { name: '捐助者帳號', link: '/admin/donors' },
+    { name: '系統公告', link: '/admin/announcements' },
     { name: '災害控管', link: '/admin/disaster-control' },
   ],
 };
@@ -100,7 +114,7 @@ const ADMIN_AREA: NavItem = {
 /** 導覽列只列出該身分可進入的項目。公開資訊頁各身分都看得到。 */
 export function navigationFor(role: AppRole, disasterOpen = false): NavItem[] {
   if (role === 'admin') {
-    return [ADMIN_AREA, SERVICE, ABOUT];
+    return [ADMIN_OVERVIEW, ADMIN_REVIEW, ADMIN_PLATFORM, SERVICE, ABOUT];
   }
 
   if (role === 'agency') {

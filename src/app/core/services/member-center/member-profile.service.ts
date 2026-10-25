@@ -297,7 +297,7 @@ export class MemberProfileService {
       city: row.city ?? undefined,
       avatarUrl: row.avatarUrl ?? undefined,
       loginProvider: ['email', 'google', 'line', 'facebook'].includes(provider) ? provider : 'email',
-      accountStatus: status === 'DELETED' ? 'DELETED' : 'ACTIVE',
+      accountStatus: status === 'DELETED' || status === 'SUSPENDED' ? status : 'ACTIVE',
       deletedAt: row.deletedAt ? new Date(row.deletedAt) : null,
     };
   }

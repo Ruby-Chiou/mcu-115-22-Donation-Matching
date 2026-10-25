@@ -53,6 +53,8 @@ export class DonationService {
     note: string;
     needReceipt: boolean;
     needThankYou: boolean;
+    thankNameMode: 'masked' | 'full';
+    thankPublic: boolean;
     receiptTitle: string | null;
     taxId: string | null;
     donorEmail: string | null;
@@ -76,6 +78,8 @@ export class DonationService {
         note: data.note,
         need_receipt: data.needReceipt,
         need_thank_you: data.needThankYou,
+        thank_name_mode: data.thankNameMode,
+        thank_public: data.thankPublic,
         receipt_title: data.receiptTitle,
         tax_id: data.taxId,
         donor_email: data.donorEmail,

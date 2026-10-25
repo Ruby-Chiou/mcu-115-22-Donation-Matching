@@ -94,7 +94,7 @@
 
         <a [routerLink]="auth.principal().role === 'agency' ? '/agency/profile' : '/member'">
           <i class="fa-solid fa-id-card"></i>
-          {{ auth.principal().role === 'agency' ? '機構資料' : '會員專區' }}
+          {{ auth.principal().role === 'agency' ? '機構資料' : auth.principal().role === 'admin' ? '客訴信箱' : '會員專區' }}
         </a>
 
 

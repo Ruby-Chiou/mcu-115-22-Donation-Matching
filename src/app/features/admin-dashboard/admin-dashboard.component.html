@@ -1,19 +1,210 @@
-<div class="admin-dashboard-container">
-  <h1>管理者總覽中心</h1>
-  <p class="subtitle">歡迎回來！這裡列出管理者目前可以進入的頁面。</p>
+<section class="desk">
+  <header class="intro">
+    <p class="eyebrow">管理者</p>
+    <h1>總覽中心</h1>
+    <p class="lead">先看要處理的事。捐助者看得到的頁面，和受助者看得到的頁面，分開來。</p>
+  </header>
 
-  <div *ngFor="let section of menuSections" class="section-group">
-    <h2>
-      <span class="material-symbols-outlined section-icon">{{ section.icon }}</span>
-      {{ section.title }}
-    </h2>
-
-    <div class="card-grid">
-      <div *ngFor="let item of section.items" class="nav-card" (click)="goTo(item.path)">
-        <h3>{{ item.name }}</h3>
-        <p>{{ item.desc }}</p>
-        <span class="path-tag">{{ item.path }}</span>
-      </div>
-    </div>
+  <div class="modes">
+    <button type="button" [class.active]="mode() === 'overview'" (click)="show('overview')">管理者概覽</button>
+    <button type="button" [class.active]="mode() === 'donor'" (click)="show('donor')">捐助者可見</button>
+    <button type="button" [class.active]="mode() === 'agency'" (click)="show('agency')">受助者可見</button>
   </div>
-</div>
+
+  @if (leaveNotice()) {
+    <p class="notice">{{ leaveNotice() }}</p>
+  }
+  @if (notice()) {
+    <p class="notice">{{ notice() }}</p>
+  }
+
+  @switch (mode()) {
+    @case ('overview') {
+      <div class="stats">
+        <a class="stat" routerLink="/member">
+          <span>未處理客訴</span>
+          <strong>{{ loading() ? '…' : openComplaints().length }}</strong>
+          <small>進客訴信箱</small>
+        </a>
+        <a class="stat" routerLink="/admin/agency-verify">
+          <span>待審受助者</span>
+          <strong>{{ loading() ? '…' : pendingAgencies().length }}</strong>
+          <small>進機構審核</small>
+        </a>
+        <a class="stat" routerLink="/admin/company-verify">
+          <span>待審企業</span>
+          <strong>{{ loading() ? '…' : pendingCompanies().length }}</strong>
+          <small>進企業審核</small>
+        </a>
+        <a class="stat" routerLink="/admin/disaster-control">
+          <span>災害模式</span>
+          <strong>{{ disasterOpen ? '開啟' : '關閉' }}</strong>
+          <small>進災害控管</small>
+        </a>
+      </div>
+
+      <div class="columns">
+        <section>
+          <h2>客訴信件</h2>
+          <ul>
+            @for (item of openComplaints().slice(0, 5); track item.id) {
+              <li>
+                <a routerLink="/member">
+                  <strong>{{ item.subject }}</strong>
+                  <span>{{ item.senderName }} · {{ item.createdAt | date: 'yyyy/MM/dd' }}</span>
+                </a>
+              </li>
+            } @empty {
+              <li class="empty">{{ loading() ? '讀取中…' : '沒有未處理的客訴。' }}</li>
+            }
+          </ul>
+        </section>
+        <section>
+          <h2>等待審核</h2>
+          <ul>
+            @for (item of pendingAgencies().slice(0, 5); track item.id) {
+              <li>
+                <a routerLink="/admin/agency-verify">
+                  <strong>{{ item.name || '未填機構名稱' }}</strong>
+                  <span>受助者 · {{ item.submittedAt | date: 'yyyy/MM/dd' }}</span>
+                </a>
+              </li>
+            }
+            @for (item of pendingCompanies().slice(0, 5); track item.userId) {
+              <li>
+                <a routerLink="/admin/company-verify">
+                  <strong>{{ item.companyName || '未填企業名稱' }}</strong>
+                  <span>企業捐助者 · {{ item.createdAt | date: 'yyyy/MM/dd' }}</span>
+                </a>
+              </li>
+            }
+            @if (!loading() && pendingAgencies().length === 0 && pendingCompanies().length === 0) {
+              <li class="empty">沒有待審的受助者或企業。</li>
+            }
+          </ul>
+        </section>
+      </div>
+
+      <section class="later">
+        <h2>不必每天看</h2>
+        <div class="links">
+          <a routerLink="/admin/donors">捐助者帳號</a>
+          <a routerLink="/admin/announcements">系統公告</a>
+        </div>
+      </section>
+    }
+    @case ('donor') {
+      <p class="lead">這些頁面捐助者看得到，從這裡也可以直接打開。</p>
+      <div class="pages">
+        @for (page of donorPages(); track page.path) {
+          <a [routerLink]="page.path">
+            <strong>{{ page.name }}</strong>
+            <span>{{ page.desc }}</span>
+          </a>
+        }
+      </div>
+      @if (!disasterOpen) {
+        <p class="note">災害救助目前關閉，捐助者的導覽不會出現這一頁。</p>
+      }
+      <p class="note">捐助紀錄、配送查詢和填寫捐助，只有捐助者登入後進得去。</p>
+    }
+    @case ('agency') {
+      <div class="rail">
+        <aside>
+          <label>
+            選擇受助者
+            <input type="search" name="agencyQuery" [(ngModel)]="agencyQuery" placeholder="名稱或縣市" />
+          </label>
+          <ul class="servers">
+            @for (profile of visibleAgencies(); track profile.organizationName) {
+              <li>
+                <button
+                  type="button"
+                  [class.active]="selectedAgency()?.organizationName === profile.organizationName"
+                  (click)="choose(profile)"
+                >
+                  <span class="mark">{{ mark(profile.organizationName) }}</span>
+                  <span>
+                    <strong>{{ profile.organizationName }}</strong>
+                    <small>{{ profile.city || '未填縣市' }} · {{ profile.verified ? '資格已確認' : '審核中' }}</small>
+                  </span>
+                </button>
+              </li>
+            } @empty {
+              <li class="empty">{{ loading() ? '受助者讀取中…' : '沒有符合的受助者。' }}</li>
+            }
+          </ul>
+        </aside>
+
+        @if (selectedAgency(); as profile) {
+          <div class="channels">
+            <h2>{{ profile.organizationName }}</h2>
+            <p class="lead">{{ profile.city || '未填縣市' }} · {{ profile.verified ? '資格已確認' : '審核中' }}。左邊換一家，右邊就是這家看得到的頁面。</p>
+            @switch (accessState(profile)) {
+              @case ('approved') {
+                <p class="note">這家已同意接入，到 {{ accessGrant()?.expiresAt | date: 'HH:mm' }} 為止。@if (accessGrant()?.operatorName) { 維修人員是 {{ accessGrant()?.operatorName }}。 }@if (accessGrant()?.clientLabel) { 申請裝置是 {{ accessGrant()?.clientLabel }}。 }@if (accessGrant()?.clientIp) { IP 是 {{ accessGrant()?.clientIp }}。 }下面的作業頁現在可以打開。受助者一旦結束，這個畫面會回到總覽。</p>
+                <button type="button" [disabled]="accessBusy()" (click)="endAccess()">結束接入</button>
+                @if (accessNotice()) {
+                  <p class="form-alert" [class.ok]="accessOk()" role="alert">{{ accessNotice() }}</p>
+                }
+              }
+              @case ('pending') {
+                <p class="note">已送出申請，等這家在總控制台同意。@if (accessGrant()?.operatorName) { 維修人員是 {{ accessGrant()?.operatorName }}。 }@if (accessGrant()?.clientLabel) { 已記下裝置 {{ accessGrant()?.clientLabel }}。 }@if (accessGrant()?.clientIp) { 已記下 IP {{ accessGrant()?.clientIp }}。 }同意後作業頁會開放兩小時。</p>
+                <button type="button" [disabled]="accessBusy()" (click)="endAccess()">取消申請</button>
+                @if (accessNotice()) {
+                  <p class="form-alert" [class.ok]="accessOk()" role="alert">{{ accessNotice() }}</p>
+                }
+              }
+              @case ('other') {
+                <p class="note">目前還接在另一家。先結束那一次，才能申請這家。</p>
+                <button type="button" [disabled]="accessBusy()" (click)="endAccess()">結束目前的接入</button>
+                @if (accessNotice()) {
+                  <p class="form-alert" [class.ok]="accessOk()" role="alert">{{ accessNotice() }}</p>
+                }
+              }
+              @default {
+                <label class="reason">
+                  維修人員
+                  <input type="text" name="operatorName" maxlength="30" autocomplete="off" [(ngModel)]="operatorName" />
+                </label>
+                <label class="reason">
+                  密碼
+                  <input type="password" name="operatorPassword" autocomplete="off" [class.invalid]="accessNotice() && !accessOk()" [(ngModel)]="operatorPassword" />
+                </label>
+                <label class="reason">
+                  接入原因
+                  <textarea name="accessReason" rows="2" maxlength="200" [(ngModel)]="accessReason" placeholder="例如：協助修正卡在審核的捐助"></textarea>
+                </label>
+                <button type="button" [disabled]="accessBusy()" (click)="askAccess(profile)">申請接入</button>
+                @if (accessNotice()) {
+                  <p #accessAlert class="form-alert" [class.ok]="accessOk()" role="alert">{{ accessNotice() }}</p>
+                }
+                <p class="note">受助者會看到這次填的稱呼。對方同意後才進得去，而且只開兩小時。</p>
+              }
+            }
+            @for (group of agencyChannels(profile); track group.title) {
+              <section>
+                <h3>{{ group.title }}</h3>
+                <div class="pages">
+                  @for (page of group.items; track page.name) {
+                    @if (page.path) {
+                      <a [routerLink]="page.path">
+                        <strong>{{ page.name }}</strong>
+                        <span>{{ page.desc }}</span>
+                      </a>
+                    } @else {
+                      <p>
+                        <strong>{{ page.name }}</strong>
+                        <span>{{ page.desc }}。對方同意後才能打開。</span>
+                      </p>
+                    }
+                  }
+                </div>
+              </section>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</section>

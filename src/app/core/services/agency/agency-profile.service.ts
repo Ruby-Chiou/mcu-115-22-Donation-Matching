@@ -2,6 +2,8 @@ import { Injectable, inject, signal } from '@angular/core';
 
 import { normalizeWebsiteUrl } from '../../map/map-links';
 import { AgencyProfile } from '../../../models/user/agency';
+import { AgencyAccessService } from './agency-access.service';
+import { AuthSessionService } from '../auth/auth-session.service';
 import { SupabaseService } from '../database/supabase.service';
 import { MemberSessionService } from '../member-center/member-session.service';
 
@@ -100,18 +102,24 @@ interface AgencyProfileRow {
 export class AgencyProfileService {
   private readonly supabase = inject(SupabaseService);
   private readonly session = inject(MemberSessionService);
+  private readonly auth = inject(AuthSessionService);
+  private readonly access = inject(AgencyAccessService);
   private readonly tableName = 'agency_profiles';
   private readonly imageBucket = 'agency-intro';
 
   readonly profile = signal<AgencyProfile | null>(null);
 
   async loadOwn(): Promise<AgencyProfile> {
-    const uid = await this.session.getCurrentUid();
+    const uid = await this.profileUid();
     const { data, error } = await this.supabase.client.from(this.tableName).select('*').eq('uid', uid).maybeSingle();
 
     if (error) {
       console.error('讀取機構資料失敗：', error);
       throw error;
+    }
+
+    if (!data && this.auth.principal().role === 'admin') {
+      throw new Error('這家受助者的資料讀不到');
     }
 
     const row = (data as AgencyProfileRow | null) ?? (await this.createOwn(uid));
@@ -122,6 +130,18 @@ export class AgencyProfileService {
     const profile = this.mapRow(row);
     this.profile.set(profile);
     return profile;
+  }
+
+  private async profileUid(): Promise<string> {
+    if (this.auth.principal().role === 'admin') {
+      const grant = await this.access.activeGrant();
+      if (!grant || !this.access.stillOpen(grant)) {
+        throw new Error('尚未取得這家受助者的同意');
+      }
+      return grant.agencyUid;
+    }
+
+    return this.session.getCurrentUid();
   }
 
   async save(draft: AgencyProfileDraft): Promise<AgencyProfile> {

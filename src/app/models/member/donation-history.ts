@@ -20,6 +20,8 @@ export interface DonorDonationHistory {
   humanReason: string | null;
   needReceipt: boolean;
   needThankYou: boolean;
+  thankNameMode: 'masked' | 'full';
+  thankPublic: boolean;
   note: string;
   createdAt: string;
   aiCheckedAt: string | null;

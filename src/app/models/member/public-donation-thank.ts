@@ -5,8 +5,12 @@
 export interface PublicDonationThank {
   id: number;
   donorUid: string;
-  /** 公開顯示用（可遮罩，如 王*明） */
+  /** 公開頁實際顯示的名稱，依捐助者選擇的匿名或全名 */
   displayName: string;
+  /** masked 匿名，full 全名 */
+  nameMode?: 'masked' | 'full';
+  /** false 時只有捐助者自己看得到 */
+  isPublic?: boolean;
   honorific: string; // 先生 / 小姐 / 君
   donationItem: string;
   agencyName: string;
@@ -15,7 +19,20 @@ export interface PublicDonationThank {
   donationId?: string;
 }
 
-/** 公開牆不顯示全名。兩個字留姓，更長則留頭尾。 */
+export type ThankNameMode = 'masked' | 'full';
+
+/** 匿名留頭尾；全名照捐助者填的姓名。 */
+export function publicDonorName(name: string, mode: ThankNameMode): string {
+  const trimmed = name.trim();
+
+  if (mode === 'full') {
+    return trimmed || '捐助者';
+  }
+
+  return maskDonorName(trimmed);
+}
+
+/** 匿名時兩個字留姓，更長則留頭尾。 */
 export function maskDonorName(name: string): string {
   const trimmed = name.trim();
 

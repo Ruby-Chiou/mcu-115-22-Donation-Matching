@@ -2,15 +2,18 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthSessionService } from '../../core/services/auth/auth-session.service';
+import { AdminComplaintDeskComponent } from './admin-complaint-desk.component';
 import { MemberCenterComponent } from './member-center.component';
 import { MemberPlaceholderComponent } from './member-placeholder.component';
 
 @Component({
   selector: 'app-member-entry',
-  imports: [MemberCenterComponent, MemberPlaceholderComponent],
+  imports: [MemberCenterComponent, MemberPlaceholderComponent, AdminComplaintDeskComponent],
   template: `
     @if (auth.principal().role === 'donor') {
       <app-member-center />
+    } @else if (auth.principal().role === 'admin') {
+      <app-admin-complaint-desk />
     } @else if (auth.principal().role !== 'agency') {
       <app-member-placeholder />
     }

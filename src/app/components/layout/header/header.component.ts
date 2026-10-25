@@ -46,7 +46,14 @@ export class HeaderComponent implements OnInit {
   }
 
   protected accountLabel(): string {
-    return this.auth.principal().role === 'agency' ? '機構資料' : '會員專區';
+    const role = this.auth.principal().role;
+    if (role === 'agency') {
+      return '機構資料';
+    }
+    if (role === 'admin') {
+      return '客訴信箱';
+    }
+    return '會員專區';
   }
 
   protected get roleLabel(): string {

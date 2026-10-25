@@ -2,14 +2,19 @@
 
 # Compiled output
 /dist
+/dist-check
 /tmp
 /out-tsc
 /bazel-out
+*.tsbuildinfo
 
 # Node
 /node_modules
 npm-debug.log
 yarn-error.log
+yarn-debug.log*
+pnpm-debug.log*
+*.log
 
 # IDEs and editors
 .idea/
@@ -51,9 +56,18 @@ Thumbs.db
 # Supabase CLI（本機連結／暫存，勿 commit）
 supabase/.branches
 supabase/.temp
+supabase/.env
 supabase/.env.keys
 supabase/.env.local
 supabase/.env.*.local
+
+# 本機密鑰。信箱應用程式密碼與服務金鑰放在 Supabase secret，不要進 git。
+.env
+.env.*
+!.env.example
+*.pem
+**/credentials.json
+**/service-account*.json
 
 # 本機影像審核的模型與套件
 /server/donation-vision/node_modules/

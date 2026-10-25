@@ -12,7 +12,7 @@
 
   <div class="announcement-list">
 
-    @for (item of announcements; track item.date + item.text) {
+    @for (item of announcements(); track item.date + item.text) {
     <div class="announcement-item">
 
       <span class="announcement-date">

@@ -3,7 +3,7 @@ import { UserBase } from './user-base';
 /** 登入來源；第三方登入接上後由 Auth provider 寫入 */
 export type DonorLoginProvider = 'email' | 'google' | 'line' | 'facebook';
 
-export type DonorAccountStatus = 'ACTIVE' | 'DELETED';
+export type DonorAccountStatus = 'ACTIVE' | 'SUSPENDED' | 'DELETED';
 
 export const DONOR_LOGIN_PROVIDER_LABELS: Record<DonorLoginProvider, string> = {
   email: 'Email 帳號',

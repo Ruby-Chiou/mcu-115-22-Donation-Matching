@@ -1,0 +1,151 @@
+<section class="desk">
+  <header>
+    <p class="eyebrow">管理者</p>
+    <h1>捐助者詳情</h1>
+    <p class="lead"><a class="text-link" routerLink="/admin/donors">回到捐助者列表</a></p>
+  </header>
+
+  @if (notice()) {
+    <p class="notice" [class.error]="noticeError()">{{ notice() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="empty">帳號載入中...</p>
+  } @else if (donor(); as person) {
+    <article class="panel">
+      <h2>{{ person.displayName || '未命名捐助者' }}</h2>
+      <dl>
+        <dt>信箱</dt>
+        <dd>{{ person.email || '尚未填寫' }}</dd>
+        <dt>真實姓名</dt>
+        <dd>{{ person.fullName || '尚未填寫' }}</dd>
+        <dt>電話</dt>
+        <dd>{{ person.phone || '尚未填寫' }}</dd>
+        <dt>縣市</dt>
+        <dd>{{ person.city || '尚未填寫' }}</dd>
+        <dt>類型</dt>
+        <dd>{{ kindLabel(person.donorKind) }}</dd>
+        <dt>登入方式</dt>
+        <dd>{{ person.loginProvider || '尚未填寫' }}</dd>
+        <dt>建立時間</dt>
+        <dd>{{ person.createdAt ? (person.createdAt | date: 'yyyy/MM/dd HH:mm') : '尚未記錄' }}</dd>
+        <dt>狀態</dt>
+        <dd>{{ statusLabel(person.accountStatus) }}</dd>
+      </dl>
+
+      <div class="actions">
+        <button type="button" class="ghost" [class.active-action]="panel() === 'activity'" (click)="showPanel('activity')">查看動態</button>
+        <button type="button" class="ghost" [class.active-action]="panel() === 'message'" (click)="showPanel('message')">私訊</button>
+        <button type="button" class="ghost" [class.active-action]="panel() === 'thank'" (click)="showPanel('thank')">感謝牆</button>
+        <button type="button" class="ghost" [class.active-action]="panel() === 'blacklist'" (click)="showPanel('blacklist')">黑名單</button>
+        @if (person.accountStatus === 'ACTIVE') {
+          <button type="button" class="warn" [disabled]="saving()" (click)="setStatus('SUSPENDED')">停用帳號</button>
+        } @else {
+          <button type="button" [disabled]="saving()" (click)="setStatus('ACTIVE')">恢復使用</button>
+        }
+      </div>
+
+      @switch (panel()) {
+        @case ('activity') {
+          <div class="stack">
+            <div class="activity-tools">
+              <label class="grow">
+                搜尋這位捐助者的紀錄
+                <input type="search" name="activityQuery" [(ngModel)]="activityQuery" placeholder="物資、收據號碼、信件主旨" />
+              </label>
+              <div class="chips">
+                @for (chip of activityKinds; track chip.id) {
+                  <button type="button" class="ghost" [class.active-action]="activityKind === chip.id" (click)="activityKind = chip.id">{{ chip.label }}</button>
+                }
+              </div>
+            </div>
+            <p class="hint">點一筆紀錄會打開那一筆的修正頁。</p>
+            @if (activityLoading()) {
+              <p class="empty">動態載入中...</p>
+            } @else {
+              <ul class="records">
+                @for (item of visibleActivity(); track item.kind + item.id) {
+                  <li>
+                    <a class="record-link" [routerLink]="['/admin/donors', person.uid, item.kind, item.id]">
+                      <strong>{{ item.title }}</strong>
+                      <span>{{ activityKindLabel(item.kind) }} · {{ item.detail }}</span>
+                      <span>{{ item.createdAt | date: 'yyyy/MM/dd' }}</span>
+                    </a>
+                  </li>
+                } @empty {
+                  <li class="empty">沒有符合的紀錄。</li>
+                }
+              </ul>
+            }
+          </div>
+        }
+        @case ('message') {
+          <div class="stack">
+            <p class="notice">送出後會出現在這位捐助者的會員專區收件匣。</p>
+            <label>
+              主旨
+              <input type="text" name="messageSubject" maxlength="80" [(ngModel)]="messageSubject" placeholder="寫給這位捐助者" />
+            </label>
+            <label>
+              內容
+              <textarea name="messageBody" rows="4" maxlength="2000" [(ngModel)]="messageBody" placeholder="這封信會出現在對方的會員收件匣"></textarea>
+            </label>
+            <div class="actions">
+              <button type="button" [disabled]="saving()" (click)="sendMessage()">送出私訊</button>
+            </div>
+          </div>
+        }
+        @case ('thank') {
+          <div class="stack">
+            <p class="notice">這會在公開感謝牆加上一張卡片。名稱可以寫全名或匿名，也會出現在對方會員專區。</p>
+            <label>
+              公開名稱
+              <input type="text" name="thankHeadline" maxlength="40" [(ngModel)]="boardHeadline" />
+            </label>
+            <label>
+              捐贈內容
+              <textarea name="thankBody" rows="3" maxlength="300" [(ngModel)]="boardBody" placeholder="例如 白米 10 包"></textarea>
+            </label>
+            <div class="actions">
+              <button type="button" [disabled]="saving()" (click)="saveBoard('thank_wall')">放到感謝牆</button>
+              @if (mark(person.uid).thank) {
+                <button type="button" class="warn" [disabled]="saving()" (click)="clearBoard('thank_wall')">從感謝牆移除</button>
+              }
+              <a class="text-link" routerLink="/thank-you-wall" target="_blank">開啟公開感謝牆</a>
+            </div>
+          </div>
+        }
+        @case ('blacklist') {
+          <div class="stack">
+            <p class="notice">這會把這位捐助者加進公開頁右側的捐助者黑名單。原本那幾則範例故事不會再算進這份名單。</p>
+            <label>
+              公開顯示名稱
+              <input type="text" name="blacklistHeadline" maxlength="40" [(ngModel)]="boardHeadline" />
+            </label>
+            <label>
+              原因
+              <textarea name="blacklistBody" rows="3" maxlength="300" [(ngModel)]="boardBody" placeholder="公開頁會顯示這個原因"></textarea>
+            </label>
+            <div class="actions">
+              <button type="button" class="warn" [disabled]="saving()" (click)="saveBoard('blacklist')">列入黑名單</button>
+              @if (mark(person.uid).blacklist) {
+                <button type="button" [disabled]="saving()" (click)="clearBoard('blacklist')">移出黑名單</button>
+              }
+              <a class="text-link" routerLink="/thank-you-wall" target="_blank">開啟公開黑名單</a>
+            </div>
+            <h3>目前的捐助者黑名單</h3>
+            <ul class="feed">
+              @for (item of publicBlacklist(); track item.id) {
+                <li [class.mine]="item.donorUid === person.uid"><strong>{{ item.headline }}</strong><span>{{ item.body }}</span></li>
+              } @empty {
+                <li>還沒有捐助者被列入公開黑名單。</li>
+              }
+            </ul>
+          </div>
+        }
+      }
+    </article>
+  } @else {
+    <p class="empty">找不到這位捐助者。</p>
+  }
+</section>

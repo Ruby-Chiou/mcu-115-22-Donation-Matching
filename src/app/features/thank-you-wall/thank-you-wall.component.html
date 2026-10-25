@@ -14,6 +14,19 @@
         💕 感謝牆 💕
       </h2>
 
+      @if (wallNotices().length) {
+        <div class="board-notices">
+          @for (notice of wallNotices(); track notice.id) {
+            <article class="board-notice">
+              @if (notice.headline) {
+                <strong>{{ notice.headline }}</strong>
+              }
+              <p>{{ notice.body }}</p>
+            </article>
+          }
+        </div>
+      }
+
       <div class="thank-you-list">
         @if (isLoading()) {
           <p class="wall-empty">感謝牆載入中...</p>
@@ -38,7 +51,7 @@
               </div>
             </article>
           } @empty {
-            <p class="wall-empty">機構接受捐助後，會以遮罩姓名公開在這裡。</p>
+            <p class="wall-empty">機構接受捐助後，會依照捐助者選擇的姓名與公開方式出現在這裡。</p>
           }
         }
       </div>
@@ -56,50 +69,14 @@
       </h2>
 
       <div class="blacklist-list">
-
-        <div class="blacklist-item">
-          <div class="blacklist-user">
-            吳○○
+        @for (item of blacklist(); track item.id) {
+          <div class="blacklist-item">
+            <div class="blacklist-user">{{ item.headline }}</div>
+            <div class="blacklist-reason">{{ item.body }}</div>
           </div>
-
-          <div class="blacklist-reason">
-            冒名行為
-          </div>
-        </div>
-
-
-        <div class="blacklist-item">
-          <div class="blacklist-user">
-            蔡○○
-          </div>
-
-          <div class="blacklist-reason">
-            未依約寄送
-          </div>
-        </div>
-
-
-        <div class="blacklist-item">
-          <div class="blacklist-user">
-            林○○
-          </div>
-
-          <div class="blacklist-reason">
-            調換捐贈物品
-          </div>
-        </div>
-
-
-        <div class="blacklist-item">
-          <div class="blacklist-user">
-            陳○○
-          </div>
-
-          <div class="blacklist-reason">
-            冒充官方單位
-          </div>
-        </div>
-
+        } @empty {
+          <p class="wall-empty">目前沒有黑名單公告。</p>
+        }
       </div>
 
     </aside>

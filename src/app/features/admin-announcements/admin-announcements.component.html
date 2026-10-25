@@ -1,0 +1,53 @@
+<section class="desk">
+  <header>
+    <p class="eyebrow">管理者</p>
+    <h1>系統公告</h1>
+    <p class="lead">撰寫、發布或收回平台公告。已發布的內容會出現在首頁與受助機構總控台。</p>
+  </header>
+
+  @if (notice()) {
+    <p class="notice" [class.error]="noticeError()">{{ notice() }}</p>
+  }
+
+  <form class="panel" (ngSubmit)="save()">
+    <label class="grow">
+      公告內容
+      <textarea name="body" [(ngModel)]="body" maxlength="400" placeholder="寫給所有使用者的系統公告"></textarea>
+    </label>
+    <div class="actions">
+      <label class="check">
+        <input type="checkbox" name="publishNow" [(ngModel)]="publishNow" />
+        儲存後立即發布
+      </label>
+      <button type="submit" [disabled]="saving()">{{ editingId ? '更新公告' : '新增公告' }}</button>
+      @if (editingId) {
+        <button type="button" class="ghost" (click)="resetForm()">取消編輯</button>
+      }
+    </div>
+  </form>
+
+  @if (loading()) {
+    <p class="empty">公告載入中...</p>
+  } @else {
+    <ul>
+      @for (item of items(); track item.id) {
+        <li>
+          <article class="panel">
+            <span class="badge" [class.stopped]="!item.published">{{ item.published ? '已發布' : '草稿' }}</span>
+            <p>{{ item.body }}</p>
+            @if (item.publishedAt) {
+              <p class="lead">發布時間 {{ item.publishedAt | date: 'yyyy/MM/dd HH:mm' }}</p>
+            }
+            <div class="actions">
+              <button type="button" class="ghost" (click)="edit(item)">編輯</button>
+              <button type="button" class="ghost" (click)="toggle(item)">{{ item.published ? '收回' : '發布' }}</button>
+              <button type="button" class="warn" (click)="remove(item)">刪除</button>
+            </div>
+          </article>
+        </li>
+      } @empty {
+        <p class="empty">目前沒有系統公告。</p>
+      }
+    </ul>
+  }
+</section>

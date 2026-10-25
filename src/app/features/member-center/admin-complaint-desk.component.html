@@ -1,0 +1,103 @@
+<section class="desk">
+  <header>
+    <p class="eyebrow">客訴信箱</p>
+    <h1>客訴信件</h1>
+    <p class="lead">
+      件數標在按鈕上，點按鈕才換清單。回覆不等於結案。對方若七天內沒有再回覆，系統會自動結案，並同時通知來信者與 {{ supportEmail }}。
+    </p>
+  </header>
+
+  @if (!loading()) {
+  <div class="filters">
+    <button type="button" [class.active-action]="view() === 'open'" (click)="view.set('open')">
+      未處理 <b>{{ openItems().length }}</b>
+    </button>
+    <button type="button" [class.active-action]="view() === 'waiting'" (click)="view.set('waiting')">
+      待對方回覆 <b>{{ waitingItems().length }}</b>
+    </button>
+    <button type="button" [class.active-action]="view() === 'manual'" (click)="view.set('manual')">
+      手動結案 <b>{{ manualItems().length }}</b>
+    </button>
+    <button type="button" [class.active-action]="view() === 'auto'" (click)="view.set('auto')">
+      逾期自動結案 <b>{{ autoItems().length }}</b>
+    </button>
+  </div>
+  }
+
+  @if (notice()) {
+  <p class="notice" [class.error]="noticeError()">{{ notice() }}</p>
+  } @if (loading()) {
+  <p class="empty">信件載入中...</p>
+  } @else {
+  <div class="layout">
+      <div class="queue">
+        @for (item of visible(); track item.id) {
+          <button type="button" [class.active]="selected()?.id === item.id" (click)="open(item)">
+            <strong>{{ item.subject }}</strong>
+            <span>{{ item.senderName }} · {{ item.senderEmail }}</span>
+            @if (view() === 'waiting') {
+              @if (replyDeadline(item); as deadline) {
+                <span>自動結案時間 {{ deadline | date: 'yyyy/MM/dd HH:mm' }}</span>
+              }
+            } @else if (view() === 'manual' || view() === 'auto') {
+              @if (item.closedAt) {
+                <span>結案於 {{ item.closedAt | date: 'yyyy/MM/dd HH:mm' }}</span>
+              }
+            }
+          </button>
+        } @empty {
+          <p class="empty">這一類目前沒有案件。</p>
+        }
+      </div>
+
+    @if (selected(); as item) {
+    <article class="panel">
+      <h2>{{ item.subject }}</h2>
+      <dl>
+        <dt>來信人</dt>
+        <dd>{{ item.senderName }}</dd>
+        <dt>信箱</dt>
+        <dd><a [href]="'mailto:' + item.senderEmail">{{ item.senderEmail }}</a></dd>
+        <dt>類型</dt>
+        <dd>{{ categoryLabel(item.category) }}</dd>
+        <dt>時間</dt>
+        <dd>{{ item.createdAt | date: 'yyyy/MM/dd HH:mm' }}</dd>
+        <dt>狀態</dt>
+        <dd>
+          @if (item.status === 'open') { 未處理 } @else if (item.status === 'replied') { 已回覆，待對方回覆 } @else if (item.closeMethod ===
+          'auto') { 逾期自動結案 } @else { 手動結案 }
+        </dd>
+        @if (item.status === 'replied' && replyDeadline(item); as deadline) {
+        <dt>自動結案</dt>
+        <dd>{{ deadline | date: 'yyyy/MM/dd HH:mm' }}</dd>
+        } @if (item.closedAt) {
+        <dt>結案時間</dt>
+        <dd>{{ item.closedAt | date: 'yyyy/MM/dd HH:mm' }}</dd>
+        }
+        <dt>內容</dt>
+        <dd>{{ item.body }}</dd>
+      </dl>
+
+      @for (reply of replies(); track reply.id) {
+      <p class="notice">{{ reply.authorName }} · {{ reply.createdAt | date: 'yyyy/MM/dd HH:mm' }}<br />{{ reply.body }}</p>
+      }
+
+      <label class="grow">
+        回覆
+        <textarea name="replyBody" rows="5" maxlength="2000" [(ngModel)]="replyBody" placeholder="寫給來信人的回覆"></textarea>
+      </label>
+      <p class="hint">送出回覆不會結案。對方七天內沒再回覆，系統才會自動結案並通知雙方。若對方已經用 Email 回了，請按「對方已回覆」。</p>
+      <div class="actions">
+        <button type="button" [disabled]="saving()" (click)="sendReply()">送出回覆</button>
+        @if (item.status === 'replied') {
+        <button type="button" class="ghost" [disabled]="saving()" (click)="markSenderReplied()">對方已回覆</button>
+        }
+        <button type="button" class="warn" [disabled]="saving()" (click)="closeSelected()">
+          {{ item.status === 'closed' ? '重新開啟' : '手動結案' }}
+        </button>
+      </div>
+    </article>
+    }
+  </div>
+  }
+</section>

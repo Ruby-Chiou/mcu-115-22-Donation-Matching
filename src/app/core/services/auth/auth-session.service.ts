@@ -115,6 +115,16 @@ export class AuthSessionService {
         }
       }
 
+      if (account.role === 'donor') {
+        const block = await this.donorBlockReason(session.user.id);
+        if (block) {
+          this.accountError = new Error(block);
+          this.principal.set(GUEST_PRINCIPAL);
+          await this.supabase.client.auth.signOut();
+          return;
+        }
+      }
+
       this.accountError = null;
       this.principal.set({
         role: account.role,
@@ -197,6 +207,28 @@ export class AuthSessionService {
     }
 
     return new Promise((resolve) => this.zone.run(() => resolve()));
+  }
+
+  private async donorBlockReason(userId: string): Promise<string | null> {
+    const { data, error } = await this.supabase.client
+      .from('donor_profiles')
+      .select('accountStatus')
+      .eq('uid', userId)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
+    }
+
+    if (data.accountStatus === 'SUSPENDED') {
+      return '此捐助帳號已停用，請聯絡平台管理者。';
+    }
+
+    if (data.accountStatus === 'DELETED') {
+      return '此捐助帳號已註銷。';
+    }
+
+    return null;
   }
 
   private async agencyBlockReason(userId: string): Promise<string | null> {

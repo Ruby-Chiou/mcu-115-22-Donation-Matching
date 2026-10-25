@@ -9,6 +9,7 @@ import { AiReviewResult, DonationService } from '../../../../core/services/agenc
 import { DonorReceiptRequestComponent } from '../../../receipt/donor-receipt-request/donor-receipt-request.component';
 import { MemberProfileService } from '../../../../core/services/member-center/member-profile.service';
 import { ReceiptLineItem, emptyReceiptLine, validateDonorReceiptRequest } from '../../../../core/receipt/donation-receipt-document';
+import { maskDonorName } from '../../../../models/member/public-donation-thank';
 @Component({
   selector: 'app-donor-daily-form',
   imports: [CommonModule, FormsModule, DonorReceiptRequestComponent],
@@ -103,6 +104,8 @@ export class DonorDailyFormComponent implements OnInit {
   note = '';
   needReceipt = '';
   needThankYou = '';
+  thankNameMode: '' | 'masked' | 'full' = '';
+  thankPublic: '' | 'public' | 'private' = '';
   donorEmail = '';
   donorIdNo = '';
   receiptLines: ReceiptLineItem[] = [];
@@ -110,6 +113,10 @@ export class DonorDailyFormComponent implements OnInit {
   proofFile: File | null = null;
   proofFileName = '';
   // 捐贈完成證明
+  get maskedPreview(): string {
+    return maskDonorName(this.donorName || '王小明');
+  }
+
   get needProofUpload(): boolean {
     return this.needReceipt === 'yes' || this.needThankYou === 'yes';
   }
@@ -202,6 +209,16 @@ export class DonorDailyFormComponent implements OnInit {
       }
     }
 
+    if (this.thankNameMode !== 'masked' && this.thankNameMode !== 'full') {
+      alert('請選擇感謝牆要顯示匿名或全名');
+      return;
+    }
+
+    if (this.thankPublic !== 'public' && this.thankPublic !== 'private') {
+      alert('請選擇這筆捐助要不要出現在公開感謝牆');
+      return;
+    }
+
     if (!this.quantity || this.quantity <= 0) {
       alert('請輸入正確的捐贈數量');
       return;
@@ -229,6 +246,8 @@ export class DonorDailyFormComponent implements OnInit {
         note: this.note,
         needReceipt: this.needReceipt === 'yes',
         needThankYou: this.needThankYou === 'yes',
+        thankNameMode: this.thankNameMode,
+        thankPublic: this.thankPublic === 'public',
         receiptTitle: this.needReceipt === 'yes' ? this.donorName : null,
         taxId: this.needReceipt === 'yes' ? this.donorIdNo : null,
         donorEmail: this.needReceipt === 'yes' ? this.donorEmail : null,

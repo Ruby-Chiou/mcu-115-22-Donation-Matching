@@ -4,16 +4,27 @@ import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { donorActionsOpen, isDonorPrivatePath, RoleAccessPolicy } from '../auth/role-access.policy';
 import { safeReturnUrl } from '../auth/safe-return-url';
 import { AuthPrincipal } from '../../models/auth/app-role';
+import { AgencyAccessService } from '../services/agency/agency-access.service';
 import { AuthSessionService } from '../services/auth/auth-session.service';
 
 export const accessGuard: CanActivateFn = async (_route, state) => {
   const auth = inject(AuthSessionService);
   const router = inject(Router);
   const policy = inject(RoleAccessPolicy);
+  const access = inject(AgencyAccessService);
 
   await auth.restore();
 
   const principal = auth.principal();
+  if (principal.role === 'admin' && isAgencyWorkspace(state.url)) {
+    const grant = await access.activeGrant(true).catch(() => null);
+    if (grant && access.stillOpen(grant)) {
+      return true;
+    }
+
+    return router.parseUrl('/admin/dashboard');
+  }
+
   const decision = policy.decide(principal.role, state.url);
 
   if (decision === 'allow') {
@@ -84,4 +95,9 @@ function resumeStoredReturn(
   }
 
   return router.parseUrl(returnUrl);
+}
+
+function isAgencyWorkspace(url: string): boolean {
+  const path = (url.split('?')[0] ?? '').split('#')[0] || '/';
+  return path === '/agency' || path.startsWith('/agency/');
 }

@@ -21,9 +21,19 @@
         <div class="donation-item">{{ item.donationItem }}</div>
         <div class="organization">至{{ item.agencyName }}</div>
         <div class="published">{{ item.publishedAt | date: 'yyyy/MM/dd' }}</div>
+        <p class="visibility-state">{{ item.isPublic === false ? '只有自己看得到' : '公開中' }} · {{ item.nameMode === 'full' ? '全名' : '匿名' }}</p>
+        <div class="visibility-actions">
+          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, 'masked', item.isPublic !== false)">匿名</button>
+          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, 'full', item.isPublic !== false)">全名</button>
+          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, item.nameMode === 'full' ? 'full' : 'masked', true)">公開</button>
+          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, item.nameMode === 'full' ? 'full' : 'masked', false)">只有自己看得到</button>
+        </div>
       </article>
     } @empty {
-      <p class="state-text">目前沒有已公開的感謝紀錄。</p>
+      <p class="state-text">還沒有感謝紀錄。審核通過後會出現在這裡，也可以先到捐助紀錄設定。</p>
     }
   </div>
+  @if (saveMessage()) {
+    <p class="state-text">{{ saveMessage() }}</p>
+  }
 }

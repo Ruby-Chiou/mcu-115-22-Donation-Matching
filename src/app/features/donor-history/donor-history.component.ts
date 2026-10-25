@@ -115,12 +115,34 @@ export class DonorHistoryComponent implements OnInit {
   readonly trackingDraft = signal('');
   readonly trackingSaving = signal(false);
   readonly trackingMessage = signal('');
+  readonly nameModeDraft = signal<'masked' | 'full'>('masked');
+  readonly publicDraft = signal(true);
+  readonly visibilitySaving = signal(false);
+  readonly visibilityMessage = signal('');
 
   selectRecord(record: DonorDonationHistory): void {
     this.selectedId.set(record.id);
     this.viewerKind.set(null);
     this.trackingDraft.set(record.trackingNo);
     this.trackingMessage.set('');
+    this.nameModeDraft.set(record.thankNameMode);
+    this.publicDraft.set(record.thankPublic);
+    this.visibilityMessage.set('');
+  }
+
+  async saveVisibility(record: DonorDonationHistory): Promise<void> {
+    this.visibilitySaving.set(true);
+    this.visibilityMessage.set('');
+
+    try {
+      await this.thankService.setDonationVisibility(record.id, this.nameModeDraft(), this.publicDraft());
+      await Promise.all([this.historyService.loadHistory(), this.thankService.loadMyPublicThanks()]);
+      this.visibilityMessage.set(this.publicDraft() ? '已更新公開感謝的顯示方式。' : '這筆已改成只有自己看得到。');
+    } catch (error) {
+      this.visibilityMessage.set(error instanceof Error ? error.message : '顯示方式沒有更新，請稍後再試。');
+    } finally {
+      this.visibilitySaving.set(false);
+    }
   }
 
   onTrackingInput(event: Event): void {

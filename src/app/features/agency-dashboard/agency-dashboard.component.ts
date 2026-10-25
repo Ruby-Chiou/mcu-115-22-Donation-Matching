@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PLATFORM_ANNOUNCEMENTS, PLATFORM_NEWS } from '../../core/content/platform-feed';
+import { PLATFORM_ANNOUNCEMENTS, PLATFORM_NEWS, PlatformAnnouncement } from '../../core/content/platform-feed';
+import { PlatformAnnouncementService } from '../../core/services/admin/platform-announcement.service';
 import {
   AgencyDashboardService,
   AgencyDashboardSummary,
@@ -32,8 +33,9 @@ interface DashboardCard {
 })
 export class AgencyDashboardComponent implements OnInit {
   private readonly disaster = inject(DisasterControlService);
+  private readonly announcementService = inject(PlatformAnnouncementService);
 
-  protected readonly announcements = PLATFORM_ANNOUNCEMENTS;
+  protected readonly announcements = signal<PlatformAnnouncement[]>([...PLATFORM_ANNOUNCEMENTS]);
   protected readonly latestNews = PLATFORM_NEWS;
 
   protected get disasterOpen(): boolean {
@@ -111,7 +113,20 @@ export class AgencyDashboardComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await Promise.all([this.loadDashboardSummary(), this.loadUrgentDailyNeeds(), this.loadReminders()]);
+    await Promise.all([
+      this.loadDashboardSummary(),
+      this.loadUrgentDailyNeeds(),
+      this.loadReminders(),
+      this.loadAnnouncements(),
+    ]);
+  }
+
+  private async loadAnnouncements(): Promise<void> {
+    try {
+      this.announcements.set(await this.announcementService.published());
+    } catch (error) {
+      console.error('載入平台公告失敗：', error);
+    }
   }
 
   // 載入五張卡片統計

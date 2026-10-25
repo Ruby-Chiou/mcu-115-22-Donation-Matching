@@ -1,0 +1,48 @@
+@if (notice()) {
+  <p class="access-note">{{ notice() }}</p>
+}
+
+@if (authRole() === 'agency' && incoming().length) {
+  <section class="access-banner" aria-label="管理者接入申請">
+    @for (item of incoming(); track item.id) {
+      <article>
+        @if (item.status === 'pending') {
+          <p>
+            <strong>{{ item.operatorName || item.adminName || '管理者' }}</strong> 申請接入作業頁。
+            @if (item.clientLabel) {
+              裝置：{{ item.clientLabel }}。
+            }
+            @if (item.clientIp) {
+              IP：{{ item.clientIp }}。
+            }
+            原因：{{ item.reason }}
+          </p>
+          <div>
+            <button type="button" [disabled]="busy()" (click)="decide(item.id, true)">同意兩小時</button>
+            <button type="button" class="quiet" [disabled]="busy()" (click)="decide(item.id, false)">拒絕</button>
+          </div>
+        } @else {
+          <p>
+            <strong>{{ item.operatorName || item.adminName || '管理者' }}</strong> 正在協助處理，到 {{ item.expiresAt | date: 'HH:mm' }} 為止。
+            @if (item.clientLabel) {
+              裝置：{{ item.clientLabel }}。
+            }
+            @if (item.clientIp) {
+              IP：{{ item.clientIp }}。
+            }
+          </p>
+          <button type="button" class="quiet" [disabled]="busy()" (click)="revoke(item.id)">結束接入</button>
+        }
+      </article>
+    }
+  </section>
+}
+
+@if (authRole() === 'admin' && acting(); as grant) {
+  <section class="access-banner" aria-label="正在協助受助者">
+    <article>
+      <p>正在協助這家受助者，到 {{ grant.expiresAt | date: 'HH:mm' }} 為止。對方可以隨時結束。</p>
+      <button type="button" class="quiet" [disabled]="busy()" (click)="revoke(grant.id)">結束接入</button>
+    </article>
+  </section>
+}

@@ -1,0 +1,108 @@
+<section class="desk">
+  <header>
+    <p class="eyebrow">管理者</p>
+    <h1>紀錄詳情</h1>
+    @if (donor(); as person) {
+      <p class="lead">
+        <a class="text-link" [routerLink]="['/admin/donors', person.uid]">回到 {{ person.displayName || person.email || '捐助者' }} 的頁面</a>
+      </p>
+    }
+  </header>
+
+  @if (notice()) {
+    <p class="notice" [class.error]="noticeError()">{{ notice() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="empty">紀錄載入中...</p>
+  } @else if (record(); as item) {
+    <article class="panel">
+      <h2>{{ item.title }}</h2>
+      <p class="hint">{{ kindLabel(item.kind) }} · {{ item.detail }} · {{ item.createdAt | date: 'yyyy/MM/dd HH:mm' }}</p>
+
+      <form class="repair" (submit)="$event.preventDefault(); save()">
+        @switch (item.kind) {
+          @case ('donation') {
+            <label>實際物資<input name="repairMaterial" [(ngModel)]="repair['material']" /></label>
+            <label>數量<input name="repairQuantity" type="number" min="1" [(ngModel)]="repair['quantity']" /></label>
+            <label>
+              審核狀態
+              <select name="repairStatus" [(ngModel)]="repair['status']">
+                @for (option of donationStatuses; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label>物流單號<input name="repairTracking" [(ngModel)]="repair['tracking']" placeholder="沒有單號就留空" /></label>
+            <label>備註<textarea name="repairNote" rows="3" [(ngModel)]="repair['note']"></textarea></label>
+            @if (repair['method']) {
+              <p class="hint">捐贈方式：{{ repair['method'] }}</p>
+            }
+            @if (repair['aiReason']) {
+              <p class="hint">系統審核說明：{{ repair['aiReason'] }}</p>
+            }
+            @if (repair['humanReason']) {
+              <p class="hint">機構審核說明：{{ repair['humanReason'] }}</p>
+            }
+          }
+          @case ('thank') {
+            <label>公開名稱<input name="repairDisplayName" [(ngModel)]="repair['displayName']" /></label>
+            <label>捐贈內容<input name="repairThankItem" [(ngModel)]="repair['donationItem']" /></label>
+            <label>機構<input name="repairThankAgency" [(ngModel)]="repair['agencyName']" /></label>
+          }
+          @case ('receipt') {
+            <label>收據號碼<input name="repairReceiptNo" [(ngModel)]="repair['receiptNo']" /></label>
+            <label>機構<input name="repairReceiptAgency" [(ngModel)]="repair['agencyName']" /></label>
+            <label>捐贈內容<input name="repairReceiptItem" [(ngModel)]="repair['donationItem']" /></label>
+            @if (repair['pdfUrl']) {
+              <a class="text-link" [href]="repair['pdfUrl']" target="_blank">開啟收據檔案</a>
+            }
+          }
+          @case ('certificate') {
+            <label>機構<input name="repairCertificateAgency" [(ngModel)]="repair['agencyName']" /></label>
+            <label>捐贈內容<input name="repairCertificateItem" [(ngModel)]="repair['donationItem']" /></label>
+            <label>備註<textarea name="repairCertificateNote" rows="3" [(ngModel)]="repair['note']"></textarea></label>
+            @if (repair['fileUrl']) {
+              <a class="text-link" [href]="repair['fileUrl']" target="_blank">開啟感謝狀檔案</a>
+            }
+          }
+          @case ('message') {
+            <p class="hint">{{ repair['folder'] }} · {{ repair['peer'] }}</p>
+            <p class="message-body">{{ repair['content'] }}</p>
+            <label>
+              回覆主旨
+              <input name="replySubject" maxlength="80" [(ngModel)]="replySubject" />
+            </label>
+            <label>
+              回覆內容
+              <textarea name="replyBody" rows="4" maxlength="2000" [(ngModel)]="replyBody" placeholder="這封回覆會出現在對方的會員收件匣"></textarea>
+            </label>
+          }
+        }
+
+        @if (item.kind === 'donation' || item.kind === 'thank') {
+          <fieldset>
+            <legend>感謝牆姓名</legend>
+            <label><input type="radio" name="repairNameMode" value="masked" [(ngModel)]="repair['nameMode']" /> 匿名</label>
+            <label><input type="radio" name="repairNameMode" value="full" [(ngModel)]="repair['nameMode']" /> 全名</label>
+          </fieldset>
+          <fieldset>
+            <legend>公開範圍</legend>
+            <label><input type="radio" name="repairPublic" value="true" [(ngModel)]="repair['isPublic']" /> 公開在感謝牆</label>
+            <label><input type="radio" name="repairPublic" value="false" [(ngModel)]="repair['isPublic']" /> 只有捐助者自己看得到</label>
+          </fieldset>
+        }
+
+        <div class="actions">
+          @if (item.kind === 'message') {
+            <button type="button" [disabled]="saving()" (click)="sendReply()">送出回覆</button>
+          } @else {
+            <button type="submit" [disabled]="saving()">儲存修正</button>
+          }
+        </div>
+      </form>
+    </article>
+  } @else {
+    <p class="empty">找不到這筆紀錄。</p>
+  }
+</section>
