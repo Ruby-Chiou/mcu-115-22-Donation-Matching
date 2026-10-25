@@ -197,6 +197,16 @@ export class MemberProfileService {
       console.error('修改密碼失敗：', error);
       throw error;
     }
+
+    const updatedAt = new Date().toISOString();
+    const { error: stampError } = await this.supabaseService.client
+      .from(this.tableName)
+      .update({ passwordUpdatedAt: updatedAt, updatedAt })
+      .eq('uid', user.id);
+
+    if (stampError) {
+      console.error('記錄密碼更新時間失敗：', stampError);
+    }
   }
 
   /**

@@ -1,0 +1,18 @@
+<section class="donor-contact">
+  <p>請先用站內信聯絡。若沒有回覆，再用捐助者自願留下的電話：{{ phone() || '未留下' }}。</p>
+  @if (donorUid()) {
+    <label>
+      站內信
+      <textarea rows="2" maxlength="500" [value]="content" (input)="content = $any($event.target).value" placeholder="例如請問這批物資何時可以收到"></textarea>
+    </label>
+    <button type="button" [disabled]="sending()" (click)="send()">{{ sending() ? '送出中...' : '送出站內信' }}</button>
+  } @else {
+    <p>這筆沒有會員帳號，無法用站內信。</p>
+  }
+  @if (notice()) {
+    <p class="ok">{{ notice() }}</p>
+  }
+  @if (errorText()) {
+    <p class="error">{{ errorText() }}</p>
+  }
+</section>

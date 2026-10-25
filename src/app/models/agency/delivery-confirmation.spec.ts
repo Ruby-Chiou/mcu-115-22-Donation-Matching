@@ -3,6 +3,7 @@ import { DeliveryShipment, receiptSubmitError } from './delivery-confirmation';
 describe('receipt confirmation', () => {
   const ready: DeliveryShipment = {
     id: '1',
+    donorUid: 'donor-1',
     donorName: '王小明',
     phone: '0912',
     actualMaterial: '白米',

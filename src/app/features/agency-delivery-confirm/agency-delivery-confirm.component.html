@@ -40,7 +40,12 @@
           <app-donation-record-links [donationId]="shipment.id" current="delivery" />
           <dl>
             <div><dt>捐助者</dt><dd>{{ shipment.donorName }}</dd></div>
-            <div><dt>電話</dt><dd>{{ shipment.phone || '未填' }}</dd></div>
+            <div class="wide">
+              <dt>聯絡</dt>
+              <dd>
+                <app-agency-donor-contact [donorUid]="shipment.donorUid" [donorName]="shipment.donorName" [phone]="shipment.phone" />
+              </dd>
+            </div>
             <div><dt>數量</dt><dd>{{ shipment.quantity }}</dd></div>
             <div><dt>方式</dt><dd>{{ shipment.donationMethod || '未填' }}</dd></div>
             <div>

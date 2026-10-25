@@ -16,7 +16,7 @@
     <p class="error-text">{{ errorText() }}</p>
   } @else if (preview(); as sheet) {
     @if (isDraft()) {
-      <p class="draft-note no-print">這是目前表單內容的預覽。按下載會直接存成加密 PDF，開啟密碼是身分證字號。尚未按「同意開立」前，捐助者的會員收據不會更新。</p>
+      <p class="draft-note no-print">這是目前表單內容的預覽。按下載會直接存成加密 PDF。開啟密碼整段遮住，不會出現在這一頁。尚未按「同意開立」前，捐助者的會員收據不會更新。</p>
     }
     @if (downloadError()) {
       <p class="error-text">{{ downloadError() }}</p>

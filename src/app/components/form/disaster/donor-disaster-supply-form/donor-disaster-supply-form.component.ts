@@ -217,7 +217,7 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   // 提交捐贈表單  //
   submitForm(): void {
     // 基本資料檢查
-    if (!this.donorName || !this.phone || !this.actualMaterial || !this.quantity || !this.needReceipt || !this.needThankYou) {
+    if (!this.donorName || !this.actualMaterial || !this.quantity || !this.needReceipt || !this.needThankYou) {
       alert('請填寫完整的捐贈資料');
       return;
     }

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Provider } from '@supabase/supabase-js';
 
+import { oauthRedirectUrl } from '../../auth/oauth-redirect-url';
 import { safeReturnUrl } from '../../auth/safe-return-url';
 import { SupabaseService } from '../database/supabase.service';
 
@@ -27,7 +28,7 @@ export class SocialAuthService {
     const { data, error } = await this.supabase.client.auth.signInWithOAuth({
       provider: provider === 'line' ? 'custom:line-login' : (provider as Provider),
       options: {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: oauthRedirectUrl(window.location.origin, document.querySelector('base')?.getAttribute('href')),
         scopes: provider === 'facebook' ? 'public_profile email' : undefined,
         queryParams: provider === 'google' ? { prompt: 'select_account' } : undefined,
         skipBrowserRedirect: true,

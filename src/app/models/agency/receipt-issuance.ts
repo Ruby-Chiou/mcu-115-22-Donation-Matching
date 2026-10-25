@@ -22,6 +22,7 @@ export interface IssuedDonationReceipt {
   completedOn: string;
   donationItem: string;
   issuedAt: string;
+  pdfSentAt: string;
   orgSealUrl: string;
   officerSealUrl: string;
   pdfUrl: string;
@@ -71,6 +72,7 @@ export interface AgencyReceiptTask {
   receiptLines: ReceiptLineItem[];
   receiptTitle: string;
   needReceipt: boolean;
+  passwordChanged: boolean;
   needThankYou: boolean;
   receiptIssued: boolean;
   certificateUploaded: boolean;

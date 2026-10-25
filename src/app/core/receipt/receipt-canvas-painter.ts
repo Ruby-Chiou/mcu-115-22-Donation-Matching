@@ -69,8 +69,7 @@ function drawReceipt(
 
   y = drawSection(context, y, '捐助者', [
     `姓名　${textOf(document.donorName)}`,
-    `電話　${textOf(document.donorPhone)}`,
-    `Email　${textOf(document.donorEmail)}`,
+    `電話　${document.donorPhone.trim() ? textOf(document.donorPhone) : '未留下'}`,
   ]);
   y = drawSection(context, y, '受贈機構', [
     `名稱　${textOf(document.agencyName)}`,

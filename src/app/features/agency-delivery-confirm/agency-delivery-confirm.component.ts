@@ -3,12 +3,13 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { DeliveryConfirmationService } from '../../core/services/agency/delivery-confirmation.service';
+import { AgencyDonorContactComponent } from '../agency-donor-contact/agency-donor-contact.component';
 import { DonationRecordLinksComponent } from '../agency-record-links/donation-record-links.component';
 import { DeliveryShipment, ReceiptProofFile, receiptSubmitError } from '../../models/agency/delivery-confirmation';
 
 @Component({
   selector: 'app-agency-delivery-confirm',
-  imports: [DatePipe, DonationRecordLinksComponent],
+  imports: [DatePipe, DonationRecordLinksComponent, AgencyDonorContactComponent],
   templateUrl: './agency-delivery-confirm.component.html',
   styleUrl: './agency-delivery-confirm.component.scss',
 })

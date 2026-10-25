@@ -3,19 +3,20 @@
 
   <div class="readonly-grid">
     <p>姓名　<strong>{{ donorName() || '請先填寫上方姓名' }}</strong></p>
-    <p>電話　<strong>{{ donorPhone() || '請先填寫上方電話' }}</strong></p>
+    <p>電話　<strong>{{ donorPhone() || '未留下' }}</strong></p>
     <p>接送方式　<strong>{{ handoverMethod() || '請先選擇寄送或面交' }}</strong></p>
   </div>
 
   <label>
     Email
     <input type="email" maxlength="80" [value]="donorEmail()" (input)="donorEmail.set(inputValue($event))" />
+    <small>可不填。就算填了也不會顯示給受助機構，他們會先用站內信聯絡你。</small>
   </label>
 
   <label>
     身分證字號
     <input type="text" maxlength="10" [value]="donorIdNo()" (input)="donorIdNo.set(inputValue($event))" autocomplete="off" />
-    <small>只用來作為下載 PDF 的開啟密碼，不會印在收據上。</small>
+    <small>這是你的收據開啟密碼，不會印在收據上。受助機構只看得到整段遮罩，不能查看或修改。</small>
   </label>
 
   <div class="lines-head">

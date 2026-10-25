@@ -10,17 +10,17 @@ import {
   readReceiptLogistics,
   ReceiptLineItem,
   receiptPdfFileName,
+  receiptNeedsResend,
   receiptQuantityTotal,
   summarizeReceiptLines,
   validateAgencyReceiptIssue,
 } from '../../receipt/donation-receipt-document';
 import { DonationReceiptPdfService } from '../../receipt/donation-receipt-pdf.service';
-import { isTaiwanId } from '../../receipt/taiwan-id';
+import { AuthSessionService } from '../auth/auth-session.service';
 import { pdfBlob } from '../../receipt/receipt-file-download';
 import { AgencyReceiptTask, IssuedDonationReceipt, ReceiptDraft, ReceiptSealFiles } from '../../../models/agency/receipt-issuance';
 import { AGENCY_OFFICE } from '../../../models/user/agency';
 import { SupabaseService } from '../database/supabase.service';
-import { MemberMessageService } from '../member-center/member-message.service';
 import { PublicDonationThankService } from '../member-center/public-donation-thank.service';
 
 interface DonationRow {
@@ -42,6 +42,7 @@ interface DonationRow {
   status: string;
   created_at: string;
   tracking_no: string | null;
+  receipt_password_changed_at: string | null;
 }
 
 interface DemandRow {
@@ -72,6 +73,7 @@ interface ReceiptRow {
   completedOn: string | null;
   pdfUrl: string | null;
   pdfFileName: string | null;
+  pdfSentAt: string | null;
   note: string | null;
 }
 
@@ -97,9 +99,9 @@ export class AgencyReceiptIssuanceService {
   private readonly receiptBucket = 'donor-receipts';
 
   private readonly supabaseService = inject(SupabaseService);
+  private readonly auth = inject(AuthSessionService);
   private readonly publicThanks = inject(PublicDonationThankService);
   private readonly receiptPdf = inject(DonationReceiptPdfService);
-  private readonly messages = inject(MemberMessageService);
 
   private readonly tasksSignal = signal<AgencyReceiptTask[]>([]);
   readonly tasks = this.tasksSignal.asReadonly();
@@ -129,7 +131,8 @@ export class AgencyReceiptIssuanceService {
         need_thank_you,
         status,
         created_at,
-        tracking_no
+        tracking_no,
+        receipt_password_changed_at
       `
       )
       .eq('status', 'human_approved')
@@ -179,6 +182,7 @@ export class AgencyReceiptIssuanceService {
         receiptLines,
         receiptTitle: row.receipt_title || row.donor_name || '',
         needReceipt: !!row.need_receipt,
+        passwordChanged: receiptNeedsResend(row.receipt_password_changed_at, receipt?.pdfSentAt ?? null, receipt?.issuedAt ?? null),
         needThankYou: !!row.need_thank_you,
         receiptIssued: !!receipt,
         certificateUploaded: !!certificate,
@@ -224,30 +228,58 @@ export class AgencyReceiptIssuanceService {
     };
   }
 
-  /** 把目前留存的開啟密碼寄到捐助者收件匣。信件內容就是密碼，編輯頁本身不顯示。 */
-  async sendReceiptPassword(task: AgencyReceiptTask): Promise<void> {
+  /** 捐助者更新開啟密碼後，用留存的密碼重做 PDF，信裡不附密碼。 */
+  async resendReceipt(task: AgencyReceiptTask): Promise<void> {
     if (!task.receiptIssued || !task.receipt) {
-      throw new Error('收據尚未開立，還不能寄送開啟密碼');
+      throw new Error('收據尚未開立，還不能重新發送');
     }
 
-    if (!task.donorUid) {
-      throw new Error('這位捐助者沒有會員帳號，無法寄到收件匣');
+    if (!task.passwordChanged) {
+      throw new Error('捐助者還沒有更新開啟密碼');
     }
 
-    const password = normalizeDonorId(task.receipt.donorIdNo);
+    await this.saveReceipt(task, this.draftFromTask(task));
+    await this.notifyDonor(
+      task,
+      `收據 ${task.receipt.receiptNo} 已重新發送`,
+      '你更新了帳號密碼，受助機構已重新發送收據。請到會員收據下載，用你原來設定的開啟密碼開啟。這封信不會附上密碼。',
+    );
+  }
 
-    if (!isTaiwanId(password)) {
-      throw new Error('留存的身分證字號無效，請先更正再寄送');
+  async contactDonor(donorUid: string, donorName: string, content: string): Promise<void> {
+    const message = content.trim();
+
+    if (!donorUid) {
+      throw new Error('這筆沒有會員帳號，無法用站內信聯絡');
     }
 
-    const receiptNo = task.receipt.receiptNo;
+    if (message.length < 2) {
+      throw new Error('請先寫下要聯絡的內容');
+    }
 
-    await this.messages.sendMessage({
-      recipientUid: task.donorUid,
-      recipientName: task.donorName || '捐助者',
-      subject: `收據 ${receiptNo} 的開啟密碼`,
-      content: `您的捐贈收據（${receiptNo}）開啟密碼是：${password}\n請用這個密碼開啟 PDF，不要把這封信轉給其他人。`,
+    await this.notifyDonor({ donorUid, donorName }, '關於你的捐助', message);
+  }
+
+  private async notifyDonor(target: { donorUid: string; donorName: string }, subject: string, content: string): Promise<void> {
+    const senderUid = this.auth.principal().userId;
+
+    if (!senderUid) {
+      throw new Error('請先登入受助機構帳號');
+    }
+
+    const { error } = await this.supabaseService.client.from('member_messages').insert({
+      recipientUid: target.donorUid,
+      recipientName: target.donorName || '捐助者',
+      senderUid,
+      senderName: this.auth.principal().displayName || '受助機構',
+      category: 'AGENCY',
+      subject,
+      content,
     });
+
+    if (error) {
+      throw new Error('站內信沒有送出，請稍後再試。');
+    }
   }
 
   /**
@@ -363,7 +395,7 @@ export class AgencyReceiptIssuanceService {
 
     const { error: pdfError } = await this.supabaseService.client
       .from(this.receiptTable)
-      .update({ pdfUrl: stored.url, pdfFileName: stored.fileName })
+      .update({ pdfUrl: stored.url, pdfFileName: stored.fileName, pdfSentAt: new Date().toISOString() })
       .eq('donationId', task.donationId);
 
     if (pdfError) {
@@ -503,7 +535,7 @@ export class AgencyReceiptIssuanceService {
     const { data, error } = await this.supabaseService.client
       .from(this.receiptTable)
       .select(
-        'id, donationId, receiptNo, donorName, receiptTitle, agencyName, donorIdNo, donorPhone, donorEmail, donationItem, donationDate, orgPhone, orgAddress, issuedAt, largeSealUrl, smallSealUrl, lineItems, handoverMethod, completedOn, pdfUrl, pdfFileName, note'
+        'id, donationId, receiptNo, donorName, receiptTitle, agencyName, donorIdNo, donorPhone, donorEmail, donationItem, donationDate, orgPhone, orgAddress, issuedAt, pdfSentAt, largeSealUrl, smallSealUrl, lineItems, handoverMethod, completedOn, pdfUrl, pdfFileName, note'
       )
       .in('donationId', donationIds);
 
@@ -611,6 +643,7 @@ export class AgencyReceiptIssuanceService {
       ...readReceiptLogistics(row.note),
       donationItem: row.donationItem ?? '',
       issuedAt: row.issuedAt ?? '',
+      pdfSentAt: row.pdfSentAt ?? '',
       orgSealUrl: row.largeSealUrl ?? '',
       officerSealUrl: row.smallSealUrl ?? '',
       pdfUrl: row.pdfUrl ?? '',

@@ -41,7 +41,7 @@
 
       <p>捐助者： {{ donation.donor_name }}</p>
 
-      <p>捐助者手機： {{ donation.phone }}</p>
+      <app-agency-donor-contact [donorUid]="donation.donor_uid || ''" [donorName]="donation.donor_name" [phone]="donation.phone" />
       
       <p>捐助者實際提供： {{ donation.actual_material }}</p>
 

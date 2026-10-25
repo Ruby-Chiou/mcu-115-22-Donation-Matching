@@ -347,6 +347,7 @@ export class DonationService {
         id,
         demand_id,
         donor_name,
+        donor_uid,
         phone,
         actual_material,
         quantity,

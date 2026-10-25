@@ -5,6 +5,7 @@ import { SupabaseService } from '../database/supabase.service';
 
 interface ShipmentRow {
   id: string;
+  donor_uid: string | null;
   donor_name: string | null;
   phone: string | null;
   actual_material: string | null;
@@ -30,7 +31,7 @@ export class DeliveryConfirmationService {
     const { data, error } = await this.supabase.client
       .from('donor_daily_donations')
       .select(
-        'id, donor_name, phone, actual_material, quantity, donation_method, tracking_no, tracking_uploaded_at, note, receipt_confirmed_at, receipt_partial, receipt_declined_video, receipt_note',
+        'id, donor_uid, donor_name, phone, actual_material, quantity, donation_method, tracking_no, tracking_uploaded_at, note, receipt_confirmed_at, receipt_partial, receipt_declined_video, receipt_note',
       )
       .eq('status', 'human_approved')
       .order('created_at', { ascending: false });
@@ -41,6 +42,7 @@ export class DeliveryConfirmationService {
 
     return ((data ?? []) as ShipmentRow[]).map((row) => ({
       id: row.id,
+      donorUid: row.donor_uid?.trim() || '',
       donorName: row.donor_name?.trim() || '未填姓名',
       phone: row.phone?.trim() || '',
       actualMaterial: row.actual_material?.trim() || '未填物資',

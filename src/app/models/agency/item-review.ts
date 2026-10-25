@@ -8,6 +8,7 @@ export interface RecipientDonationReview {
   id: string;
   demand_id: number;
   donor_name: string;
+  donor_uid?: string | null;
   phone: string;
   actual_material: string;
   quantity: number;

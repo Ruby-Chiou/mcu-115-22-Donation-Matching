@@ -8,13 +8,14 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { DonationService } from '../../../core/services/agency-daily-demand/daily-donation.service';
 
+import { AgencyDonorContactComponent } from '../../agency-donor-contact/agency-donor-contact.component';
 import { DonationRecordLinksComponent } from '../../agency-record-links/donation-record-links.component';
 import { DonationFile, RecipientDonationReview } from '../../../models/agency/item-review';
 
 @Component({
   selector: 'app-agency-item-review-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DonationRecordLinksComponent],
+  imports: [CommonModule, ReactiveFormsModule, DonationRecordLinksComponent, AgencyDonorContactComponent],
   templateUrl: './agency-item-review-detail.component.html',
   styleUrl: './agency-item-review-detail.component.scss',
 })

@@ -1,5 +1,6 @@
 export interface DeliveryShipment {
   id: string;
+  donorUid: string;
   donorName: string;
   phone: string;
   actualMaterial: string;

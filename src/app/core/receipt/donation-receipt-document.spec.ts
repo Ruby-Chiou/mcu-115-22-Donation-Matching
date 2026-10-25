@@ -52,6 +52,20 @@ describe('donation receipt document', () => {
     ).toContain('同意');
   });
 
+  it('lets the donor skip phone and email', () => {
+    expect(
+      validateDonorReceiptRequest({
+        donorName: '王小明',
+        donorPhone: '',
+        donorEmail: '',
+        donorIdNo: 'A123456789',
+        lines,
+        handoverMethod: '面交',
+        agreed: true,
+      }),
+    ).toBeNull();
+  });
+
   it('requires agency contact data before issue', () => {
     expect(
       validateAgencyReceiptIssue({

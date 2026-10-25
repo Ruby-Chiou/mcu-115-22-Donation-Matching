@@ -209,16 +209,12 @@ export function validateDonorReceiptRequest(request: DonorReceiptRequest): strin
     return '請填寫捐助者姓名，收據會沿用這個名字';
   }
 
-  if (!request.donorPhone.trim()) {
-    return '請填寫捐助者電話';
-  }
-
-  if (!isReceiptEmail(request.donorEmail)) {
-    return '請填寫有效的 Email，收據會留在這個會員帳號';
+  if (request.donorEmail.trim() && !isReceiptEmail(request.donorEmail)) {
+    return 'Email 格式不正確。不填也可以，受助機構不會看到信箱。';
   }
 
   if (!isTaiwanId(request.donorIdNo)) {
-    return '請填寫有效的身分證字號，之後開啟 PDF 需要用它當密碼';
+    return '請填寫有效的身分證字號。它只當作你的收據開啟密碼，受助機構看不到也不能改。';
   }
 
   if (!request.handoverMethod.trim()) {
@@ -251,18 +247,35 @@ export interface AgencyReceiptIssue {
   completedOn: string;
 }
 
-/** 機構按下開立時，文件必須已經能做成正式 PDF。 */
-export function validateAgencyReceiptIssue(issue: AgencyReceiptIssue): string | null {
-  if (!issue.donorName.trim() || !issue.donorPhone.trim()) {
-    return '請填寫捐助者姓名與電話';
+/** 捐助者更新密碼的時間比上次發送收據還新，受助者才要重做一次。 */
+export function receiptNeedsResend(passwordChangedAt: string | null, pdfSentAt: string | null, issuedAt: string | null): boolean {
+  if (!passwordChangedAt) {
+    return false;
   }
 
-  if (!isReceiptEmail(issue.donorEmail)) {
-    return '請填寫捐助者 Email';
+  const sentAt = pdfSentAt || issuedAt;
+
+  if (!sentAt) {
+    return false;
+  }
+
+  const changed = Date.parse(passwordChangedAt);
+  const sent = Date.parse(sentAt);
+
+  return Number.isFinite(changed) && Number.isFinite(sent) && changed > sent;
+}
+
+export function validateAgencyReceiptIssue(issue: AgencyReceiptIssue): string | null {
+  if (!issue.donorName.trim()) {
+    return '請填寫捐助者姓名';
+  }
+
+  if (issue.donorEmail.trim() && !isReceiptEmail(issue.donorEmail)) {
+    return '留存的 Email 格式不正確';
   }
 
   if (!isTaiwanId(issue.donorIdNo)) {
-    return '請填寫捐助者的身分證字號，這個號碼是 PDF 的開啟密碼';
+    return '捐助者還沒有設定開啟密碼，無法開立收據';
   }
 
   if (!issue.agencyName.trim() || !issue.agencyAddress.trim() || !issue.agencyPhone.trim()) {

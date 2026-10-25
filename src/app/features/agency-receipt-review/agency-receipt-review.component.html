@@ -106,6 +106,9 @@
                       <span class="muted">—</span>
                     }
                   </div>
+                  @if (task.passwordChanged) {
+                    <p class="sub">捐助者已更新密碼，可重新發送收據</p>
+                  }
                   <app-donation-record-links
                     [donationId]="task.donationId"
                     current="receipt"

@@ -45,7 +45,7 @@
       <p class="error-text" role="alert">{{ errorText() }}</p>
     }
 
-    <p class="hint">請核對捐助者填的物資，補上機構資料與章印。同意開立後會產生加密 PDF，留在捐助者的會員收據。開啟密碼不會印在收據上，這一頁也只顯示遮罩。</p>
+    <p class="hint">請核對捐助者填的物資，補上機構資料與章印。同意開立後會產生加密 PDF，留在捐助者的會員收據。開啟密碼整段遮住，這一頁不能查看或修改。</p>
 
     <form class="form-box" (ngSubmit)="save()">
       <h2>捐助者</h2>
@@ -54,47 +54,27 @@
           姓名
           <input type="text" name="donorName" [(ngModel)]="draft.donorName" maxlength="40" required />
         </label>
-        <label>
-          電話
-          <input type="text" name="donorPhone" [(ngModel)]="draft.donorPhone" maxlength="20" required />
-        </label>
-        <label>
-          Email
-          <input type="email" name="donorEmail" [(ngModel)]="draft.donorEmail" maxlength="80" required />
-        </label>
         <div class="id-panel span-2">
           <div class="masked-field">
-            <span>身分證字號</span>
+            <span>開啟密碼</span>
             <p class="masked-id">{{ maskedId() }}</p>
           </div>
-          <button
-            type="button"
-            class="ghost-btn"
-            [disabled]="isSendingPassword() || !current.receiptIssued"
-            (click)="sendPassword()"
-          >
-            {{ isSendingPassword() ? '寄送中...' : '寄送開啟密碼' }}
-          </button>
-          @if (!correctingId()) {
-            <button type="button" class="text-btn" (click)="startIdCorrection()">字號打錯，更正</button>
+          @if (current.receiptIssued && current.passwordChanged) {
+            <button type="button" class="ghost-btn" [disabled]="isResending()" (click)="resendReceipt()">
+              {{ isResending() ? '發送中...' : '重新發送收據' }}
+            </button>
           }
         </div>
-        @if (passwordNotice()) {
-          <p class="hint span-2">{{ passwordNotice() }}</p>
+        <p class="hint span-2">信箱不會顯示。請先用站內信聯絡；找不到人時，才用捐助者自願留下的電話。</p>
+        @if (current.receiptIssued && !current.passwordChanged) {
+          <p class="hint span-2">捐助者若在會員資料更新密碼，這裡才會出現重新發送收據。</p>
         }
-        @if (!current.receiptIssued) {
-          <p class="hint span-2">收據開立後，才能把開啟密碼寄到捐助者的收件匣。</p>
+        @if (resendNotice()) {
+          <p class="hint span-2">{{ resendNotice() }}</p>
         }
-        @if (correctingId()) {
-          <label>
-            更正後的身分證字號
-            <input type="text" name="correctedId" [(ngModel)]="correctedId" maxlength="10" autocomplete="off" />
-          </label>
-          <p class="hint span-2">
-            只有捐助者打錯、用自己的字號打不開時才更正。儲存後會重做 PDF，之後要用新字號開啟。
-            <button type="button" class="text-btn" (click)="cancelIdCorrection()">取消更正</button>
-          </p>
-        }
+        <div class="span-2">
+          <app-agency-donor-contact [donorUid]="current.donorUid" [donorName]="current.donorName" [phone]="draft.donorPhone" />
+        </div>
       </div>
 
       <h2>捐贈物資</h2>

@@ -44,8 +44,9 @@
       </div>
       <!-- 電話 -->
       <div class="form-group">
-        <label>聯絡電話<span>*</span></label>
-        <input type="tel" name="phone" [(ngModel)]="phone" placeholder="請輸入聯絡電話" required />
+        <label>聯絡電話</label>
+        <input type="tel" name="phone" [(ngModel)]="phone" placeholder="可不填" />
+        <small class="input-hint">受助機構會先用站內信找你。只有找不到人時，才會用你自願留下的電話。</small>
       </div>
       <!-- 數量 -->
       <div class="form-group">

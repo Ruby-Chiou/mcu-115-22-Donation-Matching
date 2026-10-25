@@ -25,13 +25,13 @@ export function normalizeTaiwanId(value: string): string {
   return value.trim().toUpperCase();
 }
 
-/** 畫面上只留前後各三碼，完整字號不出現在編輯欄。 */
+/** 受助者畫面整段遮住，不露出任何一碼。 */
 export function maskTaiwanId(value: string): string {
   const id = normalizeTaiwanId(value);
 
-  if (id.length < 6) {
-    return '尚未填寫';
+  if (!id) {
+    return '尚未設定';
   }
 
-  return `${id.slice(0, 3)}****${id.slice(-3)}`;
+  return '＊＊＊＊＊＊＊＊＊＊';
 }
