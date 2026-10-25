@@ -1,0 +1,83 @@
+<section class="company-review">
+  <header>
+    <h1>企業捐助者審核</h1>
+    <p>身分審核不是寄確認信到註冊信箱。請用統一編號查公開公司登記，再打電話確認這間公司真實存在、確實有送出這份申請，且代表人正確。三項都核對後才可通過。</p>
+  </header>
+
+  <label>
+    狀態
+    <select [(ngModel)]="filter">
+      <option value="all">全部</option>
+      <option value="pending">待審核</option>
+      <option value="supplement">待補件</option>
+      <option value="approved">已通過</option>
+      <option value="rejected">未通過</option>
+    </select>
+  </label>
+
+  @if (errorText()) {
+    <p class="error" role="alert">{{ errorText() }}</p>
+  }
+
+  @if (loading()) {
+    <p>正在載入企業申請…</p>
+  } @else if (visible().length === 0) {
+    <p>目前沒有符合的申請。</p>
+  } @else {
+    <ul>
+      @for (item of visible(); track item.userId) {
+        <li>
+          <button type="button" (click)="open(item)">
+            <strong>{{ item.companyName }}</strong>
+            <span>{{ item.taxId }}</span>
+            <span>{{ statusLabel(item.status) }}</span>
+            <time>{{ item.createdAt | date: 'yyyy/MM/dd' }}</time>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (selected(); as item) {
+    <article>
+      <h2>{{ item.companyName }}</h2>
+      <dl>
+        <div><dt>統一編號</dt><dd>{{ item.taxId }}</dd></div>
+        <div><dt>負責人</dt><dd>{{ item.representative }}</dd></div>
+        <div><dt>電話</dt><dd>{{ item.contactPhone || '—' }}</dd></div>
+        <div><dt>地址</dt><dd>{{ item.address || '—' }}</dd></div>
+        <div><dt>登記文件</dt><dd>{{ item.documentName || '未上傳檔名' }}</dd></div>
+        <div><dt>目前狀態</dt><dd>{{ statusLabel(item.status) }}</dd></div>
+      </dl>
+      <p class="method">
+        <a [href]="registryUrl" target="_blank" rel="noopener noreferrer">開啟經濟部商工登記公示查詢</a>
+        ，搜尋統一編號 {{ item.taxId }}。名稱、地址要和這份申請一致，再撥打 {{ item.contactPhone || '申請電話' }}。
+      </p>
+      <fieldset>
+        <legend>電話與登記核對</legend>
+        <label class="check">
+          <input type="checkbox" [(ngModel)]="checkedRegistry" name="checkedRegistry" />
+          <span>已用統一編號查到公開公司登記，名稱與地址相符</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" [(ngModel)]="checkedCalled" name="checkedCalled" />
+          <span>已撥打申請電話，對方確認有提出這份註冊申請</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" [(ngModel)]="checkedRepresentative" name="checkedRepresentative" />
+          <span>註冊代表人與登記資料或通話結果相符</span>
+        </label>
+      </fieldset>
+      <label>
+        通話紀錄
+        <textarea [(ngModel)]="reviewNote" name="reviewNote" rows="3" placeholder="接聽人、通話時間，以及對方是否承認這份申請"></textarea>
+      </label>
+      <div class="actions">
+        <button type="button" (click)="decide('approved')" [disabled]="!phoneChecksDone()">通過</button>
+        <button type="button" (click)="decide('supplement')">要求補件</button>
+        <button type="button" (click)="decide('rejected')">不通過</button>
+        <button type="button" class="ghost" (click)="close()">關閉</button>
+      </div>
+    </article>
+  }
+</section>

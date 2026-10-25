@@ -1,0 +1,14 @@
+<section class="detail-page">
+  <a class="back-link" routerLink="/donor/beneficiaries">← 返回受助機構</a>
+
+  @if (!ready()) {
+    <p class="missing">機構資料載入中...</p>
+  } @else if (profile) {
+    <app-beneficiary-panel [profile]="profile" />
+  } @else {
+    <div class="missing">
+      <h1>找不到這間受助機構</h1>
+      <p>請回到列表，改看其他縣市的單位。</p>
+    </div>
+  }
+</section>

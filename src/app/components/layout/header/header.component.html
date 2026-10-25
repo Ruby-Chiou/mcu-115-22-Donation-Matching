@@ -3,7 +3,7 @@
     <div class="nav-wrapper">
       <div class="left">
 
-  <a routerLink="" class="logo-link">
+  <a [routerLink]="homeLink()" class="logo-link">
     <img
       src="assets/images/logo.png"
       alt="智慧捐助媒合平台 Logo"
@@ -11,7 +11,7 @@
     />
   </a>
 
-  <p class="nav-name" routerLink="">
+  <p class="nav-name" [routerLink]="homeLink()">
     智慧捐助媒合平台
   </p>
 
@@ -21,29 +21,46 @@
         <nav>
           @for (item of navItems; track item.name) {
           <div class="nav-item-with-dropdown">
-            <a [routerLink]="item.link">{{ item.name }} <i class="fa-solid fa-chevron-down arrow"></i></a>
+            <a [routerLink]="item.link">{{ item.name }} @if (item.sub.length) { <i class="fa-solid fa-chevron-down arrow"></i> }</a>
+            @if (item.sub.length) {
             <ul class="dropdown-menu">
               @for (sub of item.sub; track sub.name) {
               <li><a [routerLink]="sub.link">{{ sub.name }}</a></li>
               }
             </ul>
+            }
           </div>
           }
         </nav>
       </div>
 
       <div class="right">
-        <a routerLink="/login">登入</a>
-        <span>|</span>
-        <a routerLink="/register">註冊</a>
-        <span>|</span>
-        <a routerLink="/member">會員專區</a>
-        <a class="bell-link" routerLink="/member" [queryParams]="{ tab: 'inbox' }" aria-label="收件匣">
-          <i class="fa-solid fa-bell"></i>
-          @if (messageService.unreadCount() > 0) {
-            <span class="bell-badge">{{ messageService.unreadCount() > 99 ? '99+' : messageService.unreadCount() }}</span>
+        @if (auth.principal().role === 'guest') {
+          <a routerLink="/login">登入</a>
+          <span>|</span>
+          <a routerLink="/register">註冊</a>
+        } @else {
+          <span
+            class="identity-badge"
+            [attr.data-role]="auth.principal().role"
+            [attr.aria-label]="roleLabel + '，' + auth.principal().displayName + '您好'"
+          >
+            @if (auth.principal().donorKind === 'company') {
+              <span class="kind-mark">公司</span>
+            }
+            {{ auth.principal().displayName }} 您好!
+          </span>
+          <a [routerLink]="accountLink()">{{ accountLabel() }}</a>
+          <button type="button" class="logout-btn" (click)="logout()">登出</button>
+          @if (auth.principal().role === 'donor') {
+            <a class="bell-link" routerLink="/member" [queryParams]="{ tab: 'inbox' }" aria-label="收件匣">
+              <i class="fa-solid fa-bell"></i>
+              @if (messageService.unreadCount() > 0) {
+                <span class="bell-badge">{{ messageService.unreadCount() > 99 ? '99+' : messageService.unreadCount() }}</span>
+              }
+            </a>
           }
-        </a>
+        }
       </div>
     </div>
   </div>

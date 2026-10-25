@@ -4,7 +4,7 @@
     <div class="role-page">
       <app-role-selector
         title="請選擇登入身份"
-        description="捐助者可進行捐贈；受助者為社福團體與機構。"
+        description="個人捐助者可使用第三方登入；公司名義使用帳密或自然人憑證，並需通過身分審核。受助者使用行動自然人憑證。"
         (roleSelected)="selectRole($event)"
       >
       </app-role-selector>
@@ -17,6 +17,8 @@
       <!-- 捐助者登入獨立元件 (注意這裡改接 forgotPasswordClicked) -->
       <app-donor-login
         *ngIf="!isForgotPasswordStep && !isAgency"
+        heading="捐助者登入"
+        lead="個人名義可使用 Google、LINE 或 Facebook；公司名義請用帳號密碼或自然人憑證。"
         (backToRoleSelection)="backToRoleSelection()"
         (forgotPasswordClicked)="goToForgotPassword()"
       >
@@ -26,7 +28,6 @@
       <app-agency-login
         *ngIf="!isForgotPasswordStep && isAgency"
         (backToRoleSelection)="backToRoleSelection()"
-        (forgotPasswordClicked)="goToForgotPassword()"
       >
       </app-agency-login>
 

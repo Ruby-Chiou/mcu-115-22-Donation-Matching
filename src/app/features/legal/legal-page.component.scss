@@ -1,0 +1,33 @@
+.legal-page {
+  width: min(820px, calc(100% - 32px));
+  margin: 32px auto 80px;
+  padding: 32px 28px 12px;
+  background: #fff;
+  border: 1px solid #d7e4ef;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(14, 52, 77, 0.05);
+}
+
+.updated {
+  margin: 0 0 8px;
+  color: #005bac;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0 0 12px;
+  color: #163a53;
+  font-size: 32px;
+}
+
+.intro,
+p {
+  color: #3d5160;
+  line-height: 1.8;
+}
+
+h2 {
+  margin: 28px 0 8px;
+  color: #163a53;
+  font-size: 20px;
+}

@@ -38,6 +38,11 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
+  app-donation-record-links {
+    display: block;
+    margin-top: 12px;
+  }
   gap: 18px;
   padding-bottom: 22px;
   border-bottom: 1px solid #e2e8f0;

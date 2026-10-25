@@ -5,11 +5,12 @@ import { DonationReceiptSheetComponent } from '../../../components/receipt/donat
 import { DonationReceiptPdfService } from '../../../core/receipt/donation-receipt-pdf.service';
 import { AgencyReceiptIssuanceService } from '../../../core/services/agency/agency-receipt-issuance.service';
 import { ReceiptDraft } from '../../../models/agency/receipt-issuance';
+import { DonationRecordLinksComponent } from '../../agency-record-links/donation-record-links.component';
 import { DonationReceiptView } from '../../../models/member/donation-receipt';
 
 @Component({
   selector: 'app-agency-receipt-preview',
-  imports: [RouterLink, DonationReceiptSheetComponent],
+  imports: [RouterLink, DonationReceiptSheetComponent, DonationRecordLinksComponent],
   templateUrl: './agency-receipt-preview.component.html',
   styleUrl: './agency-receipt-preview.component.scss',
 })

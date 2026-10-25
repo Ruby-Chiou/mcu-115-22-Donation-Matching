@@ -13,6 +13,7 @@
     "sb:migration:list": "supabase migration list",
     "sb:migration:new": "supabase migration new",
     "sb:push": "supabase db push",
+    "ai:vision": "npm --prefix server/donation-vision start",
     "sb:push:dry": "supabase db push --dry-run"
   },
   "private": true,

@@ -1,0 +1,18 @@
+<section class="beneficiary-panel">
+  <p class="eyebrow">受助機構</p>
+  <h2>{{ profile.organizationName }}</h2>
+  <span class="city">{{ profile.city }}</span>
+
+  <app-supply-detail-carousel
+    [images]="profile.introImages"
+    [imageAlt]="profile.organizationName + '的介紹圖片'"
+    emptyLabel="尚未上傳介紹圖片"
+  />
+
+  @for (field of fields(); track field.label) {
+    <div class="panel-row">
+      <h3>{{ field.label }}</h3>
+      <p>{{ field.value }}</p>
+    </div>
+  }
+</section>

@@ -1,0 +1,130 @@
+.directory-page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 28px auto 72px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #005bac;
+  font-weight: 700;
+}
+
+.directory-header h1 {
+  margin: 0 0 8px;
+  color: #163a53;
+  font-size: 34px;
+}
+
+.directory-header p:last-child {
+  margin: 0;
+  max-width: 640px;
+  color: #445866;
+  line-height: 1.7;
+}
+
+.city-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 20px;
+}
+
+.city-filters button {
+  border: 1px solid #d7e4ef;
+  border-radius: 999px;
+  background: #fff;
+  color: #27506b;
+  padding: 8px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.city-filters button.active {
+  border-color: #005bac;
+  background: #005bac;
+  color: #fff;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.org-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #d7e4ef;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(14, 52, 77, 0.06);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.org-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(14, 52, 77, 0.12);
+}
+
+.org-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: #e7f1fb;
+}
+
+.org-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 16px 18px;
+}
+
+.org-card-body span {
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e7f1fb;
+  color: #005bac;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.org-card-body h2 {
+  margin: 0;
+  color: #163a53;
+  font-size: 20px;
+}
+
+.org-card-body p {
+  margin: 0;
+  color: #5f7f8f;
+  line-height: 1.6;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #5f7f8f;
+}
+
+@media (max-width: 900px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .directory-header h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}

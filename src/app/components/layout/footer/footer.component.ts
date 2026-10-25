@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 
 @Component({
   selector: 'app-footer',
@@ -8,4 +10,10 @@ import { RouterLink } from '@angular/router';
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.scss',
 })
-export class FooterComponent {}
+export class FooterComponent {
+  protected readonly auth = inject(AuthSessionService);
+
+  protected get signedIn(): boolean {
+    return this.auth.principal().role !== 'guest';
+  }
+}

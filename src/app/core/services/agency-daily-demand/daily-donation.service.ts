@@ -1,7 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environment/environment';
 
@@ -40,14 +38,10 @@ export class DonationService {
 
   private readonly bucketName = 'donation-files';
 
-  private readonly apiUrl = 'https://localhost:7020';
-
   private readonly supabase: SupabaseClient = createClient(environment.supabaseUrl, environment.supabasePublishableKey);
 
   private readonly memberSession = inject(MemberSessionService);
   private readonly publicThanks = inject(PublicDonationThankService);
-
-  constructor(private readonly http: HttpClient) {}
 
   async createDonation(data: {
     demandId: number;
@@ -121,9 +115,75 @@ export class DonationService {
   }
 
   async reviewDonationWithAi(donationId: string): Promise<AiReviewResult> {
-    return await firstValueFrom(
-      this.http.post<AiReviewResult>( `${this.apiUrl}/api/ai-donation-reviews/donations/${donationId}/ai-review`, {})
-    );
+    const response = await fetch(this.aiReviewUrl(donationId), { method: 'POST' });
+    const payload = (await response.json().catch(() => null)) as {
+      message?: string;
+      donationId?: string;
+      DonationId?: string;
+      status?: string;
+      Status?: string;
+      aiDecision?: string;
+      AiDecision?: string;
+      decisionText?: string;
+      DecisionText?: string;
+      detectedCondition?: string;
+      DetectedCondition?: string;
+      reason?: string;
+      Reason?: string;
+      conditionMatches?: boolean;
+      ConditionMatches?: boolean;
+    } | null;
+
+    const reason = (payload?.reason ?? payload?.Reason ?? '').trim();
+    const decision = payload?.aiDecision ?? payload?.AiDecision ?? '';
+
+    if (!response.ok || (decision !== 'accepted' && decision !== 'rejected') || reason.length < 8) {
+      throw new Error(payload?.message || 'OpenRouter 審核沒有完成，這筆會停在 AI 審核');
+    }
+
+    return {
+      donationId: payload?.donationId ?? payload?.DonationId ?? donationId,
+      status: payload?.status ?? payload?.Status ?? 'pending_human_review',
+      decision,
+      decisionText: payload?.decisionText ?? payload?.DecisionText ?? '',
+      detectedCondition: payload?.detectedCondition ?? payload?.DetectedCondition ?? '',
+      reason,
+      conditionMatches: Boolean(payload?.conditionMatches ?? payload?.ConditionMatches),
+    };
+  }
+
+  /** 本機開發走 proxy，避免 127.0.0.1 被後端 CORS 擋住。正式站直接打 Render。 */
+  private aiReviewUrl(donationId: string): string {
+    const path = `/api/ai-donation-reviews/donations/${encodeURIComponent(donationId)}/ai-review`;
+    const host = typeof location === 'undefined' ? '' : location.hostname;
+
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return path;
+    }
+
+    return `${environment.aiReviewApiUrl}${path}`;
+  }
+
+  private toAiReviewResult(donationId: string, data: unknown): AiReviewResult {
+    const result = data as {
+      donationId?: string;
+      status?: string;
+      decision?: string;
+      decisionText?: string;
+      detectedCondition?: string;
+      reason?: string;
+      conditionMatches?: boolean;
+    };
+
+    return {
+      donationId: result.donationId || donationId,
+      status: result.status || 'pending_human_review',
+      decision: result.decision || '',
+      decisionText: result.decisionText || '',
+      detectedCondition: result.detectedCondition || '',
+      reason: result.reason || '',
+      conditionMatches: !!result.conditionMatches,
+    };
   }
 
   private async uploadDonationFile(donationId: string, file: File, fileType: DonationFileType, index: number): Promise<void> {

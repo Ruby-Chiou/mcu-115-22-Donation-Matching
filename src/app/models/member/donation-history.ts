@@ -26,6 +26,9 @@ export interface DonorDonationHistory {
   humanCheckedAt: string | null;
   /** 審核通過後，捐助者上傳的物流單號 */
   trackingNo: string;
+  receiptConfirmedAt: string | null;
+  receiptPartial: boolean;
+  receiptDeclinedVideo: boolean;
 }
 
 export const DONATION_HISTORY_STATUS_LABELS: Record<DonationStatus, string> = {

@@ -54,3 +54,8 @@ supabase/.temp
 supabase/.env.keys
 supabase/.env.local
 supabase/.env.*.local
+
+# 本機影像審核的模型與套件
+/server/donation-vision/node_modules/
+/server/donation-vision/.cache/
+/server/donation-vision/smoke-out/

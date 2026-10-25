@@ -6,9 +6,9 @@
   width: 100%;
   max-width: none;
 
-  margin: 30px 0 0;
+  margin: 10px 0 0;
 
-  padding: 40px 50px 45px;
+  padding: 28px 50px 32px;
 
   box-sizing: border-box;
 
@@ -23,7 +23,7 @@
 .about-title {
   max-width: 1400px;
 
-  margin: 0 auto 35px;
+  margin: 0 auto 16px;
 
   text-align: center;
 
@@ -40,13 +40,21 @@
 // ==========================================
 
 .about-content {
-  position: relative;
+  display: grid;
+
+  grid-template-columns: minmax(240px, 1.15fr) minmax(280px, 500px) minmax(220px, 1fr);
+
+  grid-template-areas:
+    "message image intro"
+    "message image link";
+
+  align-items: center;
+
+  gap: 8px 24px;
 
   width: 100%;
 
   max-width: 1400px;
-
-  min-height: 420px;
 
   margin: 0 auto;
 }
@@ -57,29 +65,32 @@
 // ==========================================
 
 .about-image {
-  position: absolute;
+  grid-area: image;
 
-  left: 50%;
-  top: 50%;
+  position: relative;
 
-  transform: translate(-50%, -50%);
+  width: 100%;
 
-  width: 80%;
+  aspect-ratio: 1627 / 571;
 
-  max-width: 1000px;
-
-  z-index: 1;
+  overflow: hidden;
 }
 
 
 .about-image img {
+  position: absolute;
+
   display: block;
 
-  width: 100%;
+  width: 118.93%;
 
-  height: auto;
+  max-width: none;
 
-  object-fit: contain;
+  height: 142.38%;
+
+  left: -9.34%;
+
+  top: -18.56%;
 }
 
 
@@ -88,14 +99,13 @@
 // ==========================================
 
 .about-message {
-  position: absolute;
+  grid-area: message;
 
-  left: 0;
-  bottom: 35px;
+  justify-self: end;
 
-  width: 30%;
+  align-self: end;
 
-  z-index: 2;
+  max-width: 360px;
 }
 
 
@@ -117,14 +127,13 @@
 // ==========================================
 
 .about-introduction {
-  position: absolute;
+  grid-area: intro;
 
-  top: 20px;
-  right: 0;
+  justify-self: start;
 
-  width: 28%;
+  align-self: center;
 
-  z-index: 2;
+  max-width: 260px;
 }
 
 
@@ -142,9 +151,7 @@
 
 
 .about-introduction .second-line {
-  display: inline-block;
-
-  margin-left: 3em;
+  display: inline;
 }
 
 
@@ -153,12 +160,11 @@
 // ==========================================
 
 .about-link {
-  position: absolute;
+  grid-area: link;
 
-  right: 0;
-  bottom: 10px;
+  justify-self: start;
 
-  z-index: 2;
+  align-self: start;
 
   color: var(--color-brand-primary);
 
@@ -192,26 +198,17 @@
   }
 
   .about-content {
-    min-height: auto;
-
     display: flex;
 
     flex-direction: column;
 
-    gap: 25px;
+    gap: 20px;
   }
 
   .about-image {
-    position: relative;
-
-    left: auto;
-    top: auto;
-
-    transform: none;
-
     width: 100%;
 
-    max-width: 700px;
+    max-width: 640px;
 
     margin: 0 auto;
 
@@ -220,24 +217,16 @@
 
   .about-message,
   .about-introduction {
-    position: relative;
-
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
-
     width: 100%;
+
+    justify-self: auto;
+
+    text-align: left;
 
     order: 2;
   }
 
   .about-link {
-    position: relative;
-
-    right: auto;
-    bottom: auto;
-
     display: block;
 
     width: fit-content;
@@ -270,7 +259,7 @@
   }
 
   .about-introduction .second-line {
-    margin-left: 2em;
+    margin-left: 0;
   }
 
   .about-link {

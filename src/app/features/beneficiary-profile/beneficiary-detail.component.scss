@@ -1,0 +1,20 @@
+.detail-page {
+  width: min(880px, calc(100% - 32px));
+  margin: 28px auto 72px;
+}
+
+.back-link {
+  color: #005bac;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.missing {
+  margin-top: 24px;
+}
+
+.missing h1 {
+  margin: 0 0 8px;
+  color: #163a53;
+  font-size: 32px;
+}

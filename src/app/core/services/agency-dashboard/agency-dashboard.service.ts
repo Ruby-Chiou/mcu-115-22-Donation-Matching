@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from '../database/supabase.service';
 import { AgencyReceiptIssuanceService } from '../agency/agency-receipt-issuance.service';
+import { DeliveryConfirmationService } from '../agency/delivery-confirmation.service';
 
 export interface AgencyDashboardSummary {
   dailyDemandCount: number | null;
@@ -41,6 +42,7 @@ export interface DashboardReminderGroup {
 })
 export class AgencyDashboardService {
   private readonly receiptIssuanceService = inject(AgencyReceiptIssuanceService);
+  private readonly deliveries = inject(DeliveryConfirmationService);
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
@@ -70,27 +72,38 @@ export class AgencyDashboardService {
   // 五張卡片統計
   async getSummary(): Promise<AgencyDashboardSummary> {
     const [
-      dailyDemandResult,
-      pendingItemReviewResult,
-      pendingReceiptReviewResult,
-      emergencyMaterialResult,
-      emergencyVolunteerResult,
+      dailyDemandCount,
+      pendingItemReviewCount,
+      pendingReceiptReviewCount,
+      pendingReceivingCount,
+      emergencyMaterialCount,
+      emergencyVolunteerCount,
     ] = await Promise.all([
-      this.getPublishedDailyDemandCount(),
-      this.getPendingItemReviewCount(),
+      this.loadCount(() => this.getPublishedDailyDemandCount()),
+      this.loadCount(() => this.getPendingItemReviewCount()),
       this.receiptIssuanceService.countPending().catch(() => null),
-      this.getPublishedEmergencyMaterialCount(),
-      this.getPublishedEmergencyVolunteerCount(),
+      this.deliveries.list().then((shipments) => this.deliveries.waitingCount(shipments)).catch(() => null),
+      this.loadCount(() => this.getPublishedEmergencyMaterialCount()),
+      this.loadCount(() => this.getPublishedEmergencyVolunteerCount()),
     ]);
 
     return {
-      dailyDemandCount: dailyDemandResult,
-      pendingItemReviewCount: pendingItemReviewResult,
-      pendingReceiptReviewCount: pendingReceiptReviewResult,
-      pendingReceivingCount: null,
-      emergencyMaterialCount: emergencyMaterialResult,
-      emergencyVolunteerCount: emergencyVolunteerResult,
+      dailyDemandCount,
+      pendingItemReviewCount,
+      pendingReceiptReviewCount,
+      pendingReceivingCount,
+      emergencyMaterialCount,
+      emergencyVolunteerCount,
     };
+  }
+
+  private async loadCount(loader: () => Promise<number>): Promise<number | null> {
+    try {
+      return await loader();
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
 
   // 待辦提醒：查詢現在起未來 72 小時內的截止項目

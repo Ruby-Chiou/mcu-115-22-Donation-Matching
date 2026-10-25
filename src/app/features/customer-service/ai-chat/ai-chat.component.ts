@@ -1,7 +1,9 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiChatService } from '../../../core/services/backend-ai-chat/ai-chat.service.service';
+import { APP_ROLE_LABEL } from '../../../models/auth/app-role';
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 
 interface ChatMessage {
   sender: 'user' | 'assistant';
@@ -15,9 +17,16 @@ interface ChatMessage {
   templateUrl: './ai-chat.component.html',
   styleUrl: './ai-chat.component.scss',
 })
-export class AiChatComponent {
+export class AiChatComponent implements OnInit {
   private readonly assistantApi = inject(AiChatService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly auth = inject(AuthSessionService);
+
+  async ngOnInit(): Promise<void> {
+    await this.auth.restore();
+    this.currentRole = APP_ROLE_LABEL[this.auth.principal().role];
+    this.cdr.markForCheck();
+  }
 
   message = '';
   currentRole = '訪客';

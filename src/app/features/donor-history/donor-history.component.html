@@ -6,7 +6,7 @@
 }
 
 @if (embedded()) {
-  <p class="section-hint">依登入身分顯示您的日常捐助紀錄與審核進度。物流單號請至「配送查詢」。</p>
+  <p class="section-hint">審核通過的寄送捐助，才在這裡上傳物流單號。機構看到單號並收到貨後，會做簽收回報。</p>
 }
 
 <div class="history-toolbar">
@@ -116,7 +116,7 @@
               <dd>{{ record.recipient }}</dd>
             }
 
-            @if (record.address) {
+            @if (record.status === 'human_approved' && record.address) {
               <dt>收件地址</dt>
               <dd>{{ record.address }}</dd>
             }
@@ -180,13 +180,25 @@
               <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
                 {{ trackingSaving() ? '上傳中...' : record.trackingNo ? '更新單號' : '上傳單號' }}
               </button>
-              <p class="shortcut-hint">物資審核已通過。上傳物流單號後，才會在全站跑馬燈廣播。</p>
+              <p class="shortcut-hint">機構已通過。請寄出後把物流單號填在這裡，受助機構才看得到、也才會等這批貨。</p>
               @if (trackingMessage()) {
                 <p class="tracking-message">{{ trackingMessage() }}</p>
               }
             </form>
           }
 
+          @if (record.status === 'human_approved' && record.donationMethod === '寄送' && record.trackingNo) {
+            <p class="shortcut-hint">
+              單號 {{ record.trackingNo }} 已給受助機構。
+              @if (record.receiptConfirmedAt) {
+                機構已簽收。
+                @if (record.receiptPartial) { 數量較多，沒有全部拆箱拍攝。 }
+                @if (record.receiptDeclinedVideo) { 這次沒有錄影，之後爭議由雙方各自承擔。 }
+              } @else {
+                機構收到貨後會拍照回報。
+              }
+            </p>
+          }
           <div class="detail-actions">
             <a class="btn btn-outline" [routerLink]="['/donor/daily/detail', record.demandId]">查看原需求</a>
             <a class="btn btn-primary" routerLink="/tracking">配送查詢</a>

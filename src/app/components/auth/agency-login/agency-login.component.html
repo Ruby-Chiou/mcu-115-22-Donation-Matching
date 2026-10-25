@@ -2,31 +2,34 @@
   <div class="form-header">
     <div>
       <h2>受助者登入</h2>
-      <p>請選擇憑證驗證方式以安全登入系統。</p>
+      <p>機構經辦人請使用內政部行動自然人憑證完成驗證。同一裝置若有多張憑證，請選擇所屬機構。</p>
     </div>
     <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
   </div>
 
-  <div class="input-grid">
-    <div class="field full fido-guide-box">
-      <span>機構經辦人身分驗證</span>
-      <p class="guide-desc">
-        本系統採用內政部行動自然人憑證（FIDO）或政府憑證閘道，點擊下方按鈕將引導您至安全驗證頁面，系統不會記錄您的憑證密碼。
-      </p>
+  @if (gateOpen) {
+    <app-natural-person-gate
+      [certificates]="certificateCards()"
+      (verified)="onCertificateVerified($event)"
+      (cancelled)="closeCertificateGate()"
+    />
+  } @else {
+    <div class="cert-intro">
+      <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+      <div>
+        <strong>行動自然人憑證</strong>
+        <p>將導向內政部憑證管理中心，確認已啟用的憑證與生物特徵。本平台不會記錄憑證密碼。</p>
+      </div>
     </div>
-  </div>
-
-  <div class="actions">
-    <div class="action-links">
-      <a routerLink="/register" class="link-btn">尚未註冊帳號？</a>
+    <div class="button-row">
+      <button type="button" class="primary-btn fido-action-btn" (click)="openCertificateGate()" [disabled]="submitting">
+        <i class="fa-solid fa-fingerprint"></i>
+        使用行動自然人憑證登入
+      </button>
     </div>
-  </div>
+  }
 
-  <div class="button-row">
-    <button type="button" class="primary-btn fido-action-btn" (click)="launchFidoLogin()">
-      <i class="fa-solid fa-shield-halved"></i> 使用行動自然人憑證登入
-    </button>
-  </div>
-
-  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+  @if (submitMessage) {
+    <p class="submit-message" [class.is-error]="isError">{{ submitMessage }}</p>
+  }
 </div>

@@ -63,16 +63,7 @@
         <p>{{ demand.recipient }}</p>
       </div>
 
-      <button
-        type="button"
-        class="contact-btn"
-        [routerLink]="[
-            '/donor/daily/form',
-            demand.id
-          ]"
-      >
-        我要捐助
-      </button>
+      <button type="button" class="contact-btn" (click)="requestDonate()">我要捐助</button>
     </div>
   </div>
 
@@ -153,30 +144,12 @@
     <p class="description">{{ demand.note || '無' }}</p>
   </div>
 
-  <button
-    type="button"
-    class="contact-btn bottom-contact-btn"
-    [routerLink]="[
-        '/donor/daily/form',
-        demand.id
-      ]"
-  >
-    我要捐助
-  </button>
-
-  <div class="organization-intro">
-    <h3>需求單位介紹</h3>
-
-    <p>
-      博幼基金會於 2002 年成立，以「提升偏鄉資源不足孩子的學習成就與自信心，
-      讓他們未來有選擇職業和生活模式的能力」為使命，藉由「社工輔導及課輔教育」
-      兩大服務方法，培育社區師資、開發學習教材，運用社會資源使孩子維持健康、
-      拓展視野，持續與各界跨域合作。希望弭平先天的不平等，讓偏鄉孩子有充足的
-      學習資源與機會，提升未來競爭力，達成「教育脫貧，讓知識帶希望回家」的願景。
-      期許孩子在不久的將來能真正「自立脫貧」，擁有充滿希望的家園， 不再落入貧窮循環。
-    </p>
-  </div>
+  <button type="button" class="contact-btn bottom-contact-btn" (click)="requestDonate()">我要捐助</button>
 </div>
+
+@if (beneficiary; as profile) {
+<app-beneficiary-panel [profile]="profile" />
+}
 
 <!-- 留言區 -->
 <div class="comment-section">

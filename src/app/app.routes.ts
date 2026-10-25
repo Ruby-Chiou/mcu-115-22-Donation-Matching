@@ -1,8 +1,9 @@
-import { Routes } from '@angular/router';
+import { Route, Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
+import { accessGuard, loginPageGuard } from './core/guards/access.guard';
 import { donorDisasterGuard } from './core/guards/donor-disaster.guard';
 
-export const routes: Routes = [
+const appRoutes: Routes = [
   // 1. 預設首頁
   { path: '', component: HomeComponent, pathMatch: 'full' },
 
@@ -22,6 +23,16 @@ export const routes: Routes = [
   {
     path: 'donor/daily',
     loadComponent: () => import('./features/daily/donor-daily-lobby/donor-daily-lobby.component').then((m) => m.DonorDailyLobbyComponent), // 日常捐助大廳
+  },
+  {
+    path: 'donor/beneficiaries',
+    loadComponent: () =>
+      import('./features/beneficiary-profile/beneficiary-profile.component').then((m) => m.BeneficiaryProfileComponent),
+  },
+  {
+    path: 'donor/beneficiaries/:name',
+    loadComponent: () =>
+      import('./features/beneficiary-profile/beneficiary-detail.component').then((m) => m.BeneficiaryDetailComponent),
   },
   {
     path: 'donor/daily/detail/:id',
@@ -46,7 +57,7 @@ export const routes: Routes = [
   },
   {
     path: 'member',
-    loadComponent: () => import('./features/member-center/member-center.component').then((m) => m.MemberCenterComponent), // 會員專區(個人資料/收件匣/捐贈回饋/捐助紀錄)
+    loadComponent: () => import('./features/member-center/member-entry.component').then((m) => m.MemberEntryComponent), // 會員專區：捐助者用現有專區，受助者與管理者先留入口
   },
   {
     path: 'tracking',
@@ -100,7 +111,18 @@ export const routes: Routes = [
     path: 'agency/dashboard',
     loadComponent: () => import('./features/agency-dashboard/agency-dashboard.component').then((m) => m.AgencyDashboardComponent),
   },
+  {
+    path: 'agency/profile',
+    loadComponent: () => import('./features/agency-profile/agency-profile.component').then((m) => m.AgencyProfileComponent),
+  },
   // 4.2 捐助發票與感謝狀送出處
+  {
+    path: 'agency/delivery-confirm',
+    loadComponent: () =>
+      import('./features/agency-delivery-confirm/agency-delivery-confirm.component').then(
+        (m) => m.AgencyDeliveryConfirmComponent,
+      ),
+  },
   {
     path: 'agency/receipt-review',
     loadComponent: () =>
@@ -225,7 +247,12 @@ export const routes: Routes = [
   {
     path: 'admin/agency-verify',
     loadComponent: () =>
-      import('./features/auth/admin-agency-verify/admin-agency-verify.component').then((m) => m.AdminAgencyVerifyComponent), // 社福機構註冊字號審核
+      import('./features/auth/admin-agency-verify/admin-agency-verify.component').then((m) => m.AdminAgencyVerifyComponent),
+  },
+  {
+    path: 'admin/company-verify',
+    loadComponent: () =>
+      import('./features/auth/admin-company-verify/admin-company-verify.component').then((m) => m.AdminCompanyVerifyComponent),
   },
   {
     path: 'admin/disaster-control',
@@ -260,6 +287,24 @@ export const routes: Routes = [
     path: 'contact-us',
     loadComponent: () => import('./features/about-us/contact-us/contact-us.component').then((m) => m.ContactUsComponent),
   },
+  {
+    path: 'legal/:page',
+    loadComponent: () => import('./features/legal/legal-page.component').then((m) => m.LegalPageComponent),
+  },
   // 6. 防呆萬用路由：如果隨便亂打網址，一律踢回大廳
   { path: '**', redirectTo: 'home' },
 ];
+
+export const routes: Routes = appRoutes.map(withIdentityBarrier);
+
+function withIdentityBarrier(route: Route): Route {
+  if (route.path === '**') {
+    return route;
+  }
+
+  if (route.path === 'login') {
+    return { ...route, canActivate: [loginPageGuard, ...(route.canActivate ?? [])] };
+  }
+
+  return { ...route, canActivate: [accessGuard, ...(route.canActivate ?? [])] };
+}

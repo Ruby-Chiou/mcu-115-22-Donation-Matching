@@ -5,8 +5,8 @@ import { environment } from '../../../../environment/environment';
 import { SupabaseService } from '../database/supabase.service';
 
 /**
- * 會員身分解析：優先 Supabase Auth；開發期可退回 environment.memberDemoUid。
- * 其他會員服務只依賴本服務取得 uid，不各自硬編碼測試帳號。
+ * 會員 uid 以 Supabase Auth 為準。
+ * memberDemoUid 僅在明確設定時作為後備，預設關閉。
  */
 @Injectable({
   providedIn: 'root',

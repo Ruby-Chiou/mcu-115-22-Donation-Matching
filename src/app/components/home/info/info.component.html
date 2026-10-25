@@ -12,43 +12,19 @@
 
   <div class="announcement-list">
 
+    @for (item of announcements; track item.date + item.text) {
     <div class="announcement-item">
 
       <span class="announcement-date">
-        26/09/07
+        {{ item.date }}
       </span>
 
       <span class="announcement-text">
-        系統更新通知：平台已於 26/09/07 完成系統更新，請使用者重新登入以享受最新功能。
+        {{ item.text }}
       </span>
 
     </div>
-
-
-    <div class="announcement-item">
-
-      <span class="announcement-date">
-        26/09/06
-      </span>
-
-      <span class="announcement-text">
-        平台新增「災害救助」功能，提供民眾在災害發生時快速提出需求。
-      </span>
-
-    </div>
-
-
-    <div class="announcement-item">
-
-      <span class="announcement-date">
-        26/09/05
-      </span>
-
-      <span class="announcement-text">
-        系統維護通知：平台將於 26/09/07 進行系統維護，屆時可能暫時無法使用。
-      </span>
-
-    </div>
+    }
 
   </div>
 

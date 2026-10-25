@@ -205,3 +205,57 @@ textarea:focus {
   margin: 10px 0 0;
   font-weight: bold;
 }
+
+.submit-message.is-error {
+  color: var(--color-error, #c62828);
+}
+
+.primary-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.kind-switch {
+  display: flex;
+  gap: 8px;
+}
+
+.kind-switch button {
+  border: 1px solid var(--border-lightest);
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kind-switch button.active {
+  background: #1565c0;
+  color: #fff;
+  border-color: #1565c0;
+}
+
+.kind-note {
+  margin: 0;
+  color: #526579;
+  line-height: 1.6;
+}
+
+.cert-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 16px;
+  background: #0b3a66;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cert-link:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

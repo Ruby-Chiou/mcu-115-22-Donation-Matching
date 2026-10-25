@@ -1,0 +1,207 @@
+<section class="agency-profile">
+  <header class="page-head">
+    <p class="eyebrow">受助者</p>
+    <h1>機構資料</h1>
+    <p>公開展示的內容可以在這裡改、也可以新增圖片。註冊時留下的機構與經辦人資料也在這一頁，只有自己和管理者看得到。</p>
+  </header>
+
+  @if (loading()) {
+    <p class="state">資料載入中...</p>
+  } @else if (loadError()) {
+    <p class="state error">{{ loadError() }}</p>
+  } @else if (draft) {
+    @if (notice()) {
+      <p class="notice" [class.error]="noticeError()" role="status">{{ notice() }}</p>
+    }
+
+    <form (ngSubmit)="save()">
+      <section class="card">
+        <div class="card-head">
+          <h2>公開展示</h2>
+          <a [routerLink]="previewLink()">到前台查看</a>
+        </div>
+        <p class="card-note">這些欄位會出現在受助機構專區，以及需求詳情頁的機構卡片。</p>
+
+        <div class="grid">
+          <label class="field">
+            <span>機構名稱</span>
+            <input type="text" name="agencyName" [(ngModel)]="draft.agencyName" maxlength="80" required />
+          </label>
+
+          <label class="field">
+            <span>服務縣市</span>
+            <select name="city" [(ngModel)]="draft.city">
+              <option value="">請選擇</option>
+              @for (city of cities; track city) {
+                <option [value]="city">{{ city }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="field">
+            <span>成立年份</span>
+            <input type="text" name="establishedYear" [(ngModel)]="draft.establishedYear" maxlength="8" placeholder="例如 2014" />
+          </label>
+
+          <label class="field">
+            <span>公開聯絡電話</span>
+            <input type="tel" name="contactPhone" [(ngModel)]="draft.contactPhone" maxlength="30" />
+          </label>
+
+          <label class="field wide">
+            <span>立案資料</span>
+            <input type="text" name="registrationLabel" [(ngModel)]="draft.registrationLabel" maxlength="80" />
+          </label>
+
+          <label class="field wide">
+            <span>服務宗旨</span>
+            <input type="text" name="mission" [(ngModel)]="draft.mission" maxlength="80" />
+          </label>
+
+          <label class="field wide">
+            <span>服務地區</span>
+            <input type="text" name="serviceArea" [(ngModel)]="draft.serviceArea" maxlength="120" placeholder="例如 臺北市中山區、信義區" />
+          </label>
+
+          <label class="field wide">
+            <span>背景介紹</span>
+            <textarea name="background" [(ngModel)]="draft.background" rows="5" maxlength="600"></textarea>
+          </label>
+        </div>
+
+        <div class="targets">
+          <span>服務對象</span>
+          <div class="chips">
+            @for (target of draft.serviceTargets; track target) {
+              <button type="button" class="chip" (click)="removeTarget(target)">{{ target }} ×</button>
+            } @empty {
+              <span class="muted">尚未新增</span>
+            }
+          </div>
+          <div class="add-row">
+            <input type="text" name="newTarget" [(ngModel)]="newTarget" maxlength="20" placeholder="輸入後按新增" (keydown.enter)="$event.preventDefault(); addTarget()" />
+            <button type="button" class="ghost" (click)="addTarget()">新增</button>
+          </div>
+        </div>
+
+        <div class="photos">
+          <div>
+            <span>封面圖片</span>
+            <div class="cover">
+              @if (draft.image) {
+                <img [src]="draft.image" alt="機構封面" />
+              } @else {
+                <p>尚未上傳</p>
+              }
+            </div>
+            <label class="ghost file-btn">
+              {{ uploading() ? '上傳中...' : '更換封面' }}
+              <input type="file" [accept]="imageAccept" [disabled]="uploading()" (change)="onCoverSelected($event)" />
+            </label>
+          </div>
+
+          <div>
+            <span>介紹輪播（最多 {{ introLimit }} 張）</span>
+            <div class="gallery">
+              @for (image of draft.introImages; track image; let index = $index) {
+                <figure>
+                  <img [src]="image" alt="" />
+                  <figcaption>
+                    <button type="button" (click)="useAsCover(image)">設為封面</button>
+                    <button type="button" (click)="removeIntro(index)">移除</button>
+                  </figcaption>
+                </figure>
+              } @empty {
+                <p class="muted">上傳後，民眾會在機構卡片裡左右切換這些圖片。</p>
+              }
+            </div>
+            <label class="ghost file-btn">
+              {{ uploading() ? '上傳中...' : '新增介紹圖片' }}
+              <input type="file" [accept]="imageAccept" [disabled]="uploading() || draft.introImages.length >= introLimit" (change)="onIntroSelected($event)" />
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>註冊資料</h2>
+        </div>
+        <p class="card-note">這一區不會出現在民眾頁。資格狀態由管理者審核，這裡不能自己改成已確認。</p>
+
+        <dl class="locked">
+          <div>
+            <dt>登入信箱</dt>
+            <dd>{{ email() }}</dd>
+          </div>
+          <div>
+            <dt>資格狀態</dt>
+            <dd>{{ statusLabel() }}</dd>
+          </div>
+        </dl>
+
+        <div class="grid">
+          <label class="field">
+            <span>統一編號</span>
+            <input type="text" name="registrationNumber" [(ngModel)]="draft.registrationNumber" maxlength="20" />
+          </label>
+
+          <label class="field">
+            <span>負責人姓名</span>
+            <input type="text" name="representative" [(ngModel)]="draft.representative" maxlength="40" />
+          </label>
+
+          <label class="field wide">
+            <span>機構地址</span>
+            <input type="text" name="defaultAddress" [(ngModel)]="draft.defaultAddress" maxlength="120" />
+          </label>
+
+          <label class="field">
+            <span>經辦人姓名</span>
+            <input type="text" name="contactPersonName" [(ngModel)]="draft.contactPersonName" maxlength="40" />
+          </label>
+
+          <label class="field">
+            <span>經辦人職稱</span>
+            <input type="text" name="contactPersonTitle" [(ngModel)]="draft.contactPersonTitle" maxlength="40" />
+          </label>
+
+          <label class="field">
+            <span>所屬部門</span>
+            <input type="text" name="department" [(ngModel)]="draft.department" maxlength="40" />
+          </label>
+
+          <label class="field">
+            <span>經辦人電話</span>
+            <input type="tel" name="contactPersonPhone" [(ngModel)]="draft.contactPersonPhone" maxlength="30" />
+          </label>
+
+          <label class="field wide">
+            <span>經辦人信箱</span>
+            <input type="email" name="contactPersonEmail" [(ngModel)]="draft.contactPersonEmail" maxlength="80" />
+          </label>
+        </div>
+
+        <label class="file-line">
+          <span>授權證明文件</span>
+          <strong>{{ (draft.verificationDocumentUrl || '尚未選擇').replace('stored:', '') }}</strong>
+          <span class="ghost file-btn">
+            重新選擇
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" (change)="onVerificationFile($event)" />
+          </span>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" name="consentToContact" [(ngModel)]="draft.consentToContact" />
+          <span>同意平台於必要時用上述方式確認身分與資格</span>
+        </label>
+
+        <p class="agreed">註冊時已同意服務條款與隱私權政策。</p>
+      </section>
+
+      <div class="actions">
+        <button type="submit" [disabled]="saving() || uploading()">{{ saving() ? '儲存中...' : '儲存機構資料' }}</button>
+      </div>
+    </form>
+  }
+</section>

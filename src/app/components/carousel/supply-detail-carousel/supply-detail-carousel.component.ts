@@ -17,6 +17,8 @@ export class SupplyDetailCarouselComponent
   implements OnChanges, OnDestroy {
 
   @Input() images: string[] = [];
+  @Input() imageAlt = '物資圖片';
+  @Input() emptyLabel = '物資圖片';
 
   currentIndex = 0;
 

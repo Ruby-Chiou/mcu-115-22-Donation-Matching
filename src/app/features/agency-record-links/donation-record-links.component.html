@@ -1,0 +1,14 @@
+<nav class="record-links" aria-label="同一筆捐助">
+  @if (showLabel()) {
+    <span class="label">同一筆</span>
+  }
+  @for (station of stations(); track station.id) {
+    @if (station.id === current()) {
+      @if (showCurrent()) {
+        <span class="current">{{ station.label }}</span>
+      }
+    } @else {
+      <a [routerLink]="station.commands" [queryParams]="station.query">{{ station.label }}</a>
+    }
+  }
+</nav>

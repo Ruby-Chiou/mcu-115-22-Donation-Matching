@@ -1,0 +1,20 @@
+@if (document) {
+  <article class="legal-page">
+    <p class="updated">更新於 {{ document.updated }}</p>
+    <h1>{{ document.title }}</h1>
+    <p class="intro">{{ document.intro }}</p>
+    @for (section of document.sections; track section.heading) {
+      <section>
+        <h2>{{ section.heading }}</h2>
+        @for (paragraph of section.paragraphs; track paragraph) {
+          <p>{{ paragraph }}</p>
+        }
+      </section>
+    }
+  </article>
+} @else {
+  <article class="legal-page">
+    <h1>找不到這份說明</h1>
+    <p>請從頁尾的隱私權政策、網站使用條款或網站安全政策重新進入。</p>
+  </article>
+}

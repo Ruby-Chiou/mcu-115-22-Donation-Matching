@@ -1,0 +1,38 @@
+.record-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.label {
+  color: #64748b;
+}
+
+a,
+.current {
+  padding: 4px 10px;
+  border: 1px solid #d0dbe6;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+a {
+  color: #245c86;
+  background: #fff;
+
+  &:hover {
+    border-color: #245c86;
+    background: #f5f9fc;
+  }
+}
+
+.current {
+  border-color: #245c86;
+  background: #eef5fb;
+  color: #245c86;
+  font-weight: 700;
+}

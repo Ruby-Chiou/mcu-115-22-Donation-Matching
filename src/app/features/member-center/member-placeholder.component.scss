@@ -1,0 +1,25 @@
+.member-placeholder {
+  max-width: 720px;
+  margin: 24px auto 48px;
+  padding: 32px 28px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(15, 40, 70, 0.08);
+
+  h1 {
+    margin: 0 0 12px;
+    color: #143a55;
+  }
+
+  p {
+    margin: 0 0 20px;
+    color: #5f7184;
+    line-height: 1.7;
+  }
+
+  a {
+    color: #1565c0;
+    font-weight: 700;
+    text-decoration: none;
+  }
+}

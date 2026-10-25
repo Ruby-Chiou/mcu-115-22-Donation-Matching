@@ -200,13 +200,11 @@ export class DonorHistoryComponent implements OnInit {
 
   progressSteps(record: DonorDonationHistory): { label: string; done: boolean; current: boolean }[] {
     const status = record.status;
-
-    return [
-      {
-        label: '提交捐助',
-        done: true,
-        current: false,
-      },
+    const approved = status === 'human_approved';
+    const rejected = status === 'human_rejected';
+    const shipped = record.donationMethod === '寄送';
+    const steps = [
+      { label: '提交申請', done: true, current: false },
       {
         label: 'AI 審核',
         done: status !== 'pending_ai_review',
@@ -214,14 +212,31 @@ export class DonorHistoryComponent implements OnInit {
       },
       {
         label: '機構審核',
-        done: status === 'human_approved' || status === 'human_rejected',
+        done: approved || rejected,
         current: status === 'pending_human_review',
       },
-      {
-        label: status === 'human_rejected' ? '未通過' : '已通過',
-        done: status === 'human_approved' || status === 'human_rejected',
-        current: status === 'human_approved' || status === 'human_rejected',
-      },
     ];
+
+    if (rejected) {
+      steps.push({ label: '未通過', done: true, current: true });
+      return steps;
+    }
+
+    if (shipped) {
+      steps.push({
+        label: '上傳物流單號',
+        done: approved && !!record.trackingNo,
+        current: approved && !record.trackingNo,
+      });
+    }
+
+    const waitingReceipt = approved && (!shipped || !!record.trackingNo) && !record.receiptConfirmedAt;
+    steps.push({
+      label: '受助者簽收',
+      done: !!record.receiptConfirmedAt,
+      current: waitingReceipt,
+    });
+
+    return steps;
   }
 }

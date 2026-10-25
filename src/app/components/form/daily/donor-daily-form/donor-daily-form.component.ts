@@ -275,14 +275,15 @@ export class DonorDailyFormComponent implements OnInit {
     } catch (error) {
       console.error('AI 審核失敗：', error);
 
-      this.reviewError = '捐助資料已成功送出，但 AI 審核暫時失敗。';
+      this.reviewError = 'OpenRouter 審核沒有完成，這筆會停在 AI 審核，不會直接交給機構。';
     } finally {
       this.isReviewing = false;
+      this.cdr.detectChanges();
     }
   }
 
-  goToDisasterOpen() {
-    this.router.navigate(['/disaster/open']);
+  goToHistory(): void {
+    void this.router.navigate(['/donor/history']);
   }
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

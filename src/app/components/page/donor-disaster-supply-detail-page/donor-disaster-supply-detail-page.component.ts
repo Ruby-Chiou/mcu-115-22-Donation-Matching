@@ -1,15 +1,19 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { SupplyDetailCarouselComponent } from '../../carousel/supply-detail-carousel/supply-detail-carousel.component';
+import { BeneficiaryPublicProfileService } from '../../../core/services/agency/beneficiary-public-profile.service';
+import { BeneficiaryPanelComponent } from '../../card/beneficiary-panel/beneficiary-panel.component';
+import { AGENCY_OFFICE } from '../../../models/user/agency';
 
 import { DisasterDemandService } from '../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand } from '../../../models/agency/disaster-demand';
 
 import { DisasterCommentService } from '../../../core/services/comments/disaster-comment.service';
 import { DisasterComment } from '../../../core/services/comments/disaster-comment.service';
+import { AuthRedirectService } from '../../../core/services/auth/auth-redirect.service';
 
 // 每一筆留言及其底下的所有回覆
 interface CommentThreadNode {
@@ -20,12 +24,18 @@ interface CommentThreadNode {
 
 @Component({
   selector: 'app-disaster-supply-detail-page',
-  imports: [FormsModule, NgClass, NgTemplateOutlet, SupplyDetailCarouselComponent],
+  imports: [FormsModule, NgClass, NgTemplateOutlet, SupplyDetailCarouselComponent, BeneficiaryPanelComponent],
   templateUrl: './donor-disaster-supply-detail-page.component.html',
   styleUrls: ['./donor-disaster-supply-detail-page-A.component.scss', './donor-disaster-supply-detail-page-B.component.scss'],
 })
 export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000001';
+  private readonly authRedirect = inject(AuthRedirectService);
+  protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
+
+  get beneficiary() {
+    return this.beneficiaryProfiles.findForPlace(AGENCY_OFFICE.agencyName, this.demand?.address ?? '');
+  }
   // =========================
   // 目前查看的需求
   // =========================
@@ -62,7 +72,10 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
     try {
       console.log('[災害詳細頁] 開始查詢資料');
 
-      const demand = await this.disasterDemandService.getDemandById(id);
+      const [demand] = await Promise.all([
+        this.disasterDemandService.getDemandById(id),
+        this.beneficiaryProfiles.ensureLoaded(),
+      ]);
 
       console.log('[災害詳細頁] 查詢結果：', demand);
 
@@ -116,7 +129,7 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   // 前往物資捐助表單
   // =========================
   goToSupplyForm(): void {
-    this.router.navigate(['/donor/disaster/supply/form', this.demand.id]);
+    void this.authRedirect.openDonorAction(`/donor/disaster/supply/form/${this.demand.id}`);
   }
 
   // =========================

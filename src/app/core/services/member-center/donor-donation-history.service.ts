@@ -24,6 +24,9 @@ interface DonationHistoryRow {
   ai_checked_at: string | null;
   human_checked_at: string | null;
   tracking_no: string | null;
+  receipt_confirmed_at: string | null;
+  receipt_partial: boolean | null;
+  receipt_declined_video: boolean | null;
 }
 
 interface DemandMetaRow {
@@ -71,7 +74,10 @@ export class DonorDonationHistoryService {
         created_at,
         ai_checked_at,
         human_checked_at,
-        tracking_no
+        tracking_no,
+        receipt_confirmed_at,
+        receipt_partial,
+        receipt_declined_video
       `
       )
       .eq('donor_uid', uid)
@@ -140,6 +146,9 @@ export class DonorDonationHistoryService {
       aiCheckedAt: row.ai_checked_at,
       humanCheckedAt: row.human_checked_at,
       trackingNo: row.tracking_no ?? '',
+      receiptConfirmedAt: row.receipt_confirmed_at,
+      receiptPartial: !!row.receipt_partial,
+      receiptDeclinedVideo: !!row.receipt_declined_video,
     };
   }
 

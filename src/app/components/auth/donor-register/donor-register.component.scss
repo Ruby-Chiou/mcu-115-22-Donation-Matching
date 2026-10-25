@@ -191,12 +191,45 @@ input:focus {
 }
 
 /* submit message */
+.kind-switch {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.kind-switch button {
+  border: 1px solid var(--border-lightest, #d7e0ea);
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kind-switch button.active {
+  background: #1565c0;
+  color: #fff;
+  border-color: #1565c0;
+}
+
+.kind-note {
+  grid-column: span 2;
+  margin: 0;
+  color: #526579;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
 .submit-message {
   margin: 12px 0 0;
-  color: var(--color-error);
+  color: #2e7d32;
   font-weight: 700;
   grid-column: span 2;
   text-align: right;
+}
+
+.submit-message.is-error {
+  color: var(--color-error);
 }
 
 /* 錯誤紅框與震動特效 */

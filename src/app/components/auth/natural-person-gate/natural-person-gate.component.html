@@ -1,0 +1,125 @@
+<section class="cert-gate" role="dialog" aria-labelledby="cert-gate-title">
+  <header class="cert-bar">
+    <div class="emblem" aria-hidden="true">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <div>
+      <p class="agency-name">內政部憑證管理中心</p>
+      <p class="service-name">行動自然人憑證身份驗證</p>
+    </div>
+  </header>
+
+  <div class="cert-body">
+    <h3 id="cert-gate-title">跨機關身分辨識</h3>
+    <p class="request-line">智慧捐助媒合平台正在要求驗證您的行動自然人憑證。</p>
+
+    <dl class="meta">
+      <div>
+        <dt>交易序號</dt>
+        <dd>{{ transactionNo }}</dd>
+      </div>
+      <div>
+        <dt>要求時間</dt>
+        <dd>{{ requestedAt }}</dd>
+      </div>
+      <div>
+        <dt>驗證方式</dt>
+        <dd>FIDO 無密碼驗證</dd>
+      </div>
+    </dl>
+
+    @switch (step()) {
+      @case ('connect') {
+        <div class="status-panel" role="status">
+          <span class="spinner" aria-hidden="true"></span>
+          <p>正在連線憑證服務，並偵測已啟用的行動自然人憑證…</p>
+        </div>
+      }
+      @case ('review') {
+        @if (certificates().length > 1) {
+          <p class="hint">此裝置已啟用多張行動自然人憑證，請選擇本次要驗證的持有人。</p>
+          <div class="cert-choices">
+            @for (cert of certificates(); track cert.id) {
+              <button
+                type="button"
+                class="cert-card"
+                [class.is-selected]="selectedId() === cert.id"
+                (click)="choose(cert.id)"
+              >
+                <p class="cert-kicker">已偵測到憑證</p>
+                <h4>{{ cert.agencyName }}</h4>
+                <dl>
+                  <div>
+                    <dt>持有人</dt>
+                    <dd>{{ cert.holderName }}</dd>
+                  </div>
+                  <div>
+                    <dt>身分識別</dt>
+                    <dd>{{ cert.maskedId }}</dd>
+                  </div>
+                  <div>
+                    <dt>憑證序號</dt>
+                    <dd>{{ cert.serial }}</dd>
+                  </div>
+                  <div>
+                    <dt>憑證狀態</dt>
+                    <dd class="valid">有效</dd>
+                  </div>
+                </dl>
+              </button>
+            }
+          </div>
+        } @else {
+          @if (certificates()[0]; as cert) {
+          <article class="cert-card">
+            <p class="cert-kicker">已偵測到憑證</p>
+            <h4>{{ cert.agencyName }}</h4>
+            <dl>
+              <div>
+                <dt>持有人</dt>
+                <dd>{{ cert.holderName }}</dd>
+              </div>
+              <div>
+                <dt>身分識別</dt>
+                <dd>{{ cert.maskedId }}</dd>
+              </div>
+              <div>
+                <dt>憑證序號</dt>
+                <dd>{{ cert.serial }}</dd>
+              </div>
+              <div>
+                <dt>發行機關</dt>
+                <dd>內政部憑證管理中心</dd>
+              </div>
+              <div>
+                <dt>憑證狀態</dt>
+                <dd class="valid">有效</dd>
+              </div>
+            </dl>
+          </article>
+          }
+        }
+        <p class="hint">請在已綁定的裝置上完成生物特徵確認。私鑰不會離開您的裝置，本平台也不會保存憑證密碼。</p>
+        <div class="cert-actions">
+          <button type="button" class="confirm-btn" (click)="confirmWithBiometric()" [disabled]="!activeCertificate()">
+            <i class="fa-solid fa-fingerprint"></i>
+            以生物特徵確認
+          </button>
+          <button type="button" class="cancel-btn" (click)="cancel()">取消</button>
+        </div>
+      }
+      @case ('confirm') {
+        <div class="status-panel" role="status">
+          <i class="fa-solid fa-fingerprint fingerprint" aria-hidden="true"></i>
+          <p>正在比對生物特徵並完成憑證簽章…</p>
+        </div>
+      }
+      @case ('done') {
+        <div class="status-panel success" role="status">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+          <p>{{ successText() }}</p>
+        </div>
+      }
+    }
+  </div>
+</section>

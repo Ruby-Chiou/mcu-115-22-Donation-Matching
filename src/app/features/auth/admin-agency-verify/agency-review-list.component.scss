@@ -1,0 +1,312 @@
+:host {
+  display: block;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.list-panel {
+  overflow: hidden;
+  border: 1px solid #e6ecf2;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.panel-heading,
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.panel-heading {
+  padding: 26px 28px 20px;
+
+  h2 {
+    margin: 0 0 7px;
+    color: #24384d;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0;
+    color: #8592a2;
+    font-size: 13px;
+  }
+}
+
+.result-count {
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: #edf3f8;
+  color: #416782;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  padding: 0 28px 22px;
+}
+
+.search-box {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 14px;
+  border: 1px solid #dce4ec;
+  border-radius: 9px;
+
+  &:focus-within {
+    border-color: #3978a8;
+  }
+
+  span {
+    font-size: 25px;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    padding: 12px 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 13px;
+  }
+}
+
+.status-filter {
+  min-width: 145px;
+  padding: 0 13px;
+  border: 1px solid #dce4ec;
+  border-radius: 9px;
+  background: #fff;
+  color: #45596d;
+  font-size: 13px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  thead {
+    background: #f6f8fb;
+  }
+
+  th,
+  td {
+    padding: 15px 22px;
+    white-space: nowrap;
+  }
+
+  th {
+    color: #728195;
+    font-size: 12px;
+  }
+
+  td {
+    border-top: 1px solid #edf1f5;
+    color: #526378;
+    font-size: 13px;
+  }
+
+  tbody tr:hover {
+    background: #fafcfe;
+  }
+}
+
+.agency-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.agency-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #e8f0f8;
+  color: #315f86;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.agency-info {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+
+  strong {
+    color: #304357;
+    font-size: 13px;
+  }
+
+  small {
+    color: #94a0ae;
+    font-size: 11px;
+  }
+}
+
+.registration-number {
+  color: #52667a;
+  font-size: 12px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-pending {
+  background: #fff4dc;
+  color: #b67b18;
+}
+
+.status-approved {
+  background: #e2f5e9;
+  color: #258453;
+}
+
+.status-supplement {
+  background: #fff0df;
+  color: #b66d1d;
+}
+
+.status-rejected,
+.status-deleted {
+  background: #fde9e9;
+  color: #c24646;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.detail-button,
+.cancel-row-button {
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+}
+
+.detail-button {
+  border: 1px solid #cbdbea;
+  background: #fff;
+  color: #32688f;
+
+  &:hover {
+    background: #edf5fb;
+  }
+}
+
+.cancel-row-button {
+  border: 1px solid #e4b4b4;
+  background: #fff5f5;
+  color: #a33b3b;
+
+  &:disabled {
+    border-color: #e6e6e6;
+    background: #f7f7f7;
+    color: #98a6b3;
+    cursor: not-allowed;
+  }
+}
+
+.empty-state {
+  height: 190px;
+  text-align: center;
+  white-space: normal;
+
+  span,
+  strong {
+    display: block;
+    margin: 7px auto;
+  }
+
+  .empty-icon {
+    color: #9aaaba;
+    font-size: 30px;
+  }
+
+  strong {
+    color: #51667a;
+  }
+}
+
+.table-footer {
+  padding: 16px 28px;
+  border-top: 1px solid #edf1f5;
+  color: #8794a3;
+  font-size: 12px;
+}
+
+.clear-filter {
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: #3978a8;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 650px) {
+  .panel-heading {
+    align-items: flex-start;
+    padding: 20px 16px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    padding: 0 16px 18px;
+  }
+
+  .search-box,
+  .status-filter {
+    min-height: 44px;
+  }
+
+  table th,
+  table td {
+    padding: 14px;
+  }
+
+  .table-footer {
+    padding: 14px 16px;
+  }
+}

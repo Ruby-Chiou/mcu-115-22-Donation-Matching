@@ -1,0 +1,7 @@
+{
+  "/api/ai-donation-reviews": {
+    "target": "https://mcu-115-22-donation-matching-backend.onrender.com",
+    "secure": true,
+    "changeOrigin": true
+  }
+}

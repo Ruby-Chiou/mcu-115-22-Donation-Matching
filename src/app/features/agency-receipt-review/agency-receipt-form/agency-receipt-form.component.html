@@ -3,6 +3,9 @@
 </div>
 
 <div class="container">
+  @if (donationId()) {
+    <app-donation-record-links [donationId]="donationId()" current="receipt" />
+  }
   @if (isLoading()) {
     <p class="state-text">資料載入中...</p>
   } @else if (!task()) {

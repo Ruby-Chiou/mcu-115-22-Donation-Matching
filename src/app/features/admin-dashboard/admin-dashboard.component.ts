@@ -2,6 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
+import { RoleAccessPolicy } from '../../core/auth/role-access.policy';
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -11,6 +13,7 @@ import { Router } from '@angular/router';
 })
 export class AdminDashboardComponent {
   private router = inject(Router);
+  private readonly access = inject(RoleAccessPolicy);
 
   // 定義所有模組的導航清單
   menuSections = [
@@ -63,11 +66,21 @@ export class AdminDashboardComponent {
       title: '系統後台模組 (Admin)',
       icon: 'settings',
       items: [
-        { name: '機構字號審核', path: '/admin/agency-verify', desc: '審核社福機構註冊資格' },
+        { name: '機構字號審核', path: '/admin/agency-verify', desc: '對照公開社福資料並電話確認機構資格' },
+        { name: '企業捐助者審核', path: '/admin/company-verify', desc: '查公開公司登記並電話確認後才開放捐助' },
         { name: '災害模式控制台', path: '/admin/disaster-control', desc: '切換災害模式與發布公告' },
       ],
     },
   ];
+
+  constructor() {
+    this.menuSections = this.menuSections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => this.access.canActivate('admin', item.path)),
+      }))
+      .filter((section) => section.items.length > 0);
+  }
 
   // 點擊卡片跳轉
   goTo(path: string) {

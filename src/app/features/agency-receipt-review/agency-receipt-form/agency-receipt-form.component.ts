@@ -7,11 +7,12 @@ import { ReceiptLineEditorComponent } from '../../../components/receipt/receipt-
 import { emptyReceiptLine } from '../../../core/receipt/donation-receipt-document';
 import { isTaiwanId, maskTaiwanId, normalizeTaiwanId } from '../../../core/receipt/taiwan-id';
 import { AgencyReceiptIssuanceService } from '../../../core/services/agency/agency-receipt-issuance.service';
+import { DonationRecordLinksComponent } from '../../agency-record-links/donation-record-links.component';
 import { AgencyReceiptTask, RECEIPT_CARRIERS, ReceiptDraft } from '../../../models/agency/receipt-issuance';
 
 @Component({
   selector: 'app-agency-receipt-form',
-  imports: [FormsModule, NgTemplateOutlet, RouterLink, ReceiptLineEditorComponent],
+  imports: [FormsModule, NgTemplateOutlet, RouterLink, ReceiptLineEditorComponent, DonationRecordLinksComponent],
   templateUrl: './agency-receipt-form.component.html',
   styleUrl: './agency-receipt-form.component.scss',
 })
@@ -60,8 +61,12 @@ export class AgencyReceiptFormComponent implements OnInit {
     return maskTaiwanId(this.storedIdNo);
   }
 
+  protected donationId(): string {
+    return this.route.snapshot.paramMap.get('donationId') ?? '';
+  }
+
   async ngOnInit(): Promise<void> {
-    const donationId = this.route.snapshot.paramMap.get('donationId') ?? '';
+    const donationId = this.donationId();
 
     try {
       const task = await this.issuanceService.getTask(donationId);

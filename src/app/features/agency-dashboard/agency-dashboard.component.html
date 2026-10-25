@@ -7,7 +7,17 @@
 
   <section aria-label="總覽統計">
     <div class="summary-grid">
-      @for (card of cards; track card.title) { @if (card.isAvailable) {
+      @for (card of cards; track card.title) { @if (card.type === 'emergency' && !disasterOpen) {
+      <article class="summary-card emergency-card is-closed" aria-disabled="true">
+        <div class="card-top">
+          <i class="card-icon" [class]="card.icon" aria-hidden="true"></i>
+          <span class="coming-soon-badge">已關閉</span>
+        </div>
+        <p class="card-title">急難救助</p>
+        <p class="card-value card-value-unavailable">關閉</p>
+        <p class="card-description">管理者已關閉此模式，前台與機構作業都不會顯示急難救助。</p>
+      </article>
+      } @else if (card.isAvailable) {
       <a class="summary-card" [class.emergency-card]="card.type === 'emergency'" [routerLink]="card.route">
         <div class="card-top">
           <i class="card-icon" [class]="card.icon" aria-hidden="true"></i>
@@ -54,6 +64,41 @@
         <p class="card-description">{{ card.description }}</p>
       </article>
       } }
+    </div>
+  </section>
+
+  <section class="platform-feed" aria-label="平台通知與最新消息">
+    <div class="feed-column">
+      <h2>
+        <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
+        平台通知
+      </h2>
+      <ul>
+        @for (item of announcements; track item.date + item.text) {
+          <li>
+            <time>{{ item.date }}</time>
+            <p>{{ item.text }}</p>
+          </li>
+        }
+      </ul>
+    </div>
+    <div class="feed-column">
+      <h2>
+        <i class="fa-solid fa-newspaper" aria-hidden="true"></i>
+        最新消息
+      </h2>
+      <ul>
+        @for (news of latestNews; track news.title) {
+          <li>
+            <a [routerLink]="news.link">
+              <time>{{ news.date }}</time>
+              <span class="news-category">{{ news.category }}</span>
+              <strong>{{ news.title }}</strong>
+              <p>{{ news.content }}</p>
+            </a>
+          </li>
+        }
+      </ul>
     </div>
   </section>
 

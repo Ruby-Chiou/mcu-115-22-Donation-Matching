@@ -1,0 +1,12 @@
+{
+  "name": "donation-vision",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node decide.test.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1"
+  }
+}

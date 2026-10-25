@@ -1,0 +1,134 @@
+:host {
+  display: block;
+}
+
+.company-review {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+h1 {
+  margin: 0 0 8px;
+}
+
+header p,
+label {
+  color: #526579;
+  line-height: 1.6;
+}
+
+ul {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+li button,
+article {
+  width: 100%;
+  border: 1px solid #eadfd4;
+  border-radius: 14px;
+  background: #fff;
+  text-align: left;
+}
+
+li button {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+
+article {
+  padding: 18px;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+dt {
+  color: #6b7c8d;
+  font-size: 13px;
+}
+
+dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+textarea,
+select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.method {
+  margin: 0 0 12px;
+}
+
+.method a {
+  color: #6a1b9a;
+  font-weight: 700;
+}
+
+fieldset {
+  margin: 0 0 14px;
+  border: 1px solid #eadfd4;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+legend {
+  padding: 0 6px;
+  font-weight: 700;
+}
+
+.check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 8px 0;
+  color: #243140;
+}
+
+.check input {
+  margin-top: 4px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.actions button,
+select {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #6a1b9a;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #c62828;
+  font-weight: 700;
+}

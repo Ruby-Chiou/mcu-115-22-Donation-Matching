@@ -1,0 +1,101 @@
+<section class="list-panel">
+  <div class="panel-heading">
+    <div>
+      <h2>機構申請清單</h2>
+      <p>查看申請資料。註銷可以直接在這一列處理，不必先打開詳情。</p>
+    </div>
+    <span class="result-count">共 {{ applications().length }} 筆</span>
+  </div>
+
+  <div class="toolbar">
+    <label class="search-box">
+      <span aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        [ngModel]="keyword()"
+        (ngModelChange)="keyword.set($event)"
+        name="agencyReviewKeyword"
+        placeholder="搜尋機構名稱、電話、Email 或註冊字號"
+        aria-label="搜尋機構申請"
+      />
+    </label>
+
+    <select
+      [ngModel]="status()"
+      (ngModelChange)="status.set($event)"
+      name="agencyReviewStatus"
+      aria-label="依審核狀態篩選"
+      class="status-filter"
+    >
+      <option value="all">所有狀態</option>
+      <option value="pending">待審核</option>
+      <option value="approved">已驗證</option>
+      <option value="supplement">待補件</option>
+      <option value="rejected">未通過</option>
+      <option value="deleted">已註銷</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>申請機構</th>
+          <th>註冊字號</th>
+          <th>申請日期</th>
+          <th>審核狀態</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (application of applications(); track application.id) {
+          <tr>
+            <td>
+              <div class="agency-cell">
+                <span class="agency-avatar">{{ application.name.charAt(0) }}</span>
+                <span class="agency-info">
+                  <strong>{{ application.name }}</strong>
+                  <small>{{ application.contact }}</small>
+                </span>
+              </div>
+            </td>
+            <td><span class="registration-number">{{ application.registrationNumber }}</span></td>
+            <td>{{ application.submittedAt }}</td>
+            <td>
+              <span class="status-badge" [class]="statusClass(application)">
+                <span class="status-dot"></span>
+                {{ statusText(application) }}
+              </span>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="detail-button" (click)="openApplication.emit(application)">查看詳情</button>
+                <button
+                  type="button"
+                  class="cancel-row-button"
+                  [disabled]="application.accountStatus === 'DELETED' || cancellingId() === application.id"
+                  (click)="requestCancel(application)"
+                >
+                  {{ application.accountStatus === 'DELETED' ? '已註銷' : (cancellingId() === application.id ? '註銷中...' : '註銷帳號') }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="empty-state">
+              <span class="empty-icon">⌕</span>
+              <strong>找不到符合條件的申請</strong>
+              <span>請嘗試更換關鍵字或審核狀態。</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer">
+    <span>顯示 {{ applications().length }} 筆申請資料</span>
+    <button type="button" class="clear-filter" (click)="clearFilters()">清除搜尋條件</button>
+  </div>
+</section>

@@ -171,6 +171,79 @@ h1 {
   font-size: 18px;
 }
 
+.platform-feed {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.feed-column {
+  padding: 20px;
+  border: 1px solid #eadfd4;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.feed-column h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.feed-column h2 i {
+  color: #e68a3a;
+}
+
+.feed-column ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feed-column li {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3ebe3;
+}
+
+.feed-column li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.feed-column time,
+.news-category {
+  color: #9a6a3b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.feed-column p,
+.feed-column strong {
+  margin: 4px 0 0;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.feed-column a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.feed-column a:hover strong {
+  color: #c86e21;
+}
+
+.news-category {
+  margin-left: 8px;
+}
+
 .urgent-needs-section {
   margin-top: 32px;
   padding: 24px;
@@ -438,6 +511,10 @@ h1 {
 }
 
 @media (max-width: 760px) {
+  .platform-feed {
+    grid-template-columns: 1fr;
+  }
+
   .dashboard-reminders {
     margin-bottom: 20px;
     padding-bottom: 20px;

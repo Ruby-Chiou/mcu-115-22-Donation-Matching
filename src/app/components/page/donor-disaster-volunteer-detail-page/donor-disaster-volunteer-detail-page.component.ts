@@ -1,12 +1,16 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 
+import { BeneficiaryPublicProfileService } from '../../../core/services/agency/beneficiary-public-profile.service';
+import { BeneficiaryPanelComponent } from '../../card/beneficiary-panel/beneficiary-panel.component';
+import { AGENCY_OFFICE } from '../../../models/user/agency';
 import { VolunteerDemandService } from '../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand } from '../../../models/agency/volunteer-demand';
 import { VolunteerCommentService, VolunteerComment } from '../../../core/services/comments/volunteer-comment.service';
+import { AuthRedirectService } from '../../../core/services/auth/auth-redirect.service';
 
 interface CommentThreadNode {
   comment: VolunteerComment;
@@ -16,11 +20,17 @@ interface CommentThreadNode {
 
 @Component({
   selector: 'app-donor-disaster-volunteer-detail-page',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BeneficiaryPanelComponent],
   templateUrl: './donor-disaster-volunteer-detail-page.component.html',
   styleUrl: './donor-disaster-volunteer-detail-page.component.scss',
 })
 export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
+  private readonly authRedirect = inject(AuthRedirectService);
+  protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
+
+  get beneficiary() {
+    return this.beneficiaryProfiles.findForPlace(AGENCY_OFFICE.agencyName, this.volunteer?.location ?? '');
+  }
   volunteer?: VolunteerDemand;
   isLoading = true;
   loadError = '';
@@ -40,7 +50,10 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
     console.log('[志工詳細頁] route id：', id);
 
     try {
-      const volunteer = await this.volunteerDemandService.getDemandById(id);
+      const [volunteer] = await Promise.all([
+        this.volunteerDemandService.getDemandById(id),
+        this.beneficiaryProfiles.ensureLoaded(),
+      ]);
 
       if (!volunteer) {
         this.loadError = '找不到此筆志工需求。';
@@ -73,7 +86,7 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
       return;
     }
 
-    this.router.navigate(['/donor/disaster/volunteer/form', id]);
+    void this.authRedirect.openDonorAction(`/donor/disaster/volunteer/form/${id}`);
   }
   // 返回志工需求清單
 

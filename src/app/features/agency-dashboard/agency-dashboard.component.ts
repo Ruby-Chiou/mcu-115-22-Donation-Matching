@@ -1,12 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { PLATFORM_ANNOUNCEMENTS, PLATFORM_NEWS } from '../../core/content/platform-feed';
 import {
   AgencyDashboardService,
   AgencyDashboardSummary,
   DashboardReminderGroup,
   UrgentDailyNeed,
 } from '../../core/services/agency-dashboard/agency-dashboard.service';
+import { DisasterControlService } from '../../core/services/disaster-control/disaster-control.service';
 
 interface DashboardCard {
   title: string;
@@ -29,6 +31,15 @@ interface DashboardCard {
   styleUrl: './agency-dashboard.component.scss',
 })
 export class AgencyDashboardComponent implements OnInit {
+  private readonly disaster = inject(DisasterControlService);
+
+  protected readonly announcements = PLATFORM_ANNOUNCEMENTS;
+  protected readonly latestNews = PLATFORM_NEWS;
+
+  protected get disasterOpen(): boolean {
+    return this.disaster.data().isOpen;
+  }
+
   cards: DashboardCard[] = [
     {
       title: '日常需求',
@@ -63,11 +74,12 @@ export class AgencyDashboardComponent implements OnInit {
     {
       title: '待確認收件',
       value: null,
-      unit: '',
-      description: '功能建置中',
+      unit: '筆',
+      description: '正在載入…',
+      route: '/agency/delivery-confirm',
       icon: 'fa-solid fa-truck',
       type: 'normal',
-      isAvailable: false,
+      isAvailable: true,
     },
     {
       title: '災害需求',
@@ -165,24 +177,35 @@ export class AgencyDashboardComponent implements OnInit {
     this.cards = this.cards.map((card) => {
       switch (card.title) {
         case '日常需求':
-          return {
-            ...card,
-            value: summary.dailyDemandCount,
-            description: '目前已上架的日常需求',
-          };
+          return summary.dailyDemandCount === null
+            ? { ...card, value: null, description: '資料載入失敗' }
+            : {
+                ...card,
+                value: summary.dailyDemandCount,
+                description: '目前已上架的日常需求',
+              };
 
         case '待審核物資':
-          return {
-            ...card,
-            value: summary.pendingItemReviewCount,
-            description: '等待機構人工決定',
-          };
+          return summary.pendingItemReviewCount === null
+            ? { ...card, value: null, description: '資料載入失敗' }
+            : {
+                ...card,
+                value: summary.pendingItemReviewCount,
+                description: '需要人工審核',
+              };
 
         case '待審核發票':
           return {
             ...card,
             value: summary.pendingReceiptReviewCount,
             description: '待開立收據或上傳感謝狀',
+          };
+
+        case '待確認收件':
+          return {
+            ...card,
+            value: summary.pendingReceivingCount,
+            description: '已通過、貨到後可以簽收',
           };
 
         case '災害需求':

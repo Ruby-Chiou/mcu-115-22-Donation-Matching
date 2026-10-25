@@ -2,6 +2,10 @@
   <h1>會員專區</h1>
 </div>
 
+@if (companyNotice()) {
+  <p class="company-notice" role="status">{{ companyNotice() }}</p>
+}
+
 <div class="switch-area" role="tablist">
   <button
     type="button"

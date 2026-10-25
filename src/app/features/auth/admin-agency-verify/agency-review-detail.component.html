@@ -1,0 +1,159 @@
+@if (application(); as application) {
+  <div class="modal-backdrop" (click)="closed.emit()">
+    <section
+      class="review-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="review-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="modal-header">
+        <div>
+          <span class="eyebrow">APPLICATION REVIEW</span>
+          <h2 id="review-title">機構申請詳情</h2>
+        </div>
+        <button type="button" class="close-button" aria-label="關閉視窗" (click)="closed.emit()">×</button>
+      </header>
+
+      <div class="modal-body">
+        <div class="application-summary">
+          <span class="agency-avatar large-avatar">{{ application.name.charAt(0) }}</span>
+          <div>
+            <h3>{{ application.name }}</h3>
+            <span class="status-badge" [class]="statusClass(application)">
+              <span class="status-dot"></span>
+              {{ statusText(application) }}
+            </span>
+          </div>
+        </div>
+
+        <h4 class="section-title">註冊資料</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><span>登入信箱</span><strong>{{ application.email || '未填' }}</strong></div>
+          <div class="detail-item"><span>申請日期</span><strong>{{ application.submittedAt || '未填' }}</strong></div>
+          <div class="detail-item"><span>機構名稱</span><strong>{{ application.name }}</strong></div>
+          <div class="detail-item"><span>統一編號</span><strong>{{ application.registrationNumber }}</strong></div>
+          <div class="detail-item"><span>負責人姓名</span><strong>{{ application.representative }}</strong></div>
+          <div class="detail-item"><span>機構聯絡電話</span><strong>{{ application.phone }}</strong></div>
+          <div class="detail-item full-width"><span>機構預設地址</span><strong>{{ application.defaultAddress }}</strong></div>
+          <div class="detail-item"><span>經辦人姓名</span><strong>{{ application.contact }}</strong></div>
+          <div class="detail-item"><span>職稱</span><strong>{{ application.contactPersonTitle }}</strong></div>
+          <div class="detail-item"><span>所屬部門</span><strong>{{ application.department }}</strong></div>
+          <div class="detail-item"><span>經辦人電話</span><strong>{{ application.contactPersonPhone }}</strong></div>
+          <div class="detail-item"><span>經辦人信箱</span><strong>{{ application.contactPersonEmail }}</strong></div>
+          <div class="detail-item"><span>同意聯絡確認</span><strong>{{ application.consentToContact ? '已同意' : '未同意' }}</strong></div>
+          <div class="detail-item"><span>服務條款</span><strong>{{ application.agreeToTerms ? '已同意' : '未同意' }}</strong></div>
+          <div class="detail-item"><span>帳號狀態</span><strong>{{ application.accountStatus === 'DELETED' ? '已註銷' : '使用中' }}</strong></div>
+        </div>
+
+        <h4 class="section-title">資格證明文件</h4>
+        <div class="document-card">
+          <span class="document-icon">檔</span>
+          <div class="document-info">
+            <strong>{{ application.documentName }}</strong>
+            <small>{{ application.documentStored ? '檔案已上傳，可開啟核對' : '這筆只留下檔名，沒有檔案本體' }}</small>
+          </div>
+          <button type="button" class="document-open" [disabled]="!application.documentStored || openingDocument" (click)="openDocument()">
+            {{ openingDocument ? '開啟中...' : '查看文件' }}
+          </button>
+        </div>
+        @if (preview.url) {
+          <div class="document-preview">
+            @if (preview.type.startsWith('image/')) {
+              <img [src]="preview.url" [alt]="preview.name" />
+            } @else {
+              <iframe [src]="preview.url" [title]="preview.name"></iframe>
+            }
+            <a [href]="preview.url" [download]="preview.name">下載檔案</a>
+          </div>
+        }
+        @if (documentError) {
+          <p class="document-notice">{{ documentError }}</p>
+        }
+        @if (!application.documentStored) {
+          <p class="document-notice">這是改版前送出的申請，系統當時沒有把檔案存下來，所以無法打開。</p>
+        }
+
+        <h4 class="section-title">公開資料與電話核對</h4>
+        <p class="method">
+          資格不是寄確認信、讓對方點連結就通過。請用上面的機構名稱、統一編號到下列公認網站查這間機構是否存在，再撥打該網站上寫的電話。註冊表自己填的電話只拿來對照，不能代替網站公布的電話。
+        </p>
+        <ul class="registries">
+          @for (registry of registries; track registry.url) {
+            <li>
+              <a [href]="registry.url" target="_blank" rel="noopener noreferrer">{{ registry.name }}</a>
+              <span>{{ registry.hint }}</span>
+            </li>
+          }
+        </ul>
+        <fieldset>
+          <legend>三項都核對後才能通過</legend>
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="organizationFound" name="organizationFound" />
+            <span>已在公開查詢網站找到這間機構，名稱與統一編號相符</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="calledPublishedPhone" name="calledPublishedPhone" />
+            <span>已撥打該網站公布的電話，不是只撥註冊表上的電話</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="registrantConfirmed" name="registrantConfirmed" />
+            <span>對方確認註冊人任職於該機構，且承認有向本平台註冊</span>
+          </label>
+        </fieldset>
+
+        <div class="review-note">
+          <label for="reviewReason">
+            查核紀錄
+            <span>（通過、補件、未通過或註銷時必填）</span>
+          </label>
+          <textarea
+            id="reviewReason"
+            [(ngModel)]="reviewReason"
+            name="reviewReason"
+            rows="3"
+            placeholder="寫下查詢的網站、接聽人、通話時間，以及機構、註冊人、本平台註冊是否都確認。"
+          ></textarea>
+        </div>
+        @if (decisionError) {
+          <p class="decision-error" role="alert">{{ decisionError }}</p>
+        }
+      </div>
+
+      <footer class="modal-footer">
+        <button
+          type="button"
+          class="action-button cancel-account-button"
+          [disabled]="application.accountStatus === 'DELETED' || cancelling() || !reviewReason.trim()"
+          (click)="requestCancel()"
+        >
+          {{ application.accountStatus === 'DELETED' ? '已註銷' : (cancelling() ? '註銷中...' : '註銷帳號') }}
+        </button>
+        <button
+          type="button"
+          class="action-button reject-button"
+          [disabled]="application.accountStatus === 'DELETED' || !reviewReason.trim()"
+          (click)="decide('rejected')"
+        >
+          駁回申請
+        </button>
+        <button
+          type="button"
+          class="action-button supplement-button"
+          [disabled]="application.accountStatus === 'DELETED' || !reviewReason.trim()"
+          (click)="decide('supplement')"
+        >
+          要求補件
+        </button>
+        <button
+          type="button"
+          class="action-button approve-button"
+          [disabled]="!canApprove(application)"
+          (click)="decide('approved')"
+        >
+          ✓ 通過審核
+        </button>
+      </footer>
+    </section>
+  </div>
+}

@@ -1,0 +1,146 @@
+<section class="delivery-page">
+  <header class="page-heading">
+    <h1>收件確認</h1>
+    <p>
+      這裡看得到捐助者審核通過後上傳的物流單號。貨到了就拍照回報，需要的話可以再錄一段影片。數量很多時不必全部拆箱。若選擇不錄影，要標明之後的爭議由捐助者與受助機構各自承擔。
+    </p>
+  </header>
+
+  @if (loadError) {
+    <p class="error" role="alert">{{ loadError }}</p>
+  }
+
+  @if (loading) {
+    <p class="muted">正在載入已通過的捐助…</p>
+  } @else {
+    <div class="layout">
+      <section class="list-panel">
+        <h2>待處理 {{ waiting().length }} 筆</h2>
+        <div class="shipment-scroll">
+        @for (shipment of shipments; track shipment.id) {
+          <button type="button" class="shipment" [class.active]="selected?.id === shipment.id" (click)="open(shipment)">
+            <strong>{{ shipment.actualMaterial }}</strong>
+            <span>{{ shipment.donorName }} · {{ shipment.quantity }} · {{ shipment.donationMethod || '未填方式' }}</span>
+            @if (shipment.donationMethod === '寄送') {
+              <span class="tracking">{{ shipment.trackingNo || '還沒有物流單號' }}</span>
+            } @else {
+              <span class="tracking">面交，不必等物流單號</span>
+            }
+            <em>{{ shipment.receiptConfirmedAt ? '已簽收' : (ready(shipment) ? '可以簽收' : '等捐助者上傳單號') }}</em>
+          </button>
+        } @empty {
+          <p class="muted">目前沒有審核通過的捐助。</p>
+        }
+        </div>
+      </section>
+
+      <section class="detail-panel">
+        @if (selected; as shipment) {
+          <h2>{{ shipment.actualMaterial }}</h2>
+          <app-donation-record-links [donationId]="shipment.id" current="delivery" />
+          <dl>
+            <div><dt>捐助者</dt><dd>{{ shipment.donorName }}</dd></div>
+            <div><dt>電話</dt><dd>{{ shipment.phone || '未填' }}</dd></div>
+            <div><dt>數量</dt><dd>{{ shipment.quantity }}</dd></div>
+            <div><dt>方式</dt><dd>{{ shipment.donationMethod || '未填' }}</dd></div>
+            <div>
+              <dt>物流單號</dt>
+              <dd>
+                @if (shipment.donationMethod === '寄送') {
+                  {{ shipment.trackingNo || '捐助者尚未上傳' }}
+                } @else {
+                  面交沒有物流單號
+                }
+              </dd>
+            </div>
+            @if (shipment.note) {
+              <div class="wide"><dt>捐助備註</dt><dd>{{ shipment.note }}</dd></div>
+            }
+          </dl>
+
+          @if (shipment.receiptConfirmedAt) {
+            <p class="done">已於 {{ shipment.receiptConfirmedAt | date: 'yyyy/MM/dd HH:mm' }} 簽收。</p>
+            @if (shipment.receiptPartial) {
+              <p>數量較多，這次沒有全部拆箱拍攝。</p>
+            }
+            @if (shipment.receiptDeclinedVideo) {
+              <p class="warning">這次沒有錄影。之後若有爭議，捐助者與受助機構各自承擔。</p>
+            }
+            @if (shipment.receiptNote) {
+              <p>{{ shipment.receiptNote }}</p>
+            }
+            <div class="proofs">
+              @for (file of proofs; track file.id) {
+                @if (file.fileType === 'receipt_image') {
+                  <img [src]="file.url" [alt]="file.name" />
+                } @else {
+                  <video [src]="file.url" controls></video>
+                }
+              }
+            </div>
+          } @else if (!ready(shipment)) {
+            <p class="warning">這筆是寄送，但捐助者還沒有上傳物流單號。單號出現之後才能簽收。</p>
+          } @else {
+            <form (submit)="$event.preventDefault(); submit()">
+              <label class="upload">
+                收貨照片
+                <input type="file" accept="image/*" multiple (change)="onPhotos($event)" />
+              </label>
+              @if (photos.length > 0) {
+                <ul>
+                  @for (photo of photos; track photo.name; let index = $index) {
+                    <li>
+                      {{ photo.name }}
+                      <button type="button" (click)="removePhoto(index)">移除</button>
+                    </li>
+                  }
+                </ul>
+              }
+              <p class="hint">箱子很多時，拍外箱、單號和其中幾箱內容就好，不必全部拆開。</p>
+              <label class="check">
+                <input type="checkbox" [checked]="partial" (change)="partial = $any($event.target).checked" />
+                <span>數量較多，這次沒有全部拆箱拍攝</span>
+              </label>
+
+              <label class="upload">
+                收貨影片（可不傳）
+                <input type="file" accept="video/*" (change)="onVideo($event)" />
+              </label>
+              @if (video) {
+                <p>
+                  {{ video.name }}
+                  <button type="button" (click)="clearVideo()">移除影片</button>
+                </p>
+              }
+
+              @if (!video) {
+                <label class="check warning-check">
+                  <input type="checkbox" [checked]="declinedVideo" (change)="declinedVideo = $any($event.target).checked" />
+                  <span>我不錄影。之後若對數量、品項或損壞有爭議，捐助者與受助機構各自承擔。</span>
+                </label>
+              }
+
+              <label>
+                補充說明
+                <textarea rows="2" [value]="note" (input)="note = $any($event.target).value" placeholder="例如只拆了其中兩箱，其餘外箱完整"></textarea>
+              </label>
+
+              @if (formError) {
+                <p class="error" role="alert">{{ formError }}</p>
+              }
+
+              <button type="submit" class="submit" [disabled]="submitting">
+                {{ submitting ? '上傳中...' : '送出簽收回報' }}
+              </button>
+            </form>
+          }
+        } @else if (missingId) {
+          <p class="warning">這筆捐助還沒有進入收件確認。審核通過之後才會出現在這裡。</p>
+          <app-donation-record-links [donationId]="missingId" current="delivery" />
+        } @else {
+          <p class="muted">請從左邊選擇一筆捐助。</p>
+        }
+      </section>
+    </div>
+  }
+</section>

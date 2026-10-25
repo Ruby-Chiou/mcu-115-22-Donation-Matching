@@ -2,44 +2,75 @@
   <div class="form-header">
     <div>
       <h2>捐助者註冊</h2>
-      <p>歡迎成為捐助者，填寫帳號與聯絡資訊。</p>
+      <p>個人與公司都在這裡註冊。公司名義要等管理者確認身分後才能捐助。</p>
     </div>
     <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
   </div>
 
+  <div class="kind-switch" role="tablist" aria-label="捐助名義">
+    <button type="button" role="tab" [class.active]="kind === 'individual'" (click)="setKind('individual')">個人名義</button>
+    <button type="button" role="tab" [class.active]="kind === 'company'" (click)="setKind('company')">公司名義</button>
+  </div>
+
   <div class="input-grid">
-    <div class="social-login">
-      <div class="social-row">
-        <p>或使用其他應用註冊</p>
-        <div class="social-buttons">
-          <button type="button" class="social-btn" (click)="socialRegister('google')">
-            Google<i class="fa-brands fa-google" style="color: #4285f4"></i>
-          </button>
-          <button type="button" class="social-btn" (click)="socialRegister('line')">
-            LINE<i class="fa-brands fa-line" style="color: #00c300"></i>
-          </button>
-          <button type="button" class="social-btn" (click)="socialRegister('facebook')">
-            Facebook
-            <i class="fa-brands fa-facebook" style="color: #1877f2"></i>
-          </button>
+    @if (kind === 'individual') {
+      <div class="social-login">
+        <div class="social-row">
+          <p>或使用其他應用註冊</p>
+          <div class="social-buttons">
+            <button type="button" class="social-btn" (click)="socialRegister('google')" [disabled]="submitting">
+              Google<i class="fa-brands fa-google" style="color: #4285f4"></i>
+            </button>
+            <button type="button" class="social-btn" (click)="socialRegister('line')" [disabled]="submitting">
+              LINE<i class="fa-brands fa-line" style="color: #00c300"></i>
+            </button>
+            <button type="button" class="social-btn" (click)="socialRegister('facebook')" [disabled]="submitting">
+              Facebook
+              <i class="fa-brands fa-facebook" style="color: #1877f2"></i>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    } @else {
+      <p class="kind-note">公司只能用帳號密碼註冊，完成後會把負責人的行動自然人憑證核發到這台裝置。身分是否真實，由管理者查公開公司登記並打電話確認，不是寄確認信到這個信箱。Google、LINE、Facebook 不開放給公司。</p>
+    }
 
     <label class="field full">
       <span>電子信箱</span>
       <input type="email" [(ngModel)]="donorForm.email" name="donorEmail" />
     </label>
 
-    <label class="field full">
-      <span>帳號名稱</span>
-      <input type="text" [(ngModel)]="donorForm.accountName" name="donorAccountName" />
-    </label>
-
-    <label class="field full">
-      <span>真實姓名</span>
-      <input type="text" [(ngModel)]="donorForm.fullName" name="fullName" />
-    </label>
+    @if (kind === 'individual') {
+      <label class="field full">
+        <span>帳號名稱</span>
+        <input type="text" [(ngModel)]="donorForm.accountName" name="donorAccountName" />
+      </label>
+      <label class="field full">
+        <span>真實姓名</span>
+        <input type="text" [(ngModel)]="donorForm.fullName" name="fullName" />
+      </label>
+    } @else {
+      <label class="field full">
+        <span>公司名稱</span>
+        <input type="text" [(ngModel)]="donorForm.companyName" name="companyName" />
+      </label>
+      <label class="field full">
+        <span>統一編號</span>
+        <input type="text" [(ngModel)]="donorForm.taxId" name="taxId" inputmode="numeric" maxlength="8" />
+      </label>
+      <label class="field full">
+        <span>負責人姓名</span>
+        <input type="text" [(ngModel)]="donorForm.representative" name="representative" />
+      </label>
+      <label class="field full">
+        <span>公司地址</span>
+        <input type="text" [(ngModel)]="donorForm.address" name="address" />
+      </label>
+      <label class="field full">
+        <span>公司登記文件</span>
+        <input type="file" name="companyDocument" (change)="onDocument($event)" />
+      </label>
+    }
 
     <label class="field full">
       <span>聯絡電話</span>
@@ -64,8 +95,8 @@
   </div>
 
   <div class="button-row">
-    <button type="submit" class="primary-btn">送出註冊</button>
+    <button type="submit" class="primary-btn" [disabled]="submitting">{{ submitting ? '送出中...' : '送出註冊' }}</button>
   </div>
 
-  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+  <p class="submit-message" [class.is-error]="isError" *ngIf="submitMessage">{{ submitMessage }}</p>
 </form>

@@ -39,6 +39,10 @@
     <p class="notice-text" role="status">{{ notice() }}</p>
   }
 
+  @if (linkedMissing()) {
+    <p class="error-text" role="status">這筆捐助還沒有進入捐助發票。審核通過之後才會留在這裡。</p>
+  }
+
   @if (isLoading()) {
     <p class="state-text">清單載入中...</p>
   } @else {
@@ -67,7 +71,7 @@
           </thead>
           <tbody>
             @for (task of filteredTasks(); track task.donationId; let index = $index) {
-              <tr>
+              <tr [id]="'donation-' + task.donationId" [class.linked]="linkedId() === task.donationId">
                 <td class="serial-column">{{ index + 1 }}</td>
                 <td>{{ task.donorName || '未填姓名' }}</td>
                 <td class="item-column" [title]="task.actualMaterial || task.demandItem">
@@ -102,6 +106,12 @@
                       <span class="muted">—</span>
                     }
                   </div>
+                  <app-donation-record-links
+                    [donationId]="task.donationId"
+                    current="receipt"
+                    [showCurrent]="false"
+                    [showLabel]="false"
+                  />
                 </td>
               </tr>
             }

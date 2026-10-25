@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-export type UserRole = 'donor' | 'agency';
+import { LoginPortal } from '../../../models/auth/app-role';
 
 @Component({
   selector: 'app-role-selector',
@@ -11,10 +11,11 @@ export type UserRole = 'donor' | 'agency';
 export class RoleSelectorComponent {
   @Input() title = '';
   @Input() description = '';
+  @Input() showAdmin = false;
 
-  @Output() roleSelected = new EventEmitter<UserRole>();
+  @Output() roleSelected = new EventEmitter<LoginPortal>();
 
-  selectRole(role: UserRole): void {
+  selectRole(role: LoginPortal): void {
     this.roleSelected.emit(role);
   }
 }

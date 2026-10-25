@@ -1,17 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { RoleSelectorComponent } from '../../../components/auth/role-selector/role-selector.component';
 import { DonorLoginComponent } from '../../../components/auth/donor-login/donor-login.component';
 import { AgencyLoginComponent } from '../../../components/auth/agency-login/agency-login.component';
 import { ForgotPasswordComponent } from '../../../components/auth/forgot-password/forgot-password.component';
+import { LoginPortal } from '../../../models/auth/app-role';
 
-type UserRole = 'donor' | 'agency';
+type UserRole = LoginPortal;
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, RouterLink, RoleSelectorComponent, DonorLoginComponent, AgencyLoginComponent, ForgotPasswordComponent],
+  imports: [CommonModule, RoleSelectorComponent, DonorLoginComponent, AgencyLoginComponent, ForgotPasswordComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })

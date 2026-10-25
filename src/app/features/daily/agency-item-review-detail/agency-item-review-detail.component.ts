@@ -8,12 +8,13 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { DonationService } from '../../../core/services/agency-daily-demand/daily-donation.service';
 
+import { DonationRecordLinksComponent } from '../../agency-record-links/donation-record-links.component';
 import { DonationFile, RecipientDonationReview } from '../../../models/agency/item-review';
 
 @Component({
   selector: 'app-agency-item-review-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DonationRecordLinksComponent],
   templateUrl: './agency-item-review-detail.component.html',
   styleUrl: './agency-item-review-detail.component.scss',
 })
@@ -178,8 +179,16 @@ export class AgencyItemReviewDetailComponent implements OnInit {
     this.humanReasonControl.reset('');
   }
 
+  get hasMaterialMedia(): boolean {
+    return this.imageFiles.length > 0 || this.videoFiles.length > 0;
+  }
+
   async acceptDonation(): Promise<void> {
     if (!this.donation || this.isSubmittingDecision || this.donation.status !== 'pending_human_review') {
+      return;
+    }
+
+    if (this.imageFiles.length === 0) {
       return;
     }
 

@@ -14,6 +14,7 @@
     <header class="detail-header">
       <div>
         <h1>{{ donation.demand_material }}</h1>
+        <app-donation-record-links [donationId]="donation.id" current="review" />
       </div>
 
       <span
@@ -58,9 +59,15 @@
     <section class="detail-section">
       <h2>AI 審核結果</h2>
 
-      <p>AI 判定： {{ getAiDecisionText( donation.ai_decision ) }}</p>
+      <p>AI 判定： {{ hasMaterialMedia ? getAiDecisionText( donation.ai_decision ) : '不通過' }}</p>
 
-      @if (donation.ai_reason) {
+      @if (!hasMaterialMedia) {
+      <div class="reason-box">
+        <h3>說明</h3>
+
+        <p>沒有上傳物資照片或影片，不能判定通過。</p>
+      </div>
+      } @else if (donation.ai_reason) {
       <div class="reason-box">
         <h3>說明</h3>
 
@@ -101,9 +108,7 @@
         <button
           type="button"
           class="accept-button"
-          [disabled]="
-                isSubmittingDecision
-              "
+          [disabled]="isSubmittingDecision || imageFiles.length === 0"
           (click)="acceptDonation()"
         >
           @if (isSubmittingDecision) { 處理中... } @else { 接受物資 }

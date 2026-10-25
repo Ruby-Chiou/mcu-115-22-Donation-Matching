@@ -61,6 +61,18 @@
         <a routerLink="/daily/locations">
           捐助地圖
         </a>
+
+        <a routerLink="/donor/beneficiaries">
+          受助機構
+        </a>
+
+        <a routerLink="/intro">
+          平台介紹
+        </a>
+
+        <a routerLink="/platform-guide">
+          平台導覽
+        </a>
       </div>
 
 
@@ -68,14 +80,21 @@
       <div class="footer-column">
         <h3>平台服務</h3>
 
-        <a routerLink="/login">
-          <i class="fa-solid fa-right-to-bracket"></i>
-          登入
-        </a>
+        @if (!signedIn) {
+          <a routerLink="/login">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            登入
+          </a>
 
-        <a routerLink="/register">
-          <i class="fa-solid fa-user-plus"></i>
-          註冊
+          <a routerLink="/register">
+            <i class="fa-solid fa-user-plus"></i>
+            註冊
+          </a>
+        }
+
+        <a [routerLink]="auth.principal().role === 'agency' ? '/agency/profile' : '/member'">
+          <i class="fa-solid fa-id-card"></i>
+          {{ auth.principal().role === 'agency' ? '機構資料' : '會員專區' }}
         </a>
 
 
@@ -94,11 +113,11 @@
     <div class="footer-bottom-container">
 
       <div class="footer-links">
-        <a href="#">隱私權政策</a>
+        <a routerLink="/legal/privacy">隱私權政策</a>
         <span>|</span>
-        <a href="#">網站使用條款</a>
+        <a routerLink="/legal/terms">網站使用條款</a>
         <span>|</span>
-        <a href="#">網站安全政策</a>
+        <a routerLink="/legal/security">網站安全政策</a>
       </div>
 
       <div class="copyright">

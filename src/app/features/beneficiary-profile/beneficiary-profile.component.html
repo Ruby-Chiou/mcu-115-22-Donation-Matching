@@ -1,0 +1,35 @@
+<section class="directory-page">
+  <header class="directory-header">
+    <p class="eyebrow">受助機構</p>
+    <h1>找找住家附近的受助單位</h1>
+    <p>先看機構照片與名稱，點進卡片才會看到公開的詳細資料。可用縣市篩出離你比較近的單位。</p>
+  </header>
+
+  @if (!ready()) {
+    <p class="empty">機構資料載入中...</p>
+  } @else if (loadError()) {
+    <p class="empty">{{ loadError() }}</p>
+  } @else {
+  <div class="city-filters" role="group" aria-label="依縣市篩選">
+    <button type="button" [class.active]="activeCity() === '全部'" (click)="selectCity('全部')">全部</button>
+    @for (city of cities(); track city) {
+      <button type="button" [class.active]="activeCity() === city" (click)="selectCity(city)">{{ city }}</button>
+    }
+  </div>
+
+  <div class="card-grid">
+    @for (profile of profiles(); track profile.organizationName) {
+      <a class="org-card" [routerLink]="['/donor/beneficiaries', profile.organizationName]">
+        <img [src]="profile.image" [alt]="profile.organizationName" />
+        <div class="org-card-body">
+          <span>{{ profile.city }}</span>
+          <h2>{{ profile.organizationName }}</h2>
+          <p>{{ profile.mission }}</p>
+        </div>
+      </a>
+    } @empty {
+      <p class="empty">這個縣市目前沒有可查看的受助機構。</p>
+    }
+  </div>
+  }
+</section>

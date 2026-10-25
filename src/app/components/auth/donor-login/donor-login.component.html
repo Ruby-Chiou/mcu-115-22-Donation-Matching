@@ -1,38 +1,68 @@
 <form class="login-form" (ngSubmit)="onSubmit()">
   <div class="form-header">
     <div>
-      <h2>捐助者登入</h2>
-      <p>歡迎登入，請輸入帳號與密碼。</p>
+      <h2>{{ heading }}</h2>
+      <p>{{ lead }}</p>
     </div>
     <button type="button" class="ghost-btn" (click)="onBackToRoleSelection()">切換身份</button>
   </div>
 
-  <div class="social-login">
+  <div class="kind-switch" role="tablist" aria-label="捐助名義">
+    <button type="button" role="tab" [class.active]="kind === 'individual'" [attr.aria-selected]="kind === 'individual'" (click)="setKind('individual')">
+      個人名義
+    </button>
+    <button type="button" role="tab" [class.active]="kind === 'company'" [attr.aria-selected]="kind === 'company'" (click)="setKind('company')">
+      公司名義
+    </button>
+  </div>
+
+  @if (kind === 'company') {
+    <p class="kind-note">公司請用帳號密碼，或使用負責人的行動自然人憑證。公司不能使用 Google、LINE、Facebook。管理者會查公開公司登記並打電話確認後，才開放捐助。</p>
+    @if (gateOpen) {
+      <app-natural-person-gate
+        [certificates]="certificateCards()"
+        successText="憑證驗證成功，正在登入企業捐助者。"
+        (verified)="onCertificateVerified($event)"
+        (cancelled)="closeCertificate()"
+      />
+    } @else {
+      <button type="button" class="cert-link" (click)="openCertificate()" [disabled]="submitting || certificateCards().length === 0">
+        <i class="fa-solid fa-fingerprint"></i>
+        使用行動自然人憑證登入
+      </button>
+      @if (certificateCards().length === 0) {
+        <p class="kind-note">這台裝置還沒有企業憑證。註冊公司時會核發到這台瀏覽器，目前請先用帳號密碼。</p>
+      }
+    }
+  }
+
+  <div class="social-login" *ngIf="showSocial && kind === 'individual' && !gateOpen">
     <div class="social-row">
       <p>或使用其它應用登入帳號</p>
       <div class="social-buttons">
-        <button type="button" class="social-btn google" (click)="socialRegister('google')">
+        <button type="button" class="social-btn google" (click)="socialRegister('google')" [disabled]="submitting">
           Google<i class="fa-brands fa-google" style="color: #4285f4"></i>
         </button>
-        <button type="button" class="social-btn line" (click)="socialRegister('line')">
+        <button type="button" class="social-btn line" (click)="socialRegister('line')" [disabled]="submitting">
           LINE<i class="fa-brands fa-line" style="color: #06c755"></i>
         </button>
-        <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')">
+        <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')" [disabled]="submitting">
           Facebook<i class="fa-brands fa-facebook" style="color: #1877f2"></i>
         </button>
       </div>
     </div>
   </div>
 
+  @if (!gateOpen) {
   <div class="input-grid">
     <label class="field full">
       <span>電子信箱</span>
-      <input type="email" [(ngModel)]="loginForm.email" name="email" required />
+      <input type="email" [(ngModel)]="loginForm.email" name="email" autocomplete="username" required />
     </label>
 
     <label class="field full">
       <span>密碼</span>
-      <input type="password" [(ngModel)]="loginForm.password" name="password" required />
+      <input type="password" [(ngModel)]="loginForm.password" name="password" autocomplete="current-password" required />
     </label>
   </div>
 
@@ -49,8 +79,9 @@
   </div>
 
   <div class="button-row">
-    <button type="submit" class="primary-btn">登入</button>
+    <button type="submit" class="primary-btn" [disabled]="submitting">{{ submitting ? '登入中...' : '登入' }}</button>
   </div>
+  }
 
-  <p class="submit-message" *ngIf="submitMessage">{{ submitMessage }}</p>
+  <p class="submit-message" *ngIf="submitMessage" [class.is-error]="isError">{{ submitMessage }}</p>
 </form>

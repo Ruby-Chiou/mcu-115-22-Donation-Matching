@@ -4,9 +4,13 @@ export const environment = {
   supabasePublishableKey: 'sb_publishable_iPIGLsEblhCVK6GwJKxZSw_bbPX0pHO',
 
   /**
-   * 尚未有 Auth session 時，會員專區暫時使用的開發用捐助者 uid。
-   * 必須與 supabase/seed.sql 的測試帳一致。
-   * 正式接上登入後應改為 null，並要求未登入導向 /login。
+   * 已改由登入工作階段決定 uid。保持 null，避免未登入時套用示範捐助者。
    */
-  memberDemoUid: 'dev-donor-001' as string | null,
+  memberDemoUid: null as string | null,
+
+  /**
+   * 捐助照片審核。開發時走 Angular proxy，正式站直接打後端。
+   * 後端再呼叫 OpenRouter，並把結果寫回資料庫。
+   */
+  aiReviewApiUrl: 'https://mcu-115-22-donation-matching-backend.onrender.com',
 };

@@ -3,7 +3,7 @@
   @if (images.length === 0) {
 
     <div class="no-image">
-      <span>物資圖片</span>
+      <span>{{ emptyLabel }}</span>
     </div>
 
   } @else {
@@ -24,7 +24,7 @@
       <div class="carousel-main">
         <img
           [src]="images[currentIndex]"
-          alt="物資圖片"
+          [alt]="imageAlt"
           class="main-image">
       </div>
 

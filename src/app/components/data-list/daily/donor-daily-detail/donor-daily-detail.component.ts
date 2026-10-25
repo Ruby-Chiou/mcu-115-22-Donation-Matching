@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,8 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { SupplyDetailCarouselComponent } from '../../../carousel/supply-detail-carousel/supply-detail-carousel.component';
+import { BeneficiaryPublicProfileService } from '../../../../core/services/agency/beneficiary-public-profile.service';
+import { BeneficiaryPanelComponent } from '../../../card/beneficiary-panel/beneficiary-panel.component';
 import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 import { DailyComment } from '../../../../core/services/comments/daily-comment.service';
+import { AuthRedirectService } from '../../../../core/services/auth/auth-redirect.service';
 
 interface CommentThreadNode {
   comment: DailyComment;
@@ -18,17 +21,33 @@ interface CommentThreadNode {
 @Component({
   selector: 'app-donor-daily-detail',
   standalone: true,
-  imports: [RouterLink, CommonModule, RouterModule, FormsModule, SupplyDetailCarouselComponent],
+  imports: [RouterLink, CommonModule, RouterModule, FormsModule, SupplyDetailCarouselComponent, BeneficiaryPanelComponent],
   templateUrl: './donor-daily-detail.component.html',
   styleUrl: './donor-daily-detail.component.scss',
 })
 export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000011';
+  private readonly authRedirect = inject(AuthRedirectService);
+  protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
   demand?: DailyDemand;
   currentImageIndex = 0;
   private imageTimer?: ReturnType<typeof setInterval>;
   isLoading = true;
   loadError = '';
+
+  get beneficiary() {
+    return this.beneficiaryProfiles.findForPlace(this.demand?.recipient ?? '', this.demand?.address ?? '');
+  }
+
+  requestDonate(): void {
+    const id = this.demand?.id;
+
+    if (id == null) {
+      return;
+    }
+
+    void this.authRedirect.openDonorAction(`/donor/daily/form/${id}`);
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -48,7 +67,7 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
     }
 
     try {
-      await this.loadDemandData(id);
+      await Promise.all([this.loadDemandData(id), this.beneficiaryProfiles.ensureLoaded()]);
 
       console.log('目前需求：', this.demand);
       console.log('圖片數量：', this.demand?.image?.length);

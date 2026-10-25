@@ -1,4 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 
 import { PublicGuideComponent } from '../../../components/platform-guide/public-guide/public-guide.component';
 import { DonorGuideComponent } from '../../../components/platform-guide/donor-guide/donor-guide.component';
@@ -19,26 +21,16 @@ type GuideType = 'donor' | 'agency' | null;
   styleUrl: './platform-guide.component.scss',
 })
 export class PlatformGuideComponent implements OnInit {
+  private readonly auth = inject(AuthSessionService);
 
   protected readonly currentRole = signal<GuideRole>('guest');
 
   protected readonly selectedGuide = signal<GuideType>(null);
 
-  ngOnInit(): void {
-    this.loadRole();
-  }
-
-  private loadRole(): void {
-    const savedRole =
-      localStorage.getItem('userRole') ??
-      localStorage.getItem('role');
-
-    if (savedRole === 'donor' || savedRole === 'agency') {
-      this.currentRole.set(savedRole);
-      return;
-    }
-
-    this.currentRole.set('guest');
+  async ngOnInit(): Promise<void> {
+    await this.auth.restore();
+    const role = this.auth.principal().role;
+    this.currentRole.set(role === 'donor' || role === 'agency' ? role : 'guest');
   }
 
   protected selectGuide(guide: 'donor' | 'agency'): void {

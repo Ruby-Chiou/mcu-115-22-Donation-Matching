@@ -4,7 +4,12 @@
   padding-bottom: 50px;
 }
 
-/* 上方主詳情與下方留言共用卡片外框 */
+app-beneficiary-panel {
+  max-width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .detail-info,
 .comment-section {
   width: 100%;
@@ -197,22 +202,6 @@
   background: #f3e8dc;
   color: #b86b2c;
   font-size: 14px;
-}
-
-.organization-intro {
-  width: 100%;
-  margin: 40px auto 0;
-
-  h3 {
-    margin-bottom: 16px;
-    font-size: 20px;
-  }
-
-  p {
-    line-height: 1.8;
-    color: #555;
-    text-align: left;
-  }
 }
 
 /* 留言區內部元素樣式 */

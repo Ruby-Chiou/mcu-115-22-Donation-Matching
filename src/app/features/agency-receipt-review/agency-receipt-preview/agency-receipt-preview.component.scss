@@ -6,9 +6,14 @@
 .toolbar {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 8px;
   margin-bottom: 16px;
+
+  app-donation-record-links {
+    margin-right: auto;
+  }
 }
 
 .ghost-btn,

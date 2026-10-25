@@ -159,6 +159,57 @@ header {
       }
     }
 
+    .identity-badge {
+      display: inline-flex;
+      align-items: center;
+      max-width: 280px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      .kind-mark {
+        flex: 0 0 auto;
+        margin-right: 6px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.22);
+        font-size: 12px;
+      }
+
+      &[data-role='donor'] {
+        background: #1565c0;
+      }
+
+      &[data-role='agency'] {
+        background: #2e7d32;
+      }
+
+      &[data-role='admin'] {
+        background: #6a1b9a;
+      }
+    }
+
+    .logout-btn {
+      border: 0;
+      background: transparent;
+      color: var(--color-text-main);
+      font: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: var(--color-brand-primary);
+      }
+    }
+
     .bell-link {
       position: relative;
       display: inline-flex;
