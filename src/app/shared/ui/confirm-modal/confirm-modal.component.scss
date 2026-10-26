@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 .modal-backdrop,
 .off-shelf-overlay,
 .on-shelf-overlay {
@@ -69,7 +71,7 @@ button {
   touch-action: manipulation;
 }
 
-@media (max-width: 767px) {
+@include bp.mobile {
   button {
     flex: 1 1 calc(50% - 12px);
   }
