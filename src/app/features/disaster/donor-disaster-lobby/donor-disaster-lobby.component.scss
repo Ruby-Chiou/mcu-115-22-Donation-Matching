@@ -1,10 +1,12 @@
+@use 'breakpoint' as bp;
+
 :host {
   width: 100%;
   overflow-x: hidden;
 }
 .title {
   text-align: center;
-  color: #005BAC;
+  color: var(--color-link);
 }
 .disaster-announcement {
   max-width: 1250px;
@@ -14,8 +16,8 @@
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  border-left: 5px solid #005bac;
-  background: #eff6ff;
+  border-left: 5px solid var(--color-link);
+  background: var(--bg-action-faint);
   color: var(--color-text-main);
   overflow: hidden;
 }
@@ -23,9 +25,9 @@
   flex-shrink: 0;
   margin: 0;
   padding-right: 20px;
-  color: #005bac;
-  font-size: 20px;
-  background: #eff6ff;
+  color: var(--color-link);
+  font-size: var(--font-size-20);
+  background: var(--bg-action-faint);
   z-index: 2;
 }
 .announcement-marquee {
@@ -49,7 +51,7 @@
 }
 .disaster-announcement .marquee {
   margin: 0;
-  line-height: 1.7;
+  line-height: var(--line-height-loose);
 }
 .disaster-announcement .marquee span {
   display: inline-block;
@@ -57,7 +59,7 @@
 }
 .disaster-announcement .scheduled-close {
   color: var(--color-text-muted);
-  font-size: 24px;
+  font-size: var(--font-size-24);
 }
 @keyframes announcement-marquee {
   from {
@@ -77,7 +79,7 @@
 .disaster-announcement .scheduled-close {
   margin-top: 8px;
   color: var(--color-text-muted);
-  font-size: 24px;
+  font-size: var(--font-size-24);
 }
 
 .disaster-announcement .marquee {
@@ -117,7 +119,7 @@
   max-width: 1250px;
   margin: 0 auto 30px auto;
   display: flex;
-  gap: 30px; /* 保持跟下方兩區塊之間的 gap 一模一樣 */
+  gap: var(--space-30); /* 保持跟下方兩區塊之間的 gap 一模一樣 */
 }
 
 /* 2. 左邊按鈕：對齊左側新聞區塊 (flex: 2) */
@@ -138,9 +140,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
-  font-weight: bold;
-  //border: 1px solid #ccc;
+  font-size: var(--font-size-24);
+  font-weight: var(--font-weight-bold);
+  color: inherit;
+  text-decoration: none;
+  //border: 1px solid var(--border-input);
   border-radius: 0px;
   background: transparent;
   box-sizing: border-box;
@@ -155,14 +159,14 @@ padding-left: 1100px;
   max-width: 1250px;
   margin: 0 auto;
   display: flex;
-  gap: 30px;
+  gap: var(--space-30);
 }
 
 /* 左側新聞 */
 .left-menu {
   flex: 2;
   height: 290px;
-  padding: 30px;
+  padding: var(--space-30);
 
   background-color: var(--bg-layer-1);
   border-radius: var(--border-radius-main);
@@ -178,7 +182,7 @@ padding-left: 1100px;
       width: 45%;
       height: 250px;
       overflow: hidden;
-      border-radius: 12px;
+      border-radius: var(--radius-12);
 
       img {
         width: 100%;
@@ -190,9 +194,9 @@ padding-left: 1100px;
     .card-text {
       flex: 1;
       color: var(--color-text-main);
-      font-size: 16px;
-      line-height: 1.8;
-      font-weight: 600;
+      font-size: var(--font-size-16);
+      line-height: var(--line-height-looser);
+      font-weight: var(--font-weight-semibold);
 
       .highlight {
         color: var(--color-text-muted);
@@ -205,20 +209,20 @@ padding-left: 1100px;
 .disaster-indicators {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-8);
   margin-top: 20px;
 
   .dot {
     width: 10px;
     height: 10px;
     background-color: #bdc3c7;
-    border-radius: 50%;
+    border-radius: var(--radius-circle);
     cursor: pointer;
 
     &.active {
       background-color: var(--color-brand-primary);
       width: 24px;
-      border-radius: 5px;
+      border-radius: var(--radius-5);
     }
   }
 }
@@ -228,10 +232,10 @@ padding-left: 1100px;
 flex: 1;        // 改成跟左側一樣比例
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-20);
   .info-card {
    flex: 1;        // 三個框平均分配高度
-  padding: 15px;
+  padding: var(--space-15);
 
     background-color: var(--bg-layer-1);
     border-radius: var(--border-radius-main);
@@ -242,14 +246,101 @@ flex: 1;        // 改成跟左側一樣比例
 
     h3 {
       margin: 0 0 10px;
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
 
     p {
       margin: 0;
-      font-size: 14px;
+      font-size: var(--font-size-14);
       color: var(--color-text-muted);
     }
+  }
+}
+
+@include bp.mobile {
+  .title {
+    margin: 8px var(--layout-page-padding) 16px;
+    font-size: var(--font-size-22);
+  }
+
+  .disaster-announcement {
+    height: auto;
+    margin: 0 var(--layout-page-padding) 16px;
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+
+  .disaster-announcement h2 {
+    padding-right: 0;
+    font-size: var(--font-size-16);
+  }
+
+  .announcement-marquee,
+  .disaster-announcement .marquee,
+  .disaster-announcement .marquee span {
+    white-space: normal;
+    animation: none;
+    padding-left: 0;
+  }
+
+  .announcement-marquee {
+    mask-image: none;
+    -webkit-mask-image: none;
+    width: 100%;
+  }
+
+  .disaster-announcement .scheduled-close,
+  .disaster-announcement .marquee {
+    font-size: var(--font-size-14);
+  }
+
+  .title-row,
+  .menu-container {
+    flex-direction: column;
+    max-width: none;
+    margin: 0 var(--layout-page-padding) 16px;
+    gap: var(--space-12);
+  }
+
+  .title-box {
+    height: auto;
+    min-height: 44px;
+    justify-content: flex-start;
+    font-size: var(--font-size-18);
+  }
+
+  .left-menu {
+    height: auto;
+    padding: var(--space-16);
+  }
+
+  .left-menu .news-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-12);
+  }
+
+  .left-menu .news-card .card-image {
+    width: 100%;
+    height: 180px;
+  }
+
+  .right-menu {
+    gap: var(--space-12);
+  }
+
+  .history-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border-radius: var(--border-radius-main);
+    background: var(--color-brand-primary);
+    color: var(--color-white);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
   }
 }
 

@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 .platform-guide-page {
   width: 100%;
   min-height: 100vh;
@@ -18,7 +20,7 @@
   background:
     linear-gradient(
       135deg,
-      #eaf4f8 0%,
+      var(--bg-action-mist) 0%,
       #f7fbfd 100%
     );
 
@@ -41,9 +43,9 @@
 
   color: var(--color-brand-primary);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 
   letter-spacing: 2px;
 }
@@ -56,7 +58,7 @@
 
   font-size: 42px;
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 
@@ -65,9 +67,9 @@
 
   color: var(--color-text-muted);
 
-  font-size: 18px;
+  font-size: var(--font-size-18);
 
-  line-height: 1.7;
+  line-height: var(--line-height-loose);
 }
 
 
@@ -118,9 +120,9 @@
 
   color: var(--color-text-main);
 
-  font-size: 30px;
+  font-size: var(--font-size-30);
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 
@@ -129,9 +131,9 @@
 
   color: var(--color-text-muted);
 
-  font-size: 16px;
+  font-size: var(--font-size-16);
 
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 // ==========================================
@@ -143,7 +145,7 @@
 
   grid-template-columns: repeat(2, 1fr);
 
-  gap: 18px;
+  gap: var(--space-18);
 
   margin-bottom: 30px;
 }
@@ -154,7 +156,7 @@
 
   align-items: center;
 
-  gap: 14px;
+  gap: var(--space-14);
 
   width: 100%;
 
@@ -164,15 +166,15 @@
 
   border: 1px solid var(--border-default);
 
-  border-radius: 18px;
+  border-radius: var(--radius-18);
 
   background-color: var(--color-white);
 
   color: var(--color-text-main);
 
-  font-size: 18px;
+  font-size: var(--font-size-18);
 
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 
   text-align: left;
 
@@ -199,13 +201,13 @@
 
   flex-shrink: 0;
 
-  border-radius: 14px;
+  border-radius: var(--radius-14);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 20px;
+  font-size: var(--font-size-20);
 }
 
 
@@ -217,7 +219,7 @@
 .guide-selector-button .arrow {
   color: var(--color-brand-primary);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
   transition: transform 0.2s ease;
 }
@@ -228,7 +230,7 @@
 
   border-color: var(--color-brand-primary);
 
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-raised);
 }
 
 
@@ -237,7 +239,7 @@
 
   background-color: #f1f8fb;
 
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-raised);
 }
 
 
@@ -250,7 +252,7 @@
 // RWD
 // ==========================================
 
-@media (max-width: 600px) {
+@include bp.mobile {
 
   .guide-hero {
     padding: 50px 20px;
@@ -258,12 +260,12 @@
 
 
   .guide-hero h1 {
-    font-size: 32px;
+    font-size: var(--font-size-32);
   }
 
 
   .guide-hero p {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
 
@@ -274,11 +276,11 @@
 
 
   .section-heading h2 {
-    font-size: 25px;
+    font-size: var(--font-size-25);
   }
 
 }
-@media (max-width: 700px) {
+@include bp.tablet {
 
   .guide-selector {
     grid-template-columns: 1fr;

@@ -7,7 +7,7 @@ import { SupplyDetailCarouselComponent } from '../../../../components/carousel/s
 import { BeneficiaryPublicProfileService } from '../../../../core/services/agency/beneficiary-public-profile.service';
 import { BeneficiaryPanelComponent } from '../../../../components/card/beneficiary-panel/beneficiary-panel.component';
 import { CommentAuthorChipComponent } from '../../../../components/comment/comment-author-chip.component';
-import { commentAuthor, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
+import { canDeleteOwnComment, commentAuthor, commentDeleteError, commentPreviewNotice, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
 import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
 import { AGENCY_OFFICE } from '../../../../models/user/agency';
 
@@ -122,11 +122,13 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
 
       console.log('[災害留言] 載入結果：', this.comments);
 
+      this.commentNotice = commentPreviewNotice(false);
       this.buildCommentThreads();
     } catch (error) {
       console.error('[災害留言] 載入留言失敗：', error);
 
       this.comments = [];
+      this.commentNotice = commentPreviewNotice(true);
       this.buildCommentThreads();
     }
   }
@@ -295,6 +297,26 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
       this.cdr.detectChanges();
     } catch (error) {
       console.error('[災害留言] 愛心操作失敗：', error);
+    }
+  }
+
+  canDelete(comment: DisasterComment): boolean {
+    return canDeleteOwnComment(comment, this.auth.principal().userId);
+  }
+
+  async deleteComment(comment: DisasterComment): Promise<void> {
+    if (!confirm('刪除這則留言？')) {
+      return;
+    }
+
+    try {
+      await this.disasterCommentService.deleteComment(comment.id);
+      if (this.demand?.id) {
+        await this.loadComments(this.demand.id);
+      }
+    } catch (error) {
+      this.commentNotice = commentDeleteError(error);
+      this.cdr.detectChanges();
     }
   }
 

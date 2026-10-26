@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: flex;
   flex-direction: column;
@@ -5,7 +7,7 @@
   width: 100%;
   height: calc(100dvh - 40px);
   min-height: 0;
-  color: #243447;
+  color: var(--color-text-slate-night);
 }
 
 :host *,
@@ -32,18 +34,18 @@ textarea {
 
 .page-heading h1 {
   margin: 0 0 clamp(6px, 0.7vh, 12px);
-  color: #1c3045;
+  color: var(--color-text-slate-night-2);
   font-size: clamp(28px, 2.6vh, 36px);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
 }
 
 .page-heading p,
 .hint,
 .muted {
   margin: 0;
-  color: #5d6e80;
+  color: var(--color-text-slate-blue);
   font-size: clamp(15px, 1.55vh, 17px);
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 .page-heading p {
@@ -62,9 +64,9 @@ textarea {
 .list-panel,
 .detail-panel {
   min-height: 0;
-  border: 1px solid #e6ecf2;
-  border-radius: 16px;
-  background: #fff;
+  border: 1px solid var(--bg-layer-1);
+  border-radius: var(--radius-16);
+  background: var(--color-white);
   padding: clamp(16px, 1.8vh, 28px) clamp(16px, 1.4vw, 28px);
 }
 
@@ -93,12 +95,12 @@ textarea {
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-4);
   margin: 0;
   padding: clamp(12px, 1.3vh, 18px) 14px;
-  border: 1px solid #e1e9f1;
-  border-radius: 12px;
-  background: #fff;
+  border: 1px solid var(--border-panel);
+  border-radius: var(--radius-12);
+  background: var(--color-white);
   color: inherit;
   line-height: 1.45;
   text-align: left;
@@ -109,18 +111,18 @@ textarea {
   }
 
   &.active {
-    border-color: #245c86;
-    background: #f5f9fc;
+    border-color: var(--color-text-steel);
+    background: var(--bg-panel-soft);
   }
 }
 
 .tracking {
-  color: #245c86;
-  font-weight: 700;
+  color: var(--color-text-steel);
+  font-weight: var(--font-weight-bold);
 }
 
 .shipment em {
-  color: #748294;
+  color: var(--color-text-slate-mid);
   font-style: normal;
   font-size: clamp(13px, 1.35vh, 15px);
 }
@@ -150,7 +152,7 @@ dl {
 
 dl > div {
   display: grid;
-  gap: 4px;
+  gap: var(--space-4);
   align-content: start;
   padding-bottom: clamp(8px, 0.8vh, 12px);
   border-bottom: 1px solid #eef2f6;
@@ -161,14 +163,14 @@ dl > div {
 }
 
 dt {
-  color: #8b98a6;
+  color: var(--color-text-gray-blue);
   font-size: clamp(13px, 1.3vh, 15px);
 }
 
 dd {
   margin: 0;
   font-size: clamp(16px, 1.65vh, 18px);
-  line-height: 1.4;
+  line-height: var(--line-height-snug);
 }
 
 form {
@@ -181,30 +183,30 @@ form {
 .check {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
   font-size: clamp(15px, 1.5vh, 17px);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 input[type='file'] {
-  font-size: 14px;
-  font-weight: 400;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
 }
 
 .check {
   flex-direction: row;
   align-items: flex-start;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 textarea {
   width: 100%;
   min-height: 0;
   padding: 10px 12px;
-  border: 1px solid #dce5ed;
-  border-radius: 8px;
-  font-size: 15px;
-  line-height: 1.5;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-8);
+  font-size: var(--font-size-15);
+  line-height: var(--line-height-normal);
 }
 
 .submit {
@@ -212,10 +214,10 @@ textarea {
   min-height: 44px;
   padding: 10px 22px;
   border: 0;
-  border-radius: 8px;
-  background: #245c86;
-  color: #fff;
-  font-weight: 700;
+  border-radius: var(--radius-8);
+  background: var(--color-text-steel);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 
   &:disabled {
@@ -225,7 +227,7 @@ textarea {
 }
 
 .error {
-  color: #a33b3b;
+  color: var(--color-error-brick);
 }
 
 .warning,
@@ -234,13 +236,13 @@ textarea {
 }
 
 .done {
-  color: #248653;
-  font-weight: 700;
+  color: var(--color-success-leaf);
+  font-weight: var(--font-weight-bold);
 }
 
 .proofs {
   display: grid;
-  gap: 12px;
+  gap: var(--space-12);
   margin-top: 12px;
 
   img,
@@ -248,12 +250,12 @@ textarea {
     width: 100%;
     max-height: clamp(180px, 24vh, 320px);
     object-fit: contain;
-    border-radius: 8px;
-    background: #f8fafc;
+    border-radius: var(--radius-8);
+    background: var(--bg-page);
   }
 }
 
-@media (max-width: 800px) {
+@include bp.tablet {
   :host {
     height: auto;
   }

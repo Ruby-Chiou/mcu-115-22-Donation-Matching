@@ -27,7 +27,7 @@ interface NotificationSettingsRow {
 }
 
 /**
- * 通知偏好：只負責讀寫設定，實際寄信由之後的後端／排程依此表執行。
+ * 通知偏好：站內開關影響小鈴鐺；寄信由資料庫排程，再交給 dispatch-member-mail。
  */
 @Injectable({
   providedIn: 'root',

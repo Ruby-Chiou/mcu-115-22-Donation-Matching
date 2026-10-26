@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 .agency-profile {
   width: min(980px, calc(100% - 32px));
   margin: 28px auto 72px;
@@ -5,30 +7,30 @@
 
 .page-head h1 {
   margin: 0 0 8px;
-  color: #163a53;
-  font-size: 32px;
+  color: var(--color-text-dark);
+  font-size: var(--font-size-32);
 }
 
 .eyebrow {
   margin: 0 0 6px;
-  color: #005bac;
-  font-weight: 700;
+  color: var(--color-link);
+  font-weight: var(--font-weight-bold);
 }
 
 .page-head p:last-child,
 .card-note,
 .agreed,
 .muted {
-  color: #5d7282;
-  line-height: 1.7;
+  color: var(--color-text-slate-blue);
+  line-height: var(--line-height-loose);
 }
 
 .card {
   margin-top: 22px;
   padding: 24px;
-  background: #fff;
-  border: 1px solid #d7e4ef;
-  border-radius: 16px;
+  background: var(--color-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-16);
   box-shadow: 0 8px 24px rgba(14, 52, 77, 0.05);
 }
 
@@ -36,25 +38,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .card-head h2 {
   margin: 0;
-  color: #163a53;
-  font-size: 22px;
+  color: var(--color-text-dark);
+  font-size: var(--font-size-22);
 }
 
 .card-head a {
-  color: #005bac;
-  font-weight: 700;
+  color: var(--color-link);
+  font-weight: var(--font-weight-bold);
   text-decoration: none;
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .field,
@@ -63,15 +65,15 @@
 .file-line {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-6);
 }
 
 .field span,
 .targets > span,
 .photos span,
 .file-line > span:first-child {
-  color: #27506b;
-  font-weight: 700;
+  color: var(--color-text-medium);
+  font-weight: var(--font-weight-bold);
 }
 
 .field.wide {
@@ -84,9 +86,9 @@ textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #c9d8e4;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   box-sizing: border-box;
-  color: #163a53;
+  color: var(--color-text-dark);
   font: inherit;
 }
 
@@ -107,7 +109,7 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .add-row input {
@@ -119,16 +121,16 @@ textarea {
 .ghost,
 .actions button {
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   font: inherit;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .chip {
   padding: 6px 12px;
-  background: #e7f1fb;
-  color: #005bac;
+  background: var(--bg-action-tint);
+  color: var(--color-link);
 }
 
 .ghost,
@@ -138,8 +140,8 @@ textarea {
 
 .ghost {
   width: fit-content;
-  background: #f4f8fb;
-  color: #005bac;
+  background: var(--bg-panel-soft);
+  color: var(--color-link);
 }
 
 .actions {
@@ -148,8 +150,8 @@ textarea {
 }
 
 .actions button {
-  background: #005bac;
-  color: #fff;
+  background: var(--color-link);
+  color: var(--color-white);
 }
 
 .actions button:disabled,
@@ -161,14 +163,14 @@ textarea {
 .photos {
   display: grid;
   grid-template-columns: 240px 1fr;
-  gap: 20px;
+  gap: var(--space-20);
 }
 
 .cover,
 .gallery figure {
   overflow: hidden;
-  border-radius: 12px;
-  background: #e7f1fb;
+  border-radius: var(--radius-12);
+  background: var(--bg-action-tint);
 }
 
 .cover {
@@ -188,7 +190,7 @@ textarea {
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .gallery figure {
@@ -198,17 +200,17 @@ textarea {
 .gallery figcaption {
   display: flex;
   justify-content: space-between;
-  gap: 6px;
-  padding: 6px;
+  gap: var(--space-6);
+  padding: var(--space-6);
 }
 
 .gallery button {
   border: 0;
   background: transparent;
-  color: #005bac;
+  color: var(--color-link);
   cursor: pointer;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .file-btn {
@@ -226,25 +228,25 @@ textarea {
 .locked {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: var(--space-12);
   margin: 0 0 16px;
 }
 
 .locked div {
   padding: 12px 14px;
-  border-radius: 12px;
-  background: #f7fbff;
+  border-radius: var(--radius-12);
+  background: var(--bg-form);
 }
 
 .locked dt {
-  color: #5d7282;
-  font-size: 13px;
+  color: var(--color-text-slate-blue);
+  font-size: var(--font-size-13);
 }
 
 .locked dd {
   margin: 4px 0 0;
-  color: #163a53;
-  font-weight: 700;
+  color: var(--color-text-dark);
+  font-weight: var(--font-weight-bold);
 }
 
 .check {
@@ -259,18 +261,18 @@ textarea {
 .state {
   margin-top: 16px;
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   background: #e8f6ee;
   color: #146c43;
 }
 
 .notice.error,
 .state.error {
-  background: #fdecea;
-  color: #b42318;
+  background: var(--bg-error-sand);
+  color: var(--color-error-strong);
 }
 
-@media (max-width: 760px) {
+@include bp.tablet {
   .grid,
   .photos,
   .locked {

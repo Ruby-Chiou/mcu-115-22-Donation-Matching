@@ -1,17 +1,19 @@
+@use 'breakpoint' as bp;
+
 .cert-gate {
   overflow: hidden;
-  border: 1px solid #d5e0ea;
-  border-radius: 16px;
-  background: #fff;
+  border: 1px solid var(--border-cool-strong);
+  border-radius: var(--radius-16);
+  background: var(--color-white);
 }
 
 .cert-bar {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-14);
   padding: 16px 18px;
-  background: #0b3a66;
-  color: #fff;
+  background: var(--color-text-navy);
+  color: var(--color-white);
 }
 
 .emblem {
@@ -19,9 +21,9 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: rgba(255, 255, 255, 0.12);
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .agency-name,
@@ -30,14 +32,14 @@
 }
 
 .agency-name {
-  font-size: 13px;
-  letter-spacing: 0.04em;
+  font-size: var(--font-size-13);
+  letter-spacing: var(--tracking-wide);
   opacity: 0.85;
 }
 
 .service-name {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
 }
 
 .cert-body {
@@ -46,20 +48,20 @@
 
 .cert-body h3 {
   margin: 0 0 6px;
-  color: #14324d;
-  font-size: 20px;
+  color: var(--color-text-dark);
+  font-size: var(--font-size-20);
 }
 
 .request-line {
   margin: 0 0 16px;
-  color: #526579;
-  line-height: 1.6;
+  color: var(--color-text-blue-gray);
+  line-height: var(--line-height-relaxed);
 }
 
 .meta,
 .cert-card dl {
   display: grid;
-  gap: 10px;
+  gap: var(--space-10);
   margin: 0;
 }
 
@@ -77,66 +79,66 @@
 
 .meta dt,
 .cert-card dt {
-  color: #6b7c8d;
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--color-text-slate-mid);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-semibold);
 }
 
 .meta dd,
 .cert-card dd {
   margin: 0;
-  color: #1d3348;
-  font-weight: 700;
+  color: var(--color-text-ink-blue);
+  font-weight: var(--font-weight-bold);
 }
 
 .status-panel {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
   min-height: 72px;
-  padding: 14px;
-  border-radius: 12px;
-  background: #f4f8fb;
-  color: #1d3348;
+  padding: var(--space-14);
+  border-radius: var(--radius-12);
+  background: var(--bg-panel-soft);
+  color: var(--color-text-ink-blue);
 }
 
 .status-panel p {
   margin: 0;
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 .status-panel.success {
   background: #eef8f1;
-  color: #1b5e20;
+  color: var(--color-success-dark);
 }
 
 .spinner {
   width: 22px;
   height: 22px;
   border: 3px solid #d5e3f0;
-  border-top-color: #0b3a66;
-  border-radius: 50%;
+  border-top-color: var(--color-text-navy);
+  border-radius: var(--radius-circle);
   animation: spin 0.8s linear infinite;
 }
 
 .fingerprint {
-  color: #0b3a66;
-  font-size: 28px;
+  color: var(--color-text-navy);
+  font-size: var(--font-size-28);
   animation: pulse 1s ease-in-out infinite;
 }
 
 .cert-choices {
   display: grid;
-  gap: 10px;
+  gap: var(--space-10);
   margin-bottom: 12px;
 }
 
 .cert-card {
   margin-bottom: 12px;
-  padding: 16px;
+  padding: var(--space-16);
   border: 1px solid #d7e4f0;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #f8fbfe 0%, #fff 100%);
+  border-radius: var(--radius-14);
+  background: linear-gradient(180deg, var(--bg-form) 0%, var(--color-white) 100%);
 }
 
 button.cert-card {
@@ -148,20 +150,20 @@ button.cert-card {
 }
 
 .cert-card.is-selected {
-  border-color: #0b3a66;
+  border-color: var(--color-text-navy);
   box-shadow: 0 0 0 2px rgba(11, 58, 102, 0.22);
 }
 
 .cert-kicker {
   margin: 0 0 4px;
-  color: #0b3a66;
-  font-size: 13px;
-  font-weight: 700;
+  color: var(--color-text-navy);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-bold);
 }
 
 .cert-card h4 {
   margin: 0 0 12px;
-  color: #14324d;
+  color: var(--color-text-dark);
 }
 
 .cert-card dl {
@@ -169,37 +171,40 @@ button.cert-card {
 }
 
 .valid {
-  color: #1b5e20;
+  color: var(--color-success-dark);
 }
 
 .hint {
   margin: 0 0 14px;
-  color: #526579;
-  font-size: 14px;
-  line-height: 1.6;
+  color: var(--color-text-blue-gray);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-relaxed);
 }
 
 .cert-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .confirm-btn,
 .cancel-btn {
-  border-radius: 999px;
+  min-height: 44px;
+  border-radius: var(--radius-pill);
   padding: 11px 16px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .confirm-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   border: 0;
-  background: #0b3a66;
-  color: #fff;
+  background: var(--color-text-navy);
+  color: var(--color-white);
 }
 
 .confirm-btn:disabled {
@@ -208,9 +213,9 @@ button.cert-card {
 }
 
 .cancel-btn {
-  border: 1px solid #d5e0ea;
-  background: #fff;
-  color: #526579;
+  border: 1px solid var(--border-cool-strong);
+  background: var(--color-white);
+  color: var(--color-text-blue-gray);
 }
 
 @keyframes spin {
@@ -225,9 +230,28 @@ button.cert-card {
   }
 }
 
-@media (max-width: 700px) {
+@include bp.tablet {
   .meta,
   .cert-card dl {
     grid-template-columns: 1fr;
+  }
+}
+
+@include bp.mobile {
+  .cert-body {
+    padding-bottom: 88px;
+  }
+
+  .cert-actions {
+    position: fixed;
+    right: 16px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 16px;
+    z-index: 30;
+    justify-content: flex-end;
+    padding: var(--space-12);
+    border-radius: var(--radius-16);
+    background: var(--color-white);
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.16);
   }
 }

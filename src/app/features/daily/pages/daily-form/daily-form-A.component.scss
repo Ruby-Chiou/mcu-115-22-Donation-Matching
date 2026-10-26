@@ -7,10 +7,10 @@
 h1 {
   margin: 28px 0 24px;
   text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: #1565c0;
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-4);
+  color: var(--color-action);
 }
 
 /*編輯頁需求編號*/
@@ -26,36 +26,36 @@ h1 {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background-color: #f0f4f9;
-  border: 1px solid #d0e1f9;
-  border-radius: 8px;
+  background-color: var(--bg-neutral);
+  border: 1px solid var(--bg-action-wash);
+  border-radius: var(--radius-8);
   padding: 8px 16px;
-  gap: 8px;
-  line-height: 1;
+  gap: var(--space-8);
+  line-height: var(--line-height-none);
 }
 
 .info-label {
-  font-size: 15px;
-  color: #5f6368;
-  font-weight: 500;
-  line-height: 1;
+  font-size: var(--font-size-15);
+  color: var(--color-text-graphite);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-none);
 }
 
 .info-value {
-  font-size: 15px;
+  font-size: var(--font-size-15);
   color: var(--color-brand-primary);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   font-family: monospace, sans-serif;
-  letter-spacing: 0.5px;
-  line-height: 1;
+  letter-spacing: var(--tracking-fine);
+  line-height: var(--line-height-none);
 }
 
 .form-box {
-  background: #fff;
-  border: 1px solid #e3ebf5;
-  border-radius: 16px;
-  padding: 30px !important;
-  box-shadow: 0 10px 28px rgb(21 101 192 / 8%);
+  background: var(--color-white);
+  border: 1px solid var(--bg-action-pale);
+  border-radius: var(--radius-16);
+  padding: var(--space-30) !important;
+  box-shadow: var(--shadow-card);
 }
 
 /*標籤*/
@@ -63,8 +63,8 @@ label {
   display: block;
   margin-bottom: 8px;
   color: var(--color-text-main);
-  font-weight: 500;
-  font-size: 17px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-17);
 }
 
 .form-box > label {
@@ -77,11 +77,11 @@ select,
 textarea {
   width: 100%;
   box-sizing: border-box;
-  padding: 12px;
+  padding: var(--space-12);
   margin-bottom: 20px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 16px;
+  border-radius: var(--radius-10);
+  border: 1px solid var(--border-muted);
+  font-size: var(--font-size-16);
 }
 
 textarea {
@@ -98,11 +98,11 @@ textarea {
 .item-input {
   width: 450px;
   min-height: 100px;
-  padding: 12px;
+  padding: var(--space-12);
   box-sizing: border-box;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 16px;
+  border-radius: var(--radius-10);
+  border: 1px solid var(--border-muted);
+  font-size: var(--font-size-16);
   resize: vertical;
 }
 
@@ -110,7 +110,7 @@ textarea {
 .quantity-box {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--space-15);
 }
 
 .quantity-box input {
@@ -124,9 +124,9 @@ textarea {
 
 .contact-time-title {
   margin-top: 5px !important;
-  font-size: 17px;
-  font-weight: 600;
-  color: #1a202c;
+  font-size: var(--font-size-17);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-near-black);
 }
 
 .unit-input {
@@ -151,20 +151,20 @@ textarea {
   width: 100%;
   min-height: 100px;
   box-sizing: border-box;
-  background-color: #ffffff;
-  border: 2px dashed #b0bec5;
-  border-radius: 10px;
-  padding: 20px;
+  background-color: var(--color-white);
+  border: 2px dashed var(--color-text-silver);
+  border-radius: var(--radius-10);
+  padding: var(--space-20);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .upload-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 /* 選擇圖片按鈕 */
@@ -172,21 +172,21 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-8);
   padding: 8px 16px;
-  background-color: #ffffff;
-  border: 1px solid #1565c0;
-  border-radius: 8px;
-  color: #1565c0;
-  font-size: 16px;
-  font-weight: 500;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-action);
+  border-radius: var(--radius-8);
+  color: var(--color-action);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   white-space: nowrap;
   transition: background-color 0.2s ease;
 }
 
 .image-upload-btn:hover {
-  background-color: #f0f7ff;
+  background-color: var(--bg-action-softer);
 }
 
 /* 隱藏原生檔案選擇 */
@@ -196,8 +196,8 @@ textarea {
 
 /* 上傳提示 */
 .image-upload-hint {
-  font-size: 14px;
-  color: #666666;
+  font-size: var(--font-size-14);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -206,7 +206,7 @@ textarea {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .selected-image {
@@ -217,24 +217,24 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #e8f3ff;
-  border: 1px solid #a6cffd;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  background-color: var(--bg-action-chip);
+  border: 1px solid var(--color-action-chip);
+  border-radius: var(--radius-8);
+  box-shadow: var(--shadow-faint);
 }
 
 .selected-image-name {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   padding: 6px 12px;
   margin: 0;
   background: transparent;
   border: none;
-  border-radius: 8px;
-  color: #1565c0;
-  font-size: 15px;
-  font-weight: 500;
+  border-radius: var(--radius-8);
+  color: var(--color-action);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -244,11 +244,11 @@ textarea {
 }
 
 .selected-image-name:hover {
-  background-color: #d0e5ff !important;
+  background-color: var(--bg-action-pale-2) !important;
   border-color: transparent !important;
-  color: #0d47a1 !important;
+  color: var(--color-action-dark) !important;
   padding: 6px 12px !important;
-  border-radius: 8px !important;
+  border-radius: var(--radius-8) !important;
   text-decoration: none !important;
 }
 
@@ -256,19 +256,19 @@ textarea {
 .remove-image-btn {
   flex-shrink: 0;
   padding: 5px 12px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  color: #dc2626;
-  font-size: 15px;
-  font-weight: 500;
+  background-color: var(--bg-error-pale);
+  border: 1px solid var(--border-error-soft);
+  border-radius: var(--radius-6);
+  color: var(--color-error-hot);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 .remove-image-btn:hover {
-  background-color: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c;
+  background-color: var(--bg-error-wash);
+  border-color: var(--color-error-pale);
+  color: var(--color-error-bold);
 }
 
 /*接收方式*/
@@ -276,11 +276,11 @@ textarea {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
   margin-bottom: 35px;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   box-sizing: border-box;
   width: fit-content;
 }

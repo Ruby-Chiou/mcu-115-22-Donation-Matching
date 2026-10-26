@@ -12,6 +12,10 @@ const PAGE_HEIGHT = 1754;
 const MARGIN = 72;
 const FONT = '"Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif';
 
+function themeColor(name: string): string {
+  return getComputedStyle(window.document.documentElement).getPropertyValue(name).trim();
+}
+
 /** 用系統中文字型把收據畫成一頁圖，再交給 PDF 組裝。版面只留文字與章印。 */
 export async function paintReceipt(document: DonationReceiptDocument): Promise<Uint8Array> {
   const canvas = window.document.createElement('canvas');
@@ -23,10 +27,10 @@ export async function paintReceipt(document: DonationReceiptDocument): Promise<U
     throw new Error('瀏覽器無法繪製收據');
   }
 
-  context.fillStyle = '#ffffff';
+  context.fillStyle = themeColor('--color-white');
   context.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
-  context.fillStyle = '#111111';
-  context.strokeStyle = '#111111';
+  context.fillStyle = themeColor('--color-text-print');
+  context.strokeStyle = themeColor('--color-text-print');
   context.lineWidth = 2;
   context.textBaseline = 'top';
   context.strokeRect(36, 36, PAGE_WIDTH - 72, PAGE_HEIGHT - 72);
@@ -94,9 +98,9 @@ function drawReceipt(
 
   drawSeals(context, orgSeal, officerSeal);
   context.font = `22px ${FONT}`;
-  context.fillStyle = '#333333';
+  context.fillStyle = themeColor('--color-text-body');
   context.fillText('本收據須經機構章與負責人簽章後生效。', MARGIN, 1648);
-  context.fillStyle = '#111111';
+  context.fillStyle = themeColor('--color-text-print');
 }
 
 function drawSection(context: CanvasRenderingContext2D, y: number, title: string, rows: string[]): number {

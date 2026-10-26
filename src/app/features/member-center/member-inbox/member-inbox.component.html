@@ -81,7 +81,7 @@
           <h3>{{ replyParentId() ? '回覆信件' : '撰寫新信' }}</h3>
 
           <label class="field">
-            <span>收件機構</span>
+            <span>{{ counterpartLabel() }}</span>
             <select formControlName="recipientUid">
               <option value="" disabled>請選擇機構</option>
               @for (contact of messageService.contacts(); track contact.uid) {
@@ -89,7 +89,7 @@
               }
             </select>
             @if (messageService.contacts().length === 0) {
-              <small class="hint">目前沒有往來過的機構，收到機構來信後即可回覆。</small>
+              <small class="hint">{{ emptyContactHint() }}</small>
             }
             @if (hasComposeError('recipientUid')) {
               <small class="field-error">請選擇收件機構</small>

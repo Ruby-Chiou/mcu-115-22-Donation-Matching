@@ -19,6 +19,7 @@ export class DonorDailyFilterComponent {
 
   @Output() filterChange = new EventEmitter<DailyFilter>();
 
+  filtersOpen = false;
   openFilter: string | null = null;
 
   selectedCategories: string[] = [];

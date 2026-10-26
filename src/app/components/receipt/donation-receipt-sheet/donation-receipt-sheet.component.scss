@@ -1,14 +1,16 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: block;
-  color: #111;
+  color: var(--color-text-print);
 }
 
 .paper {
   padding: 28px 32px;
   border: 1px solid #d7d7d7;
-  background: #fff;
-  font-size: 16px;
-  line-height: 1.5;
+  background: var(--color-white);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-normal);
 }
 
 h1,
@@ -19,14 +21,14 @@ p {
 
 h1 {
   margin-bottom: 12px;
-  font-size: 28px;
+  font-size: var(--font-size-28);
   letter-spacing: 0.2em;
   text-align: center;
 }
 
 h2 {
   margin-top: 16px;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 table {
@@ -38,19 +40,19 @@ table {
 th,
 td {
   padding: 8px 10px;
-  border: 1px solid #111;
+  border: 1px solid var(--color-text-print);
   text-align: left;
 }
 
 .totals {
   margin: 0 0 12px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 footer {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
+  gap: var(--space-16);
   margin-top: 18px;
 }
 
@@ -60,9 +62,9 @@ footer {
   justify-content: center;
   width: 110px;
   height: 110px;
-  border: 1px solid #111;
-  color: #b42318;
-  font-weight: 700;
+  border: 1px solid var(--color-text-print);
+  color: var(--color-error-strong);
+  font-weight: var(--font-weight-bold);
 
   img {
     width: 100%;
@@ -73,6 +75,23 @@ footer {
 
 .note {
   margin-top: 12px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-align: right;
+}
+
+@include bp.mobile {
+  .paper {
+    padding: var(--space-16);
+    overflow-x: auto;
+  }
+
+  h1 {
+    font-size: var(--font-size-22);
+    letter-spacing: 0.08em;
+  }
+
+  footer {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }

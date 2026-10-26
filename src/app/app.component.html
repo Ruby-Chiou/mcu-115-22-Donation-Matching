@@ -8,6 +8,13 @@
 
 <app-footer></app-footer>
 
+@if (showBackToTop()) {
+  <button type="button" class="back-to-top" (click)="backToTop()" aria-label="回到頂端">
+    <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+    頂端
+  </button>
+}
+
 @if (closedModal.isVisible()) {
 <div class="disaster-closed-modal-backdrop" role="presentation">
   <section

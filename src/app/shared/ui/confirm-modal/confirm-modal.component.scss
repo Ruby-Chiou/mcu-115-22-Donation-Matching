@@ -3,34 +3,45 @@
 .on-shelf-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: var(--z-modal);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    16px
+    max(16px, env(safe-area-inset-bottom));
   background: rgba(0, 0, 0, 0.45);
 }
 
 .modal-box,
 .off-shelf-modal,
 .on-shelf-modal {
-  width: min(460px, calc(100% - 40px));
+  width: min(460px, 100%);
+  max-height: calc(100dvh - 32px);
+  margin-block: auto;
+  box-sizing: border-box;
+  overflow: auto;
   padding: 28px 30px;
-  background: #fff;
-  border-radius: 16px;
+  background: var(--color-white);
+  border-radius: var(--radius-16);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   text-align: center;
 
   h2 {
     margin: 0 0 16px;
-    font-size: 22px;
-    color: #333;
+    font-size: var(--font-size-22);
+    color: var(--color-text-body);
   }
 
   p {
     margin: 10px 0;
-    font-size: 16px;
-    line-height: 1.7;
-    color: #555;
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-loose);
+    color: var(--color-text-quiet);
   }
 }
 
@@ -38,40 +49,52 @@
 .off-shelf-actions,
 .on-shelf-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  gap: var(--space-12);
   margin-top: 22px;
+  position: sticky;
+  bottom: 0;
+  background: var(--color-white);
 }
 
 button {
   min-width: 96px;
+  min-height: 44px;
   padding: 10px 16px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--font-size-15);
+  touch-action: manipulation;
+}
+
+@media (max-width: 767px) {
+  button {
+    flex: 1 1 calc(50% - 12px);
+  }
 }
 
 .cancel-btn,
 .back-btn {
   background: #eceff3;
-  color: #333;
+  color: var(--color-text-body);
 }
 
 .confirm-btn,
 .confirm-off-btn {
-  background: #b42318;
-  color: #fff;
+  background: var(--color-error-strong);
+  color: var(--color-white);
 }
 
 .hide-btn {
-  background: #0056b3;
-  color: #fff;
+  background: var(--color-link);
+  color: var(--color-white);
 }
 
 .hidden-status {
-  color: #0056b3;
-  font-weight: 700;
+  color: var(--color-link);
+  font-weight: var(--font-weight-bold);
 }
 
 .warning-text {
@@ -79,6 +102,6 @@ button {
 }
 
 .system-note {
-  font-size: 13px;
-  color: #777;
+  font-size: var(--font-size-13);
+  color: var(--color-text-subtle);
 }

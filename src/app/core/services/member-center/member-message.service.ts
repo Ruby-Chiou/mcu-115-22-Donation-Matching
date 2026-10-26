@@ -1,8 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { MemberMessage, MessageContact, MessageFolder, SendMessagePayload } from '../../../models/member/member-message';
+import { alertsInApp } from '../../../models/member/notification-settings';
 import { SupabaseService } from '../database/supabase.service';
 import { MemberMessageRow, mapRowToMemberMessage } from './member-message.mapper';
+import { MemberMailDispatchService } from './member-mail-dispatch.service';
+import { MemberNotificationSettingsService } from './member-notification-settings.service';
 import { MemberProfileService } from './member-profile.service';
 import { MemberSessionService } from './member-session.service';
 
@@ -19,13 +22,19 @@ export class MemberMessageService {
   private readonly supabaseService = inject(SupabaseService);
   private readonly session = inject(MemberSessionService);
   private readonly profileService = inject(MemberProfileService);
+  private readonly notifications = inject(MemberNotificationSettingsService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   private readonly inboxSignal = signal<MemberMessage[]>([]);
   private readonly sentSignal = signal<MemberMessage[]>([]);
 
   readonly inbox = this.inboxSignal.asReadonly();
   readonly sent = this.sentSignal.asReadonly();
-  readonly unreadCount = computed(() => this.inboxSignal().filter((message) => !message.isRead).length);
+  readonly unreadCount = computed(() => {
+    const inApp = this.notifications.settings()?.inApp ?? null;
+
+    return this.inboxSignal().filter((message) => !message.isRead && alertsInApp(message.category, inApp)).length;
+  });
 
   /** 可寄信對象：曾來信或曾寄信過的機構 */
   readonly contacts = computed<MessageContact[]>(() => {
@@ -142,6 +151,7 @@ export class MemberMessageService {
 
     const message = mapRowToMemberMessage(data as MemberMessageRow);
     this.sentSignal.update((messages) => [message, ...messages]);
+    void this.mail.sweep();
 
     return message;
   }

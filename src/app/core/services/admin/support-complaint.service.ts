@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 
 import { supportCategoryLabel } from '../../content/support-contact';
 import { SupabaseService } from '../database/supabase.service';
+import { MemberMailDispatchService } from '../member-center/member-mail-dispatch.service';
 import { MemberSessionService } from '../member-center/member-session.service';
 
 export type ComplaintStatus = 'open' | 'replied' | 'closed';
@@ -72,6 +73,7 @@ interface ReplyRow {
 export class SupportComplaintService {
   private readonly supabase = inject(SupabaseService);
   private readonly session = inject(MemberSessionService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   async submit(draft: SupportComplaintDraft): Promise<SupportComplaintSubmitResult> {
     const { data, error } = await this.supabase.client.functions.invoke('notify-support-complaint', {
@@ -178,6 +180,8 @@ export class SupportComplaintService {
 
       if (inboxError) {
         console.error('客訴回覆已保存，但沒有寫入會員收件匣：', inboxError);
+      } else {
+        void this.mail.sweep();
       }
     }
 

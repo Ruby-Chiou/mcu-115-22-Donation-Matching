@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 
 import { SupabaseService } from '../database/supabase.service';
+import { MemberMailDispatchService } from '../member-center/member-mail-dispatch.service';
 import { MemberSessionService } from '../member-center/member-session.service';
 import { DonorAccountRecord } from './donor-account-admin.service';
 
@@ -32,6 +33,7 @@ const DONATION_STATUS: Record<string, string> = {
 export class DonorActivityService {
   private readonly supabase = inject(SupabaseService);
   private readonly session = inject(MemberSessionService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   async sendMessage(donor: DonorAccountRecord, subject: string, content: string): Promise<void> {
     const authorUid = await this.session.getCurrentUid();
@@ -48,6 +50,8 @@ export class DonorActivityService {
     if (error) {
       throw error;
     }
+
+    void this.mail.sweep();
   }
 
   async repairDonation(id: string, fields: Record<string, string>): Promise<void> {

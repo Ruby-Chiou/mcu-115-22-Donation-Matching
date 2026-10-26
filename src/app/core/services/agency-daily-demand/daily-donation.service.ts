@@ -6,6 +6,7 @@ import { DonationFile, RecipientDonationReview } from '../../../models/agency/it
 import { SupabaseService } from '../database/supabase.service';
 import { MemberSessionService } from '../member-center/member-session.service';
 import { PublicDonationThankService } from '../member-center/public-donation-thank.service';
+import { MemberMailDispatchService } from '../member-center/member-mail-dispatch.service';
 
 type DonationFileType = 'material_image' | 'material_video';
 
@@ -46,6 +47,7 @@ export class DonationService {
 
   private readonly memberSession = inject(MemberSessionService);
   private readonly publicThanks = inject(PublicDonationThankService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   async createDonation(data: {
     demandId: number;
@@ -113,10 +115,15 @@ export class DonationService {
       })),
     ];
 
-    for (let index = 0; index < files.length; index += 1) {
-      const currentFile = files[index];
+    try {
+      for (let index = 0; index < files.length; index += 1) {
+        const currentFile = files[index];
 
-      await this.uploadDonationFile(donation.id, currentFile.file, currentFile.fileType, index);
+        await this.uploadDonationFile(donation.id, currentFile.file, currentFile.fileType, index);
+      }
+    } catch (error) {
+      await this.supabase.from(this.tableName).delete().eq('id', donation.id);
+      throw error;
     }
 
     return donation;
@@ -146,7 +153,7 @@ export class DonationService {
     const decision = payload?.aiDecision ?? payload?.AiDecision ?? '';
 
     if (!response.ok || (decision !== 'accepted' && decision !== 'rejected') || reason.length < 8) {
-      throw new Error(payload?.message || 'OpenRouter 審核沒有完成，這筆會停在 AI 審核');
+      throw new Error(payload?.message || '這次沒有辨識完成，機構會直接看照片確認。');
     }
 
     return {
@@ -459,6 +466,16 @@ export class DonationService {
       console.error('更新人工審核結果失敗：', error);
 
       throw error;
+    }
+
+    const { error: noticeError } = await this.supabase.rpc('notify_donation_review', {
+      p_donation_id: donationId,
+    });
+
+    if (noticeError) {
+      console.error('審核通知沒有送進收件匣：', noticeError);
+    } else {
+      void this.mail.sweep();
     }
 
     if (!isAccepted) {

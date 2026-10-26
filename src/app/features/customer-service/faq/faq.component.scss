@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 /* =====================
    FAQ 元件外層
 ===================== */
@@ -6,13 +8,13 @@
   width: 100%;
   min-height: calc(100dvh - 70px);
   overflow: visible;
-  background: #fff;
+  background: var(--color-white);
 }
 
 .customer-service-page {
   width: 100%;
   min-height: calc(100dvh - 70px);
-  background: #fff;
+  background: var(--color-white);
 }
 
 /* =====================
@@ -25,7 +27,7 @@
   min-height: calc(100dvh - 70px);
   padding: 0 72px 32px;
   box-sizing: border-box;
-  background: #fff;
+  background: var(--color-white);
 }
 
 /* =====================
@@ -39,16 +41,16 @@
 
 .panel-title h1 {
   margin: 0 0 8px;
-  color: #1f2937;
+  color: var(--color-text-ink);
   font-size: 36px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .panel-title p {
   margin: 0;
-  color: #8a94a3;
-  font-size: 15px;
-  line-height: 1.5;
+  color: var(--color-text-gray-blue);
+  font-size: var(--font-size-15);
+  line-height: var(--line-height-normal);
 }
 
 /* =====================
@@ -66,12 +68,12 @@
 .faq-tabs {
   display: flex;
   flex: 1;
-  gap: 8px;
+  gap: var(--space-8);
   min-width: 0;
-  padding: 5px;
+  padding: var(--space-5);
   box-sizing: border-box;
-  background: #f3f5f7;
-  border-radius: 12px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-12);
 }
 
 .faq-tab {
@@ -79,12 +81,12 @@
   min-height: 48px;
   padding: 12px 14px;
   color: #697586;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   background: transparent;
   border: none;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -94,25 +96,25 @@
 }
 
 .faq-tab:hover {
-  color: #374151;
-  background: #fff;
+  color: var(--color-text-charcoal);
+  background: var(--color-white);
 }
 
 .faq-tab.active-general {
-  color: #2563eb;
-  background: #fff;
+  color: var(--color-link-bright);
+  background: var(--color-white);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .faq-tab.active-donor {
-  color: #16805b;
-  background: #fff;
+  color: var(--color-success-jade);
+  background: var(--color-white);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .faq-tab.active-recipient {
-  color: #d97706;
-  background: #fff;
+  color: var(--color-warning-deep);
+  background: var(--color-white);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
@@ -130,22 +132,22 @@
   height: 50px;
   padding: 0 16px 0 44px;
   box-sizing: border-box;
-  color: #374151;
-  font-size: 15px;
-  background: #f3f5f7;
+  color: var(--color-text-charcoal);
+  font-size: var(--font-size-15);
+  background: var(--bg-muted);
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   outline: none;
   transition: all 0.2s ease;
 }
 
 .faq-search input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-gray);
 }
 
 .faq-search input:focus {
-  background: #fff;
-  border-color: #d1d5db;
+  background: var(--color-white);
+  border-color: var(--border-silver);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
 }
 
@@ -155,8 +157,8 @@
   top: 50%;
   left: 16px;
   z-index: 1;
-  color: #9ca3af;
-  font-size: 16px;
+  color: var(--color-text-gray);
+  font-size: var(--font-size-16);
   pointer-events: none;
   transform: translateY(-50%);
 }
@@ -168,29 +170,29 @@
   flex: none;
   padding: 0;
   overflow: visible;
-  background: #fff;
+  background: var(--color-white);
 }
 
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-14);
   padding-bottom: 20px;
 }
 
 .faq-empty-state {
   margin: 28px 0;
-  color: #8a94a3;
-  font-size: 16px;
+  color: var(--color-text-gray-blue);
+  font-size: var(--font-size-16);
   text-align: center;
 }
 
 /* FAQ 單項卡片 */
 .faq-entry {
   overflow: hidden;
-  background: #fff;
+  background: var(--color-white);
   border: 1px solid #e6e9ed;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   transition: box-shadow 0.2s ease;
 }
 
@@ -207,14 +209,14 @@
   padding: 16px 20px;
   box-sizing: border-box;
   text-align: left;
-  background: #fff;
+  background: var(--color-white);
   border: none;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .faq-item:hover {
-  background: #f8fafc;
+  background: var(--bg-page);
 }
 
 /* 問號圖示 */
@@ -226,26 +228,26 @@
   height: 34px;
   flex-shrink: 0;
   margin-right: 14px;
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 600;
-  background: #f1f5f9;
-  border-radius: 9px;
+  color: var(--color-text-slate);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  background: var(--bg-slate);
+  border-radius: var(--radius-9);
 }
 
 .general-item.is-open .faq-icon {
-  color: #2563eb;
-  background: #eff6ff;
+  color: var(--color-link-bright);
+  background: var(--bg-action-faint);
 }
 
 .donor-item.is-open .faq-icon {
-  color: #16805b;
+  color: var(--color-success-jade);
   background: #ecfdf5;
 }
 
 .recipient-item.is-open .faq-icon {
-  color: #d97706;
-  background: #fff7ed;
+  color: var(--color-warning-deep);
+  background: var(--bg-gradient-end);
 }
 
 /* 問題文字 */
@@ -257,10 +259,10 @@
 .faq-content strong {
   display: block;
   overflow: hidden;
-  color: #374151;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.5;
+  color: var(--color-text-charcoal);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -274,28 +276,28 @@
   height: 28px;
   flex-shrink: 0;
   margin-left: 14px;
-  color: #9ca3af;
-  font-size: 20px;
+  color: var(--color-text-gray);
+  font-size: var(--font-size-20);
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .faq-item.is-open .faq-arrow {
-  color: #64748b;
+  color: var(--color-text-slate);
   transform: rotate(180deg);
 }
 
 /* FAQ 展開答案 */
 .faq-answer {
   padding: 18px 24px 20px 68px;
-  color: #64748b;
-  font-size: 15px;
-  line-height: 1.8;
+  color: var(--color-text-slate);
+  font-size: var(--font-size-15);
+  line-height: var(--line-height-looser);
   background: #fafbfc;
-  border-top: 1px solid #edf0f2;
+  border-top: 1px solid var(--bg-ash);
 }
 
 .general-answer {
-  border-left: 3px solid #3b82f6;
+  border-left: 3px solid var(--color-link-vivid);
 }
 
 .donor-answer {
@@ -303,7 +305,7 @@
 }
 
 .recipient-answer {
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--color-warning-amber);
 }
 
 .faq-answer ol {
@@ -327,36 +329,36 @@
   margin: 20px 0 0;
   padding: 20px 24px;
   box-sizing: border-box;
-  background: #f8fafc;
+  background: var(--bg-page);
   border: 1px solid #e7ebef;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
 }
 
 .contact-admin span {
   display: block;
   margin-bottom: 7px;
-  color: #374151;
-  font-size: 16px;
-  font-weight: 700;
+  color: var(--color-text-charcoal);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
 }
 
 .contact-admin p {
   margin: 0;
-  color: #8a94a3;
-  font-size: 14px;
-  line-height: 1.6;
+  color: var(--color-text-gray-blue);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-relaxed);
 }
 
 /* =====================
    平板
 ===================== */
-@media (max-width: 900px) {
+@include bp.tablet {
   .faq-panel {
     padding: 0 32px 24px;
   }
 
   .faq-controls {
-    gap: 20px;
+    gap: var(--space-20);
   }
 
   .faq-search {
@@ -368,7 +370,7 @@
 /* =====================
    手機
 ===================== */
-@media (max-width: 600px) {
+@include bp.mobile {
   :host {
     min-height: 100dvh;
     overflow: visible;
@@ -384,17 +386,17 @@
   }
 
   .panel-title h2 {
-    font-size: 21px;
+    font-size: var(--font-size-21);
   }
 
   .panel-title p {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .faq-controls {
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: var(--space-14);
     margin-bottom: 20px;
   }
 
@@ -410,12 +412,12 @@
   .faq-tab {
     min-height: 44px;
     padding: 8px 4px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .faq-item {
     min-height: 62px;
-    padding: 14px;
+    padding: var(--space-14);
   }
 
   .faq-icon {
@@ -425,16 +427,16 @@
   }
 
   .faq-content strong {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .faq-answer {
     padding: 14px 16px 16px 48px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .contact-admin {
     margin-top: 16px;
-    padding: 16px;
+    padding: var(--space-16);
   }
 }

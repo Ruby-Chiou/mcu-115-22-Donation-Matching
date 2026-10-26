@@ -1,0 +1,115 @@
+// 全站重複的尺寸、文字、陰影、層級。顏色仍放在 _color.scss。
+// 元件寫 var(--名稱)，不要再散落同樣的數字。
+@use 'breakpoint' as bp;
+
+:root {
+  /* 斷點與版面。數值跟 _breakpoint.scss 同一組。 */
+  --screen-desktop: #{bp.$screen-desktop};
+  --screen-tablet: #{bp.$screen-tablet};
+  --screen-mobile: #{bp.$screen-mobile};
+  --layout-header-height: 70px;
+  --layout-page-padding: clamp(16px, 2.4vw, 28px);
+  --layout-page-max: 1120px;
+  --layout-gap: clamp(12px, 1.8vw, 24px);
+
+  /* 圓角 */
+  --radius-4: 4px;
+  --radius-5: 5px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-9: 9px;
+  --radius-10: 10px;
+  --radius-12: 12px;
+  --radius-14: 14px;
+  --radius-15: 15px;
+  --radius-16: 16px;
+  --radius-18: 18px;
+  --radius-20: 20px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+  --border-radius-main: var(--radius-12);
+  --border-radius-pill: var(--radius-pill);
+
+  /* 間距。只用在單一數值的 gap、padding、margin。 */
+  --space-4: 4px;
+  --space-5: 5px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-15: 15px;
+  --space-16: 16px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-30: 30px;
+  --space-2xs: 0.4rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+
+  /* 字級 */
+  --font-size-11: 11px;
+  --font-size-12: 12px;
+  --font-size-13: 13px;
+  --font-size-14: 14px;
+  --font-size-15: 15px;
+  --font-size-16: 16px;
+  --font-size-17: 17px;
+  --font-size-18: 18px;
+  --font-size-19: 19px;
+  --font-size-20: 20px;
+  --font-size-21: 21px;
+  --font-size-22: 22px;
+  --font-size-24: 24px;
+  --font-size-25: 25px;
+  --font-size-26: 26px;
+  --font-size-28: 28px;
+  --font-size-30: 30px;
+  --font-size-32: 32px;
+  --font-size-compact: 0.85rem;
+  --font-size-small: 0.9rem;
+  --font-size-body: 0.95rem;
+  --font-size-ui: 0.98rem;
+
+  /* 字重 */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-heavy: 800;
+
+  /* 行高 */
+  --line-height-none: 1;
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.4;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.7;
+  --line-height-looser: 1.8;
+
+  /* 陰影。既有的 sm 到 xl 維持原值。 */
+  --shadow-sm: 0 4px 12px rgba(14, 52, 77, 0.06);
+  --shadow-md: 0 8px 28px rgba(47, 112, 187, 0.16);
+  --shadow-lg: 0 18px 50px rgba(12, 45, 75, 0.12);
+  --shadow-xl: 0 20px 60px rgba(12, 45, 75, 0.16);
+  --shadow-card: 0 10px 28px rgb(21 101 192 / 8%);
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-panel: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-line: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 6px 18px rgba(36, 100, 149, 0.06);
+  --shadow-overlay: 0 5px 20px rgba(0, 0, 0, 0.25);
+  --shadow-raised: 0 5px 14px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.12);
+  --shadow-hairline: 0 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-faint: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+  /* 字距 */
+  --tracking-fine: 0.5px;
+  --tracking-wide: 0.04em;
+  --tracking-4: 4px;
+  --tracking-5: 5px;
+
+  /* 層級 */
+  --z-modal: 9999;
+}

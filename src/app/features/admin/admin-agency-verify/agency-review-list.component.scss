@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: block;
 }
@@ -14,9 +16,9 @@ button {
 
 .list-panel {
   overflow: hidden;
-  border: 1px solid #e6ecf2;
-  border-radius: 16px;
-  background: #fff;
+  border: 1px solid var(--bg-layer-1);
+  border-radius: var(--radius-16);
+  background: var(--color-white);
 }
 
 .panel-heading,
@@ -24,7 +26,7 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .panel-heading {
@@ -32,29 +34,29 @@ button {
 
   h2 {
     margin: 0 0 7px;
-    color: #24384d;
-    font-size: 20px;
+    color: var(--color-text-navy-soft);
+    font-size: var(--font-size-20);
   }
 
   p {
     margin: 0;
     color: #8592a2;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
 .result-count {
   padding: 7px 12px;
-  border-radius: 20px;
+  border-radius: var(--radius-20);
   background: #edf3f8;
   color: #416782;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   white-space: nowrap;
 }
 
 .toolbar {
   display: flex;
-  gap: 12px;
+  gap: var(--space-12);
   padding: 0 28px 22px;
 }
 
@@ -62,18 +64,18 @@ button {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   min-width: 0;
   padding: 0 14px;
-  border: 1px solid #dce4ec;
-  border-radius: 9px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-9);
 
   &:focus-within {
-    border-color: #3978a8;
+    border-color: var(--color-link-steel);
   }
 
   span {
-    font-size: 25px;
+    font-size: var(--font-size-25);
   }
 
   input {
@@ -83,18 +85,18 @@ button {
     border: 0;
     outline: 0;
     background: transparent;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
 .status-filter {
   min-width: 145px;
   padding: 0 13px;
-  border: 1px solid #dce4ec;
-  border-radius: 9px;
-  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-9);
+  background: var(--color-white);
   color: #45596d;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .table-wrapper {
@@ -118,13 +120,13 @@ table {
 
   th {
     color: #728195;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   td {
-    border-top: 1px solid #edf1f5;
+    border-top: 1px solid var(--bg-slate-soft);
     color: #526378;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   tbody tr:hover {
@@ -135,7 +137,7 @@ table {
 .agency-cell {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .agency-avatar {
@@ -144,33 +146,33 @@ table {
   place-items: center;
   width: 42px;
   height: 42px;
-  border-radius: 12px;
-  background: #e8f0f8;
-  color: #315f86;
-  font-size: 17px;
-  font-weight: 700;
+  border-radius: var(--radius-12);
+  background: var(--bg-action-tint);
+  color: var(--color-text-steel-deep);
+  font-size: var(--font-size-17);
+  font-weight: var(--font-weight-bold);
 }
 
 .agency-info {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--space-5);
 
   strong {
     color: #304357;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   small {
     color: #94a0ae;
-    font-size: 11px;
+    font-size: var(--font-size-11);
   }
 }
 
 .registration-number {
   color: #52667a;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .status-badge {
@@ -178,54 +180,54 @@ table {
   align-items: center;
   gap: 7px;
   padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 12px;
+  border-radius: var(--radius-20);
+  font-size: var(--font-size-12);
   white-space: nowrap;
 }
 
 .status-dot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: currentColor;
 }
 
 .status-pending {
-  background: #fff4dc;
-  color: #b67b18;
+  background: var(--bg-accent-cream);
+  color: var(--color-warning-gold);
 }
 
 .status-approved {
-  background: #e2f5e9;
-  color: #258453;
+  background: var(--bg-success-soft);
+  color: var(--color-success-leaf);
 }
 
 .status-supplement {
-  background: #fff0df;
-  color: #b66d1d;
+  background: var(--bg-accent-cream);
+  color: var(--color-accent-clay);
 }
 
 .status-rejected,
 .status-deleted {
-  background: #fde9e9;
-  color: #c24646;
+  background: var(--bg-error-sand);
+  color: var(--color-error-clay);
 }
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .detail-button,
 .cancel-row-button {
   padding: 8px 12px;
   border-radius: 7px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .detail-button {
-  border: 1px solid #cbdbea;
-  background: #fff;
+  border: 1px solid var(--border-cool);
+  background: var(--color-white);
   color: #32688f;
 
   &:hover {
@@ -234,14 +236,14 @@ table {
 }
 
 .cancel-row-button {
-  border: 1px solid #e4b4b4;
-  background: #fff5f5;
-  color: #a33b3b;
+  border: 1px solid var(--color-error-blush-strong);
+  background: var(--bg-error-soft);
+  color: var(--color-error-brick);
 
   &:disabled {
     border-color: #e6e6e6;
     background: #f7f7f7;
-    color: #98a6b3;
+    color: var(--color-text-gray);
     cursor: not-allowed;
   }
 }
@@ -259,7 +261,7 @@ table {
 
   .empty-icon {
     color: #9aaaba;
-    font-size: 30px;
+    font-size: var(--font-size-30);
   }
 
   strong {
@@ -269,23 +271,23 @@ table {
 
 .table-footer {
   padding: 16px 28px;
-  border-top: 1px solid #edf1f5;
+  border-top: 1px solid var(--bg-slate-soft);
   color: #8794a3;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .clear-filter {
   padding: 6px 0;
   border: 0;
   background: transparent;
-  color: #3978a8;
+  color: var(--color-link-steel);
 
   &:hover {
     text-decoration: underline;
   }
 }
 
-@media (max-width: 650px) {
+@include bp.mobile {
   .panel-heading {
     align-items: flex-start;
     padding: 20px 16px;
@@ -303,7 +305,7 @@ table {
 
   table th,
   table td {
-    padding: 14px;
+    padding: var(--space-14);
   }
 
   .table-footer {

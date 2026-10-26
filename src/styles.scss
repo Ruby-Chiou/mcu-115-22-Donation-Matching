@@ -1,7 +1,15 @@
+@use 'breakpoint' as bp;
 @use 'color';
+@use 'variable';
 
 html {
   height: 100%;
+  overflow-x: clip;
+}
+
+img,
+video {
+  max-width: 100%;
 }
 
 .leaflet-div-icon.font-marker {
@@ -13,17 +21,17 @@ html {
 }
 
 .font-marker i {
-  font-size: 32px;
-  line-height: 1;
+  font-size: var(--font-size-32);
+  line-height: var(--line-height-none);
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
 }
 
 .font-marker-agency i {
-  color: #d93025;
+  color: var(--color-error-stronger);
 }
 
 .font-marker-volunteer i {
-  color: #0f766e;
+  color: var(--color-success-teal);
 }
 
 .font-marker-user {
@@ -31,8 +39,8 @@ html {
 }
 
 .font-marker-user i {
-  color: #005bac;
-  font-size: 28px;
+  color: var(--color-link);
+  font-size: var(--font-size-28);
 }
 
 body {
@@ -46,4 +54,139 @@ body {
   margin: 0;
   height: 100%;
 }
+
+@include bp.below-desktop {
+  app-daily-locations .container.container,
+  app-disaster-locations .map-section.map-section {
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+
+  app-daily-locations .sidebar.sidebar,
+  app-disaster-locations .map-sidebar.map-sidebar {
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    max-height: 46vh;
+    min-height: 220px;
+  }
+
+  app-disaster-locations #disaster-map {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    height: 68vh;
+    min-height: 320px;
+  }
+
+  app-daily-locations .sidebar.sidebar {
+    overflow: hidden;
+  }
+
+  app-daily-locations .map-wrap.map-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+  }
+
+  app-daily-locations #map#map {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    height: 68vh;
+    min-height: 520px;
+  }
+
+  app-daily-locations .locate-dialog.locate-dialog {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  app-daily-list,
+  app-disaster-list,
+  app-volunteer-list {
+    display: block;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  app-daily-list .toolbar-row.toolbar-row,
+  app-disaster-list .toolbar-row.toolbar-row,
+  app-volunteer-list .toolbar-row.toolbar-row {
+    max-width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  app-daily-list .toolbar-row.toolbar-row > *,
+  app-disaster-list .toolbar-row.toolbar-row > *,
+  app-volunteer-list .toolbar-row.toolbar-row > * {
+    flex-shrink: 0;
+  }
+
+  app-daily-list .table-wrapper.table-wrapper,
+  app-disaster-list .table-wrapper.table-wrapper,
+  app-volunteer-list .table-wrapper.table-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  app-daily-list .table-wrapper table,
+  app-disaster-list .table-wrapper table,
+  app-volunteer-list .volunteer-table.volunteer-table {
+    width: 1120px;
+    min-width: 1120px;
+  }
+}
+
+@include bp.tablet {
+  .detail-main.detail-main,
+  .service-target-box.service-target-box,
+  .carrier-list.carrier-list,
+  .custom-condition-list.custom-condition-list,
+  app-admin-company-verify dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include bp.mobile {
+  .item-input.item-input,
+  .phone-input.phone-input,
+  .medium-input.medium-input,
+  .short-field.short-field,
+  .image-upload-box.image-upload-box,
+  .filter-modal-box.filter-modal-box,
+  .modal-box.modal-box,
+  .custom-condition-row.custom-condition-row,
+  .custom-condition-input.custom-condition-input {
+    width: min(100%, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
+  }
+
+  .cert-grid.cert-grid {
+    grid-template-columns: 1fr;
+  }
+}
+button.comment-delete.comment-delete {
+  border: 0;
+  background: transparent;
+  color: var(--color-error-strong);
+  padding: 0;
+  font: inherit;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
 /* You can add global styles to this file, and also import other style files */

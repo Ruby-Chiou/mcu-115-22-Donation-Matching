@@ -19,9 +19,9 @@
   height: calc(100vh - 160px);
   margin: 0 auto;
   overflow: hidden;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
+  background: var(--color-white);
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-18);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
 }
 
@@ -34,7 +34,7 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background: #fff;
+  background: var(--color-white);
 }
 
 /* 右側固定標題 */
@@ -45,13 +45,13 @@
   justify-content: space-between;
   min-height: 72px;
   padding: 14px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-gray);
 
   p {
     margin: 4px 0 0;
-    color: #9ca3af;
-    font-size: 12px;
-    line-height: 1.5;
+    color: var(--color-text-gray);
+    font-size: var(--font-size-12);
+    line-height: var(--line-height-normal);
   }
 }
 
@@ -62,8 +62,8 @@
 
   h2 {
     margin: 0;
-    color: #1f2937;
-    font-size: 19px;
+    color: var(--color-text-ink);
+    font-size: var(--font-size-19);
     line-height: 1.3;
   }
 }
@@ -72,18 +72,18 @@
   flex: 0 0 9px;
   width: 9px;
   height: 9px;
-  background: #22c55e;
-  border-radius: 50%;
+  background: var(--color-success-bright);
+  border-radius: var(--radius-circle);
 }
 
 .role-badge {
   flex-shrink: 0;
   padding: 6px 10px;
-  color: #2563eb;
-  font-size: 12px;
-  line-height: 1.2;
-  background: #eff6ff;
-  border-radius: 999px;
+  color: var(--color-link-bright);
+  font-size: var(--font-size-12);
+  line-height: var(--line-height-tight);
+  background: var(--bg-action-faint);
+  border-radius: var(--radius-pill);
 }
 
 /* 右側只有訊息區會捲動 */
@@ -91,12 +91,12 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-14);
   min-width: 0;
   min-height: 0;
   padding: 24px;
   overflow-y: auto;
-  background: #fff;
+  background: var(--color-white);
 
   &::-webkit-scrollbar {
     width: 7px;
@@ -107,11 +107,11 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 10px;
+    background: var(--border-silver);
+    border-radius: var(--radius-10);
 
     &:hover {
-      background: #9ca3af;
+      background: var(--color-text-gray);
     }
   }
 }
@@ -132,21 +132,21 @@
 .message-bubble {
   max-width: min(75%, 620px);
   padding: 11px 15px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.65;
   white-space: pre-wrap;
   word-break: break-word;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
 
   &.assistant-message {
-    color: #374151;
-    background: #f3f4f6;
+    color: var(--color-text-charcoal);
+    background: var(--bg-muted);
     border-bottom-left-radius: 4px;
   }
 
   &.user-message {
-    color: #fff;
-    background: #2563eb;
+    color: var(--color-white);
+    background: var(--color-link-bright);
     border-bottom-right-radius: 4px;
   }
 }
@@ -155,15 +155,15 @@
 .loading-message {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   min-width: 58px;
-  padding: 14px;
+  padding: var(--space-14);
 
   span {
     width: 6px;
     height: 6px;
-    background: #9ca3af;
-    border-radius: 50%;
+    background: var(--color-text-gray);
+    border-radius: var(--radius-circle);
     animation: typing 1.2s infinite;
 
     &:nth-child(2) {
@@ -188,40 +188,40 @@
 
   h3 {
     margin: 0 0 8px;
-    color: #1f2937;
-    font-size: 24px;
+    color: var(--color-text-ink);
+    font-size: var(--font-size-24);
     line-height: 1.35;
   }
 
   p {
     margin: 0 0 20px;
-    color: #6b7280;
-    font-size: 14px;
-    line-height: 1.7;
+    color: var(--color-text-cool);
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-loose);
   }
 }
 
 .suggestion-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-8);
 
   button {
     padding: 8px 12px;
-    color: #4b5563;
+    color: var(--color-text-quiet-dark);
     font: inherit;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     line-height: 1.35;
     cursor: pointer;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--color-white);
+    border: 1px solid var(--border-gray);
+    border-radius: var(--radius-8);
     transition: 0.2s;
 
     &:hover {
-      color: #2563eb;
-      background: #eff6ff;
-      border-color: #2563eb;
+      color: var(--color-link-bright);
+      background: var(--bg-action-faint);
+      border-color: var(--color-link-bright);
     }
   }
 }
@@ -230,10 +230,10 @@
 .error-message {
   flex-shrink: 0;
   padding: 10px 24px;
-  color: #b91c1c;
-  font-size: 13px;
-  background: #fef2f2;
-  border-top: 1px solid #fee2e2;
+  color: var(--color-error-bold);
+  font-size: var(--font-size-13);
+  background: var(--bg-error-pale);
+  border-top: 1px solid var(--bg-error-wash);
 }
 
 /* 右側固定輸入區 */
@@ -241,10 +241,10 @@
   display: flex;
   flex-shrink: 0;
   align-items: stretch;
-  gap: 10px;
+  gap: var(--space-10);
   padding: 14px 24px;
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
+  background: var(--color-white);
+  border-top: 1px solid var(--border-gray);
 
   textarea {
     flex: 1;
@@ -252,16 +252,16 @@
     padding: 10px 12px;
     resize: none;
     font: inherit;
-    font-size: 14px;
-    line-height: 1.5;
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
-    border-radius: 9px;
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-normal);
+    background: var(--bg-page);
+    border: 1px solid var(--border-silver);
+    border-radius: var(--radius-9);
     outline: none;
 
     &:focus {
-      background: #fff;
-      border-color: #2563eb;
+      background: var(--color-white);
+      border-color: var(--color-link-bright);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
   }
@@ -269,14 +269,14 @@
   button {
     min-width: 60px;
     padding: 0 16px;
-    color: #fff;
+    color: var(--color-white);
     font: inherit;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    background: #2563eb;
+    background: var(--color-link-bright);
     border: 0;
-    border-radius: 9px;
+    border-radius: var(--radius-9);
     transition: 0.2s;
 
     &:hover:not(:disabled) {

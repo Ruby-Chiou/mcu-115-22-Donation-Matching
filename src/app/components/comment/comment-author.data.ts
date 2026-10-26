@@ -66,6 +66,14 @@ export interface CommentListItem {
 
 const PREVIEW_IDS = new Set([-11, -12, -13]);
 
+export function commentPreviewNotice(loadFailed: boolean): string {
+  if (loadFailed) {
+    return '真實留言暫時讀不到，下面仍是示範的一問一答。';
+  }
+
+  return '下面這幾則是示範留言，用來展示版面。真實留言會接在後面。';
+}
+
 /** 放進既有留言串的一問一答，版面與真實留言相同。 */
 export function commentPreviewItems(demandId: number): CommentListItem[] {
   return [
@@ -128,12 +136,43 @@ export function commentAuthor(
   };
 }
 
+export function canDeleteOwnComment(comment: { id: number; user_id: string | null }, userId: string | null): boolean {
+  return comment.id > 0 && !!userId && comment.user_id === userId;
+}
+
+export function commentDeleteError(error: unknown): string {
+  const record = error as { message?: string; code?: string } | null;
+  const message = record?.message ?? '';
+
+  if (record?.code === 'LOGIN_REQUIRED') {
+    return '請先登入後再刪除留言。';
+  }
+
+  if (record?.code === '23503' || /foreign key/i.test(message)) {
+    return '這則留言下面還有回覆，先刪回覆才能刪這則。';
+  }
+
+  if (record?.code === 'DELETE_EMPTY') {
+    return message || '這則留言刪不掉。只能刪自己發布的留言。';
+  }
+
+  return '留言沒有刪除，請稍後再試。';
+}
+
 export function commentWriteError(error: unknown): string {
   const record = error as { message?: string; code?: string } | null;
   const message = record?.message ?? '';
 
+  if (record?.code === 'LOGIN_REQUIRED') {
+    return '請先登入後再發布留言。';
+  }
+
+  if (/permission denied for table/i.test(message)) {
+    return '這個帳號已經登入，但留言資料表還沒開放寫入。';
+  }
+
   if (record?.code === '42501' || /row-level security|permission denied/i.test(message)) {
-    return '留言沒有寫入。請先登入，再用這個帳號發布。';
+    return '留言沒有寫入。請用目前登入的帳號再發布一次。';
   }
 
   return '留言沒有送出，請稍後再試。';

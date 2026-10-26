@@ -114,20 +114,16 @@
 
       @if (draft.handoverMethod === '寄送') {
         <h2>物流</h2>
+        <p class="hint">物流公司與單號由捐助者在審核通過後上傳，這裡只顯示。</p>
         <div class="form-grid">
-          <label>
-            物流公司
-            <select name="logisticsCarrier" [(ngModel)]="draft.logisticsCarrier" required>
-              <option value="">請選擇</option>
-              @for (carrier of carriers; track carrier) {
-                <option [value]="carrier">{{ carrier }}</option>
-              }
-            </select>
-          </label>
-          <label>
-            物流單號
-            <input type="text" name="trackingNo" [(ngModel)]="draft.trackingNo" maxlength="40" placeholder="捐助者已上傳時會自動帶入" />
-          </label>
+          <div class="readonly-field">
+            <span>物流公司</span>
+            <p>{{ draft.logisticsCarrier || '捐助者尚未選擇' }}</p>
+          </div>
+          <div class="readonly-field">
+            <span>物流單號</span>
+            <p>{{ draft.trackingNo || '捐助者尚未上傳' }}</p>
+          </div>
         </div>
       }
 

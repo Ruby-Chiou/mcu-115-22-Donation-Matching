@@ -2,7 +2,7 @@
   <header class="page-heading">
     <h1>收件確認</h1>
     <p>
-      這裡看得到捐助者審核通過後上傳的物流單號。貨到了就拍照回報，需要的話可以再錄一段影片。數量很多時不必全部拆箱。若選擇不錄影，要標明之後的爭議由捐助者與受助機構各自承擔。
+      這裡看得到捐助者審核通過後選擇的物流公司與單號。貨到了就拍照回報，需要的話可以再錄一段影片。數量很多時不必全部拆箱。若選擇不錄影，要標明之後的爭議由捐助者與受助機構各自承擔。
     </p>
   </header>
 
@@ -22,7 +22,7 @@
             <strong>{{ shipment.actualMaterial }}</strong>
             <span>{{ shipment.donorName }} · {{ shipment.quantity }} · {{ shipment.donationMethod || '未填方式' }}</span>
             @if (shipment.donationMethod === '寄送') {
-              <span class="tracking">{{ shipment.trackingNo || '還沒有物流單號' }}</span>
+              <span class="tracking">{{ shipment.logisticsCarrier || '尚未選物流' }} · {{ shipment.trackingNo || '還沒有物流單號' }}</span>
             } @else {
               <span class="tracking">面交，不必等物流單號</span>
             }
@@ -49,10 +49,11 @@
             <div><dt>數量</dt><dd>{{ shipment.quantity }}</dd></div>
             <div><dt>方式</dt><dd>{{ shipment.donationMethod || '未填' }}</dd></div>
             <div>
-              <dt>物流單號</dt>
+              <dt>物流</dt>
               <dd>
                 @if (shipment.donationMethod === '寄送') {
-                  {{ shipment.trackingNo || '捐助者尚未上傳' }}
+                  {{ shipment.logisticsCarrier || '捐助者尚未選擇物流公司' }}
+                  · {{ shipment.trackingNo || '捐助者尚未上傳單號' }}
                 } @else {
                   面交沒有物流單號
                 }
@@ -84,7 +85,7 @@
               }
             </div>
           } @else if (!ready(shipment)) {
-            <p class="warning">這筆是寄送，但捐助者還沒有上傳物流單號。單號出現之後才能簽收。</p>
+            <p class="warning">這筆是寄送。捐助者要先選擇物流公司並上傳單號，資料齊了才能簽收。</p>
           } @else {
             <form (submit)="$event.preventDefault(); submit()">
               <label class="upload">

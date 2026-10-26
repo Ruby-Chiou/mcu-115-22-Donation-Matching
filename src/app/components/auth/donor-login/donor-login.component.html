@@ -41,13 +41,13 @@
       <p>或使用其它應用登入帳號</p>
       <div class="social-buttons">
         <button type="button" class="social-btn google" (click)="socialRegister('google')" [disabled]="submitting">
-          Google<i class="fa-brands fa-google" style="color: #4285f4"></i>
+          Google<i class="fa-brands fa-google" style="color: var(--color-google)"></i>
         </button>
         <button type="button" class="social-btn line" (click)="socialRegister('line')" [disabled]="submitting">
-          LINE<i class="fa-brands fa-line" style="color: #06c755"></i>
+          LINE<i class="fa-brands fa-line" style="color: var(--color-line)"></i>
         </button>
         <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')" [disabled]="submitting">
-          Facebook<i class="fa-brands fa-facebook" style="color: #1877f2"></i>
+          Facebook<i class="fa-brands fa-facebook" style="color: var(--color-facebook)"></i>
         </button>
       </div>
     </div>

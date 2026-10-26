@@ -6,6 +6,7 @@ export interface DeliveryShipment {
   actualMaterial: string;
   quantity: number;
   donationMethod: string;
+  logisticsCarrier: string;
   trackingNo: string;
   trackingUploadedAt: string | null;
   note: string;

@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 .supply-filter {
   display: block;
   position: static;
@@ -8,9 +10,9 @@
 
   box-sizing: border-box;
 
-  background: #fffdf9;
-  border: 1px solid #e4d8c9;
-  border-radius: 14px;
+  background: var(--bg-warm);
+  border: 1px solid var(--border-sand-deep);
+  border-radius: var(--radius-14);
 
   box-shadow: 0 6px 18px rgba(83, 61, 40, 0.08);
 
@@ -24,35 +26,35 @@
 
 // 每個篩選群組之間加分隔線
 .filter-group:not(:last-child) {
-  border-bottom: 1px solid #eee4d8;
+  border-bottom: 1px solid var(--border-sand);
 }
 
 // 標題
 .filter-group h3 {
   margin: 0 0 10px;
 
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
 
-  color: #4b3a2a;
+  color: var(--color-sand-deep);
 }
 
 // 選項排列
 .pill-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 // 篩選按鈕
 .pill-btn {
   padding: 7px 16px;
 
-  border: 1px solid #d8c8b7;
-  border-radius: 20px;
+  border: 1px solid var(--color-sand);
+  border-radius: var(--radius-20);
 
-  background: #fff;
-  color: #5c4a38;
+  background: var(--color-white);
+  color: var(--color-sand-ink);
 
   cursor: pointer;
 
@@ -64,14 +66,14 @@
 
 // 滑鼠移入
 .pill-btn:hover {
-  background: #f7efe6;
+  background: var(--bg-error-sand);
 }
 
 // 已選取
 .pill-btn.active {
-  background: #005bac;
-  border-color: #005bac;
-  color: #fff;
+  background: var(--color-link);
+  border-color: var(--color-link);
+  color: var(--color-white);
 }
 
 // 底部按鈕
@@ -85,22 +87,32 @@
 .reset-btn {
   padding: 8px 18px;
 
-  border: 1px solid #d8c8b7;
-  border-radius: 8px;
+  border: 1px solid var(--color-sand);
+  border-radius: var(--radius-8);
 
-  background: #fff;
-  color: #5c4a38;
+  background: var(--color-white);
+  color: var(--color-sand-ink);
 
   cursor: pointer;
 }
 
 .reset-btn:hover {
-  background: #f7efe6;
+  background: var(--bg-error-sand);
 }
 
 // ==========================
 // 向下展開動畫
 // ==========================
+
+@include bp.mobile {
+  .supply-filter {
+    padding: 12px 14px;
+  }
+
+  .pill-btn {
+    padding: 8px 12px;
+  }
+}
 
 @keyframes filterSlideDown {
   from {

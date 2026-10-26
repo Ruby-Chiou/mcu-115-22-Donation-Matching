@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { MemberNotificationSettingsService } from '../../../core/services/member-center/member-notification-settings.service';
 import { MemberProfileService } from '../../../core/services/member-center/member-profile.service';
 import {
@@ -21,6 +22,7 @@ export class MemberNotificationSettingsComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   protected readonly settingsService = inject(MemberNotificationSettingsService);
   protected readonly profileService = inject(MemberProfileService);
+  private readonly auth = inject(AuthSessionService);
 
   readonly digestLabels = EMAIL_DIGEST_MODE_LABELS;
   readonly digestModes = Object.keys(EMAIL_DIGEST_MODE_LABELS) as EmailDigestMode[];
@@ -43,6 +45,10 @@ export class MemberNotificationSettingsComponent implements OnInit {
     quietHoursStart: ['22:00', [Validators.required, Validators.pattern(TIME_PATTERN)]],
     quietHoursEnd: ['08:00', [Validators.required, Validators.pattern(TIME_PATTERN)]],
   });
+
+  protected noticeEmail(): string {
+    return this.auth.principal().email || this.profileService.profile()?.email || '';
+  }
 
   async ngOnInit(): Promise<void> {
     try {

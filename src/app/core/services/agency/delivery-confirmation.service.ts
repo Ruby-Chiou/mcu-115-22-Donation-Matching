@@ -11,6 +11,7 @@ interface ShipmentRow {
   actual_material: string | null;
   quantity: number | null;
   donation_method: string | null;
+  logistics_carrier: string | null;
   tracking_no: string | null;
   tracking_uploaded_at: string | null;
   note: string | null;
@@ -31,7 +32,7 @@ export class DeliveryConfirmationService {
     const { data, error } = await this.supabase.client
       .from('donor_daily_donations')
       .select(
-        'id, donor_uid, donor_name, phone, actual_material, quantity, donation_method, tracking_no, tracking_uploaded_at, note, receipt_confirmed_at, receipt_partial, receipt_declined_video, receipt_note',
+        'id, donor_uid, donor_name, phone, actual_material, quantity, donation_method, logistics_carrier, tracking_no, tracking_uploaded_at, note, receipt_confirmed_at, receipt_partial, receipt_declined_video, receipt_note',
       )
       .eq('status', 'human_approved')
       .order('created_at', { ascending: false });
@@ -48,6 +49,7 @@ export class DeliveryConfirmationService {
       actualMaterial: row.actual_material?.trim() || '未填物資',
       quantity: row.quantity ?? 0,
       donationMethod: row.donation_method?.trim() || '',
+      logisticsCarrier: row.logistics_carrier?.trim() || '',
       trackingNo: row.tracking_no?.trim() || '',
       trackingUploadedAt: row.tracking_uploaded_at,
       note: row.note?.trim() || '',
@@ -67,7 +69,7 @@ export class DeliveryConfirmationService {
       return false;
     }
 
-    return shipment.donationMethod !== '寄送' || shipment.trackingNo.length > 0;
+    return shipment.donationMethod !== '寄送' || (shipment.trackingNo.length > 0 && shipment.logisticsCarrier.length > 0);
   }
 
   async proofs(donationId: string): Promise<ReceiptProofFile[]> {

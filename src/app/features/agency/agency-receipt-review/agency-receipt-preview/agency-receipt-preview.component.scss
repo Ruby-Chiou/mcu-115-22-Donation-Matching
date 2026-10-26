@@ -8,7 +8,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--space-8);
   margin-bottom: 16px;
 
   app-donation-record-links {
@@ -19,24 +19,24 @@
 .ghost-btn,
 .save-btn {
   padding: 10px 22px;
-  border-radius: 20px;
+  border-radius: var(--radius-20);
   font: inherit;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: var(--font-size-17);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   text-decoration: none;
 }
 
 .ghost-btn {
-  border: 1px solid #1565c0;
-  background: #fff;
-  color: #1565c0;
+  border: 1px solid var(--color-action);
+  background: var(--color-white);
+  color: var(--color-action);
 }
 
 .save-btn {
   border: 0;
-  background: #1565c0;
-  color: #fff;
+  background: var(--color-action);
+  color: var(--color-white);
 
   &:disabled {
     opacity: 0.6;
@@ -46,20 +46,20 @@
 
 .draft-note,
 .state-text {
-  color: #8d6e00;
-  line-height: 1.6;
+  color: var(--color-warning-text);
+  line-height: var(--line-height-relaxed);
 }
 
 .error-text {
-  color: #c62828;
+  color: var(--color-error-dark);
 }
 
 .receipt-sheet {
   padding: 40px 44px 32px;
-  border: 2px solid #1565c0;
-  border-radius: 12px;
-  background: #f7fbff;
-  font-size: 20px;
+  border: 2px solid var(--color-action);
+  border-radius: var(--radius-12);
+  background: var(--bg-form);
+  font-size: var(--font-size-20);
 
   header {
     margin-bottom: 28px;
@@ -68,7 +68,7 @@
 
   h1 {
     margin: 10px 0;
-    color: #1565c0;
+    color: var(--color-action);
     letter-spacing: 0.45em;
     font-size: 40px;
   }
@@ -76,33 +76,33 @@
   .system-label,
   .receipt-no {
     margin: 0;
-    color: #475569;
-    font-size: 18px;
+    color: var(--color-text-slate-dark);
+    font-size: var(--font-size-18);
   }
 
   dl {
     display: grid;
     grid-template-columns: 128px 1fr;
-    row-gap: 16px;
+    row-gap: var(--space-16);
     margin: 0;
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   dt {
-    color: #475569;
-    font-weight: 700;
+    color: var(--color-text-slate-dark);
+    font-weight: var(--font-weight-bold);
   }
 
   dd {
     margin: 0;
-    color: #0f172a;
+    color: var(--color-text-black);
   }
 
   footer {
     margin-top: 28px;
-    color: #475569;
+    color: var(--color-text-slate-dark);
     text-align: center;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -118,7 +118,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 
   img {
     object-fit: contain;
@@ -126,9 +126,9 @@
 
   p {
     margin: 0;
-    color: #475569;
-    font-size: 16px;
-    font-weight: 700;
+    color: var(--color-text-slate-dark);
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-bold);
   }
 }
 
@@ -148,11 +148,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #94a3b8;
-  border-radius: 50%;
-  color: #94a3b8;
-  font-size: 18px;
-  font-weight: 700;
+  border: 2px dashed var(--color-text-soft);
+  border-radius: var(--radius-circle);
+  color: var(--color-text-soft);
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
 }
 
 @media print {

@@ -1,7 +1,7 @@
 .sort-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .sort-icon-btn {
@@ -13,19 +13,19 @@
   justify-content: center;
 
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 
   padding: 0;
 
-  background: #bbdefb;
+  background: var(--color-action-ice);
   color: var(--primary);
 
   cursor: pointer;
 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-line);
 
   &:hover {
-    background: #90caf9;
+    background: var(--color-action-light);
     transform: scale(1.05);
   }
 
@@ -48,24 +48,24 @@
     align-items: center;
     justify-content: center;
 
-    gap: 8px;
+    gap: var(--space-8);
     padding: 0 16px;
 
-    border: 1.5px solid #90caf9;
-    border-radius: 18px;
+    border: 1.5px solid var(--color-action-light);
+    border-radius: var(--radius-18);
 
-    background: #fff;
+    background: var(--color-white);
     color: var(--text);
 
-    font-size: 15px;
-    font-weight: 600;
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-semibold);
 
     cursor: pointer;
 
     &:hover,
     &.active {
       border-color: var(--primary);
-      background: #f4f8ff;
+      background: var(--bg-panel);
     }
 
     .arrow-icon {
@@ -95,24 +95,24 @@
     width: 100%;
     box-sizing: border-box;
 
-    padding: 6px;
+    padding: var(--space-6);
 
-    border: 1px solid #e3f2fd;
-    border-radius: 14px;
+    border: 1px solid var(--bg-action-soft);
+    border-radius: var(--radius-14);
 
-    background: #fff;
+    background: var(--color-white);
 
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 
     .dropdown-item {
       padding: 9px 16px;
 
-      border-radius: 10px;
+      border-radius: var(--radius-10);
 
       color: var(--text);
 
-      font-size: 15px;
-      font-weight: 500;
+      font-size: var(--font-size-15);
+      font-weight: var(--font-weight-medium);
 
       white-space: nowrap;
 
@@ -121,14 +121,14 @@
       text-align: center;
 
       &:hover {
-        background: #e3f2fd;
+        background: var(--bg-action-soft);
         color: var(--primary);
       }
 
       &.selected {
         background: var(--primary);
-        color: #fff;
-        font-weight: 600;
+        color: var(--color-white);
+        font-weight: var(--font-weight-semibold);
       }
     }
   }

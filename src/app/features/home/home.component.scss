@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 // ==========================================
 // 首頁整體
 // ==========================================
@@ -7,7 +9,7 @@
 
   grid-template-columns: minmax(0, 1fr) 280px;
 
-  gap: 20px;
+  gap: var(--space-20);
 
   width: calc(100% - 40px);
   max-width: 1400px;
@@ -73,14 +75,14 @@ app-about {
 // RWD
 // ==========================================
 
-@media (max-width: 900px) {
+@include bp.tablet {
 
   .lobby-grid {
     grid-template-columns: 1fr;
 
     width: calc(100% - 30px);
 
-    gap: 20px;
+    gap: var(--space-20);
   }
 
   app-hero,

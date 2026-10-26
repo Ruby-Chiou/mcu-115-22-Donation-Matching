@@ -6,14 +6,14 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .form-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .form-header h2 {
@@ -26,8 +26,8 @@
 .form-header p {
   margin: 0;
   color: var(--color-text-light);
-  line-height: 1.6;
-  font-weight: 600;
+  line-height: var(--line-height-relaxed);
+  font-weight: var(--font-weight-semibold);
 }
 
 .ghost-btn {
@@ -37,7 +37,7 @@
   padding: 8px 12px;
   border-radius: var(--border-radius-pill);
   cursor: pointer;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   transition: all 0.12s ease;
   white-space: nowrap;
 }
@@ -50,14 +50,14 @@
 .input-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: var(--space-14);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-weight: 600;
+  gap: var(--space-6);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-medium);
 }
 
@@ -70,7 +70,7 @@ textarea {
   background: var(--color-white);
   color: var(--color-text-dark);
   box-sizing: border-box;
-  font-size: 0.98rem;
+  font-size: var(--font-size-ui);
   outline: none;
   transition:
     box-shadow 0.12s ease,
@@ -80,22 +80,22 @@ textarea {
 input:focus,
 textarea:focus {
   border-color: var(--color-brand-primary-light);
-  box-shadow: 0 6px 18px rgba(36, 100, 149, 0.06);
+  box-shadow: var(--shadow-float);
 }
 
 .social-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
   flex-wrap: wrap;
   color: var(--color-text-medium);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .social-buttons {
   display: flex;
-  gap: 12px;
+  gap: var(--space-12);
   flex-wrap: wrap;
 }
 
@@ -103,15 +103,15 @@ textarea:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-8);
   padding: 10px 16px;
   border: 1px solid var(--border-lightest);
   background: var(--color-white);
   color: var(--color-text-medium);
   border-radius: var(--border-radius-pill);
   cursor: pointer;
-  font-weight: 700;
-  font-size: 0.98rem;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-ui);
   box-shadow: var(--shadow-sm);
   transition: all 0.12s ease;
   white-space: nowrap;
@@ -130,7 +130,7 @@ textarea:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
   flex-direction: row;
   flex-wrap: nowrap;
   width: 100%;
@@ -140,11 +140,11 @@ textarea:focus {
   display: flex;
   align-items: center;
   flex-direction: row;
-  gap: 8px;
+  gap: var(--space-8);
   flex-wrap: nowrap;
   white-space: nowrap;
-  font-size: 0.98rem;
-  font-weight: 600;
+  font-size: var(--font-size-ui);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-medium);
 }
 
@@ -152,7 +152,7 @@ textarea:focus {
   display: flex;
   align-items: center;
   flex-direction: row;
-  gap: 16px;
+  gap: var(--space-16);
   flex-wrap: nowrap;
   justify-content: flex-end;
 }
@@ -162,11 +162,11 @@ textarea:focus {
   border: none;
   color: var(--color-brand-primary-dark);
   text-decoration: none;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
   padding: 0;
   transition: all 0.12s ease;
-  font-size: 0.98rem;
+  font-size: var(--font-size-ui);
   white-space: nowrap;
 }
 
@@ -178,7 +178,7 @@ textarea:focus {
 .button-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: flex-end;
@@ -190,7 +190,7 @@ textarea:focus {
   padding: 12px 20px;
   background: linear-gradient(135deg, var(--color-brand-primary-dark) 0%, var(--color-brand-primary-light) 100%);
   color: var(--color-white);
-  font-weight: 800;
+  font-weight: var(--font-weight-heavy);
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: box-shadow 0.12s ease;
@@ -203,11 +203,11 @@ textarea:focus {
 .submit-message {
   color: var(--color-success);
   margin: 10px 0 0;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
 }
 
 .submit-message.is-error {
-  color: var(--color-error, #c62828);
+  color: var(--color-error, var(--color-error-dark));
 }
 
 .primary-btn:disabled {
@@ -217,41 +217,41 @@ textarea:focus {
 
 .kind-switch {
   display: flex;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .kind-switch button {
   border: 1px solid var(--border-lightest);
-  background: #fff;
-  border-radius: 999px;
+  background: var(--color-white);
+  border-radius: var(--radius-pill);
   padding: 8px 14px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 }
 
 .kind-switch button.active {
-  background: #1565c0;
-  color: #fff;
-  border-color: #1565c0;
+  background: var(--color-action);
+  color: var(--color-white);
+  border-color: var(--color-action);
 }
 
 .kind-note {
   margin: 0;
-  color: #526579;
-  line-height: 1.6;
+  color: var(--color-text-blue-gray);
+  line-height: var(--line-height-relaxed);
 }
 
 .cert-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   align-self: flex-start;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 11px 16px;
-  background: #0b3a66;
-  color: #fff;
-  font-weight: 700;
+  background: var(--color-text-navy);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 }
 

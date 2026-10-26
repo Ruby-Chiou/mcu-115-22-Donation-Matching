@@ -1,14 +1,16 @@
+@use 'breakpoint' as bp;
+
 .role-guide {
   margin-bottom: 35px;
-  padding: 30px;
+  padding: var(--space-30);
 
-  border-radius: 20px;
+  border-radius: var(--radius-20);
 
   background-color: var(--color-white);
 
   border: 1px solid var(--border-default);
 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-soft);
 }
 
 
@@ -21,7 +23,7 @@
 
   align-items: center;
 
-  gap: 15px;
+  gap: var(--space-15);
 
   margin-bottom: 25px;
 }
@@ -38,22 +40,22 @@
 
   flex-shrink: 0;
 
-  border-radius: 16px;
+  border-radius: var(--radius-16);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 
 .role-label {
   color: var(--color-brand-primary);
 
-  font-size: 12px;
+  font-size: var(--font-size-12);
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 
   letter-spacing: 2px;
 }
@@ -64,7 +66,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 25px;
+  font-size: var(--font-size-25);
 }
 
 
@@ -73,7 +75,7 @@
 
   color: var(--color-text-muted);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 
@@ -106,7 +108,7 @@
 
   background-color: var(--color-white);
 
-  border-right: 1px solid #edf0f2;
+  border-right: 1px solid var(--bg-ash);
 }
 
 
@@ -132,15 +134,15 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 
   background-color: var(--color-brand-primary);
 
-  color: #fff;
+  color: var(--color-white);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 
@@ -155,13 +157,13 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 14px;
+  border-radius: var(--radius-14);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 21px;
+  font-size: var(--font-size-21);
 }
 
 
@@ -170,7 +172,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 
@@ -179,9 +181,9 @@
 
   color: var(--color-text-muted);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 
@@ -204,7 +206,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 
@@ -213,7 +215,7 @@
 
   color: var(--color-text-muted);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 
@@ -222,7 +224,7 @@
 
   grid-template-columns: repeat(2, 1fr);
 
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 
@@ -231,15 +233,15 @@
 
   align-items: center;
 
-  gap: 15px;
+  gap: var(--space-15);
 
   padding: 22px;
 
   box-sizing: border-box;
 
-  border-radius: 16px;
+  border-radius: var(--radius-16);
 
-  background-color: #f8fbfc;
+  background-color: var(--bg-page);
 
   border: 1px solid var(--border-default);
 
@@ -254,7 +256,7 @@
 .common-function-card:hover {
   transform: translateY(-3px);
 
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-raised);
 }
 
 
@@ -269,13 +271,13 @@
 
   flex-shrink: 0;
 
-  border-radius: 14px;
+  border-radius: var(--radius-14);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 21px;
+  font-size: var(--font-size-21);
 }
 
 
@@ -289,7 +291,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 17px;
+  font-size: var(--font-size-17);
 }
 
 
@@ -298,18 +300,18 @@
 
   color: var(--color-text-muted);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
 }
 
 
 .function-content span {
   color: var(--color-brand-primary);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 
@@ -320,20 +322,20 @@
 // RWD
 // ==========================================
 
-@media (max-width: 1100px) {
+@include bp.below-desktop {
 
   .guide-steps {
     grid-template-columns: repeat(3, 1fr);
   }
 
   .guide-step {
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--bg-ash);
   }
 
 }
 
 
-@media (max-width: 700px) {
+@include bp.tablet {
 
   .role-guide {
     padding: 22px;
@@ -350,7 +352,7 @@
 }
 
 
-@media (max-width: 500px) {
+@include bp.mobile {
 
   .guide-steps {
     grid-template-columns: 1fr;

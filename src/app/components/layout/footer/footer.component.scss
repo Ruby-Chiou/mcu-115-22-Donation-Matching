@@ -1,23 +1,20 @@
 
 
+@use 'breakpoint' as bp;
+
 // ==========================================
 // 頁尾
 // ==========================================
 
 .footer-main {
-  background-color: #1c2833;
-  padding: 45px 20px;
+  background-color: var(--footer-bg);
+  padding: 40px var(--layout-page-padding) 32px;
 }
 .footer-logo {
   display: block;
-
-  width: 140px;
+  width: 120px;
   height: auto;
-
-  margin-top: 10px;
-
-  transform: scale(1.5);
-  transform-origin: center center;
+  margin-top: 12px;
 }
 
 // ==========================================
@@ -25,13 +22,13 @@
 // ==========================================
 
 .footer-container {
-  max-width: 1200px;
+  max-width: var(--layout-page-max);
   margin: 0 auto;
 
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
 
-  gap: 45px;
+  gap: var(--layout-gap);
 }
 
 
@@ -44,20 +41,20 @@
   h3 {
     margin: 0 0 18px;
 
-    color: var(--color-white);
+    color: var(--footer-heading);
 
-    font-size: 19px;
-    font-weight: 700;
+    font-size: var(--font-size-19);
+    font-weight: var(--font-weight-bold);
   }
 
 
   p {
     margin: 0 0 12px;
 
-     color: rgba(255, 255, 255, 0.75);
+    color: var(--footer-text);
 
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: var(--font-size-15);
+    line-height: var(--line-height-looser);
   }
 
 
@@ -66,9 +63,9 @@
 
     margin-bottom: 12px;
 
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--footer-text);
 
-    font-size: 15px;
+    font-size: var(--font-size-15);
 
     text-decoration: none;
 
@@ -80,12 +77,12 @@
     i {
       width: 22px;
 
-      color: #f1c40f;
+      color: var(--footer-accent);
     }
 
 
     &:hover {
-      color: #f1c40f;
+      color: var(--footer-accent);
 
       transform: translateX(3px);
     }
@@ -98,23 +95,22 @@
 // ==========================================
 
 .footer-bottom {
-  background-color: #1c2833;
-
-  color: var(--color-white);
-
-  padding: 18px 20px;
+  background-color: var(--footer-bg);
+  color: var(--footer-heading);
+  padding: 18px var(--layout-page-padding) 22px;
 }
 
 
 .footer-bottom-container {
-  max-width: 1200px;
+  max-width: var(--layout-page-max);
   margin: 0 auto;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
 
-  gap: 20px;
+  gap: 12px 20px;
 }
 
 
@@ -126,13 +122,13 @@
   display: flex;
   align-items: center;
 
-  gap: 10px;
+  gap: var(--space-10);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
 
   a {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--footer-text);
 
     text-decoration: none;
 
@@ -140,13 +136,13 @@
 
 
     &:hover {
-      color: var(--color-white);
+      color: var(--footer-heading);
     }
   }
 
 
   span {
-    color: rgba(255, 255, 255, 0.45);
+    color: var(--footer-muted);
   }
 }
 
@@ -156,7 +152,46 @@
 // ==========================================
 
 .copyright {
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--footer-text);
+}
+
+@include bp.below-desktop {
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer-about {
+    grid-column: 1 / -1;
+  }
+}
+
+@include bp.mobile {
+  .footer-container {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-about {
+    grid-column: auto;
+  }
+
+  .footer-logo {
+    width: 180px;
+  }
+
+  .footer-bottom-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-8);
+  }
+
+  .footer-links span {
+    display: none;
+  }
 }

@@ -11,55 +11,55 @@
 .modal-box {
   width: 460px;
   padding: 32px;
-  border-radius: 20px;
-  background: #fff;
+  border-radius: var(--radius-20);
+  background: var(--color-white);
   text-align: center;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-overlay);
 
   h2 {
     margin-bottom: 22px;
     color: var(--color-brand-primary);
-    font-size: 26px;
-    font-weight: 600;
+    font-size: var(--font-size-26);
+    font-weight: var(--font-weight-semibold);
   }
 
   p {
     margin-bottom: 30px;
     color: var(--color-text-main);
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
 .modal-buttons {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: var(--space-15);
 
   button {
     padding: 9px 22px;
     border: 0;
-    border-radius: 15px;
-    font-size: 15px;
-    font-weight: 500;
+    border-radius: var(--radius-15);
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
   }
 }
 
 .confirm-btn {
-  background: #d32f2f;
-  color: #fff;
+  background: var(--color-error);
+  color: var(--color-white);
 
   &:hover {
-    background: #b71c1c;
+    background: var(--color-error-deep);
   }
 }
 
 .cancel-btn {
-  background: #90caf9;
-  color: #0d47a1;
+  background: var(--color-action-light);
+  color: var(--color-action-dark);
 
   &:hover {
-    background: #64b5f6;
+    background: var(--color-action-sky);
   }
 }
 
@@ -80,15 +80,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: var(--space-10);
   min-height: 32px;
-  color: #333;
+  color: var(--color-text-body);
   white-space: nowrap;
   line-height: 22px;
 
   i {
-    color: #1565c0;
-    font-size: 18px;
+    color: var(--color-action);
+    font-size: var(--font-size-18);
   }
 }
 
@@ -105,7 +105,7 @@
   align-items: center;
   justify-content: center;
   min-height: 28px;
-  color: #333;
+  color: var(--color-text-body);
 }
 
 .custom-hand-box {
@@ -121,8 +121,8 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    color: #1565c0;
-    font-size: 19px;
+    color: var(--color-action);
+    font-size: var(--font-size-19);
   }
 
   .box-icon {
@@ -130,8 +130,8 @@
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    color: #1565c0;
-    font-size: 15px;
+    color: var(--color-action);
+    font-size: var(--font-size-15);
   }
 }
 
@@ -143,7 +143,7 @@
   height: 18px;
 
   i {
-    font-size: 17px;
+    font-size: var(--font-size-17);
   }
 }
 
@@ -160,7 +160,7 @@
     left: 0;
     content: '';
     height: 2px;
-    background: #1565c0;
+    background: var(--color-action);
     border-radius: 2px;
   }
 

@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 // ==========================================
 // 為什麼我們要做這個平台
 // ==========================================
@@ -12,7 +14,7 @@
 
   box-sizing: border-box;
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 }
 
 
@@ -29,9 +31,9 @@
 
   color: var(--color-text-main);
 
-  font-size: 30px;
+  font-size: var(--font-size-30);
 
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 
@@ -114,11 +116,11 @@
 
   color: var(--color-brand-primary);
 
-  font-size: 20px;
+  font-size: var(--font-size-20);
 
   line-height: 1.65;
 
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 
@@ -142,11 +144,11 @@
 
   color: var(--color-brand-primary);
 
-  font-size: 20px;
+  font-size: var(--font-size-20);
 
-  line-height: 1.7;
+  line-height: var(--line-height-loose);
 
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 
@@ -168,9 +170,9 @@
 
   color: var(--color-brand-primary);
 
-  font-size: 20px;
+  font-size: var(--font-size-20);
 
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 
   text-decoration: none;
 
@@ -191,7 +193,7 @@
 // RWD
 // ==========================================
 
-@media (max-width: 900px) {
+@include bp.tablet {
 
   .about-platform {
     padding: 35px 25px 40px;
@@ -202,7 +204,7 @@
 
     flex-direction: column;
 
-    gap: 20px;
+    gap: var(--space-20);
   }
 
   .about-image {
@@ -239,7 +241,7 @@
 }
 
 
-@media (max-width: 600px) {
+@include bp.mobile {
 
   .about-platform {
     padding: 30px 20px 35px;
@@ -248,14 +250,14 @@
   .about-title {
     margin-bottom: 25px;
 
-    font-size: 25px;
+    font-size: var(--font-size-25);
   }
 
   .about-message p,
   .about-introduction p {
-    font-size: 17px;
+    font-size: var(--font-size-17);
 
-    line-height: 1.6;
+    line-height: var(--line-height-relaxed);
   }
 
   .about-introduction .second-line {
@@ -263,7 +265,7 @@
   }
 
   .about-link {
-    font-size: 17px;
+    font-size: var(--font-size-17);
   }
 
 }

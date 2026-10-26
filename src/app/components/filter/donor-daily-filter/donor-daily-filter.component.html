@@ -1,4 +1,18 @@
-<div class="filter-section">
+<div class="filter-section" [class.is-open]="filtersOpen">
+  <button
+    type="button"
+    class="filter-toggle"
+    (click)="filtersOpen = !filtersOpen"
+    [attr.aria-expanded]="filtersOpen">
+    <span class="filter-toggle-label">
+      <i class="fa-solid fa-sliders"></i>
+      篩選條件
+      <span class="filter-count" *ngIf="hasFilter()">{{ getSelectedFilters().length }}</span>
+    </span>
+    <i class="fa-solid" [class.fa-chevron-down]="!filtersOpen" [class.fa-chevron-up]="filtersOpen"></i>
+  </button>
+
+  <div class="filter-body">
   <!-- 類別 -->
   <div class="filter-row">
     <div class="filter-title">
@@ -85,5 +99,6 @@
       (click)="clearFilters()">
       <i class="fa-solid fa-trash"></i> 清除篩選
     </button>
+  </div>
   </div>
 </div>

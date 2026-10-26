@@ -13,16 +13,18 @@
   <div class="city-filters" role="group" aria-label="依縣市篩選">
     <button type="button" [class.active]="activeCity() === '全部'" (click)="selectCity('全部')">全部</button>
     @for (city of cities(); track city) {
-      <button type="button" [class.active]="activeCity() === city" (click)="selectCity(city)">{{ city }}</button>
+      <button type="button" [class.active]="activeCity() === city" (click)="selectCity(city)">{{ cityLabel(city) }}</button>
     }
   </div>
 
   <div class="card-grid">
     @for (profile of profiles(); track profile.organizationName) {
       <a class="org-card" [routerLink]="['/donor/beneficiaries', profile.organizationName]">
-        <img [src]="profile.image" [alt]="profile.organizationName" />
+        @if (hasPhoto(profile.image)) {
+          <img [src]="profile.image" [alt]="profile.organizationName" (error)="hideBrokenPhoto($event)" />
+        }
         <div class="org-card-body">
-          <span>{{ profile.city }}</span>
+          <span>{{ cityLabel(profile.city) }}</span>
           <h2>{{ profile.organizationName }}</h2>
           <p>{{ profile.mission }}</p>
         </div>

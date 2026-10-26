@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 .public-guide {
   width: 100%;
 }
@@ -8,7 +10,7 @@
 
   align-items: center;
 
-  gap: 15px;
+  gap: var(--space-15);
 
   margin-bottom: 25px;
 }
@@ -23,13 +25,13 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 16px;
+  border-radius: var(--radius-16);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 
@@ -38,7 +40,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 28px;
+  font-size: var(--font-size-28);
 }
 
 
@@ -47,7 +49,7 @@
 
   color: var(--color-text-muted);
 
-  font-size: 15px;
+  font-size: var(--font-size-15);
 }
 
 
@@ -56,11 +58,11 @@
 // ==========================================
 
 .process-card {
-  padding: 30px;
+  padding: var(--space-30);
 
-  border-radius: 20px;
+  border-radius: var(--radius-20);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 }
 
 
@@ -71,7 +73,7 @@
 
   text-align: center;
 
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 
@@ -91,7 +93,7 @@
 
   align-items: center;
 
-  gap: 8px;
+  gap: var(--space-8);
 
   min-width: 130px;
 }
@@ -106,13 +108,13 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 
   background-color: var(--color-brand-primary);
 
-  color: #fff;
+  color: var(--color-white);
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 
@@ -121,9 +123,9 @@
 
   color: var(--color-text-main);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 
@@ -138,7 +140,7 @@
 // RWD
 // ==========================================
 
-@media (max-width: 900px) {
+@include bp.tablet {
 
   .feature-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -148,7 +150,7 @@
   .process-list {
     flex-wrap: wrap;
 
-    gap: 20px;
+    gap: var(--space-20);
   }
 
 
@@ -159,7 +161,7 @@
 }
 
 
-@media (max-width: 600px) {
+@include bp.mobile {
 
   .section-title {
     align-items: flex-start;

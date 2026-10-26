@@ -1,14 +1,16 @@
+@use 'breakpoint' as bp;
+
 .role-guide {
   margin-bottom: 35px;
-  padding: 30px;
+  padding: var(--space-30);
 
-  border-radius: 20px;
+  border-radius: var(--radius-20);
 
   background-color: var(--color-white);
 
   border: 1px solid var(--border-default);
 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-soft);
 }
 
 
@@ -21,7 +23,7 @@
 
   align-items: center;
 
-  gap: 15px;
+  gap: var(--space-15);
 
   margin-bottom: 25px;
 }
@@ -37,21 +39,21 @@
 
   flex-shrink: 0;
 
-  border-radius: 16px;
+  border-radius: var(--radius-16);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 .role-label {
   color: var(--color-brand-primary);
 
-  font-size: 12px;
+  font-size: var(--font-size-12);
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 
   letter-spacing: 2px;
 }
@@ -61,7 +63,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 25px;
+  font-size: var(--font-size-25);
 }
 
 .role-guide-header p {
@@ -69,7 +71,7 @@
 
   color: var(--color-text-muted);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 
@@ -104,7 +106,7 @@
 
   background-color: var(--color-white);
 
-  border-right: 1px solid #edf0f2;
+  border-right: 1px solid var(--bg-ash);
 }
 
 .guide-step:last-child {
@@ -128,15 +130,15 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 
   background-color: var(--color-brand-primary);
 
-  color: #fff;
+  color: var(--color-white);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .step-content > i {
@@ -150,13 +152,13 @@
   align-items: center;
   justify-content: center;
 
-  border-radius: 14px;
+  border-radius: var(--radius-14);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 21px;
+  font-size: var(--font-size-21);
 }
 
 .step-content h3 {
@@ -164,7 +166,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .step-content p {
@@ -172,9 +174,9 @@
 
   color: var(--color-text-muted);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 
@@ -195,7 +197,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 .common-functions-header p {
@@ -203,7 +205,7 @@
 
   color: var(--color-text-muted);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .common-function-grid {
@@ -211,21 +213,21 @@
 
   grid-template-columns: repeat(2, 1fr);
 
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .common-function-card {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--space-15);
 
   padding: 22px;
 
   box-sizing: border-box;
 
-  border-radius: 16px;
+  border-radius: var(--radius-16);
 
-  background-color: #f8fbfc;
+  background-color: var(--bg-page);
 
   border: 1px solid var(--border-default);
 
@@ -242,7 +244,7 @@
 .common-function-card:hover {
   transform: translateY(-3px);
 
-  background-color: #ffffff;
+  background-color: var(--color-white);
 
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08);
 }
@@ -250,7 +252,7 @@
 .common-function-card:hover {
   transform: translateY(-3px);
 
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-raised);
 }
 
 .function-icon {
@@ -264,13 +266,13 @@
 
   flex-shrink: 0;
 
-  border-radius: 14px;
+  border-radius: var(--radius-14);
 
-  background-color: #eaf4f8;
+  background-color: var(--bg-action-mist);
 
   color: var(--color-brand-primary);
 
-  font-size: 21px;
+  font-size: var(--font-size-21);
 }
 
 .function-content {
@@ -282,7 +284,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 17px;
+  font-size: var(--font-size-17);
 }
 
 .function-content p {
@@ -290,17 +292,17 @@
 
   color: var(--color-text-muted);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
 }
 
 .function-content span {
   color: var(--color-brand-primary);
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 
@@ -313,11 +315,11 @@
 
   text-align: center;
 
-  border-radius: 16px;
+  border-radius: var(--radius-16);
 
   background-color: #f7f9fa;
 
-  border: 1px dashed #cbd5df;
+  border: 1px dashed var(--border-slate);
 }
 
 .locked-common-functions > i {
@@ -325,7 +327,7 @@
 
   color: var(--color-brand-primary);
 
-  font-size: 30px;
+  font-size: var(--font-size-30);
 }
 
 .locked-common-functions h4 {
@@ -333,7 +335,7 @@
 
   color: var(--color-text-main);
 
-  font-size: 19px;
+  font-size: var(--font-size-19);
 }
 
 .locked-common-functions p {
@@ -343,9 +345,9 @@
 
   color: var(--color-text-muted);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
-  line-height: 1.7;
+  line-height: var(--line-height-loose);
 }
 
 .login-button {
@@ -356,21 +358,21 @@
 
   padding: 10px 22px;
 
-  border-radius: 18px;
+  border-radius: var(--radius-18);
 
   background-color: var(--color-brand-primary);
 
-  color: #fff;
+  color: var(--color-white);
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 
   text-decoration: none;
 }
 
 .login-button:hover {
-  background-color: #0b57b5;
+  background-color: var(--color-action-deep);
 }
 
 
@@ -378,7 +380,7 @@
 // RWD
 // ==========================================
 
-@media (max-width: 1100px) {
+@include bp.below-desktop {
 
   .guide-steps {
     grid-template-columns: repeat(3, 1fr);
@@ -389,11 +391,11 @@
   }
 
   .guide-step {
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid var(--bg-ash);
   }
 }
 
-@media (max-width: 700px) {
+@include bp.tablet {
 
   .role-guide {
     padding: 22px;
@@ -412,7 +414,7 @@
   }
 }
 
-@media (max-width: 500px) {
+@include bp.mobile {
 
   .guide-steps {
     grid-template-columns: 1fr;

@@ -42,6 +42,7 @@ interface DonationRow {
   need_thank_you: boolean | null;
   status: string;
   created_at: string;
+  logistics_carrier: string | null;
   tracking_no: string | null;
   receipt_password_changed_at: string | null;
 }
@@ -133,6 +134,7 @@ export class AgencyReceiptIssuanceService {
         need_thank_you,
         status,
         created_at,
+        logistics_carrier,
         tracking_no,
         receipt_password_changed_at
       `
@@ -179,7 +181,7 @@ export class AgencyReceiptIssuanceService {
         quantity: receiptQuantityTotal(receiptLines) || row.quantity || 0,
         donationMethod: row.donation_method ?? '',
         deliveryAddress: demand?.address || storedLogistics.deliveryAddress,
-        logisticsCarrier: storedLogistics.logisticsCarrier,
+        logisticsCarrier: row.logistics_carrier || storedLogistics.logisticsCarrier,
         trackingNo: row.tracking_no || storedLogistics.trackingNo,
         receiptLines,
         receiptTitle: row.receipt_title || row.donor_name || '',
@@ -299,7 +301,11 @@ export class AgencyReceiptIssuanceService {
     const trackingNo = handoverMethod === '寄送' ? draft.trackingNo.trim() : '';
 
     if (handoverMethod === '寄送' && !logisticsCarrier) {
-      throw new Error('寄送的收據請選擇物流公司');
+      throw new Error('寄送的收據要等捐助者選擇物流公司');
+    }
+
+    if (handoverMethod === '寄送' && !trackingNo) {
+      throw new Error('寄送的收據要等捐助者上傳物流單號');
     }
 
     const donationItem = summarizeReceiptLines(lines);
@@ -347,21 +353,6 @@ export class AgencyReceiptIssuanceService {
       if (error) {
         console.error('開立收據失敗：', error);
         throw error;
-      }
-    }
-
-    if (handoverMethod === '寄送') {
-      const { error: trackingError } = await this.supabaseService.client
-        .from(this.donationTable)
-        .update({
-          tracking_no: trackingNo || null,
-          ...(trackingNo ? { tracking_uploaded_at: new Date().toISOString() } : {}),
-        })
-        .eq('id', task.donationId);
-
-      if (trackingError) {
-        console.error('寫入物流資料失敗：', trackingError);
-        throw trackingError;
       }
     }
 

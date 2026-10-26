@@ -1,3 +1,4 @@
+@use 'breakpoint' as bp;
 
 // 感謝牆與黑名單專區
 
@@ -18,8 +19,8 @@
   text-align: center;
 
   color: var(--color-text-main);
-  font-size: 32px;
-  font-weight: 700;
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
 }
 
 
@@ -60,8 +61,8 @@
   text-align: center;
 
   color: var(--color-text-main);
-  font-size: 26px;
-  font-weight: 600;
+  font-size: var(--font-size-26);
+  font-weight: var(--font-weight-semibold);
 }
 
 
@@ -75,14 +76,14 @@
 
 .board-notices {
   display: grid;
-  gap: 8px;
+  gap: var(--space-8);
   margin-bottom: 12px;
 }
 
 .board-notice {
   padding: 12px 14px;
-  border-radius: 12px;
-  background: #fff7ed;
+  border-radius: var(--radius-12);
+  background: var(--bg-gradient-end);
   color: #7c2d12;
   text-align: left;
 
@@ -95,7 +96,7 @@
   display: flex;
   flex-direction: column;
 
-  gap: 10px;
+  gap: var(--space-10);
 
   max-height: 68vh;
 
@@ -123,7 +124,7 @@
 
   background-color: var(--color-white);
 
-  border-radius: 12px;
+  border-radius: var(--radius-12);
 
   color: var(--color-text-main);
 
@@ -146,21 +147,21 @@
 
 // 「感謝」
 .card-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 
 // 捐助者
 .donor-name {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
 
   color: var(--color-brand-primary);
 
   span {
     color: var(--color-text-main);
-    font-size: 13px;
-    font-weight: 400;
+    font-size: var(--font-size-13);
+    font-weight: var(--font-weight-regular);
     margin-left: 4px;
   }
 }
@@ -168,14 +169,14 @@
 
 // 捐贈
 .donation-action {
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 
 // 物品
 .donation-item {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
 
   color: var(--color-brand-primary);
 }
@@ -183,8 +184,8 @@
 
 // 機構
 .organization {
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: var(--font-size-13);
+  line-height: var(--line-height-snug);
 }
 
 
@@ -198,13 +199,13 @@
 .thank-you-list::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.5);
 
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 
 .thank-you-list::-webkit-scrollbar-thumb {
   background-color: #adb9c2;
 
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 
 .thank-you-list::-webkit-scrollbar-thumb:hover {
@@ -218,7 +219,7 @@
 .blacklist {
   flex: 1;
 
-  padding: 30px;
+  padding: var(--space-30);
 
   background-color: #c7d3dd;
 
@@ -236,8 +237,8 @@
 
   color: var(--color-text-main);
 
-  font-size: 26px;
-  font-weight: 600;
+  font-size: var(--font-size-26);
+  font-weight: var(--font-weight-semibold);
 }
 
 
@@ -263,8 +264,8 @@
 
 // 使用者
 .blacklist-user {
-  font-size: 20px;
-  font-weight: 500;
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-medium);
 
   color: var(--color-text-main);
 
@@ -274,7 +275,7 @@
 
 // 原因
 .blacklist-reason {
-  font-size: 17px;
+  font-size: var(--font-size-17);
 
   color: var(--color-text-main);
 }
@@ -290,15 +291,71 @@
 .blacklist-list::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.25);
 
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 
 .blacklist-list::-webkit-scrollbar-thumb {
   background-color: #9ba8b1;
 
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 
 .blacklist-list::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-brand-primary);
+}
+
+@include bp.mobile {
+  .thank-you-page {
+    padding: 20px var(--layout-page-padding) 32px;
+  }
+
+  .page-title {
+    margin-bottom: 16px;
+    font-size: var(--font-size-22);
+    line-height: 1.35;
+  }
+
+  .wall-layout {
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+
+  .thank-you-wall,
+  .blacklist {
+    flex: none;
+    width: 100%;
+    padding: var(--space-16);
+    border-radius: var(--radius-16);
+    box-sizing: border-box;
+  }
+
+  .wall-title,
+  .blacklist-title {
+    font-size: var(--font-size-20);
+  }
+
+  .thank-you-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+
+  .card-who,
+  .card-what {
+    width: 100%;
+  }
+
+  .thank-you-list,
+  .blacklist-list {
+    max-height: none;
+  }
+
+  .blacklist-user {
+    font-size: var(--font-size-17);
+  }
+
+  .blacklist-reason {
+    font-size: var(--font-size-15);
+    line-height: var(--line-height-normal);
+  }
 }

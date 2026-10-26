@@ -2,6 +2,10 @@ import { Routes } from '@angular/router';
 
 export const agencyRoutes: Routes = [
   {
+    path: 'agency/inbox',
+    loadComponent: () => import('./agency-inbox/agency-inbox.component').then((m) => m.AgencyInboxComponent),
+  },
+  {
     path: 'agency/dashboard',
     loadComponent: () => import('./agency-dashboard/agency-dashboard.component').then((m) => m.AgencyDashboardComponent),
   },

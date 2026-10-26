@@ -16,36 +16,36 @@
   justify-content: space-between;
   margin-bottom: 8px;
   padding: 12px 14px;
-  border: 1px solid #f3d19c;
-  border-radius: 12px;
+  border: 1px solid var(--bg-sand-strong);
+  border-radius: var(--radius-12);
   background: #fff8eb;
-  color: #163a53;
+  color: var(--color-text-dark);
 }
 
 .access-banner p,
 .access-note {
   margin: 0;
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 .access-banner div {
   display: flex;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 button {
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   padding: 8px 14px;
-  background: #005bac;
-  color: #fff;
+  background: var(--color-link);
+  color: var(--color-white);
   cursor: pointer;
 }
 
 button.quiet {
-  background: #fff;
-  color: #9f1239;
-  border: 1px solid #f3d19c;
+  background: var(--color-white);
+  color: var(--color-error-rose);
+  border: 1px solid var(--bg-sand-strong);
 }
 
 button:disabled {

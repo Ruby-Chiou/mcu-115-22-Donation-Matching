@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 /* 整個明細頁 */
 .detail-page {
   width: 100%;
@@ -10,9 +12,9 @@
 .back-button {
   border: none;
   background: transparent;
-  color: #ff6b35;
-  font-size: 16px;
-  font-weight: 600;
+  color: var(--color-accent);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   margin-bottom: 20px;
 }
@@ -22,22 +24,22 @@
 /*標題*/
 .detail-header {
   margin-bottom: 30px;
-  color: #005bac;
+  color: var(--color-link);
 }
 .detail-header h1 {
   margin: 0;
-  font-size: 30px;
+  font-size: var(--font-size-30);
 }
 /* 上方主要資訊*/
 .detail-main {
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: 40px;
-  padding: 30px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: var(--space-30);
+  background: var(--color-white);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-panel);
   box-sizing: border-box;
 }
 /* 左邊圖片*/
@@ -45,14 +47,14 @@
   width: 100%;
   height: auto;
   max-width: 420px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   background: transparent;
 }
 
 /*右邊資訊*/
 .detail-info h2 {
   margin: 0 0 25px;
-  font-size: 28px;
+  font-size: var(--font-size-28);
 }
 /* 數量 */
 .quantity-info {
@@ -63,14 +65,14 @@
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid #eeeeee;
-  font-size: 16px;
+  border-bottom: 1px solid var(--border-hairline);
+  font-size: var(--font-size-16);
 }
 .info-item span {
-  color: #666;
+  color: var(--color-text-secondary);
 }
 .info-item strong {
-  color: #333;
+  color: var(--color-text-body);
 }
 /* 募集進度 */
 .progress-section {
@@ -83,39 +85,39 @@
   margin-bottom: 8px;
 }
 .progress-info span {
-  color: #666;
+  color: var(--color-text-secondary);
 }
 .progress-info strong {
-  color: #ff6b35;
+  color: var(--color-accent);
 }
 .progress-bar {
   width: 100%;
   height: 10px;
   overflow: hidden;
-  background: #eeeeee;
-  border-radius: 10px;
+  background: var(--border-hairline);
+  border-radius: var(--radius-10);
 }
 .progress {
   height: 100%;
-  background: #ff6b35;
-  border-radius: 10px;
+  background: var(--color-accent);
+  border-radius: var(--radius-10);
 }
 /*  受助機構 */
 .organization-box {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
   padding: 15px 0;
-  border-top: 1px solid #eeeeee;
-  border-bottom: 1px solid #eeeeee;
+  border-top: 1px solid var(--border-hairline);
+  border-bottom: 1px solid var(--border-hairline);
 }
 .organization-label {
-  color: #666;
-  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-14);
 }
 .organization-box strong {
-  color: #333;
-  font-size: 16px;
+  color: var(--color-text-body);
+  font-size: var(--font-size-16);
 }
 .donate-action {
   margin-top: 30px;
@@ -125,30 +127,30 @@
 .donate-button {
   padding: 14px 40px;
   border: none;
-  border-radius: 8px;
-  background: #ff6b35;
+  border-radius: var(--radius-8);
+  background: var(--color-accent);
   color: white;
-  font-size: 18px;
-  font-weight: bold;
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
   transition: 0.2s;
 }
 .donate-button:hover {
-  background: #004a8f;
+  background: var(--color-link-dark);
   transform: translateY(-2px);
 }
 /* 相關社福機構*/
 .organization-detail {
   margin-top: 30px;
-  padding: 30px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: var(--space-30);
+  background: var(--color-white);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-panel);
 }
 .organization-detail h2 {
   margin: 0 0 20px;
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 .organization-info {
   display: flex;
@@ -157,44 +159,44 @@
 .organization-item {
   display: grid;
   grid-template-columns: 120px 1fr;
-  gap: 20px;
+  gap: var(--space-20);
   padding: 15px 0;
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid var(--border-hairline);
   text-align: right;
 }
 .organization-item:last-child {
   border-bottom: none;
 }
 .organization-item > span {
-  color: #666;
-  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 .organization-item strong {
-  color: #333;
+  color: var(--color-text-body);
   text-align: right;
 }
 .organization-item p {
   margin: 0;
-  line-height: 1.7;
-  color: #555;
+  line-height: var(--line-height-loose);
+  color: var(--color-text-quiet);
   text-align: right;
 }
 /* 服務對象卡片 */
 .service-target-detail {
   margin-top: 30px;
-  padding: 30px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: var(--space-30);
+  background: var(--color-white);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-panel);
 }
 .service-target-detail h2 {
   margin: 0 0 10px;
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 .service-target-list {
-  color: #555;
-  line-height: 1.8;
+  color: var(--color-text-quiet);
+  line-height: var(--line-height-looser);
 }
 .service-target-list > span {
   display: inline;
@@ -205,18 +207,110 @@
 /* 需求說明*/
 .description {
   margin-top: 30px;
-  padding: 30px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: var(--space-30);
+  background: var(--color-white);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-panel);
 }
 .description h2 {
   margin: 0 0 15px;
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 .description p {
   margin: 0;
-  line-height: 1.8;
-  color: #555;
+  line-height: var(--line-height-looser);
+  color: var(--color-text-quiet);
+}
+
+@include bp.tablet {
+  .detail-page {
+    padding: 20px 16px;
+  }
+
+  .detail-header h1 {
+    font-size: var(--font-size-24);
+  }
+
+  .detail-main {
+    grid-template-columns: 1fr;
+    gap: var(--space-20);
+    padding: var(--space-16);
+  }
+
+  .detail-image {
+    max-width: none;
+  }
+
+  .detail-info h2 {
+    margin-bottom: 12px;
+    font-size: var(--font-size-22);
+  }
+
+  .donate-action {
+    margin-top: 16px;
+  }
+
+  .donate-button {
+    width: 100%;
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .info-item strong {
+    font-size: var(--font-size-18);
+  }
+
+  .organization-item {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    text-align: left;
+  }
+
+  .organization-item strong,
+  .organization-item p {
+    text-align: left;
+  }
+
+  .condition-content {
+    justify-content: flex-start;
+  }
+
+  .organization-detail,
+  .description,
+  .service-target-detail {
+    padding: var(--space-16);
+  }
+}
+
+@include bp.mobile {
+  .detail-page {
+    padding: var(--space-12);
+  }
+
+  .organization-item {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    text-align: left;
+  }
+
+  .organization-item strong,
+  .organization-item p {
+    text-align: left;
+  }
+
+  .condition-content {
+    justify-content: flex-start;
+  }
+
+  .condition-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
 }

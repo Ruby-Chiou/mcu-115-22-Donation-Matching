@@ -1,7 +1,7 @@
 .filter-trigger-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   padding-right: 4px;
 }
 
@@ -11,16 +11,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #90caf9;
-  border-radius: 50%;
-  background: #bbdefb;
-  color: #1565c0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  border: 1.5px solid var(--color-action-light);
+  border-radius: var(--radius-circle);
+  background: var(--color-action-ice);
+  color: var(--color-action);
+  box-shadow: var(--shadow-line);
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #90caf9;
+    background: var(--color-action-light);
     transform: scale(1.05);
   }
 }
@@ -31,20 +31,25 @@
 }
 
 .filter-label-text {
-  color: #333;
-  font-size: 16px;
-  font-weight: 600;
+  color: var(--color-text-body);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
   user-select: none;
 }
 
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: var(--z-modal);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 40px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding:
+    max(12px, env(safe-area-inset-top))
+    12px
+    max(12px, env(safe-area-inset-bottom));
   background: rgba(0, 0, 0, 0.4);
   box-sizing: border-box;
 }
@@ -52,52 +57,52 @@
 .modal-box {
   width: 460px;
   padding: 32px;
-  border-radius: 20px;
-  background: #fff;
+  border-radius: var(--radius-20);
+  background: var(--color-white);
   text-align: center;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-overlay);
 
   h2 {
     margin-bottom: 22px;
-    color: #1565c0;
-    font-size: 26px;
-    font-weight: 600;
+    color: var(--color-action);
+    font-size: var(--font-size-26);
+    font-weight: var(--font-weight-semibold);
   }
 
   p {
     margin-bottom: 30px;
-    color: #333;
-    font-size: 18px;
+    color: var(--color-text-body);
+    font-size: var(--font-size-18);
   }
 }
 
 .modal-buttons {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: var(--space-15);
 
   button {
     padding: 9px 22px;
     border: 0;
-    border-radius: 15px;
-    font-size: 15px;
-    font-weight: 500;
+    border-radius: var(--radius-15);
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
   }
 }
 
 .cancel-btn {
-  background: #90caf9;
-  color: #0d47a1;
+  background: var(--color-action-light);
+  color: var(--color-action-dark);
 
   &:hover {
-    background: #64b5f6;
+    background: var(--color-action-sky);
   }
 }
 
 .filter-confirm-btn {
-  background: #1565c0;
-  color: #fff;
+  background: var(--color-action);
+  color: var(--color-white);
 
   &:hover {
     opacity: 0.88;
@@ -106,25 +111,26 @@
 
 .reset-btn {
   margin-right: auto;
-  border: 1px solid #c8d0d8 !important;
-  background: #e1e6eb;
-  color: #4f5b66;
+  border: 1px solid var(--border-cool-mid) !important;
+  background: var(--border-cool-light);
+  color: var(--color-text-slate-muted);
 
   &:hover {
-    background: #d5dce3;
+    background: var(--border-cool-soft);
   }
 }
 
 .filter-modal-box {
   width: 580px;
-  max-height: calc(100vh - 80px);
+  max-height: calc(100dvh - 24px);
+  margin-block: auto;
   display: flex;
   flex-direction: column;
   padding: 30px 35px;
-  border-radius: 20px;
-  background: #fff;
+  border-radius: var(--radius-20);
+  background: var(--color-white);
   text-align: left;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-overlay);
   box-sizing: border-box;
   overflow: hidden;
 
@@ -147,43 +153,43 @@
 
   h3 {
     margin-bottom: 10px;
-    color: #444;
-    font-size: 16px;
-    font-weight: 600;
+    color: var(--color-text-dim-dark);
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-semibold);
   }
 }
 
 .pill-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .pill-btn {
   padding: 8px 18px;
   border: 0;
-  border-radius: 20px;
-  background: #e3f2fd;
-  color: #1565c0;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: var(--radius-20);
+  background: var(--bg-action-soft);
+  color: var(--color-action);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
 
   &:hover {
-    background: #bbdefb;
+    background: var(--color-action-ice);
   }
 
   &.active {
-    background: #1565c0;
-    color: #fff;
-    font-weight: 600;
+    background: var(--color-action);
+    color: var(--color-white);
+    font-weight: var(--font-weight-semibold);
   }
 }
 
 .filter-buttons {
   margin-top: 0;
   padding-top: 15px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-hairline);
   flex-shrink: 0;
   justify-content: flex-end;
 }

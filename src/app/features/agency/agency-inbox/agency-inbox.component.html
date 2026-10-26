@@ -1,0 +1,21 @@
+<section class="agency-inbox">
+  <header class="page-heading">
+    <h1>收件匣</h1>
+    <p>捐助者的回信和私訊會在這裡。頁首鈴鐺只計你有打開的通知類別。</p>
+  </header>
+
+  <div class="inbox-tabs" role="tablist">
+    <button type="button" role="tab" [class.active]="tab() === 'inbox'" [attr.aria-selected]="tab() === 'inbox'" (click)="tab.set('inbox')">
+      信件
+    </button>
+    <button type="button" role="tab" [class.active]="tab() === 'settings'" [attr.aria-selected]="tab() === 'settings'" (click)="tab.set('settings')">
+      通知設定
+    </button>
+  </div>
+
+  @if (tab() === 'inbox') {
+    <app-member-inbox />
+  } @else {
+    <app-member-notification-settings />
+  }
+</section>

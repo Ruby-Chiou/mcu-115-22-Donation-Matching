@@ -267,8 +267,9 @@ export class DonorDailyFormComponent implements OnInit {
       // 切換完成畫面
       this.submitted = true;
 
-      // 立即要求 Angular 更新模板
+      // 立即要求 Angular 更新模板，再把視窗拉回頂端
       this.cdr.detectChanges();
+      this.scrollSuccessToTop();
 
       // 背景執行 AI，不阻塞完成畫面
       void this.runAiReview(this.donationId);
@@ -278,7 +279,7 @@ export class DonorDailyFormComponent implements OnInit {
       this.isSubmitting = false;
       this.cdr.detectChanges();
 
-      alert('捐助資料送出失敗，請稍後再試。');
+      alert(donationSubmitError(error));
     }
   }
   private async runAiReview(donationId: string): Promise<void> {
@@ -294,7 +295,7 @@ export class DonorDailyFormComponent implements OnInit {
     } catch (error) {
       console.error('AI 審核失敗：', error);
 
-      this.reviewError = 'OpenRouter 審核沒有完成，這筆會停在 AI 審核，不會直接交給機構。';
+      this.reviewError = '照片已經送出。這次沒有辨識完成，機構會直接看照片確認。';
     } finally {
       this.isReviewing = false;
       this.cdr.detectChanges();
@@ -303,6 +304,15 @@ export class DonorDailyFormComponent implements OnInit {
 
   goToHistory(): void {
     void this.router.navigate(['/donor/history']);
+  }
+
+  private scrollSuccessToTop(): void {
+    const scroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    };
+
+    scroll();
+    requestAnimationFrame(scroll);
   }
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -422,4 +432,19 @@ export class DonorDailyFormComponent implements OnInit {
       this.receiptLines = [emptyReceiptLine(this.actualMaterial || this.demand?.item || '', this.quantity && this.quantity > 0 ? this.quantity : 1)];
     }
   }
+}
+
+function donationSubmitError(error: unknown): string {
+  const record = error as { message?: string } | null;
+  const message = record?.message ?? '';
+
+  if (/donor_daily_donations/i.test(message)) {
+    return '捐助資料沒有寫入。請用捐助者帳號登入後再送一次。';
+  }
+
+  if (/donation_files|storage|row-level security|permission denied/i.test(message)) {
+    return '物資照片沒有上傳，這筆捐助沒有完成。請稍後再送一次。';
+  }
+
+  return '捐助資料送出失敗，請稍後再試。';
 }

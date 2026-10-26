@@ -7,10 +7,10 @@
 h1 {
   margin: 28px 0 24px;
   text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: #1565c0;
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-4);
+  color: var(--color-action);
 }
 
 /*批次編輯標題*/
@@ -26,64 +26,64 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .edit-top-button-area button {
   min-height: 44px;
   padding: 0 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
 }
 
 .edit-top-button-area .back-btn {
-  border: 2px solid #1565c0;
-  background: #fff;
-  color: #1565c0;
+  border: 2px solid var(--color-action);
+  background: var(--color-white);
+  color: var(--color-action);
 }
 
 .edit-top-button-area .save-btn {
   border: 0;
-  background: #1565c0;
-  color: #fff;
+  background: var(--color-action);
+  color: var(--color-white);
 }
 
 .edit-top-button-area .back-btn:hover {
-  background: #e3f2fd;
+  background: var(--bg-action-soft);
 }
 
 .edit-top-button-area .save-btn:hover {
-  background: #0d47a1;
+  background: var(--color-action-dark);
 }
 
 .info-tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f4f9;
-  border: 1px solid #d0e1f9;
-  border-radius: 8px;
+  background-color: var(--bg-neutral);
+  border: 1px solid var(--bg-action-wash);
+  border-radius: var(--radius-8);
   padding: 8px 16px;
-  gap: 8px;
-  line-height: 1;
+  gap: var(--space-8);
+  line-height: var(--line-height-none);
 }
 
 .info-label {
-  font-size: 15px; /* 原為 18px，調小讓文字「需求編號」變小 */
-  color: #5f6368;
-  font-weight: 500;
-  line-height: 1;
+  font-size: var(--font-size-15); /* 原為 18px，調小讓文字「需求編號」變小 */
+  color: var(--color-text-graphite);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-none);
 }
 
 .info-value {
-  font-size: 18px; /* 原為 17px，可維持或微調放大編號 */
+  font-size: var(--font-size-18); /* 原為 17px，可維持或微調放大編號 */
   color: var(--color-brand-primary);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   font-family: monospace, sans-serif;
-  letter-spacing: 0.5px;
-  line-height: 1;
+  letter-spacing: var(--tracking-fine);
+  line-height: var(--line-height-none);
 }
 
 /* =========================
@@ -91,23 +91,23 @@ h1 {
 ========================= */
 
 .form-box {
-  background: #fff;
-  border: 1px solid #e3ebf5;
-  border-radius: 16px;
-  box-shadow: 0 10px 28px rgb(21 101 192 / 8%);
-  padding: 30px;
+  background: var(--color-white);
+  border: 1px solid var(--bg-action-pale);
+  border-radius: var(--radius-16);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-30);
   margin-bottom: 30px;
 }
 
 .light-box,
 .dark-box {
-  background: #fff;
+  background: var(--color-white);
 }
 
 /* 標題 */
 h2 {
   margin-bottom: 20px;
-  font-size: 20px;
+  font-size: var(--font-size-20);
 }
 
 /* =========================
@@ -118,8 +118,8 @@ label {
   display: block;
   margin-bottom: 8px;
   color: var(--color-text-main);
-  font-weight: 500;
-  font-size: 17px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-17);
 }
 
 .form-box > label {
@@ -134,22 +134,22 @@ input,
 select {
   width: 100%;
   box-sizing: border-box;
-  padding: 12px;
+  padding: var(--space-12);
   margin-bottom: 20px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 16px;
+  border-radius: var(--radius-10);
+  border: 1px solid var(--border-muted);
+  font-size: var(--font-size-16);
 }
 
 textarea {
   width: 100%;
   box-sizing: border-box;
   min-height: 100px;
-  padding: 12px;
+  padding: var(--space-12);
   margin-bottom: 20px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 16px;
+  border-radius: var(--radius-10);
+  border: 1px solid var(--border-muted);
+  font-size: var(--font-size-16);
   resize: vertical;
 }
 
@@ -160,7 +160,7 @@ textarea {
 .amount-box {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   margin-bottom: 20px;
 }
 
@@ -209,15 +209,15 @@ textarea {
   justify-content: space-between;
   padding: 5px 8px;
   margin-bottom: 2px;
-  border-bottom: 1px dashed #1e88e5;
+  border-bottom: 1px dashed var(--color-action-material);
   transition: background-color 0.2s ease;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
 }
 
 .condition-name {
-  color: var(--color-text-main, #333333);
-  font-weight: 500;
-  font-size: 16px;
+  color: var(--color-text-main, var(--color-text-body));
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-16);
 }
 
 .condition-row input[type='radio'] {
@@ -233,7 +233,7 @@ textarea {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 30px;
+  gap: var(--space-30);
   margin-bottom: 35px;
 }
 
@@ -241,11 +241,11 @@ textarea {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-bottom: 0;
   cursor: pointer;
   white-space: nowrap;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .priority-box input[type='radio'] {
@@ -254,15 +254,15 @@ textarea {
 }
 
 .priority-box .normal {
-  color: #333333;
+  color: var(--color-text-body);
 }
 
 .priority-box .urgent {
-  color: #f57c00;
+  color: var(--color-warning);
 }
 
 .priority-box .very-urgent {
-  color: #d32f2f;
+  color: var(--color-error);
 }
 
 /* =========================
@@ -272,7 +272,7 @@ textarea {
 .status-box {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: var(--space-30);
   margin-bottom: 35px;
 }
 
@@ -280,10 +280,10 @@ textarea {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-bottom: 0;
   cursor: pointer;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .status-box input[type='radio'] {
@@ -298,16 +298,16 @@ textarea {
 .label-row {
   display: flex !important;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-top: 20px;
   margin-bottom: 8px;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .word-count {
-  font-size: 13px;
-  color: #555;
-  font-weight: 400;
+  font-size: var(--font-size-13);
+  color: var(--color-text-quiet);
+  font-weight: var(--font-weight-regular);
   margin-left: 4px;
   white-space: nowrap;
 }
@@ -345,7 +345,7 @@ textarea {
 .custom-condition-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   width: 440px;
   flex-shrink: 0;
 }
@@ -355,7 +355,7 @@ textarea {
   grid-template-columns: repeat(2, 440px);
   grid-template-rows: repeat(3, auto);
   grid-auto-flow: column;
-  column-gap: 30px;
+  column-gap: var(--space-30);
   row-gap: 28px;
 }
 
@@ -368,12 +368,12 @@ textarea {
   width: 30px;
   height: 30px;
   flex-shrink: 0;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   background-color: white;
-  border: 1px solid #ccc;
-  color: #333;
-  font-size: 18px;
-  font-weight: bold;
+  border: 1px solid var(--border-input);
+  color: var(--color-text-body);
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -382,7 +382,7 @@ textarea {
 
 .add-condition-btn:hover,
 .delete-condition-btn:hover {
-  background-color: #f5f5f5;
+  background-color: var(--bg-muted);
 }
 
 /* =========================
@@ -390,14 +390,14 @@ textarea {
 ========================= */
 
 .invalid {
-  border: 2px solid #e53935 !important;
+  border: 2px solid var(--color-error-bright) !important;
   outline: none;
-  background-color: #fff5f5;
+  background-color: var(--bg-error-soft);
 }
 
 .required {
-  color: #d32f2f;
-  font-weight: bold;
+  color: var(--color-error);
+  font-weight: var(--font-weight-bold);
 }
 
 /* 分隔線 */
@@ -406,19 +406,19 @@ hr {
   margin-top: 30px;
   margin-bottom: 10px;
   border: none;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--border-input);
 }
 
 /* 接受物資狀態按鈕 */
 .condition-toggle {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
   border: none;
-  background-color: #90a4ae;
+  background-color: var(--color-text-ash);
   color: white;
-  font-size: 15px;
-  font-weight: bold;
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 
   display: flex;
@@ -429,11 +429,11 @@ hr {
 }
 
 .condition-toggle.accept {
-  background-color: #66a96b;
+  background-color: var(--color-success-mid);
 }
 
 .condition-toggle.reject {
-  background-color: #c75b5b;
+  background-color: var(--color-error-muted);
 }
 
 .condition-row:hover {
@@ -460,8 +460,8 @@ hr {
 }
 .label-row .priority-hint {
   display: inline;
-  color: #898888;
-  font-size: 14px;
+  color: var(--color-text-dim);
+  font-size: var(--font-size-14);
   font-weight: normal;
   white-space: normal;
 }
@@ -470,7 +470,7 @@ hr {
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: var(--space-10);
   margin-top: 25px;
   margin-bottom: 30px;
 }
@@ -479,31 +479,31 @@ hr {
   min-height: 44px;
   padding: 0 20px;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   cursor: pointer;
   color: white;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
 }
 
 .button-area .save-btn {
   border: 0;
-  background: #1565c0;
-  color: #fff;
+  background: var(--color-action);
+  color: var(--color-white);
 }
 
 .button-area .back-btn {
-  border: 2px solid #1565c0;
-  background: #fff;
-  color: #1565c0;
+  border: 2px solid var(--color-action);
+  background: var(--color-white);
+  color: var(--color-action);
 }
 
 .button-area .save-btn:hover {
-  background: #0d47a1;
+  background: var(--color-action-dark);
   opacity: 1;
 }
 
 .button-area .back-btn:hover {
-  background: #e3f2fd;
+  background: var(--bg-action-soft);
   opacity: 1;
 }

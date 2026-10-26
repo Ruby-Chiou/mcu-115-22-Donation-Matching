@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 
 import { AuthSessionService } from '../auth/auth-session.service';
 import { SupabaseService } from '../database/supabase.service';
+import { MemberMailDispatchService } from '../member-center/member-mail-dispatch.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +10,7 @@ import { SupabaseService } from '../database/supabase.service';
 export class AgencyMemberMessageService {
   private readonly supabase = inject(SupabaseService);
   private readonly auth = inject(AuthSessionService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   async sendToDonor(donorUid: string, donorName: string, subject: string, content: string): Promise<void> {
     const message = content.trim();
@@ -39,5 +41,7 @@ export class AgencyMemberMessageService {
     if (error) {
       throw new Error('站內信沒有送出，請稍後再試。');
     }
+
+    void this.mail.sweep();
   }
 }

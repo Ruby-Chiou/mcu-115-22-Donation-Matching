@@ -3,7 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AuthSessionService } from '../../core/services/auth/auth-session.service';
+import { MemberMailDispatchService } from '../../core/services/member-center/member-mail-dispatch.service';
 import { MemberMessageService } from '../../core/services/member-center/member-message.service';
+import { MemberNotificationSettingsService } from '../../core/services/member-center/member-notification-settings.service';
 import { AuthPrincipal } from '../../models/auth/app-role';
 import { DonorHistoryComponent } from '../donor-history/donor-history.component';
 import { MemberAcknowledgementsComponent } from './member-acknowledgements/member-acknowledgements.component';
@@ -32,11 +34,17 @@ export class MemberCenterComponent {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthSessionService);
   protected readonly messageService = inject(MemberMessageService);
+  private readonly notifications = inject(MemberNotificationSettingsService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   readonly activeTab = signal<MemberTab>('profile');
   protected readonly companyNotice = computed(() => companyNoticeText(this.auth.principal()));
 
   constructor() {
+    void this.notifications.loadSettings().catch(() => undefined);
+    void this.messageService.loadInbox().catch(() => undefined);
+    void this.mail.sweep();
+
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const raw = params.get('tab');
       const tab = (raw === 'certificates' ? 'acknowledgements' : raw) as MemberTab | null;

@@ -1,41 +1,43 @@
+@use 'breakpoint' as bp;
+
 /* 留言區*/
 .comment-section {
   margin-top: 30px;
-  padding: 30px;
-  background: #ffffff;
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: var(--space-30);
+  background: var(--color-white);
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-panel);
 }
 .comment-section h2 {
   margin: 0 0 20px;
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 /* 留言輸入 */
 .comment-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-12);
   margin-bottom: 30px;
 }
 .comment-form textarea {
   width: 100%;
-  padding: 12px;
+  padding: var(--space-12);
   box-sizing: border-box;
-  border: 1px solid #cccccc;
-  border-radius: 8px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-8);
   resize: vertical;
-  font-size: 15px;
+  font-size: var(--font-size-15);
   font-family: inherit;
   outline: none;
 }
 .comment-form textarea:focus {
-  border-color: #ff6b35;
+  border-color: var(--color-accent);
 }
 .comment-notice {
   margin: 0;
-  color: #9a3412;
-  font-size: 14px;
+  color: var(--color-accent-brown);
+  font-size: var(--font-size-14);
 }
 
 /* 發布留言 */
@@ -43,22 +45,22 @@
   align-self: flex-end;
   padding: 10px 24px;
   border: none;
-  border-radius: 8px;
-  background: #ff6b35;
-  color: #ffffff;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: var(--radius-8);
+  background: var(--color-accent);
+  color: var(--color-white);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }
 .comment-button:hover {
-  background: #e85a28;
+  background: var(--color-accent-hover);
 }
 
 /* 1. 留言列表與卡片基礎設置 */
 .comment-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-16);
   width: 100%;
   box-sizing: border-box;
 }
@@ -67,10 +69,10 @@
 .comment {
   width: 100%;
   box-sizing: border-box;
-  padding: 18px;
-  background: #f8f8f8;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  padding: var(--space-18);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--radius-8);
 }
 
 /* 回覆列表容器 */
@@ -78,7 +80,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-12);
   width: 100%;
   margin-top: 12px;
   padding-left: 0;
@@ -88,8 +90,10 @@
 /* 留言標題 */
 .comment-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 6px 12px;
   margin-bottom: 10px;
 }
 
@@ -98,38 +102,43 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
-  min-width: 0;
+  gap: var(--space-6);
+  flex: 1 1 auto;
+  min-width: min(100%, 10rem);
+  max-width: 100%;
 }
 
 .reply-title-text {
-  color: #666;
-  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-14);
 }
 
 .comment-title .reply-target-name {
-  color: #005bac;
-  font-weight: 700;
-  background: #e8f3ff;
+  flex: 0 0 auto;
+  color: var(--color-link);
+  font-weight: var(--font-weight-bold);
+  background: var(--bg-action-chip);
   padding: 2px 8px;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
+  line-height: 1.45;
+  max-width: 100%;
 }
 
 .comment p {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #555;
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-quiet);
 }
 
 .comment-header strong {
-  font-size: 16px;
-  color: #333;
+  font-size: var(--font-size-16);
+  color: var(--color-text-body);
 }
 
 .comment-header span {
-  font-size: 14px;
-  color: #999;
+  font-size: var(--font-size-14);
+  color: var(--color-text-faint);
 }
 
 .comment-header,
@@ -143,7 +152,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--space-16);
   width: 100%;
 }
 
@@ -151,8 +160,8 @@
   flex: 1;
   min-width: 0;
   margin: 0;
-  line-height: 1.6;
-  color: #444;
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-dim-dark);
   overflow-wrap: anywhere;
 }
 
@@ -160,44 +169,44 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: var(--space-6);
   flex-shrink: 0;
 }
 
 .comment-content-row p {
   flex: 1;
   margin: 0;
-  line-height: 1.6;
-  color: #555;
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-quiet);
 }
 /*物資緊急程度 */
 .urgency {
   display: inline-block;
   margin-bottom: 18px;
   padding: 4px 10px;
-  border-radius: 999px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
+  border-radius: var(--radius-pill);
+  color: var(--color-white);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
 }
 /* 緊急物資 */
 .urgency.very-urgent {
-  background: #d32f2f;
+  background: var(--color-error);
 }
 .urgency.urgent {
-  background: #f57c00;
+  background: var(--color-warning);
 }
 /* 一般物資 */
 .urgency.normal {
-  background: #999999;
+  background: var(--color-text-faint);
 }
 .condition-content {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-8);
 }
 .condition-item {
   white-space: nowrap;
@@ -211,18 +220,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: var(--space-18);
 
   padding: 40px 20px;
-  background-color: #fbfbfd;
-  color: #666;
-  font-size: 18px;
+  background-color: var(--bg-page);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-18);
   text-align: center;
 }
 
 .loading-state p {
   margin: 0;
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 .loading-spinner {
@@ -231,10 +240,10 @@
   box-sizing: border-box;
 
   border: 5px solid #e4f2fc;
-  border-top-color: #1685da;
-  border-right-color: #1685da;
+  border-top-color: var(--color-link-clear);
+  border-right-color: var(--color-link-clear);
 
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 
   animation: disaster-loading-spin 0.85s linear infinite;
 }
@@ -250,7 +259,7 @@
 }
 
 .empty-state {
-  color: #555;
+  color: var(--color-text-quiet);
 }
 
 .empty-state .back-button {
@@ -258,12 +267,12 @@
   padding: 10px 22px;
 
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
 
-  background-color: #1477bd;
-  color: #fff;
+  background-color: var(--color-link-ocean);
+  color: var(--color-white);
 
-  font-size: 15px;
+  font-size: var(--font-size-15);
   cursor: pointer;
 }
 
@@ -279,7 +288,7 @@
 .like-button {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-4);
   border: none;
   background: transparent;
   cursor: pointer;
@@ -287,7 +296,7 @@
 
 .like-button .material-symbols-outlined {
   color: pink;
-  font-size: 24px;
+  font-size: var(--font-size-24);
 
   /* 未按讚：空心 */
   font-variation-settings:
@@ -309,37 +318,37 @@
 }
 
 .like-button span:last-child {
-  color: #777;
-  font-size: 16px;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-16);
 }
 
 .reply-button:hover {
-  color: #fff;
+  color: var(--color-white);
 }
 
 .reply-button {
   padding: 6px 14px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   align-self: flex-end;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
 }
 
 .reply-form {
   margin-top: 12px;
   margin-left: 0;
-  padding: 12px;
-  border-radius: 8px;
-  background: #f8f8f8;
+  padding: var(--space-12);
+  border-radius: var(--radius-8);
+  background: var(--bg-muted);
 }
 
 .reply-form textarea {
   width: 100%;
   box-sizing: border-box;
   resize: vertical;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: var(--space-10);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  font-size: var(--font-size-14);
   font-family: inherit;
 }
 
@@ -347,28 +356,28 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   margin-top: 8px;
 }
 
 .reply-submit-button {
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .reply-cancel-button {
   padding: 5px 10px;
-  font-size: 12px;
-  border: 1px solid #f3b27a;
-  border-radius: 6px;
-  background: #fff0e3;
-  color: #e58a45;
+  font-size: var(--font-size-12);
+  border: 1px solid var(--color-accent-peach);
+  border-radius: var(--radius-6);
+  background: var(--bg-accent-cream);
+  color: var(--color-accent-warm-deep);
   cursor: pointer;
 }
 
 .reply-cancel-button:hover {
-  background: #ffe3cc;
-  color: #d97832;
+  background: var(--bg-accent-peach);
+  color: var(--color-accent-copper-deep);
 }
 
 /* 貫穿全高的左側垂直主線 */
@@ -396,7 +405,7 @@
   left: 8px;
   width: 2px;
   height: 22px;
-  background-color: #ff6b35;
+  background-color: var(--color-accent);
 }
 
 /* 第一層回覆：隱藏橫線 */
@@ -413,7 +422,7 @@
   left: 8px;
   width: 16px;
   height: 2px;
-  background-color: #ff6b35;
+  background-color: var(--color-accent);
 }
 
 .reply:not(:last-child)::before {
@@ -421,11 +430,11 @@
 }
 
 .reply .comment-header {
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .reply .comment-content-row p {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin: 0;
 }
 
@@ -458,8 +467,8 @@
   padding: 6px 12px;
   border: none;
   background: transparent;
-  color: #005bac;
-  font-size: 14px;
+  color: var(--color-link);
+  font-size: var(--font-size-14);
   cursor: pointer;
 }
 
@@ -471,6 +480,62 @@
 .no-comments {
   text-align: center;
   padding: 30px 20px;
-  color: #777;
-  font-size: 18px;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-18);
+}
+
+@include bp.tablet {
+  .comment-section {
+    padding: var(--space-16);
+  }
+
+  .comment-text,
+  .reply .comment-content-row p {
+    font-size: var(--font-size-16);
+  }
+
+  .comment-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .comment-header span {
+    text-align: left;
+  }
+
+  .comment-title {
+    width: 100%;
+  }
+
+  .comment-content-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-10);
+  }
+
+  .comment-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px 12px;
+  }
+
+  .reply-button {
+    align-self: center;
+  }
+
+  .reply {
+    margin-left: 0;
+    padding-left: 14px;
+  }
+
+  .nested-replies {
+    padding-left: 8px;
+  }
+
+  .reply-form-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }

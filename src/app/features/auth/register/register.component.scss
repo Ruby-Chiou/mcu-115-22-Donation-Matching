@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: block;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
@@ -33,7 +35,7 @@
   align-items: center;
 }
 
-@media (max-width: 768px) {
+@include bp.tablet {
   .role-page {
     padding-top: 24px;
   }

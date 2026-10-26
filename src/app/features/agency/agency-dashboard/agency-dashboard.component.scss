@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: block;
 }
@@ -16,9 +18,9 @@
 
 h1 {
   margin: 0;
-  color: #1f2937;
-  font-size: 32px;
-  font-weight: 700;
+  color: var(--color-text-ink);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
   text-align: center;
 }
 
@@ -26,17 +28,17 @@ h1 {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   justify-content: center;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .summary-card {
   display: flex;
   min-height: 190px;
   flex-direction: column;
-  padding: 20px;
+  padding: var(--space-20);
   border: 1px solid #f1c08f;
-  border-top: 5px solid #e68a3a;
-  border-radius: 16px;
+  border-top: 5px solid var(--color-accent-warm);
+  border-radius: var(--radius-16);
   background: #fff7ef;
   box-shadow: 0 4px 12px rgb(31 41 55 / 6%);
   color: inherit;
@@ -49,7 +51,7 @@ h1 {
 
 .summary-card:not(.is-coming-soon):hover {
   transform: translateY(-4px);
-  border-color: #e68a3a;
+  border-color: var(--color-accent-warm);
   box-shadow: 0 12px 24px rgb(31 41 55 / 12%);
 }
 
@@ -66,39 +68,39 @@ h1 {
 
 .card-icon,
 .card-value {
-  color: #c86e21;
+  color: var(--color-accent-copper);
 }
 
 .card-icon {
-  font-size: 30px;
+  font-size: var(--font-size-30);
 }
 
 .card-title {
   margin: 20px 0 8px;
-  color: #374151;
-  font-size: 16px;
-  font-weight: 700;
+  color: var(--color-text-charcoal);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
 }
 
 .card-value {
   margin: 0;
   font-size: 38px;
-  font-weight: 800;
-  line-height: 1;
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-none);
 }
 
 .card-value span {
   margin-left: 4px;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
 }
 
 .card-description {
   margin: auto 0 0;
   padding-top: 16px;
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.5;
+  color: var(--color-text-cool);
+  font-size: var(--font-size-13);
+  line-height: var(--line-height-normal);
 }
 
 .is-coming-soon {
@@ -107,32 +109,32 @@ h1 {
 }
 
 .coming-soon-badge {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 4px 8px;
   background: #f8dcc1;
   color: #9a5318;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
 }
 
 .card-value-unavailable {
-  color: #9ca3af;
+  color: var(--color-text-gray);
 }
 
 .emergency-card {
   border-color: #e9a6a6;
-  border-top-color: #d32f2f;
+  border-top-color: var(--color-error);
   background: #fff2f2;
 }
 
 .emergency-card .card-icon,
 .emergency-card .card-arrow,
 .emergency-card .card-value {
-  color: #d32f2f;
+  color: var(--color-error);
 }
 
 .emergency-card:not(.is-coming-soon):hover {
-  border-color: #d32f2f;
+  border-color: var(--color-error);
 }
 
 .emergency-card:focus-visible {
@@ -142,65 +144,65 @@ h1 {
 .emergency-counts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: var(--space-10);
   margin-top: 4px;
 }
 
 .emergency-count {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-4);
 }
 
 .emergency-label {
   color: #8f2424;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
 .emergency-count strong {
-  color: #d32f2f;
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1.2;
+  color: var(--color-error);
+  font-size: var(--font-size-24);
+  font-weight: var(--font-weight-heavy);
+  line-height: var(--line-height-tight);
 }
 
 .card-arrow {
-  color: #c86e21;
-  font-size: 18px;
+  color: var(--color-accent-copper);
+  font-size: var(--font-size-18);
 }
 
 .platform-feed {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--space-16);
   margin-top: 28px;
 }
 
 .feed-column {
-  padding: 20px;
-  border: 1px solid #eadfd4;
-  border-radius: 16px;
-  background: #fff;
+  padding: var(--space-20);
+  border: 1px solid var(--border-sand);
+  border-radius: var(--radius-16);
+  background: var(--color-white);
 }
 
 .feed-column h2 {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   margin: 0 0 14px;
-  color: #1f2937;
-  font-size: 20px;
+  color: var(--color-text-ink);
+  font-size: var(--font-size-20);
 }
 
 .feed-column h2 i {
-  color: #e68a3a;
+  color: var(--color-accent-warm);
 }
 
 .feed-column ul {
   display: grid;
-  gap: 12px;
+  gap: var(--space-12);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -219,15 +221,15 @@ h1 {
 .feed-column time,
 .news-category {
   color: #9a6a3b;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-bold);
 }
 
 .feed-column p,
 .feed-column strong {
   margin: 4px 0 0;
-  color: #374151;
-  line-height: 1.6;
+  color: var(--color-text-charcoal);
+  line-height: var(--line-height-relaxed);
 }
 
 .feed-column a {
@@ -237,7 +239,7 @@ h1 {
 }
 
 .feed-column a:hover strong {
-  color: #c86e21;
+  color: var(--color-accent-copper);
 }
 
 .news-category {
@@ -247,16 +249,16 @@ h1 {
 .urgent-needs-section {
   margin-top: 32px;
   padding: 24px;
-  border: 1px solid #eadfd4;
-  border-radius: 16px;
-  background: #fff;
+  border: 1px solid var(--border-sand);
+  border-radius: var(--radius-16);
+  background: var(--color-white);
   box-shadow: 0 4px 12px rgb(31 41 55 / 4%);
 }
 
 .urgent-section-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
   margin-bottom: 16px;
 }
 
@@ -264,32 +266,32 @@ h1 {
 .reminders-heading {
   display: flex;
   align-items: center;
-  color: #1f2937;
-  font-weight: 700;
-  line-height: 1.5;
+  color: var(--color-text-ink);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
 }
 
 .urgent-section-header h2 {
-  gap: 10px;
+  gap: var(--space-10);
   margin: 0;
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 .urgent-section-header h2 i {
   flex-shrink: 0;
-  color: #e68a3a;
+  color: var(--color-accent-warm);
 }
 
 .urgent-section-description {
   margin: 8px 0 0;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.6;
+  color: var(--color-text-cool);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-relaxed);
 }
 
 .urgent-needs-list {
   display: grid;
-  gap: 14px;
+  gap: var(--space-14);
 }
 
 .urgent-need-card {
@@ -298,8 +300,8 @@ h1 {
   min-width: 0;
   padding: 20px 64px 20px 20px;
   border: 1px solid #f1d4b8;
-  border-left: 5px solid #e68a3a;
-  border-radius: 12px;
+  border-left: 5px solid var(--color-accent-warm);
+  border-radius: var(--radius-12);
   background: #fffbf7;
   color: inherit;
   text-decoration: none;
@@ -309,12 +311,12 @@ h1 {
 }
 
 .urgent-need-card:hover {
-  border-color: #e68a3a;
+  border-color: var(--color-accent-warm);
   box-shadow: 0 8px 20px rgb(31 41 55 / 10%);
 }
 
 .urgent-need-card:focus-visible {
-  outline: 3px solid #9a4e13;
+  outline: 3px solid var(--color-accent-earth);
   outline-offset: 4px;
 }
 
@@ -322,8 +324,8 @@ h1 {
   position: absolute;
   top: 50%;
   right: 20px;
-  color: #9a4e13;
-  font-size: 20px;
+  color: var(--color-accent-earth);
+  font-size: var(--font-size-20);
   transform: translateY(-50%);
   transition: transform 0.2s ease;
 }
@@ -336,7 +338,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-12);
   margin-bottom: 18px;
 }
 
@@ -344,80 +346,80 @@ h1 {
   min-width: 0;
   margin: 0;
   overflow-wrap: anywhere;
-  color: #1f2937;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.5;
+  color: var(--color-text-ink);
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
 }
 
 .urgent-empty-state,
 .reminders-status {
-  color: #6b7280;
+  color: var(--color-text-cool);
 }
 
 .urgent-empty-state {
   padding: 36px 16px;
-  border-radius: 12px;
-  background: #f9fafb;
+  border-radius: var(--radius-12);
+  background: var(--bg-page);
   text-align: center;
 }
 
 .urgent-empty-state i {
   margin-bottom: 10px;
-  color: #e68a3a;
-  font-size: 32px;
+  color: var(--color-accent-warm);
+  font-size: var(--font-size-32);
 }
 
 .urgent-empty-state p {
   margin: 0;
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 .progress-information {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-16);
   margin-bottom: 10px;
 }
 
 .progress-quantity {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-relaxed);
 }
 
 .progress-quantity,
 .reminders-item-detail {
-  color: #6b7280;
+  color: var(--color-text-cool);
 }
 
 .progress-quantity strong {
   margin: 0 3px;
-  color: #1f2937;
-  font-size: 18px;
-  font-weight: 700;
+  color: var(--color-text-ink);
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
 }
 
 .progress-percentage {
   flex-shrink: 0;
-  color: #9a4e13;
-  font-size: 16px;
-  font-weight: 700;
+  color: var(--color-accent-earth);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
 .progress-track {
   height: 12px;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: #f3e4d5;
 }
 
 .progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: #e68a3a;
+  background: var(--color-accent-warm);
   transition: width 0.35s ease;
 }
 
@@ -430,17 +432,17 @@ h1 {
 .reminders-heading {
   gap: 9px;
   margin: 0 0 18px;
-  font-size: 22px;
+  font-size: var(--font-size-22);
 }
 
 .reminders-heading i {
-  color: #e68a3a;
-  font-size: 18px;
+  color: var(--color-accent-warm);
+  font-size: var(--font-size-18);
 }
 
 .reminders-list {
   display: grid;
-  gap: 18px;
+  gap: var(--space-18);
 }
 
 .reminders-category-title {
@@ -449,68 +451,68 @@ h1 {
   align-items: baseline;
   gap: 3px;
   margin: 0 0 6px;
-  color: #4b5563;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.6;
+  color: var(--color-text-quiet-dark);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-relaxed);
 }
 
 .reminders-category-label {
-  color: #e68a3a;
-  font-weight: 700;
+  color: var(--color-accent-warm);
+  font-weight: var(--font-weight-bold);
 }
 
 .reminders-title-divider {
-  color: #d1d5db;
+  color: var(--border-silver);
 }
 
 .is-emergency .reminders-category-label {
-  color: #d32f2f;
+  color: var(--color-error);
 }
 
 .reminders-items {
   display: grid;
-  gap: 6px;
+  gap: var(--space-6);
   margin: 0;
   padding-left: 18px;
 }
 
 .reminders-items li {
   padding-left: 2px;
-  color: #6b7280;
-  font-size: 16px;
-  line-height: 1.8;
+  color: var(--color-text-cool);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-looser);
   overflow-wrap: anywhere;
 }
 
 .reminders-items li::marker {
   color: #c3c7ce;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .reminders-item-name {
   margin-right: 8px;
-  color: #374151;
-  font-weight: 500;
+  color: var(--color-text-charcoal);
+  font-weight: var(--font-weight-medium);
 }
 
 .reminders-status {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.8;
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-looser);
 }
 
 .reminders-status[role='alert'] {
-  color: #9a4e13;
+  color: var(--color-accent-earth);
 }
 
-@media (max-width: 1200px) {
+@include bp.below-desktop {
   .summary-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 760px) {
+@include bp.tablet {
   .platform-feed {
     grid-template-columns: 1fr;
   }
@@ -522,16 +524,16 @@ h1 {
 
   .reminders-heading {
     margin-bottom: 16px;
-    font-size: 19px;
+    font-size: var(--font-size-19);
   }
 
   .reminders-list {
-    gap: 16px;
+    gap: var(--space-16);
   }
 
   .urgent-needs-section {
     margin-top: 24px;
-    padding: 18px;
+    padding: var(--space-18);
   }
 
   .urgent-section-header {
@@ -540,7 +542,7 @@ h1 {
   }
 
   .urgent-section-header h2 {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   .urgent-need-card {
@@ -562,23 +564,23 @@ h1 {
 
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: var(--space-12);
   }
 
   .summary-card {
     min-height: 165px;
-    padding: 16px;
+    padding: var(--space-16);
   }
 
   .card-value {
-    font-size: 32px;
+    font-size: var(--font-size-32);
   }
 }
 
-@media (max-width: 440px) {
+@include bp.mobile {
   .reminders-category-title,
   .reminders-items li {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .reminders-item-detail {
@@ -586,27 +588,27 @@ h1 {
   }
 
   .urgent-needs-section {
-    padding: 16px;
+    padding: var(--space-16);
   }
 
   .urgent-section-header h2 {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .progress-information {
-    gap: 8px;
+    gap: var(--space-8);
   }
 
   .progress-quantity {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .progress-quantity strong {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .progress-percentage {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .summary-grid {

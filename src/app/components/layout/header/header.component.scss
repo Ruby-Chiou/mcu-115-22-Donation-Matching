@@ -1,134 +1,131 @@
-// ==========================================
-// 2. 導覽列樣式（Header & Nav）
-// ==========================================
+@use 'breakpoint' as bp;
+
 header {
   background-color: var(--nav-bg);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1200;
   transition: transform 0.3s ease;
 
-&.header-hidden {
-  transform: translateY(-100%);
-}
+  &.header-hidden {
+    transform: translateY(-100%);
+  }
 
   .container {
-    max-width: 1200px;
+    max-width: var(--layout-page-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--layout-page-padding);
   }
 
   .nav-wrapper {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    height: 70px; // 固定導覽列高度
+    gap: var(--space-16);
+    height: var(--layout-header-height);
   }
 
   .left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-10);
+    min-width: 0;
+    flex: 0 1 auto;
+  }
 
   .site-logo {
     width: 42px;
     height: 42px;
-
     object-fit: contain;
     flex-shrink: 0;
   }
 
   .nav-name {
-    font-size: 20px;
-    font-weight: 700;
+    min-width: 0;
+    font-size: var(--font-size-20);
+    font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
-    margin: 0;
-    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
   }
-}
+
+  .nav-panel {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 28px;
+  }
+
+  .nav-toggle,
+  .nav-backdrop {
+    display: none;
+  }
 
   .center nav {
     display: flex;
-    gap: 30px;
+    align-items: center;
+    gap: 28px;
 
-    // 每個帶有下拉選單的包裹外殼
     .nav-item-with-dropdown {
-      position: relative; // 超級關鍵：讓下拉選單以這個按鈕為基準定位
-      padding-bottom: 15px; // 留下一點緩衝空間，滑鼠移往選單時才不會斷掉
+      position: relative;
+      padding-bottom: 15px;
       margin-bottom: -15px;
 
-      // 主連結樣式
       & > a {
         text-decoration: none;
         color: var(--color-text-main);
-        font-weight: 500;
-        font-size: 16px;
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-16);
         padding: 8px 4px;
         display: flex;
         align-items: center;
-        gap: 6px; // 文字與小箭頭的間距
-        transition: all 0.2s;
+        gap: var(--space-6);
 
         .arrow {
-          font-size: 11px;
-          transition: transform 0.2s; // 讓箭頭旋轉有動畫
+          font-size: var(--font-size-11);
+          transition: transform 0.2s;
         }
       }
 
-      // 當滑鼠懸停在按鈕上時的「連續技」
-      &:hover {
-        & > a {
-          color: var(--color-brand-primary);
-          .arrow {
-            transform: rotate(180deg); //滑鼠移入時小箭頭自動上下顛倒翻轉
-          }
-        }
+      &:hover > a {
+        color: var(--color-brand-primary);
 
-        // 滑鼠移入時，把原本隱藏的選單顯示出來
-        .dropdown-menu {
-          display: block;
-          opacity: 1;
-          transform: translateY(0);
+        .arrow {
+          transform: rotate(180deg);
         }
+      }
+
+      &:hover .dropdown-menu {
+        display: block;
       }
     }
 
-    //下拉選單本體（預設隱藏）
     .dropdown-menu {
-      display: none; // 預設隱藏
+      display: none;
       position: absolute;
-      top: 70%; // 緊貼著主導覽列的下方彈出
-      left: 0%;
-      transform: translateX(-50px) translateY(10px); // 往下偏移一點點
-      background-color: var(--color-white);
-      min-width: 100px; // 限制最小寬度，字才不會被擠壓換行
-      list-style: none;
-      padding: 8px 0;
+      top: 100%;
+      left: 0;
+      min-width: 168px;
       margin: 0;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); // 給它一個比較重的漂浮陰影
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      z-index: 2000; // 確保不會被下方的地基卡片擋住
+      padding: 8px 0;
+      list-style: none;
+      background: var(--nav-bg);
+      border: 1px solid var(--border-lighter);
+      border-radius: var(--border-radius-main);
+      box-shadow: var(--shadow-md);
+      z-index: 2;
 
-      // 下拉選單裡面的每一行
-      li {
-        a {
-          display: block;
-          padding: 12px 14px;
-          color: var(--color-text-main);
-          text-decoration: none;
-          font-size: 16px;
-          font-weight: 400;
-          white-space: nowrap; //強制文字絕不換行
-          transition:
-            background-color 0.2s,
-            color 0.2s;
+      a {
+        display: block;
+        padding: 10px 16px;
+        color: var(--color-text-main);
+        text-decoration: none;
+        white-space: nowrap;
 
-          &:hover {
-            background-color: #f0f2f9; // 滑鼠移到選項上的淡藍色背景
-            color: var(--color-brand-primary); // 文字變藍色
-          }
+        &:hover {
+          background: var(--nav-menu-hover);
+          color: var(--color-brand-primary);
         }
       }
     }
@@ -137,97 +134,302 @@ header {
   .right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: var(--space-14);
+    margin-left: auto;
     color: var(--color-text-muted);
 
-    a {
+    a,
+    .logout-btn {
       text-decoration: none;
       color: var(--color-text-main);
-      font-size: 16px;
-      font-weight: bold;
-      &:hover {
+      font-size: var(--font-size-16);
+      font-weight: var(--font-weight-bold);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+    }
+
+    a:hover,
+    .logout-btn:hover {
+      color: var(--color-brand-primary);
+    }
+  }
+
+  .bell-label {
+    display: none;
+  }
+
+  .bell-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .header-bell {
+    display: none;
+  }
+
+  .bell-badge {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    min-width: 18px;
+    padding: 0 4px;
+    border-radius: var(--border-radius-pill);
+    background: var(--color-error);
+    color: var(--color-white);
+    font-size: var(--font-size-11);
+    font-weight: var(--font-weight-bold);
+    line-height: 18px;
+    text-align: center;
+  }
+
+  .identity-badge {
+    display: inline-flex;
+    align-items: center;
+    max-width: 280px;
+    padding: 6px 12px;
+    border-radius: var(--border-radius-pill);
+    color: var(--color-white);
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .kind-mark {
+      flex: 0 0 auto;
+      margin-right: 6px;
+      padding: 1px 6px;
+      border-radius: var(--border-radius-pill);
+      background: rgba(255, 255, 255, 0.22);
+      font-size: var(--font-size-12);
+    }
+
+    &[data-role='donor'] {
+      background: var(--color-action);
+    }
+
+    &[data-role='agency'] {
+      background: var(--color-success-strong);
+    }
+
+    &[data-role='admin'] {
+      background: var(--color-purple);
+    }
+  }
+
+  @include bp.below-desktop {
+    .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .left {
+      flex: 1 1 auto;
+    }
+
+    .nav-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      gap: var(--space-8);
+      height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--color-brand-primary);
+      border-radius: var(--border-radius-main);
+      background: var(--nav-bg);
+      color: var(--color-brand-primary);
+      font: inherit;
+      font-size: var(--font-size-15);
+      font-weight: var(--font-weight-bold);
+      cursor: pointer;
+    }
+
+    .header-bell {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin-right: 8px;
+      color: var(--color-brand-primary);
+    }
+
+    .nav-panel .bell-link {
+      display: none;
+    }
+
+    .nav-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      border: 0;
+      padding: 0;
+      background: rgba(26, 28, 28, 0.4);
+      cursor: pointer;
+    }
+
+    .nav-panel {
+      display: none;
+    }
+
+    &.menu-open .nav-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      position: fixed;
+      top: var(--layout-header-height);
+      left: 0;
+      right: 0;
+      z-index: 2;
+      max-height: calc(100dvh - var(--layout-header-height));
+      overflow: auto;
+      margin: 0;
+      padding: 8px 0 20px;
+      background: var(--nav-bg);
+      border-top: 3px solid var(--color-brand-primary);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .center nav {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+
+      .nav-item-with-dropdown {
+        margin: 0;
+        padding: 0;
+        border-bottom: 1px solid var(--border-lighter);
+
+        & > a {
+          padding: 14px 20px;
+        }
+
+        .arrow {
+          display: none;
+        }
+
+        &:hover > a .arrow {
+          transform: none;
+        }
+      }
+
+      .dropdown-menu {
+        display: block;
+        position: static;
+        min-width: 0;
+        margin: 0;
+        padding: 4px 0 8px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: var(--bg-layer-0);
+
+        a {
+          padding: 10px 20px 10px 32px;
+          color: var(--color-text-medium);
+          white-space: normal;
+        }
+      }
+    }
+
+    .right {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-10);
+      width: auto;
+      margin: 0;
+      padding: 16px 20px 0;
+
+      .nav-login,
+      .account-link {
+        background: var(--color-brand-primary);
+        color: var(--color-white);
+      }
+
+      .nav-register,
+      .logout-btn {
+        border: 1px solid var(--color-brand-primary);
+        color: var(--color-brand-primary);
+        background: var(--nav-bg);
+      }
+
+      .nav-login:hover,
+      .account-link:hover {
+        color: var(--color-white);
+      }
+
+      .nav-register:hover,
+      .logout-btn:hover {
         color: var(--color-brand-primary);
       }
     }
 
-    i {
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--color-text-main);
-      &:hover {
-        color: var(--color-brand-primary);
-      }
+    .nav-divider {
+      display: none;
+    }
+
+    .nav-login,
+    .nav-register,
+    .account-link,
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border-radius: var(--border-radius-main);
+      font-size: var(--font-size-16);
     }
 
     .identity-badge {
-      display: inline-flex;
-      align-items: center;
-      max-width: 280px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.2;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-
-      .kind-mark {
-        flex: 0 0 auto;
-        margin-right: 6px;
-        padding: 1px 6px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.22);
-        font-size: 12px;
-      }
-
-      &[data-role='donor'] {
-        background: #1565c0;
-      }
-
-      &[data-role='agency'] {
-        background: #2e7d32;
-      }
-
-      &[data-role='admin'] {
-        background: #6a1b9a;
-      }
-    }
-
-    .logout-btn {
-      border: 0;
-      background: transparent;
-      color: var(--color-text-main);
-      font: inherit;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 0;
-
-      &:hover {
-        color: var(--color-brand-primary);
-      }
+      max-width: none;
+      justify-content: center;
     }
 
     .bell-link {
-      position: relative;
-      display: inline-flex;
+      justify-content: flex-start;
+      gap: var(--space-8);
+      min-height: 44px;
+      color: var(--color-text-main);
+    }
+
+    .bell-label {
+      display: inline;
     }
 
     .bell-badge {
-      position: absolute;
-      top: -8px;
-      right: -12px;
-      min-width: 18px;
-      padding: 0 4px;
-      border-radius: 999px;
-      background: var(--color-error);
-      color: var(--color-white);
-      font-size: 11px;
-      font-weight: 700;
-      line-height: 18px;
-      text-align: center;
+      position: static;
+      margin-left: 4px;
+    }
+  }
+
+  @include bp.mobile {
+    .site-logo {
+      width: 36px;
+      height: 36px;
+    }
+
+    .nav-name {
+      font-size: var(--font-size-16);
+    }
+
+    .nav-toggle {
+      height: 36px;
+      padding: 0 10px;
+      font-size: var(--font-size-14);
     }
   }
 }

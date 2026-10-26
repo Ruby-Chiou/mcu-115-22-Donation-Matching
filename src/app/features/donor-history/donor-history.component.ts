@@ -19,6 +19,7 @@ import {
 } from '../../models/member/donation-history';
 import { DonationReceipt } from '../../models/member/donation-receipt';
 import { PublicDonationThank } from '../../models/member/public-donation-thank';
+import { RECEIPT_CARRIERS } from '../../models/agency/receipt-issuance';
 
 type FeedbackViewer = 'receipt' | 'certificate' | 'public';
 
@@ -44,6 +45,7 @@ export class DonorHistoryComponent implements OnInit {
 
   readonly statusLabels = DONATION_HISTORY_STATUS_LABELS;
   readonly filterOptions = DONATION_HISTORY_FILTER_OPTIONS;
+  readonly carriers = RECEIPT_CARRIERS;
 
   readonly isLoading = signal(true);
   readonly errorText = signal('');
@@ -113,6 +115,7 @@ export class DonorHistoryComponent implements OnInit {
   }
 
   readonly trackingDraft = signal('');
+  readonly carrierDraft = signal('');
   readonly trackingSaving = signal(false);
   readonly trackingMessage = signal('');
   readonly nameModeDraft = signal<'masked' | 'full'>('masked');
@@ -124,6 +127,7 @@ export class DonorHistoryComponent implements OnInit {
     this.selectedId.set(record.id);
     this.viewerKind.set(null);
     this.trackingDraft.set(record.trackingNo);
+    this.carrierDraft.set(record.logisticsCarrier);
     this.trackingMessage.set('');
     this.nameModeDraft.set(record.thankNameMode);
     this.publicDraft.set(record.thankPublic);
@@ -145,6 +149,10 @@ export class DonorHistoryComponent implements OnInit {
     }
   }
 
+  onCarrierChange(event: Event): void {
+    this.carrierDraft.set((event.target as HTMLSelectElement).value);
+  }
+
   onTrackingInput(event: Event): void {
     this.trackingDraft.set((event.target as HTMLInputElement).value);
   }
@@ -154,11 +162,11 @@ export class DonorHistoryComponent implements OnInit {
     this.trackingMessage.set('');
 
     try {
-      await this.historyService.saveTrackingNumber(record.id, this.trackingDraft());
+      await this.historyService.saveTrackingNumber(record.id, this.trackingDraft(), this.carrierDraft());
       await this.thankService.loadBroadcasts();
-      this.trackingMessage.set('單號已上傳，這筆捐助會出現在全站跑馬燈。');
+      this.trackingMessage.set('物流公司與單號已上傳，受助機構看得到這筆寄送資料。');
     } catch (error) {
-      this.trackingMessage.set(error instanceof Error ? error.message : '上傳物流單號失敗，請稍後再試。');
+      this.trackingMessage.set(error instanceof Error ? error.message : '上傳物流資料失敗，請稍後再試。');
     } finally {
       this.trackingSaving.set(false);
     }
@@ -246,13 +254,13 @@ export class DonorHistoryComponent implements OnInit {
 
     if (shipped) {
       steps.push({
-        label: '上傳物流單號',
-        done: approved && !!record.trackingNo,
-        current: approved && !record.trackingNo,
+        label: '選擇物流並上傳單號',
+        done: approved && !!record.trackingNo && !!record.logisticsCarrier,
+        current: approved && (!record.trackingNo || !record.logisticsCarrier),
       });
     }
 
-    const waitingReceipt = approved && (!shipped || !!record.trackingNo) && !record.receiptConfirmedAt;
+    const waitingReceipt = approved && (!shipped || (!!record.trackingNo && !!record.logisticsCarrier)) && !record.receiptConfirmedAt;
     steps.push({
       label: '受助者簽收',
       done: !!record.receiptConfirmedAt,

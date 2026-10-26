@@ -1,7 +1,7 @@
 .custom-condition-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   width: 100%;
   min-width: 0;
 }
@@ -18,12 +18,12 @@
 .delete-condition-btn {
   width: 30px;
   height: 30px;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
   background-color: white;
-  border: 1px solid #ccc;
-  color: #333;
-  font-size: 18px;
-  font-weight: bold;
+  border: 1px solid var(--border-input);
+  color: var(--color-text-body);
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -33,14 +33,14 @@
 
 .add-condition-btn:hover,
 .delete-condition-btn:hover {
-  background-color: #f5f5f5;
+  background-color: var(--bg-muted);
 }
 
 /* 緊急優先度限制說明 */
 .priority-limit-info {
-  font-size: 13px;
-  color: #555;
-  font-weight: 400;
+  font-size: var(--font-size-13);
+  color: var(--color-text-quiet);
+  font-weight: var(--font-weight-regular);
   margin-left: 8px;
   white-space: nowrap;
 }
@@ -49,7 +49,7 @@
 .priority-box {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
   margin-bottom: 35px;
 }
 
@@ -57,11 +57,11 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-bottom: 0;
   cursor: pointer;
   white-space: nowrap;
-  font-size: 17px;
+  font-size: var(--font-size-17);
 }
 
 .priority-box input[type='radio'] {
@@ -70,22 +70,22 @@
 }
 
 .priority-box .normal {
-  color: #333333;
+  color: var(--color-text-body);
 }
 
 .priority-box .urgent {
-  color: #f57c00;
+  color: var(--color-warning);
 }
 
 .priority-box .very-urgent {
-  color: #d32f2f;
+  color: var(--color-error);
 }
 
 /*公開狀態*/
 .status-box {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
   margin-bottom: 35px;
 }
 
@@ -93,10 +93,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-bottom: 0;
   cursor: pointer;
-  font-size: 17px;
+  font-size: var(--font-size-17);
 }
 
 .status-box input[type='radio'] {
@@ -107,9 +107,9 @@
 /* 聯絡時間 */
 .contact-time-title {
   margin-top: 5px !important;
-  font-size: 17px;
-  font-weight: 600;
-  color: #1a202c;
+  font-size: var(--font-size-17);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-near-black);
 }
 
 .contact-time-box {
@@ -118,63 +118,63 @@
   margin-bottom: 35px;
   padding: 20px 24px;
   box-sizing: border-box;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  background-color: var(--color-white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-hairline);
 }
 
 /* 是否區分平日假日 */
 .contact-time-different-row {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-20);
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .contact-time-question {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333333;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-body);
 }
 
 .different-toggle {
   display: flex;
-  gap: 6px;
+  gap: var(--space-6);
 }
 
 .different-btn {
   min-width: 55px;
   padding: 7px 16px;
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  color: #333333;
-  font-size: 15px;
-  font-weight: 500;
+  background-color: var(--color-white);
+  border: 1px solid var(--border-slate);
+  border-radius: var(--radius-8);
+  color: var(--color-text-body);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .different-btn:hover {
-  background-color: #f0f7ff;
-  border-color: #93c5fd;
+  background-color: var(--bg-action-softer);
+  border-color: var(--color-action-glow);
 }
 
 .different-btn.active {
-  background-color: #e0f2fe;
-  border-color: #0284c7;
-  color: #0369a1;
-  font-weight: 600;
+  background-color: var(--bg-sky-soft);
+  border-color: var(--color-link-sky);
+  color: var(--color-link-deep);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* 聯絡時間區塊 */
 .contact-time-separated {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--space-18);
 }
 
 .contact-time-group {
@@ -186,15 +186,15 @@
 .contact-time-group-title {
   width: 65px;
   flex-shrink: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333333;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-body);
 }
 
 .contact-time-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 /* 時段按鈕 */
@@ -202,14 +202,14 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   padding: 8px 16px;
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  color: #333333;
-  font-size: 16px;
-  font-weight: 500;
+  background-color: var(--color-white);
+  border: 1px solid var(--border-slate);
+  border-radius: var(--radius-8);
+  color: var(--color-text-body);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
@@ -226,33 +226,33 @@
 }
 
 .time-option:hover {
-  background-color: #f0f7ff;
-  border-color: #93c5fd;
-  color: #1e40af;
+  background-color: var(--bg-action-softer);
+  border-color: var(--color-action-glow);
+  color: var(--color-action-indigo);
 }
 
 /* 選取狀態 */
 .time-option:has(input[type='checkbox']:checked) {
-  background-color: #e0f2fe;
-  border-color: #0284c7;
-  color: #0369a1;
-  font-weight: 600;
+  background-color: var(--bg-sky-soft);
+  border-color: var(--color-link-sky);
+  color: var(--color-link-deep);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* 時間範圍 */
 .time-range {
-  color: #555555;
-  font-size: 14px;
-  font-weight: 400;
+  color: var(--color-text-quiet);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
   transition: color 0.2s ease;
 }
 
 .time-option:hover .time-range {
-  color: #3b82f6;
+  color: var(--color-link-vivid);
 }
 
 .time-option:has(input[type='checkbox']:checked) .time-range {
-  color: #0284c7;
+  color: var(--color-link-sky);
 }
 
 /*按鈕區*/
@@ -260,7 +260,7 @@
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: var(--space-10);
   margin-top: 25px;
   margin-bottom: 30px;
 }
@@ -269,32 +269,32 @@
   min-height: 44px;
   padding: 0 20px;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   cursor: pointer;
   color: white;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
 }
 
 .button-area .save-btn {
   border: 0;
-  background: #1565c0;
-  color: #fff;
+  background: var(--color-action);
+  color: var(--color-white);
 }
 
 .button-area .back-btn {
-  border: 2px solid #1565c0;
-  background: #fff;
-  color: #1565c0;
+  border: 2px solid var(--color-action);
+  background: var(--color-white);
+  color: var(--color-action);
 }
 
 .button-area .save-btn:hover {
-  background: #0d47a1;
+  background: var(--color-action-dark);
   opacity: 1;
 }
 
 .button-area .back-btn:hover {
-  background: #e3f2fd;
+  background: var(--bg-action-soft);
   opacity: 1;
 }
 
@@ -309,15 +309,15 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: var(--border-slate);
+  border-radius: var(--radius-4);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-text-soft);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: var(--border-slate) transparent;
 }

@@ -22,8 +22,8 @@
 
     color: var(--color-text-main);
 
-    font-size: 30px;
-    font-weight: 700;
+    font-size: var(--font-size-30);
+    font-weight: var(--font-weight-bold);
   }
 
   p {
@@ -31,7 +31,7 @@
 
     color: var(--color-text-muted);
 
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -41,14 +41,14 @@
 // ==========================================
 
 .tracking-search {
-  padding: 30px;
+  padding: var(--space-30);
 
   background-color: var(--bg-layer-1);
 
   border: 1px solid var(--border-default);
   border-radius: var(--border-radius-main);
 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-soft);
 
   margin-bottom: 30px;
 }
@@ -64,13 +64,13 @@
   display: flex;
   align-items: center;
 
-  gap: 10px;
+  gap: var(--space-10);
 
   margin-bottom: 25px;
 
   i {
     color: var(--color-brand-primary);
-    font-size: 22px;
+    font-size: var(--font-size-22);
   }
 
   h3 {
@@ -78,8 +78,8 @@
 
     color: var(--color-text-main);
 
-    font-size: 22px;
-    font-weight: 600;
+    font-size: var(--font-size-22);
+    font-weight: var(--font-weight-semibold);
   }
 }
 
@@ -98,8 +98,8 @@
 
     color: var(--color-text-main);
 
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-semibold);
   }
 
   select,
@@ -111,14 +111,14 @@
 
     padding: 0 14px;
 
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-8);
 
     background-color: var(--color-white);
 
     color: var(--color-text-main);
 
-    font-size: 16px;
+    font-size: var(--font-size-16);
 
     outline: none;
 
@@ -142,7 +142,7 @@
 .input-row {
   display: flex;
 
-  gap: 12px;
+  gap: var(--space-12);
 
   input {
     flex: 1;
@@ -152,13 +152,13 @@
     width: 120px;
 
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-8);
 
     background-color: var(--color-brand-primary);
     color: var(--color-white);
 
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-semibold);
 
     cursor: pointer;
 
@@ -168,7 +168,7 @@
 
     &:hover {
       transform: translateY(-2px);
-      background-color: #0b57b5;
+      background-color: var(--color-action-deep);
     }
   }
 }
@@ -182,13 +182,13 @@
   display: flex;
   align-items: flex-start;
 
-  gap: 12px;
+  gap: var(--space-12);
 
   padding: 15px 18px;
 
-  background-color: #eef6ff;
+  background-color: var(--bg-gradient-start);
 
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 
   color: var(--color-text-main);
 
@@ -197,7 +197,7 @@
 
     color: var(--color-brand-primary);
 
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   strong {
@@ -209,9 +209,9 @@
   p {
     margin: 3px 0;
 
-    font-size: 14px;
+    font-size: var(--font-size-14);
 
-    line-height: 1.6;
+    line-height: var(--line-height-relaxed);
   }
 }
 
@@ -223,23 +223,23 @@
 .tracking-result {
   margin-bottom: 30px;
 
-  padding: 30px;
+  padding: var(--space-30);
 
   background-color: var(--color-white);
 
   border: 1px solid var(--border-default);
   border-radius: var(--border-radius-main);
 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-soft);
 }
 
 
 .result-card {
   padding: 18px 20px;
 
-  background-color: #f8fafc;
+  background-color: var(--bg-page);
 
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 
   margin-bottom: 12px;
 
@@ -260,21 +260,21 @@
 
     color: var(--color-text-muted);
 
-    font-size: 15px;
-    font-weight: 600;
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-semibold);
   }
 
   .value {
     color: var(--color-text-main);
 
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .status {
     color: #16803c;
 
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-semibold);
   }
 }
 
@@ -284,7 +284,7 @@
 // ==========================================
 
 .carrier-section {
-  padding: 30px;
+  padding: var(--space-30);
 
   background-color: var(--bg-layer-2);
 
@@ -297,7 +297,7 @@
 
   color: var(--color-text-muted);
 
-  font-size: 15px;
+  font-size: var(--font-size-15);
 }
 
 
@@ -306,7 +306,7 @@
 
   grid-template-columns: repeat(2, 1fr);
 
-  gap: 15px;
+  gap: var(--space-15);
 }
 
 
@@ -314,13 +314,13 @@
   display: flex;
   align-items: center;
 
-  gap: 15px;
+  gap: var(--space-15);
 
-  padding: 20px;
+  padding: var(--space-20);
 
   background-color: var(--color-white);
 
-  border-radius: 15px;
+  border-radius: var(--radius-15);
 
   color: var(--color-text-main);
 
@@ -338,25 +338,25 @@
     width: 50px;
     height: 50px;
 
-    border-radius: 12px;
+    border-radius: var(--radius-12);
 
     background-color: var(--color-brand-primary);
 
     color: var(--color-white);
 
-    font-size: 22px;
+    font-size: var(--font-size-22);
   }
 
   h4 {
     margin: 0 0 5px;
 
-    font-size: 17px;
+    font-size: var(--font-size-17);
   }
 
   span {
     color: var(--color-brand-primary);
 
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   &:hover {

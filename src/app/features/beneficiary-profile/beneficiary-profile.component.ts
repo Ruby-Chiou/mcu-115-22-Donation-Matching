@@ -30,4 +30,18 @@ export class BeneficiaryProfileComponent {
   selectCity(city: string): void {
     this.activeCity.set(city);
   }
+
+  protected cityLabel(city: string): string {
+    return city.trim() ? city : '未填縣市';
+  }
+
+  protected hasPhoto(image: string): boolean {
+    const value = image?.trim() ?? '';
+    return value.startsWith('https://') || value.startsWith('http://') || value.startsWith('assets/');
+  }
+
+  protected hideBrokenPhoto(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.style.display = 'none';
+  }
 }

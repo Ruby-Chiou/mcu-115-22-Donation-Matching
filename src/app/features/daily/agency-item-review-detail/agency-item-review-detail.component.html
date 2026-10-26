@@ -104,6 +104,9 @@
     </section>
     } @if ( donation.status === 'pending_human_review' ) {
     <section class="decision-section">
+      @if (imageFiles.length === 0) {
+      <p class="reason-error">沒有照片時不能按接受，請改用不接受。</p>
+      }
       <div class="decision-buttons">
         <button
           type="button"
@@ -222,6 +225,9 @@
         @if ( humanReasonControl.hasError( 'required' ) ) { 請輸入不接受原因。 } @else if ( humanReasonControl.hasError( 'minlength' ) ) {
         原因至少需要 2 個字。 }
       </p>
+      }
+      @if (errorMessage) {
+      <p class="reason-error" role="alert">{{ errorMessage }}</p>
       }
     </div>
 

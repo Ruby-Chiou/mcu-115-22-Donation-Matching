@@ -6,6 +6,13 @@
   <p class="company-notice" role="status">{{ companyNotice() }}</p>
 }
 
+@if (messageService.unreadCount() > 0) {
+  <p class="inbox-notice" role="status">
+    收件匣有 {{ messageService.unreadCount() }} 封未讀。物資有沒有通過、機構來信，都會在這裡。
+    <button type="button" (click)="selectTab('inbox')">打開收件匣</button>
+  </p>
+}
+
 <div class="switch-area" role="tablist">
   <button
     type="button"

@@ -85,11 +85,20 @@ export class CommentTableStore implements CommentStore {
     content: string,
     parentCommentId: number | null = null
   ): Promise<CommentRecord> {
+    const { data: sessionData } = await this.supabase.client.auth.getSession();
+    const sessionUserId = sessionData.session?.user.id ?? null;
+
+    if (!sessionUserId) {
+      throw Object.assign(new Error('請先登入後再發布留言。'), { code: 'LOGIN_REQUIRED' });
+    }
+
+    void userId;
+
     const { data, error } = await this.supabase.client
       .from(this.table)
       .insert({
         demand_id: demandId,
-        user_id: userId,
+        user_id: sessionUserId,
         user_role: userRole,
         user_name: userName,
         content,
@@ -104,6 +113,31 @@ export class CommentTableStore implements CommentStore {
     }
 
     return data as CommentRecord;
+  }
+
+  async deleteComment(commentId: number): Promise<void> {
+    const { data: sessionData } = await this.supabase.client.auth.getSession();
+    const sessionUserId = sessionData.session?.user.id ?? null;
+
+    if (!sessionUserId) {
+      throw Object.assign(new Error('請先登入後再刪除留言。'), { code: 'LOGIN_REQUIRED' });
+    }
+
+    const { data, error } = await this.supabase.client
+      .from(this.table)
+      .delete()
+      .eq('id', commentId)
+      .eq('user_id', sessionUserId)
+      .select('id');
+
+    if (error) {
+      console.error(`刪除${this.label}留言失敗：`, error);
+      throw error;
+    }
+
+    if (!data?.length) {
+      throw Object.assign(new Error('這則留言刪不掉。只能刪自己發布的留言。'), { code: 'DELETE_EMPTY' });
+    }
   }
 
   async toggleLike(commentId: number, userId: string): Promise<CommentRecord> {

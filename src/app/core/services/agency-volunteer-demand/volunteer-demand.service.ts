@@ -74,7 +74,6 @@ export class VolunteerDemandService implements DemandRepository<VolunteerDemand>
 
     if (commentError) {
       console.error('讀取志工主留言數失敗：', commentError);
-      throw commentError;
     }
 
     // 依照需求資料庫 ID 統計主留言數

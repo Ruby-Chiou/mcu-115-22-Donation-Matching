@@ -28,6 +28,17 @@ export async function sendSupportCopy(mail: { subject: string; text: string; htm
   });
 }
 
+export async function sendMailboxMail(mail: { to: string; toName?: string; subject: string; text: string; html: string }): Promise<void> {
+  await sendMail({
+    to: mail.to,
+    toName: mail.toName,
+    replyTo: SUPPORT_EMAIL,
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
+  });
+}
+
 export async function sendReplyCopy(mail: { to: string; toName: string; subject: string; text: string; html: string }): Promise<void> {
   await sendMail({
     to: mail.to,

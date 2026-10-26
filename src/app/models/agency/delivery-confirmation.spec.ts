@@ -9,6 +9,7 @@ describe('receipt confirmation', () => {
     actualMaterial: '白米',
     quantity: 20,
     donationMethod: '寄送',
+    logisticsCarrier: '黑貓宅急便',
     trackingNo: '771234567890',
     trackingUploadedAt: null,
     note: '',

@@ -8,18 +8,17 @@
   }
 
   <p class="intro">
-    可自行決定哪些訊息要出現在站內收件匣，以及是否轉寄到私人信箱。
-    預設不濫寄 Email，避免信箱被平台訊息洗版；實際寄信排程會依此設定執行。
+    站內開關只影響小鈴鐺的未讀數，收件匣裡的舊信還是看得到。
+    私人信箱預設關閉。打開之後，即時信會在勿擾時段之外寄出；每日彙整是台北時間早上 8 點，每週彙整是每週一早上 8 點。勿擾時段內的即時信會改到時段結束再寄。
   </p>
 
-  @if (profileService.profile(); as profile) {
+  @if (noticeEmail()) {
     <p class="email-hint">
       通知信箱：
-      <strong>{{ profile.email || '尚未綁定 Email' }}</strong>
-      @if (!profile.email) {
-        <span>（請先於個人資料綁定後才能收到郵件）</span>
-      }
+      <strong>{{ noticeEmail() }}</strong>
     </p>
+  } @else {
+    <p class="email-hint">尚未綁定 Email，私人信箱通知不會寄出。</p>
   }
 
   <form class="settings-form" [formGroup]="form" (ngSubmit)="save()">

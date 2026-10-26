@@ -306,10 +306,10 @@ export class DailyLocationsComponent implements AfterViewInit, OnDestroy {
         return false;
       },
       style: {
-        color: '#2563eb',
+        color: getComputedStyle(document.documentElement).getPropertyValue('--color-link-bright').trim(),
         weight: 3,
         opacity: 0.8,
-        fillColor: '#99c3f7',
+        fillColor: getComputedStyle(document.documentElement).getPropertyValue('--color-map-fill').trim(),
         fillOpacity: 0.25,
       },
     }).addTo(this.map);

@@ -9,7 +9,7 @@ import { SupplyDetailCarouselComponent } from '../../../../components/carousel/s
 import { BeneficiaryPublicProfileService } from '../../../../core/services/agency/beneficiary-public-profile.service';
 import { BeneficiaryPanelComponent } from '../../../../components/card/beneficiary-panel/beneficiary-panel.component';
 import { CommentAuthorChipComponent } from '../../../../components/comment/comment-author-chip.component';
-import { commentAuthor, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
+import { canDeleteOwnComment, commentAuthor, commentDeleteError, commentPreviewNotice, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
 import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
 import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 import { DailyComment } from '../../../../core/services/comments/daily-comment.service';
@@ -246,11 +246,13 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   async loadComments(demandId: number): Promise<void> {
     try {
       this.comments = await this.dailyCommentService.getComments(demandId);
+      this.commentNotice = commentPreviewNotice(false);
       this.buildCommentThreads();
     } catch (error) {
       console.error('[日常留言] 載入留言失敗：', error);
 
       this.comments = [];
+      this.commentNotice = commentPreviewNotice(true);
       this.buildCommentThreads();
     }
   }
@@ -368,6 +370,26 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   }
 
   // 判斷目前使用者是否已按讚
+  canDelete(comment: DailyComment): boolean {
+    return canDeleteOwnComment(comment, this.auth.principal().userId);
+  }
+
+  async deleteComment(comment: DailyComment): Promise<void> {
+    if (!confirm('刪除這則留言？')) {
+      return;
+    }
+
+    try {
+      await this.dailyCommentService.deleteComment(comment.id);
+      if (this.demand?.id) {
+        await this.loadComments(this.demand.id);
+      }
+    } catch (error) {
+      this.commentNotice = commentDeleteError(error);
+      this.cdr.detectChanges();
+    }
+  }
+
   hasLiked(comment: DailyComment): boolean {
     return comment.liked_user_ids?.includes(this.currentUserId) ?? false;
   }

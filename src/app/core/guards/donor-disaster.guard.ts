@@ -6,10 +6,10 @@ export const donorDisasterGuard: CanActivateFn = (route, state) => {
   const closedModal = inject(DisasterClosedModalService);
 
   const disasterOpen = localStorage.getItem('disasterOpen') === 'true';
+  const path = state.url.split('?')[0] ?? '';
 
-  // 如果目前災害是「關閉」
-  // 不允許進入 disaster-open
-  if (state.url.startsWith('donor/disaster') && !disasterOpen) {
+  // 大廳可以進來看到已關閉。物資、志工的內頁在關閉時擋下來。
+  if (!disasterOpen && path.startsWith('/donor/disaster/')) {
     closedModal.show();
 
     return router.createUrlTree(['/donor/disaster']);

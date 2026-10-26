@@ -7,10 +7,10 @@
 h1 {
   margin: 28px 0 24px;
   text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: #1565c0;
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-4);
+  color: var(--color-action);
 }
 
 .batch-edit-top-row {
@@ -35,12 +35,12 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f4f9;
-  border: 1px solid #d0e1f9;
-  border-radius: 8px;
+  background-color: var(--bg-neutral);
+  border: 1px solid var(--bg-action-wash);
+  border-radius: var(--radius-8);
   padding: 8px 16px;
-  gap: 8px;
-  line-height: 1;
+  gap: var(--space-8);
+  line-height: var(--line-height-none);
   box-sizing: border-box;
 }
 
@@ -49,50 +49,50 @@ h1 {
   align-items: center;
   justify-content: center;
   height: 44px;
-  border-radius: 12px;
-  font-weight: 700;
+  border-radius: var(--radius-12);
+  font-weight: var(--font-weight-bold);
   margin: 0;
 }
 
 .info-label {
-  font-size: 15px;
-  color: #5f6368;
-  font-weight: 500;
+  font-size: var(--font-size-15);
+  color: var(--color-text-graphite);
+  font-weight: var(--font-weight-medium);
 }
 
 .info-value {
-  font-size: 19px;
+  font-size: var(--font-size-19);
   color: var(--color-brand-primary);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   font-family: monospace, sans-serif;
-  letter-spacing: 0.5px;
+  letter-spacing: var(--tracking-fine);
 }
 
 .form-box {
-  background: #fff;
-  border: 1px solid #e3ebf5;
-  border-radius: 16px;
-  box-shadow: 0 10px 28px rgb(21 101 192 / 8%);
-  padding: 30px;
+  background: var(--color-white);
+  border: 1px solid var(--bg-action-pale);
+  border-radius: var(--radius-16);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-30);
   margin-bottom: 30px;
 }
 
 .light-box,
 .dark-box {
-  background: #fff;
+  background: var(--color-white);
 }
 
 h2 {
   margin-bottom: 20px;
-  font-size: 20px;
+  font-size: var(--font-size-20);
 }
 
 label {
   display: block;
   margin-bottom: 8px;
   color: var(--color-text-main);
-  font-weight: 500;
-  font-size: 17px;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-17);
 }
 
 .form-box > label {
@@ -104,11 +104,11 @@ select,
 textarea {
   width: 100%;
   box-sizing: border-box;
-  padding: 12px;
+  padding: var(--space-12);
   margin-bottom: 20px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  font-size: 16px;
+  border-radius: var(--radius-10);
+  border: 1px solid var(--border-muted);
+  font-size: var(--font-size-16);
 }
 
 textarea {
@@ -120,7 +120,7 @@ textarea {
 .amount-box {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   margin-bottom: 20px;
 }
 
@@ -158,15 +158,15 @@ textarea {
   justify-content: space-between;
   padding: 5px 8px;
   margin-bottom: 2px;
-  border-bottom: 1px dashed #1e88e5;
-  border-radius: 6px;
+  border-bottom: 1px dashed var(--color-action-material);
+  border-radius: var(--radius-6);
   transition: background-color 0.2s ease;
 }
 
 .condition-name {
-  color: var(--color-text-main, #333333);
-  font-weight: 500;
-  font-size: 16px;
+  color: var(--color-text-main, var(--color-text-body));
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-16);
 }
 
 .condition-row input[type='radio'] {
@@ -179,7 +179,7 @@ textarea {
 .status-box {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
   margin-bottom: 35px;
 }
 
@@ -187,10 +187,10 @@ textarea {
 .status-box label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-bottom: 0;
   cursor: pointer;
-  font-size: 17px;
+  font-size: var(--font-size-17);
   white-space: nowrap;
 }
 
@@ -201,31 +201,31 @@ textarea {
 }
 
 .priority-box .normal {
-  color: #333333;
+  color: var(--color-text-body);
 }
 
 .priority-box .urgent {
-  color: #f57c00;
+  color: var(--color-warning);
 }
 
 .priority-box .very-urgent {
-  color: #d32f2f;
+  color: var(--color-error);
 }
 
 /* 標題 + 字數提示 */
 .label-row {
   display: flex !important;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   margin-top: 20px;
   margin-bottom: 16px;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .word-count {
-  font-size: 13px;
-  color: #555;
-  font-weight: 400;
+  font-size: var(--font-size-13);
+  color: var(--color-text-quiet);
+  font-weight: var(--font-weight-regular);
   margin-left: 4px;
   white-space: nowrap;
 }
@@ -249,9 +249,9 @@ textarea {
   right: -12px;
   width: auto;
   height: calc(100% + 10px);
-  border: 2px solid #d32f2f;
-  background-color: #fff5f5;
-  border-radius: 12px;
+  border: 2px solid var(--color-error);
+  background-color: var(--bg-error-soft);
+  border-radius: var(--radius-12);
   z-index: 0;
   pointer-events: none;
 }
@@ -282,13 +282,13 @@ textarea {
   display: grid;
   grid-template-columns: repeat(2, 140px);
   column-gap: 50px !important;
-  row-gap: 10px;
+  row-gap: var(--space-10);
 }
 
 .service-target-box label {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-5);
   cursor: pointer;
 }
 
@@ -307,7 +307,7 @@ textarea {
 .custom-service-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   width: 100%;
   min-width: 0;
 }

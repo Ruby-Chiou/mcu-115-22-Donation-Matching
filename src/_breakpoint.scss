@@ -1,0 +1,39 @@
+// 全站斷點。顏色在 _color.scss，其餘重複變數在 _variable.scss。
+// 元件用 @use 'breakpoint' as bp，不要自己寫 767 / 1024。
+//
+// 這裡只保留「版面結構必須改掉」的兩段：
+// 電腦：1024px 以上，橫向導覽。
+// 平板：768px～1023px。導覽收成選單，內容維持可並排的欄數。
+// 手機：767px 以下。含一般手機、大手機與手機橫向，內容改成單欄。
+
+$screen-desktop: 1024px !default;
+$screen-tablet: 768px !default;
+$screen-mobile: 767px !default;
+
+// 1023px 以下：平板與手機。導覽收合、地圖改上下排。
+@mixin below-desktop {
+  @media (max-width: #{$screen-desktop - 1px}) {
+    @content;
+  }
+}
+
+// 與 below-desktop 同一段。既有頁面的「變窄就改欄」沿用這個名字。
+@mixin tablet {
+  @media (max-width: #{$screen-desktop - 1px}) {
+    @content;
+  }
+}
+
+// 767px 以下才是手機。
+@mixin mobile {
+  @media (max-width: $screen-mobile) {
+    @content;
+  }
+}
+
+// 欄數依卡片最小寬度自動決定，不綁死某一台裝置。
+@mixin auto-grid($min: 240px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, #{$min}), 1fr));
+  gap: var(--layout-gap);
+}

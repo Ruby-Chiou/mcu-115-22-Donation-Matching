@@ -1,15 +1,17 @@
+@use 'breakpoint' as bp;
+
 .donor-disaster-page {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 30px;
+  padding: var(--space-30);
   box-sizing: border-box;
 }
 .request-switcher {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 1rem;
+  gap: var(--space-md);
   margin-bottom: 2.5rem;
 }
 .switch-button {
@@ -17,43 +19,43 @@
   border: 0;
   border-bottom: 3px solid transparent;
   background: transparent;
-  color: #64748b;
+  color: var(--color-text-slate);
   cursor: pointer;
   font: inherit;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 .switch-button.active {
-  border-bottom-color: #005bac;
-  color: #005bac;
+  border-bottom-color: var(--color-link);
+  color: var(--color-link);
 }
 .switch-divider {
-  color: #94a3b8;
+  color: var(--color-text-soft);
   font-size: 1.5rem;
 }
 .right-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-md);
   margin-left: auto;
 }
 .filter-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: var(--space-2xs);
   padding: 0.5rem 0.25rem;
   border: 0;
   background: transparent;
-  color: #64748b;
+  color: var(--color-text-slate);
   cursor: pointer;
   font: inherit;
   font-size: 1.4rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   transition: all 0.2s ease;
 }
 .filter-button:hover {
-  color: #005bac;
+  color: var(--color-link);
 }
 .filter-icon {
   width: 22px;
@@ -62,23 +64,70 @@
 .filter-label-text {
   color: inherit;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
 }
 .map-button {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--space-2xs);
 }
 .map-button:hover {
-  color: #005bac;
+  color: var(--color-link);
 }
 .needs-section {
   margin-bottom: 60px;
 }
 .needs-section > h1 {
   margin: 0 0 1.5rem;
-  color: #005bac;
+  color: var(--color-link);
   font-size: 2rem;
+}
+
+@include bp.mobile {
+  .donor-disaster-page {
+    padding: 8px var(--layout-page-padding) 28px;
+  }
+
+  .request-switcher {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 16px;
+  }
+
+  .switch-button {
+    font-size: 1.05rem;
+  }
+
+  .right-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .map-button,
+  .filter-area .filter-button {
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--border-radius-main);
+    background: var(--nav-bg);
+    color: var(--color-text-main);
+    font-size: var(--font-size-16);
+  }
+
+  .filter-area {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+  }
+
+  .filter-area .filter-button {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .needs-section > h1 {
+    font-size: 1.35rem;
+  }
 }
 

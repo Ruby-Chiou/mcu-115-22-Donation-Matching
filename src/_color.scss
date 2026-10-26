@@ -1,46 +1,235 @@
-//這裡是顏色命名處，可全域使用
+// 全站顏色只放這裡。元件寫 var(--名稱)，不要再散落色碼。
+// 已經在用的名稱保留原值。後面是從頁面重複色碼整理出來的名稱。
 :root {
-  /* 核心招牌色*/
+  /* 核心招牌色（登入、註冊等新頁） */
   --color-brand-primary: #005cbb;
   --color-brand-primary-light: #3f93e2;
   --color-brand-primary-dark: #2b74c4;
 
-  /* 2. 文字色 */
+  /* 頁面上最常出現的藍：按鈕、連結、標題 */
+  --color-action: #1565c0;
+  --color-action-dark: #0d47a1;
+  --color-action-light: #90caf9;
+  --color-action-sky: #64b5f6;
+  --color-action-ice: #bbdefb;
+  --color-action-glow: #93c5fd;
+  --color-action-chip: #a6cffd;
+  --color-action-material: #1e88e5;
+  --color-action-indigo: #1e40af;
+  --color-link: #005bac;
+  --color-link-dark: #004a8f;
+  --color-link-sky: #0284c7;
+  --color-link-deep: #0369a1;
+  --color-link-mid: #1769aa;
+  --color-link-bright: #2563eb;
+  --color-link-vivid: #3b82f6;
+  --color-link-steel: #3978a8;
+  --color-link-clear: #1685da;
+  --color-text-steel: #245c86;
+
+  /* 文字 */
+  --color-white: #ffffff;
   --color-text-main: #1a1c1c;
+  --color-text-body: #333333;
+  --color-text-strong: #222222;
+  --color-text-print: #111111;
+  --color-text-near-black: #1a202c;
+  --color-text-black: #0f172a;
+  --color-text-ink: #1f2937;
+  --color-ink: #1c2833;
+  --color-text-charcoal: #374151;
+  --color-text-quiet: #555555;
+  --color-text-quiet-dark: #4b5563;
+  --color-text-secondary: #666666;
+  --color-text-graphite: #5f6368;
+  --color-text-subtle: #777777;
+  --color-text-cool: #6b7280;
+  --color-text-dim: #888888;
+  --color-text-faint: #999999;
+  --color-text-disabled: #9e9e9e;
+  --color-text-dim-dark: #444444;
   --color-text-muted: #44474e;
   --color-text-dark: #163a53;
+  --color-text-heading: #143a55;
   --color-text-medium: #27506b;
   --color-text-light: #638096;
   --color-text-lighter: #5f7f8f;
-  --color-white: #ffffff;
+  --color-text-slate: #64748b;
+  --color-text-slate-dark: #475569;
+  --color-text-slate-muted: #4f5b66;
+  --color-text-slate-body: #334155;
+  --color-text-slate-ink: #1e293b;
+  --color-text-slate-mid: #71808c;
+  --color-text-slate-blue: #5d7282;
+  --color-text-soft: #94a3b8;
+  --color-text-gray: #9ca3af;
+  --color-text-ash: #90a4ae;
+  --color-text-silver: #b0bec5;
+  --color-text-navy: #0b3a66;
+  --color-text-blue-gray: #526579;
 
-  /* 3. 背景層次 (這是最容易變色的地方)*/
+  /* 背景 */
   --bg-layer-0: #f0f4f8;
   --bg-layer-1: #e4eaf0;
   --bg-layer-2: #c5d0db;
   --bg-form: #f7fbff;
   --bg-gradient-start: #eef6ff;
   --bg-gradient-end: #fdf8f0;
+  --bg-page: #f8fafc;
+  --bg-paper: #f8fbff;
+  --bg-canvas: #f7f9fc;
+  --bg-panel: #f3f8fd;
+  --bg-panel-soft: #f5f9fc;
+  --bg-muted: #f5f5f5;
+  --bg-neutral: #f0f4f9;
+  --bg-slate: #f1f5f9;
+  --bg-slate-soft: #edf1f5;
+  --bg-ash: #edf0f2;
+  --bg-warm: #fffdf9;
+  --bg-action-soft: #e3f2fd;
+  --bg-action-softer: #f0f7ff;
+  --bg-action-mist: #eaf4f8;
+  --bg-action-chip: #e8f3ff;
+  --bg-action-tint: #e7f1fb;
+  --bg-action-pale: #e3ebf5;
+  --bg-action-wash: #d0e1f9;
+  --bg-action-pale-2: #d0e5ff;
+  --bg-action-cloud: #edf5ff;
+  --bg-action-glaze: #e3f0ff;
+  --bg-action-faint: #eff6ff;
+  --bg-sky-soft: #e0f2fe;
+  --bg-success-soft: #e8f5e9;
+  --bg-error-soft: #fff5f5;
+  --bg-error-wash: #fee2e2;
+  --bg-error-pale: #fef2f2;
+  --bg-error-blush: #ffebee;
+  --bg-error-sand: #fdecea;
+  --bg-error-rose: #fff1f2;
+  --bg-warning-soft: #fff4ce;
 
-  /* 4. 邊框與分隔線 */
+  /* 邊框 */
   --border-default: #c4c6d0;
   --border-light: #d7e4ef;
   --border-lighter: #e2eef6;
   --border-lightest: #e1eef8;
-  --border-radius-main: 12px;
-  --border-radius-pill: 999px;
+  --border-slate: #cbd5e1;
+  --border-soft: #e2e8f0;
+  --border-muted: #dddddd;
+  --border-input: #cccccc;
+  --border-hairline: #eeeeee;
+  --border-line: #d6d6d6;
+  --border-neutral: #e0e0e0;
+  --border-gray: #e5e7eb;
+  --border-silver: #d1d5db;
+  --border-cool: #d0d7e2;
+  --border-cool-strong: #d5e0ea;
+  --border-cool-mid: #c8d0d8;
+  --border-cool-soft: #d5dce3;
+  --border-cool-light: #e1e6eb;
+  --border-mist: #e8eef5;
+  --border-panel: #e1e9f1;
+  --border-sand: #eadfd4;
+  --border-error-soft: #fecaca;
 
-  /* 5. 狀態色 */
+  /* 狀態 */
   --color-success: #0f7a43;
+  --color-success-strong: #2e7d32;
+  --color-success-mid: #66a96b;
+  --color-success-teal: #0f766e;
   --color-error: #d32f2f;
+  --color-error-dark: #c62828;
+  --color-error-deep: #b71c1c;
+  --color-error-hot: #dc2626;
+  --color-error-strong: #b42318;
+  --color-error-bold: #b91c1c;
+  --color-error-bright: #e53935;
+  --color-error-classic: #d9534f;
+  --color-error-brick: #a33b3b;
+  --color-error-muted: #c75b5b;
+  --color-error-wine: #991b1b;
+  --color-error-rose: #9f1239;
+  --color-error-pale: #fca5a5;
   --color-warning: #f57c00;
+  --color-warning-amber: #f59e0b;
+  --color-warning-text: #8d6e00;
+  --color-accent: #ff6b35;
+  --color-accent-hover: #e85a28;
+  --color-accent-warm: #e68a3a;
+  --color-accent-deep: #e65100;
+  --color-accent-brown: #9a3412;
+  --color-accent-earth: #9a4e13;
+  --color-sand: #d8c8b7;
+  --color-sand-ink: #5c4a38;
+  --color-priority-urgent: #f64d4d;
+  --color-action-deep: #0b57b5;
+  --color-action-vivid: #2196f3;
+  --color-purple: #6a1b9a;
+  --color-text-steel-deep: #315f86;
+  --color-text-gray-blue: #8a94a3;
+  --color-success-leaf: #248653;
+  --color-success-forest: #166534;
+  --color-success-bright: #22c55e;
+  --color-warning-deep: #d97706;
+  --color-accent-clay: #b66d1d;
+  --color-accent-umber: #92400e;
+  --color-accent-copper: #c86e21;
+  --color-error-stronger: #d93025;
+  --border-sand-deep: #e4d8c9;
+  --bg-warning-cream: #fff8e1;
+  --bg-accent-cream: #fff0df;
 
-  /* 6. Shadow */
-  --shadow-sm: 0 4px 12px rgba(14, 52, 77, 0.06);
-  --shadow-md: 0 8px 28px rgba(47, 112, 187, 0.16);
-  --shadow-lg: 0 18px 50px rgba(12, 45, 75, 0.12);
-  --shadow-xl: 0 20px 60px rgba(12, 45, 75, 0.16);
+  /* 只出現兩次、但還是同一組色 */
+  --bg-sand-strong: #f3d19c;
+  --bg-sand-soft: #f3e8dc;
+  --bg-sand-rose: #f0d7df;
+  --bg-accent-peach: #ffe3cc;
+  --bg-warning-pale: #fff3c4;
+  --bg-success-pale: #dcfce7;
+  --border-sand-soft: #ead9b9;
+  --color-error-blush-strong: #e4b4b4;
+  --color-accent-tan: #b86b2c;
+  --color-accent-rust: #c96b3b;
+  --color-accent-peach: #f3b27a;
+  --color-accent-warm-deep: #e58a45;
+  --color-accent-copper-deep: #d97832;
+  --color-accent-brown-deep: #8b5a2b;
+  --color-text-taupe: #7b6f62;
+  --color-sand-deep: #4b3a2a;
+  --color-warning-gold: #b67b18;
+  --color-warning-gold-bright: #f5b400;
+  --color-warning-olive: #9a6700;
+  --color-text-ink-blue: #1d3348;
+  --color-text-slate-night: #243447;
+  --color-text-slate-night-2: #1c3045;
+  --color-text-navy-soft: #24384d;
+  --color-text-slate-steel: #344b60;
+  --color-text-slate-steel-2: #394e62;
+  --color-success-dark: #1b5e20;
+  --color-success-jade: #16805b;
+  --color-success-material: #388e3c;
+  --color-success-fresh: #1f9d55;
+  --color-error-flat: #e74c3c;
+  --color-error-clay: #c44747;
+  --color-error-rose-hot: #e11d48;
+  --color-rose: #b54b6a;
+  --color-link-ocean: #1477bd;
 
-  //導覽列背景色
+  /* 地圖 */
+  --color-map-fill: #99c3f7;
+
+  /* 第三方登入圖示，沿用各品牌色 */
+  --color-google: #4285f4;
+  --color-line: #06c755;
+  --color-facebook: #1877f2;
+
+  /* 導覽列 */
   --nav-bg: #ffffff;
+  --nav-menu-hover: #eef4fb;
+
+  /* 頁尾 */
+  --footer-bg: var(--color-ink);
+  --footer-heading: #ffffff;
+  --footer-text: rgba(255, 255, 255, 0.82);
+  --footer-muted: rgba(255, 255, 255, 0.5);
+  --footer-accent: #f1c40f;
 }

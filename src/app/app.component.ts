@@ -15,6 +15,7 @@ import { DisasterControlService } from './core/services/disaster-control/disaste
 })
 export class App {
   protected readonly title = signal('donation-matching');
+  protected readonly showBackToTop = signal(false);
   protected readonly closedModal: DisasterClosedModalService = inject(DisasterClosedModalService);
 
   private readonly router = inject(Router);
@@ -23,6 +24,10 @@ export class App {
   private hasReloadedAfterClose = false;
 
   constructor() {
+    const onScroll = () => this.showBackToTop.set(window.scrollY > 480);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    this.destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));
+
     let previousClosedAt = this.disasterControl.data().closedAt;
     effect(() => {
       const closedAt = this.disasterControl.data().closedAt;
@@ -68,5 +73,10 @@ export class App {
   goToDisasterLobby(): void {
     this.closedModal.hide();
     this.router.navigate(['/donor/disaster']);
+  }
+
+  protected backToTop(): void {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 }

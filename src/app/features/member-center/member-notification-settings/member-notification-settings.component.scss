@@ -12,12 +12,12 @@
   margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   border-radius: var(--border-radius-main);
-  background: #e8f5e9;
+  background: var(--bg-success-soft);
   color: var(--color-success);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 
   &.error {
-    background: #fdecea;
+    background: var(--bg-error-sand);
     color: var(--color-error);
   }
 }
@@ -30,13 +30,13 @@
 }
 
 .email-hint strong {
-  color: #1565c0;
+  color: var(--color-action);
 }
 
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .panel {
@@ -56,7 +56,7 @@
 .panel-desc {
   margin: 0 0 0.85rem;
   color: var(--color-text-light);
-  font-size: 0.9rem;
+  font-size: var(--font-size-small);
   line-height: 1.55;
 }
 
@@ -74,7 +74,7 @@
   }
 
   &.master {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
   }
 }
 
@@ -82,13 +82,13 @@
   margin: 0.75rem 0 0;
   padding: 0.85rem 1rem;
   border: 1px solid var(--border-lighter);
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   background: var(--bg-form);
 
   legend {
     padding: 0 0.35rem;
     color: var(--color-text-medium);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   &:disabled {
@@ -104,8 +104,8 @@
 
   span {
     color: var(--color-text-medium);
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-small);
   }
 
   select,
@@ -113,7 +113,7 @@
     max-width: 220px;
     padding: 0.5rem 0.7rem;
     border: 1px solid var(--border-light);
-    border-radius: 8px;
+    border-radius: var(--radius-8);
     font: inherit;
   }
 }
@@ -122,7 +122,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 0.75rem;
+  gap: var(--space-sm);
 
   &.disabled {
     opacity: 0.55;
@@ -144,19 +144,19 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .updated {
   color: var(--color-text-light);
-  font-size: 0.85rem;
+  font-size: var(--font-size-compact);
 }
 
 .btn {
   padding: 0.5rem 1.25rem;
   border-radius: var(--border-radius-pill);
   font: inherit;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
 
   &:disabled {
@@ -166,7 +166,7 @@
 }
 
 .btn-primary {
-  border: 1px solid #1565c0;
-  background: #1565c0;
+  border: 1px solid var(--color-action);
+  background: var(--color-action);
   color: var(--color-white);
 }

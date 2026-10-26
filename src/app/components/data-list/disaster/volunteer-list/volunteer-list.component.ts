@@ -2,7 +2,7 @@ import { Component, OnInit, HostListener, AfterViewInit, ChangeDetectorRef } fro
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { timeout, catchError, of } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
 import { VolunteerDemand, VolunteerStatus, DisplayVolunteerStatus } from '../../../../models/agency/volunteer-demand';
 
@@ -57,6 +57,7 @@ export class VolunteerListComponent {
 
   selectAll = false;
   isLoading = false;
+  loadError = '';
   isRestoringScroll = false;
   // 搜尋
   searchTerm = '';
@@ -199,14 +200,17 @@ export class VolunteerListComponent {
       下架: '已下架',
     };
 
+    let failed = false;
+
     this.VolunteerDemandService.getDemandsFromServer()
       .pipe(
-        timeout(2000),
         catchError(() => {
+          failed = true;
           return of(this.VolunteerDemandService.getDemands());
         })
       )
       .subscribe((data) => {
+        this.loadError = failed && data.length === 0 ? '志工需求暫時讀不到。請稍後重新整理。' : '';
         this.demands = data.map((item) => {
           return {
             ...item,

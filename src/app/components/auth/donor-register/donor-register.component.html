@@ -19,14 +19,14 @@
           <p>或使用其他應用註冊</p>
           <div class="social-buttons">
             <button type="button" class="social-btn" (click)="socialRegister('google')" [disabled]="submitting">
-              Google<i class="fa-brands fa-google" style="color: #4285f4"></i>
+              Google<i class="fa-brands fa-google" style="color: var(--color-google)"></i>
             </button>
             <button type="button" class="social-btn" (click)="socialRegister('line')" [disabled]="submitting">
-              LINE<i class="fa-brands fa-line" style="color: #00c300"></i>
+              LINE<i class="fa-brands fa-line" style="color: var(--color-line)"></i>
             </button>
             <button type="button" class="social-btn" (click)="socialRegister('facebook')" [disabled]="submitting">
               Facebook
-              <i class="fa-brands fa-facebook" style="color: #1877f2"></i>
+              <i class="fa-brands fa-facebook" style="color: var(--color-facebook)"></i>
             </button>
           </div>
         </div>

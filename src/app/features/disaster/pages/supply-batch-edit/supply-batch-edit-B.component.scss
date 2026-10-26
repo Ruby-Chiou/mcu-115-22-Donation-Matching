@@ -3,17 +3,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-8);
 
   padding: 8px 16px;
 
-  background-color: #ffffff;
-  border: 1px solid #1565c0;
-  border-radius: 8px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-action);
+  border-radius: var(--radius-8);
 
-  color: #1565c0;
-  font-size: 16px;
-  font-weight: 500;
+  color: var(--color-action);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
 
   cursor: pointer;
   white-space: nowrap;
@@ -21,7 +21,7 @@
 }
 
 .image-upload-btn:hover {
-  background-color: #f0f7ff;
+  background-color: var(--bg-action-softer);
 }
 
 .image-upload-btn input[type='file'] {
@@ -29,8 +29,8 @@
 }
 
 .image-upload-hint {
-  font-size: 14px;
-  color: #666666;
+  font-size: var(--font-size-14);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -38,7 +38,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .selected-image {
@@ -52,25 +52,25 @@
   align-items: center;
   justify-content: space-between;
 
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  background-color: var(--color-white);
+  border: 1px solid var(--border-slate);
+  border-radius: var(--radius-8);
+  box-shadow: var(--shadow-faint);
 }
 
 /* 圖片名稱 */
 .selected-image-name {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
   padding: 6px 12px;
   margin: 0;
-  background-color: #e8f3ff;
-  border: 1px solid #a6cffd;
-  border-radius: 8px;
-  color: #1565c0;
-  font-size: 15px;
-  font-weight: 500;
+  background-color: var(--bg-action-chip);
+  border: 1px solid var(--color-action-chip);
+  border-radius: var(--radius-8);
+  color: var(--color-action);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -81,9 +81,9 @@
 
 /* 滑鼠懸停樣式*/
 .selected-image-name:hover {
-  background-color: #d0e5ff;
-  border-color: #1565c0;
-  color: #0d47a1;
+  background-color: var(--bg-action-pale-2);
+  border-color: var(--color-action);
+  color: var(--color-action-dark);
   text-decoration: none;
 }
 
@@ -98,25 +98,25 @@
   align-items: center;
   justify-content: space-between;
 
-  background-color: #e8f3ff;
-  border: 1px solid #a6cffd;
-  border-radius: 8px;
+  background-color: var(--bg-action-chip);
+  border: 1px solid var(--color-action-chip);
+  border-radius: var(--radius-8);
 }
 
 .selected-image-name {
   background: transparent;
   border: none;
-  color: #1565c0;
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--color-action);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .selected-image-name:hover {
-  color: #0d47a1;
+  color: var(--color-action-dark);
   text-decoration: none;
 }
 
@@ -124,32 +124,32 @@
 .remove-image-btn {
   flex-shrink: 0;
   padding: 5px 12px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  color: #dc2626;
-  font-size: 15px;
-  font-weight: 500;
+  background-color: var(--bg-error-pale);
+  border: 1px solid var(--border-error-soft);
+  border-radius: var(--radius-6);
+  color: var(--color-error-hot);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .remove-image-btn:hover {
-  background-color: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c;
+  background-color: var(--bg-error-wash);
+  border-color: var(--color-error-pale);
+  color: var(--color-error-bold);
 }
 
 /*錯誤提示*/
 .invalid {
-  border: 2px solid #e53935 !important;
+  border: 2px solid var(--color-error-bright) !important;
   outline: none;
-  background-color: #fff5f5;
+  background-color: var(--bg-error-soft);
 }
 
 .required {
-  color: #d32f2f;
-  font-weight: bold;
+  color: var(--color-error);
+  font-weight: var(--font-weight-bold);
 }
 
 /*分隔線*/
@@ -157,7 +157,7 @@ hr {
   margin-top: 30px;
   margin-bottom: 10px;
   border: none;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--border-input);
 }
 
 /*接受物資狀態*/
@@ -185,8 +185,8 @@ hr {
   justify-content: space-between;
   padding: 5px 8px;
   margin-bottom: 2px;
-  border-bottom: 1px dashed #1e88e5;
-  border-radius: 6px;
+  border-bottom: 1px dashed var(--color-action-material);
+  border-radius: var(--radius-6);
   transition: background-color 0.2s ease;
 }
 
@@ -200,20 +200,20 @@ hr {
 }
 
 .condition-name {
-  color: var(--color-text-main, #333333);
-  font-weight: 500;
-  font-size: 16px;
+  color: var(--color-text-main, var(--color-text-body));
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-16);
 }
 
 .condition-toggle {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--radius-6);
   border: none;
-  background-color: #90a4ae;
+  background-color: var(--color-text-ash);
   color: white;
-  font-size: 15px;
-  font-weight: bold;
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -222,11 +222,11 @@ hr {
 }
 
 .condition-toggle.accept {
-  background-color: #66a96b;
+  background-color: var(--color-success-mid);
 }
 
 .condition-toggle.reject {
-  background-color: #c75b5b;
+  background-color: var(--color-error-muted);
 }
 
 .condition-toggle:hover {
@@ -244,48 +244,48 @@ hr {
 .condition-hint {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: var(--space-18);
   margin-bottom: 12px;
   padding-left: 2px;
-  font-size: 13px;
-  font-weight: 400;
-  color: #555;
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-quiet);
   white-space: nowrap;
 }
 
 .hint-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-4);
   white-space: nowrap;
 }
 
 .hint-icon {
   width: 20px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: var(--radius-4);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 12px;
-  font-weight: bold;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
   flex-shrink: 0;
 }
 
 /* 未設定 */
 .hint-icon.unset {
-  background-color: #90a4ae;
+  background-color: var(--color-text-ash);
 }
 
 /* 接受 */
 .hint-icon.accept {
-  background-color: #66a96b;
+  background-color: var(--color-success-mid);
 }
 
 /* 不接受 */
 .hint-icon.reject {
-  background-color: #c75b5b;
+  background-color: var(--color-error-muted);
 }
 
 /*自訂物資狀態*/

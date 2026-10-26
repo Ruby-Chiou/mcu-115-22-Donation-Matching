@@ -1,4 +1,4 @@
-/** 電子郵件彙整頻率（實際寄信排程待後端／Edge Function 接上） */
+/** 電子郵件彙整頻率。寄出時間由資料庫排程，再由 dispatch-member-mail 寄出。 */
 export type EmailDigestMode = 'INSTANT' | 'DAILY' | 'WEEKLY' | 'OFF';
 
 export const EMAIL_DIGEST_MODE_LABELS: Record<EmailDigestMode, string> = {
@@ -53,4 +53,21 @@ export function defaultNotificationSettings(uid: string): MemberNotificationSett
     quietHoursEnd: '08:00',
     updatedAt: new Date().toISOString(),
   };
+}
+
+/** 關閉的類別不計入小鈴鐺。收件匣裡的舊信仍看得到。 */
+export function alertsInApp(category: 'SYSTEM' | 'AGENCY' | 'DONATION', inApp: ChannelToggles | null): boolean {
+  if (!inApp) {
+    return true;
+  }
+
+  if (category === 'SYSTEM') {
+    return inApp.system;
+  }
+
+  if (category === 'AGENCY') {
+    return inApp.agency;
+  }
+
+  return inApp.donation;
 }

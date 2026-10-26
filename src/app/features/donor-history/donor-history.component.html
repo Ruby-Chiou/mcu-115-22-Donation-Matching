@@ -6,7 +6,7 @@
 }
 
 @if (embedded()) {
-  <p class="section-hint">審核通過的寄送捐助，才在這裡上傳物流單號。機構看到單號並收到貨後，會做簽收回報。</p>
+  <p class="section-hint">審核通過的寄送捐助，由捐助者在這裡選擇物流公司並上傳單號。機構只看得到你上傳的資料，貨到了才做簽收回報。</p>
 }
 
 <div class="history-toolbar">
@@ -198,6 +198,13 @@
 
           @if (record.status === 'human_approved' && record.donationMethod === '寄送') {
             <form class="tracking-form" (submit)="$event.preventDefault(); saveTracking(record)">
+              <label for="logistics-carrier">物流公司</label>
+              <select id="logistics-carrier" [value]="carrierDraft()" (change)="onCarrierChange($event)">
+                <option value="">請選擇</option>
+                @for (carrier of carriers; track carrier) {
+                  <option [value]="carrier">{{ carrier }}</option>
+                }
+              </select>
               <label for="tracking-no">物流單號</label>
               <input
                 id="tracking-no"
@@ -207,9 +214,9 @@
                 autocomplete="off"
               />
               <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
-                {{ trackingSaving() ? '上傳中...' : record.trackingNo ? '更新單號' : '上傳單號' }}
+                {{ trackingSaving() ? '上傳中...' : (record.trackingNo ? '更新物流資料' : '上傳物流資料') }}
               </button>
-              <p class="shortcut-hint">機構已通過。請寄出後把物流單號填在這裡，受助機構才看得到、也才會等這批貨。</p>
+              <p class="shortcut-hint">機構已通過。請選擇你寄出時用的物流公司，並填上單號。受助機構不能代選。</p>
               @if (trackingMessage()) {
                 <p class="tracking-message">{{ trackingMessage() }}</p>
               }
@@ -218,7 +225,7 @@
 
           @if (record.status === 'human_approved' && record.donationMethod === '寄送' && record.trackingNo) {
             <p class="shortcut-hint">
-              單號 {{ record.trackingNo }} 已給受助機構。
+              {{ record.logisticsCarrier || '尚未選擇物流公司' }}，單號 {{ record.trackingNo }} 已給受助機構。
               @if (record.receiptConfirmedAt) {
                 機構已簽收。
                 @if (record.receiptPartial) { 數量較多，沒有全部拆箱拍攝。 }

@@ -48,6 +48,9 @@
               </button>
 
               <button type="button" class="comment-button reply-button" (click)="replyTo(node.comment)">回覆</button>
+              @if (canDelete(node.comment)) {
+                <button type="button" class="comment-delete" (click)="deleteComment(node.comment)">刪除</button>
+              }
             </div>
           </div>
 

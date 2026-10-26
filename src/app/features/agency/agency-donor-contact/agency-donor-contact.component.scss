@@ -1,31 +1,31 @@
 .donor-contact {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
   margin-top: 8px;
-  color: #334155;
-  font-size: 14px;
-  line-height: 1.5;
+  color: var(--color-text-slate-body);
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-normal);
 }
 
 textarea {
   width: 100%;
   margin-top: 4px;
   padding: 8px 10px;
-  border: 1px solid #dce5ed;
-  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-8);
   font: inherit;
 }
 
 button {
   align-self: flex-start;
   padding: 8px 14px;
-  border: 1px solid #245c86;
-  border-radius: 999px;
-  background: #fff;
-  color: #245c86;
+  border: 1px solid var(--color-text-steel);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  color: var(--color-text-steel);
   font: inherit;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 
   &:disabled {
@@ -35,9 +35,9 @@ button {
 }
 
 .ok {
-  color: #248653;
+  color: var(--color-success-leaf);
 }
 
 .error {
-  color: #a33b3b;
+  color: var(--color-error-brick);
 }

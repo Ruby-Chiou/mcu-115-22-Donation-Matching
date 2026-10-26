@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 .carousel {
   position: relative;
   width: 100%;
@@ -20,7 +22,7 @@
   justify-content: center;
 
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 
 /* 圖片 */
@@ -42,10 +44,10 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #005BAC;
-  font-size: 32px;
+  color: var(--color-link);
+  font-size: var(--font-size-32);
   font-weight: 1000;
-  line-height: 1;
+  line-height: var(--line-height-none);
   cursor: pointer;
   transform: translateY(-50%);
   text-shadow: 0 2px 5px rgba(0, 0, 0, 1);
@@ -53,8 +55,8 @@
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
-  -webkit-text-stroke: 3px #ffffff;
-  text-stroke: 3px #ffffff;
+  -webkit-text-stroke: 3px var(--color-white);
+  text-stroke: 3px var(--color-white);
 }
 
 .arrow-left {
@@ -82,7 +84,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .carousel-dots.hidden {
@@ -96,11 +98,27 @@
 
   flex-shrink: 0;
 
-  background: #cccccc;
-  border-radius: 50%;
+  background: var(--border-input);
+  border-radius: var(--radius-circle);
   cursor: pointer;
 }
 
 .dot.active {
-  background: #005bac;
+  background: var(--color-link);
+}
+
+@include bp.tablet {
+  .carousel-wrapper,
+  .carousel-main {
+    height: auto;
+    min-height: 0;
+  }
+
+  .main-image {
+    width: 100%;
+    height: auto;
+    max-height: min(70vh, 480px);
+    object-fit: contain;
+    background: #f4f5f7;
+  }
 }

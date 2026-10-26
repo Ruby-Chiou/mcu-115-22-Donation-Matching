@@ -9,7 +9,7 @@ import { maskTaiwanId } from '../../../../core/receipt/taiwan-id';
 import { AgencyDonorContactComponent } from '../../agency-donor-contact/agency-donor-contact.component';
 import { AgencyReceiptIssuanceService } from '../../../../core/services/agency/agency-receipt-issuance.service';
 import { DonationRecordLinksComponent } from '../../agency-record-links/donation-record-links.component';
-import { AgencyReceiptTask, RECEIPT_CARRIERS, ReceiptDraft } from '../../../../models/agency/receipt-issuance';
+import { AgencyReceiptTask, ReceiptDraft } from '../../../../models/agency/receipt-issuance';
 
 @Component({
   selector: 'app-agency-receipt-form',
@@ -30,7 +30,6 @@ export class AgencyReceiptFormComponent implements OnInit {
   readonly task = signal<AgencyReceiptTask | null>(null);
   readonly orgPreview = signal('');
   readonly officerPreview = signal('');
-  readonly carriers = RECEIPT_CARRIERS;
 
   draft: ReceiptDraft = {
     donorName: '',

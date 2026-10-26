@@ -149,8 +149,10 @@
           <!-- 沒有資料 -->
           <tr *ngIf="filteredDemands.length === 0">
             <td colspan="10" class="empty-message">
-              <div class="empty-title">尚未輸入志工需求或無符合條件的需求</div>
-              <div class="empty-description">請點選上方「新增志工需求」建立需求。</div>
+              <div class="empty-title">{{ loadError || '尚未輸入志工需求或無符合條件的需求' }}</div>
+              <div class="empty-description">
+                {{ loadError ? '請稍後重新整理這個頁面。' : '請點選上方「新增志工需求」建立需求。' }}
+              </div>
             </td>
           </tr>
         </tbody>

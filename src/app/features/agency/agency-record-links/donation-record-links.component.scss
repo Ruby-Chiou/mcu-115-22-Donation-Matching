@@ -2,37 +2,37 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: var(--font-size-14);
+  line-height: var(--line-height-snug);
 }
 
 .label {
-  color: #64748b;
+  color: var(--color-text-slate);
 }
 
 a,
 .current {
   padding: 4px 10px;
   border: 1px solid #d0dbe6;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   text-decoration: none;
 }
 
 a {
-  color: #245c86;
-  background: #fff;
+  color: var(--color-text-steel);
+  background: var(--color-white);
 
   &:hover {
-    border-color: #245c86;
-    background: #f5f9fc;
+    border-color: var(--color-text-steel);
+    background: var(--bg-panel-soft);
   }
 }
 
 .current {
-  border-color: #245c86;
+  border-color: var(--color-text-steel);
   background: #eef5fb;
-  color: #245c86;
-  font-weight: 700;
+  color: var(--color-text-steel);
+  font-weight: var(--font-weight-bold);
 }

@@ -1,46 +1,48 @@
+@use 'breakpoint' as bp;
+
 .line-editor {
   display: grid;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 .line-row {
   display: grid;
   grid-template-columns: 1.6fr 0.7fr 0.7fr 1fr auto;
-  gap: 10px;
+  gap: var(--space-10);
   align-items: end;
 }
 
 label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 700;
+  gap: var(--space-6);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
 }
 
 input {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
-  border: 1px solid #d0d7e2;
-  border-radius: 8px;
+  border: 1px solid var(--border-cool);
+  border-radius: var(--radius-8);
   font: inherit;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 button {
   padding: 10px 12px;
-  border: 1px solid #94a3b8;
-  border-radius: 8px;
-  background: #fff;
+  border: 1px solid var(--color-text-soft);
+  border-radius: var(--radius-8);
+  background: var(--color-white);
   font: inherit;
   cursor: pointer;
 }
 
 .add-line {
   justify-self: start;
-  border-color: #1565c0;
-  color: #1565c0;
+  border-color: var(--color-action);
+  color: var(--color-action);
 }
 
 button:disabled {
@@ -48,8 +50,14 @@ button:disabled {
   cursor: not-allowed;
 }
 
-@media (max-width: 800px) {
+@include bp.tablet {
   .line-row {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@include bp.mobile {
+  .line-row {
+    grid-template-columns: 1fr;
   }
 }

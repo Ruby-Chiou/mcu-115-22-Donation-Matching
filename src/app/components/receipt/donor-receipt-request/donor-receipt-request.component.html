@@ -10,13 +10,20 @@
   <label>
     Email
     <input type="email" maxlength="80" [value]="donorEmail()" (input)="donorEmail.set(inputValue($event))" />
-    <small>可不填。就算填了也不會顯示給受助機構，他們會先用站內信聯絡你。</small>
+    <small>可不填。用來寄收據給你，機構不會看到這組信箱。</small>
   </label>
 
   <label>
     身分證字號
-    <input type="text" maxlength="10" [value]="donorIdNo()" (input)="donorIdNo.set(inputValue($event))" autocomplete="off" />
-    <small>這是你的收據開啟密碼，不會印在收據上。受助機構只看得到整段遮罩，不能查看或修改。</small>
+    <input
+      type="password"
+      maxlength="10"
+      [value]="donorIdNo()"
+      (input)="donorIdNo.set(inputValue($event))"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <small>用來開啟你的電子收據。輸入時會先遮住，也不會印在收據上。</small>
   </label>
 
   <div class="lines-head">

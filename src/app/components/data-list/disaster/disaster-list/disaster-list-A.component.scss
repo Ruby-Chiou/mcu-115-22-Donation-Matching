@@ -1,6 +1,6 @@
 :host {
-  --primary: #1565c0;
-  --text: #333;
+  --primary: var(--color-action);
+  --text: var(--color-text-body);
 }
 
 .container {
@@ -22,15 +22,15 @@
   min-height: 44px;
   padding: 0 22px;
   border: 0;
-  border-radius: 999px;
-  background: #1565c0;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
+  border-radius: var(--radius-pill);
+  background: var(--color-action);
+  color: var(--color-white);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 
   &:hover {
-    background: #0d47a1;
+    background: var(--color-action-dark);
   }
 }
 
@@ -50,7 +50,7 @@
 }
 
 .right-toolbar {
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 .select-all {
@@ -58,11 +58,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 
   span {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--font-size-16);
+    font-weight: var(--font-weight-semibold);
     white-space: nowrap;
   }
 
@@ -76,42 +76,42 @@
 .batch-buttons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
   margin-left: 15px;
 
   button {
     min-height: 42px;
     padding: 0 18px;
     border: 0;
-    border-radius: 999px;
-    background: #1565c0;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
+    border-radius: var(--radius-pill);
+    background: var(--color-action);
+    color: var(--color-white);
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
 
     &:hover {
-      background: #0d47a1;
+      background: var(--color-action-dark);
     }
   }
 }
 
 .batch-delete-btn,
 td .delete-btn {
-  background: #d32f2f !important;
+  background: var(--color-error) !important;
 
   &:hover {
-    background: #b71c1c !important;
+    background: var(--color-error-deep) !important;
   }
 }
 
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid #e3ebf5;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 10px 28px rgb(21 101 192 / 8%);
+  border: 1px solid var(--bg-action-pale);
+  border-radius: var(--radius-16);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
 }
 
 table {
@@ -125,11 +125,11 @@ th,
 td {
   box-sizing: border-box;
   height: 52px;
-  padding: 4px;
-  border-bottom: 1px solid #e8eef5;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-mist);
   overflow: hidden;
   text-align: center;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   vertical-align: middle;
 }
 
@@ -138,20 +138,20 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover td {
-  background: #f8fbff;
+  background: var(--bg-paper);
 }
 
 th {
   height: 44px;
-  background: #f3f8fd;
-  color: #1565c0;
-  font-size: 13px;
-  font-weight: 700;
+  background: var(--bg-panel);
+  color: var(--color-action);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
 .checkbox-column {
-  padding: 4px;
+  padding: var(--space-4);
   white-space: nowrap;
 
   input {
@@ -162,12 +162,12 @@ th {
 }
 
 .item-column {
-  padding: 4px;
+  padding: var(--space-4);
   .item-text {
     max-height: 40px;
     overflow: hidden;
-    font-size: 13px;
-    line-height: 1.4;
+    font-size: var(--font-size-13);
+    line-height: var(--line-height-snug);
     text-align: center;
     word-break: keep-all;
     display: -webkit-box;
@@ -180,9 +180,9 @@ th {
 
 /* 類別欄位固定為兩行高度 */
 .category-column {
-  padding: 4px;
-  font-size: 13px;
-  line-height: 1.4;
+  padding: var(--space-4);
+  font-size: var(--font-size-13);
+  line-height: var(--line-height-snug);
   text-align: center;
   vertical-align: middle;
   word-break: keep-all;
@@ -198,7 +198,7 @@ th {
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-4);
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -210,9 +210,9 @@ th {
     max-width: 4.8em;
     height: 30px;
     border: 0;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
+    border-radius: var(--radius-8);
+    font-size: var(--font-size-12);
+    font-weight: var(--font-weight-bold);
     text-align: center;
     text-align-last: center;
     cursor: pointer;
@@ -225,38 +225,38 @@ th {
   height: 30px;
   padding: 0 4px;
   border: 0;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
+  border-radius: var(--radius-8);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
   cursor: pointer;
 }
 
 .op-view {
-  border: 2px solid #1565c0;
-  background: #fff;
-  color: #1565c0;
+  border: 2px solid var(--color-action);
+  background: var(--color-white);
+  color: var(--color-action);
 
   &:hover {
-    background: #e3f2fd;
+    background: var(--bg-action-soft);
   }
 }
 
 .op-edit {
-  background: #1565c0;
-  color: #fff;
+  background: var(--color-action);
+  color: var(--color-white);
 
   &:hover {
-    background: #0d47a1;
+    background: var(--color-action-dark);
   }
 }
 
 .op-delete {
-  background: #c62828;
-  color: #fff;
+  background: var(--color-error-dark);
+  color: var(--color-white);
 
   &:hover {
-    background: #b71c1c;
+    background: var(--color-error-deep);
   }
 }
 
@@ -274,10 +274,10 @@ th {
   min-width: 0;
   min-height: 28px;
   padding: 0 6px;
-  border-radius: 999px;
-  background: #e3f2fd;
-  color: #1565c0;
-  font-weight: 700;
+  border-radius: var(--radius-pill);
+  background: var(--bg-action-soft);
+  color: var(--color-action);
+  font-weight: var(--font-weight-bold);
   text-decoration: none;
 }
 
@@ -287,26 +287,26 @@ th {
   justify-content: center;
   min-height: 26px;
   padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-bold);
   white-space: nowrap;
 }
 
 /* 狀態 */
 .operation-flex select.status-on {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--bg-success-soft);
+  color: var(--color-success-strong);
 }
 
 .operation-flex select.status-hide {
-  background: #fff8e1;
-  color: #8d6e00;
+  background: var(--bg-warning-cream);
+  color: var(--color-warning-text);
 }
 
 .operation-flex select.status-off {
-  background: #ffebee;
-  color: #c62828;
+  background: var(--bg-error-blush);
+  color: var(--color-error-dark);
 }
 
 /* 優先度 */
@@ -314,22 +314,22 @@ th {
 .normal,
 .urgent,
 .very-urgent {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .normal {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-slate);
+  color: var(--color-text-slate-dark);
 }
 
 .urgent {
-  background: #fff4ce;
-  color: #e65100;
+  background: var(--bg-warning-soft);
+  color: var(--color-accent-deep);
 }
 
 .very-urgent {
-  background: #ffebee;
-  color: #c62828;
+  background: var(--bg-error-blush);
+  color: var(--color-error-dark);
 }
 
 /* 空資料 */
@@ -340,14 +340,14 @@ th {
 
   .empty-title {
     margin-bottom: 12px;
-    font-size: 20px;
-    font-weight: 600;
+    font-size: var(--font-size-20);
+    font-weight: var(--font-weight-semibold);
   }
 
   .empty-description {
-    color: #666;
-    font-size: 15px;
-    line-height: 1.8;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-15);
+    line-height: var(--line-height-looser);
   }
 }
 

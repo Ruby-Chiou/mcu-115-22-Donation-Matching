@@ -7,10 +7,10 @@
 h1 {
   margin: 28px 0 24px;
   text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: #1565c0;
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-4);
+  color: var(--color-action);
 }
 
 /* 頂部資訊區 */
@@ -34,44 +34,44 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f4f9;
-  border: 1px solid #d0e1f9;
-  border-radius: 8px;
+  background-color: var(--bg-neutral);
+  border: 1px solid var(--bg-action-wash);
+  border-radius: var(--radius-8);
   padding: 8px 16px;
-  gap: 8px;
-  line-height: 1;
+  gap: var(--space-8);
+  line-height: var(--line-height-none);
 }
 
 .info-label {
-  font-size: 15px;
-  color: #5f6368;
-  font-weight: 500;
-  line-height: 1;
+  font-size: var(--font-size-15);
+  color: var(--color-text-graphite);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-none);
 }
 
 .info-value {
-  font-size: 15px;
+  font-size: var(--font-size-15);
   color: var(--color-brand-primary);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   font-family: monospace, sans-serif;
-  letter-spacing: 0.5px;
-  line-height: 1;
+  letter-spacing: var(--tracking-fine);
+  line-height: var(--line-height-none);
 }
 
 /* 詳細資料表 */
 .detail-table {
   width: 100%;
-  border: 1px solid #e3ebf5;
-  border-radius: 16px;
+  border: 1px solid var(--bg-action-pale);
+  border-radius: var(--radius-16);
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 10px 28px rgb(21 101 192 / 8%);
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
 }
 
 /* 每一列 */
 .detail-row {
   display: flex;
-  border-bottom: 1px solid #ddd; /* 統一使用下邊框分隔每一列 */
+  border-bottom: 1px solid var(--border-muted); /* 統一使用下邊框分隔每一列 */
 }
 
 /* 最後一列移除下邊框，避免重複 */
@@ -82,11 +82,11 @@ h1 {
 /* 左側標題 */
 .detail-title {
   width: 25%;
-  padding: 15px;
-  background-color: #f3f8fd;
-  color: #1565c0;
-  font-size: 16px;
-  font-weight: 700;
+  padding: var(--space-15);
+  background-color: var(--bg-panel);
+  color: var(--color-action);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,9 +97,9 @@ h1 {
 .detail-content {
   flex: 1;
   max-width: 75%;
-  padding: 15px;
+  padding: var(--space-15);
   background-color: white;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   word-break: break-word;
   overflow-wrap: break-word;
   display: flex;
@@ -114,12 +114,12 @@ h1 {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 6px;
+  gap: var(--space-6);
 }
 
 /* 需求物名稱 */
 .detail-item-name {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   word-break: break-word;
   overflow-wrap: break-word;
 }
@@ -129,7 +129,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: var(--space-10);
   margin-top: 25px;
   margin-bottom: 30px;
 }
@@ -140,87 +140,87 @@ h1 {
   min-height: 44px;
   min-width: 88px;
   padding: 0 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   border: 0;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-wide);
 }
 
 .back-btn {
-  border: 2px solid #1565c0;
-  background: #fff;
-  color: #1565c0;
+  border: 2px solid var(--color-action);
+  background: var(--color-white);
+  color: var(--color-action);
 }
 
 .edit-btn {
-  background: #1565c0;
-  color: #fff;
+  background: var(--color-action);
+  color: var(--color-white);
 }
 
 .delete-btn {
-  background: #c62828;
-  color: #fff;
+  background: var(--color-error-dark);
+  color: var(--color-white);
 }
 
 .back-btn:hover {
-  background: #e3f2fd;
+  background: var(--bg-action-soft);
   opacity: 1;
 }
 
 .edit-btn:hover {
-  background: #0d47a1;
+  background: var(--color-action-dark);
   opacity: 1;
 }
 
 .delete-btn:hover {
-  background: #b71c1c;
+  background: var(--color-error-deep);
   opacity: 1;
 }
 
 /* 接受物資狀態 */
 .condition-detail {
   display: block;
-  line-height: 1.8;
+  line-height: var(--line-height-looser);
   text-align: left;
 }
 
 .condition-item {
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
 }
 
 .condition-item span {
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .condition-icon {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin-right: 5px;
 }
 
 ::ng-deep .accept {
-  color: #2e7d32;
+  color: var(--color-success-strong);
 }
 
 ::ng-deep .reject {
-  color: #d32f2f;
+  color: var(--color-error);
 }
 
 /* 緊急優先度顏色 */
 .priority-detail.normal {
-  color: #333333;
-  font-weight: 500;
+  color: var(--color-text-body);
+  font-weight: var(--font-weight-medium);
 }
 
 .priority-detail.urgent {
-  color: #f57c00;
-  font-weight: 500;
+  color: var(--color-warning);
+  font-weight: var(--font-weight-medium);
 }
 
 .priority-detail.very-urgent {
-  color: #d32f2f;
-  font-weight: 500;
+  color: var(--color-error);
+  font-weight: var(--font-weight-medium);
 }
 
 /* =========================
@@ -237,24 +237,24 @@ h1 {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
 }
 
 .image-name-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 
   padding: 7px 12px;
 
-  border: 1px solid #d0e1f9;
-  border-radius: 8px;
+  border: 1px solid var(--bg-action-wash);
+  border-radius: var(--radius-8);
 
-  background-color: #f0f7ff;
+  background-color: var(--bg-action-softer);
 
-  color: #1565c0;
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--color-action);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
 
   cursor: pointer;
 
@@ -264,12 +264,12 @@ h1 {
 }
 
 .image-name-btn:hover {
-  background-color: #e3f2fd;
-  border-color: #90caf9;
+  background-color: var(--bg-action-soft);
+  border-color: var(--color-action-light);
 }
 
 .image-name-btn i {
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* =========================
@@ -278,5 +278,5 @@ h1 {
 
 .contact-time-detail {
   white-space: normal;
-  line-height: 1.8;
+  line-height: var(--line-height-looser);
 }

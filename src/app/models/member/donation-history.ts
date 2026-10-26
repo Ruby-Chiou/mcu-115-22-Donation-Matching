@@ -26,6 +26,8 @@ export interface DonorDonationHistory {
   createdAt: string;
   aiCheckedAt: string | null;
   humanCheckedAt: string | null;
+  /** 審核通過後，捐助者選擇的物流公司 */
+  logisticsCarrier: string;
   /** 審核通過後，捐助者上傳的物流單號 */
   trackingNo: string;
   receiptConfirmedAt: string | null;

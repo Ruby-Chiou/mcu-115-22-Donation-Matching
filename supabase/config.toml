@@ -376,6 +376,10 @@ allow_dynamic_registration = false
 [functions.notify-support-complaint]
 verify_jwt = false
 
+# 瀏覽器預檢不會帶登入憑證。改在函式裡確認登入者，否則 OPTIONS 會被擋成 CORS 錯誤。
+[functions.dispatch-member-mail]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

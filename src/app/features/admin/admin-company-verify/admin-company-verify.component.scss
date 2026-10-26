@@ -14,13 +14,13 @@ h1 {
 
 header p,
 label {
-  color: #526579;
-  line-height: 1.6;
+  color: var(--color-text-blue-gray);
+  line-height: var(--line-height-relaxed);
 }
 
 ul {
   display: grid;
-  gap: 10px;
+  gap: var(--space-10);
   margin: 16px 0;
   padding: 0;
   list-style: none;
@@ -29,39 +29,39 @@ ul {
 li button,
 article {
   width: 100%;
-  border: 1px solid #eadfd4;
-  border-radius: 14px;
-  background: #fff;
+  border: 1px solid var(--border-sand);
+  border-radius: var(--radius-14);
+  background: var(--color-white);
   text-align: left;
 }
 
 li button {
   display: flex;
-  gap: 12px;
+  gap: var(--space-12);
   align-items: center;
   padding: 14px 16px;
   cursor: pointer;
 }
 
 article {
-  padding: 18px;
+  padding: var(--space-18);
 }
 
 dl {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--space-10);
   margin: 0 0 14px;
 }
 
 dt {
-  color: #6b7c8d;
-  font-size: 13px;
+  color: var(--color-text-slate-mid);
+  font-size: var(--font-size-13);
 }
 
 dd {
   margin: 0;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 textarea,
@@ -76,25 +76,25 @@ select {
 }
 
 .method a {
-  color: #6a1b9a;
-  font-weight: 700;
+  color: var(--color-purple);
+  font-weight: var(--font-weight-bold);
 }
 
 fieldset {
   margin: 0 0 14px;
-  border: 1px solid #eadfd4;
-  border-radius: 14px;
+  border: 1px solid var(--border-sand);
+  border-radius: var(--radius-14);
   padding: 12px 14px;
 }
 
 legend {
   padding: 0 6px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .check {
   display: flex;
-  gap: 8px;
+  gap: var(--space-8);
   align-items: flex-start;
   margin: 8px 0;
   color: #243140;
@@ -107,28 +107,28 @@ legend {
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-8);
   margin-top: 12px;
 }
 
 .actions button,
 select {
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 10px 14px;
-  background: #6a1b9a;
-  color: #fff;
-  font-weight: 700;
+  background: var(--color-purple);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 }
 
 .actions button:disabled {
-  background: #d1d5db;
-  color: #6b7280;
+  background: var(--border-silver);
+  color: var(--color-text-cool);
   cursor: not-allowed;
 }
 
 .error {
-  color: #c62828;
-  font-weight: 700;
+  color: var(--color-error-dark);
+  font-weight: var(--font-weight-bold);
 }

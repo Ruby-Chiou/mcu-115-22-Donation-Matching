@@ -4,10 +4,10 @@
 
   h1 {
     margin: 0;
-    font-size: 32px;
-    font-weight: 700;
-    color: #1565c0;
-    letter-spacing: 5px;
+    font-size: var(--font-size-32);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-action);
+    letter-spacing: var(--tracking-5);
   }
 }
 
@@ -16,17 +16,44 @@
   margin: 1.25rem auto 0;
   padding: 0.9rem 1.1rem;
   border: 1px solid #ffe082;
-  border-radius: 12px;
-  background: #fff8e1;
+  border-radius: var(--radius-12);
+  background: var(--bg-warning-cream);
   color: #6d4c00;
-  line-height: 1.6;
+  line-height: var(--line-height-relaxed);
+}
+
+.inbox-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: 1200px;
+  margin: 1.25rem auto 0;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--color-action-ice);
+  border-radius: var(--radius-12);
+  background: var(--bg-action-soft);
+  color: var(--color-action-dark);
+  line-height: var(--line-height-relaxed);
+
+  button {
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--color-action);
+    color: var(--color-white);
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+  }
 }
 
 .switch-area {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 1rem;
+  gap: var(--space-md);
   max-width: 1200px;
   margin: 1.5rem auto 0;
   padding: 0 40px;
@@ -35,25 +62,25 @@
 .switch-button {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--space-2xs);
   padding: 0.5rem 0.25rem;
   border: 0;
   border-bottom: 3px solid transparent;
   background: transparent;
-  color: #64748b;
+  color: var(--color-text-slate);
   cursor: pointer;
   font: inherit;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .switch-button.active {
-  border-bottom-color: #005bac;
-  color: #005bac;
+  border-bottom-color: var(--color-link);
+  color: var(--color-link);
 }
 
 .switch-divider {
-  color: #94a3b8;
+  color: var(--color-text-soft);
   font-size: 1.2rem;
 }
 

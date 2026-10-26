@@ -1,8 +1,10 @@
+@use 'breakpoint' as bp;
+
 /* 頁面*/
 .supply-form-page {
   min-height: 100vh;
   padding: 50px 20px;
-  background: #f5f7fa;
+  background: var(--bg-canvas);
   box-sizing: border-box;
 }
 .form-container {
@@ -10,8 +12,8 @@
   max-width: 750px;
   margin: 0 auto;
   padding: 35px;
-  background: #fff;
-  border-radius: 16px;
+  background: var(--color-white);
+  border-radius: var(--radius-16);
   box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
   box-sizing: border-box;
 }
@@ -22,30 +24,30 @@
 }
 .form-header h1 {
   margin: 0 0 10px;
-  color: #005BAC;
-  font-size: 32px;
+  color: var(--color-link);
+  font-size: var(--font-size-32);
 }
 .form-header p {
   margin: 0;
-  color: #666;
-  font-size: 16px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-16);
 }
 /* 物資資訊*/
 .material-info {
   display: flex;
-  gap: 20px;
-  padding: 20px;
+  gap: var(--space-20);
+  padding: var(--space-20);
   margin-bottom: 30px;
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--bg-page);
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-12);
 }
 .material-image {
   width: 120px;
   height: 100px;
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
 }
 .material-image img {
   width: 100%;
@@ -56,20 +58,20 @@
   flex: 1;
 }
 .material-text .label {
-  color: #777;
-  font-size: 14px;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-14);
 }
 .material-text h2 {
   margin: 5px 0 10px;
-  color: #222;
-  font-size: 24px;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-24);
 }
 .material-text p {
   margin: 0;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 .material-text strong {
-  color: #333;
+  color: var(--color-text-body);
 }
 /* 區塊標題 */
 .section-title-row {
@@ -81,10 +83,10 @@
 .section-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: #005BAC;
-  font-size: 20px;
-  font-weight: 700;
+  gap: var(--space-10);
+  color: var(--color-link);
+  font-size: var(--font-size-20);
+  font-weight: var(--font-weight-bold);
 }
 .section-title span {
   display: flex;
@@ -92,25 +94,25 @@
   justify-content: center;
   width: 30px;
   height: 30px;
-  border-radius: 50%;
-  background: #005BAC;
-  color: #fff;
-  font-size: 15px;
+  border-radius: var(--radius-circle);
+  background: var(--color-link);
+  color: var(--color-white);
+  font-size: var(--font-size-15);
 }
 /* 自動填入 */
 .account-fill-option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #005BAC;
-  font-size: 14px;
-  font-weight: 600;
+  gap: var(--space-8);
+  color: var(--color-link);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }
 .account-fill-option input {
   width: 17px;
   height: 17px;
-  accent-color: #005BAC;
+  accent-color: var(--color-link);
 }
 /* 表單 */
 .form-group {
@@ -119,13 +121,13 @@
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
-  font-size: 16px;
-  font-weight: 600;
+  color: var(--color-text-body);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
 }
 .form-group label > span,
 .label-row span {
-  color: #e53935;
+  color: var(--color-error-bright);
   margin-left: 3px;
 }
 .form-group input,
@@ -134,16 +136,16 @@
   width: 100%;
   padding: 12px 14px;
   box-sizing: border-box;
-  border: 1px solid #d6d6d6;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 16px;
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-8);
+  background: var(--color-white);
+  font-size: var(--font-size-16);
   outline: none;
 }
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #005BAC;
+  border-color: var(--color-link);
   box-shadow: 0 0 0 3px rgba(0, 91, 172, .1);
 }
 .form-group textarea {
@@ -153,36 +155,36 @@
 .input-hint {
   display: block;
   margin-top: 6px;
-  color: #888;
-  font-size: 13px;
+  color: var(--color-text-dim);
+  font-size: var(--font-size-13);
 }
 /* 數量 */
 .quantity-input {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-10);
 }
 .quantity-input input {
   flex: 1;
 }
 .quantity-input span {
-  color: #555;
+  color: var(--color-text-quiet);
 }
 /* 單選*/
 .radio-group {
   display: flex;
-  gap: 30px;
+  gap: var(--space-30);
 }
 .radio-option {
   display: flex !important;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   cursor: pointer;
 }
 .radio-option input {
   width: 18px;
   height: 18px;
-  accent-color: #005BAC;
+  accent-color: var(--color-link);
 }
 /* ================================
    上傳照片 / 影片
@@ -199,23 +201,23 @@
   min-height: 100px;
   box-sizing: border-box;
 
-  background-color: #ffffff;
-  border: 2px dashed #b0bec5;
-  border-radius: 10px;
+  background-color: var(--color-white);
+  border: 2px dashed var(--color-text-silver);
+  border-radius: var(--radius-10);
 
-  padding: 20px;
+  padding: var(--space-20);
 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--space-16);
 }
 
 /* 上傳按鈕區 */
 .upload-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 /* 選擇圖片 / 上傳影片按鈕 */
@@ -223,17 +225,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-8);
 
   padding: 8px 16px;
 
-  background-color: #ffffff;
-  border: 1px solid #1565c0;
-  border-radius: 8px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-action);
+  border-radius: var(--radius-8);
 
-  color: #1565c0;
-  font-size: 16px;
-  font-weight: 500;
+  color: var(--color-action);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
 
   cursor: pointer;
   white-space: nowrap;
@@ -242,7 +244,7 @@
 }
 
 .image-upload-btn:hover {
-  background-color: #f0f7ff;
+  background-color: var(--bg-action-softer);
 }
 
 /* 隱藏原生檔案選擇 */
@@ -252,8 +254,8 @@
 
 /* 上傳提示 */
 .image-upload-hint {
-  font-size: 14px;
-  color: #666666;
+  font-size: var(--font-size-14);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -266,7 +268,7 @@
 
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 /* 單一檔案 */
@@ -281,18 +283,18 @@
   align-items: center;
   justify-content: space-between;
 
-  background-color: #e8f3ff;
-  border: 1px solid #a6cffd;
-  border-radius: 8px;
+  background-color: var(--bg-action-chip);
+  border: 1px solid var(--color-action-chip);
+  border-radius: var(--radius-8);
 
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-faint);
 }
 
 /* 檔案名稱 */
 .selected-image-name {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
 
   min-width: 0;
   padding: 6px 12px;
@@ -300,11 +302,11 @@
 
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
 
-  color: #1565c0;
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--color-action);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
 
   text-align: left;
   cursor: pointer;
@@ -317,8 +319,8 @@
 }
 
 .selected-image-name:hover {
-  background-color: #d0e5ff;
-  color: #0d47a1;
+  background-color: var(--bg-action-pale-2);
+  color: var(--color-action-dark);
 }
 
 /* 移除圖片 / 影片按鈕 */
@@ -327,13 +329,13 @@
 
   padding: 5px 12px;
 
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
+  background-color: var(--bg-error-pale);
+  border: 1px solid var(--border-error-soft);
+  border-radius: var(--radius-6);
 
-  color: #dc2626;
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--color-error-hot);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-medium);
 
   cursor: pointer;
 
@@ -341,9 +343,9 @@
 }
 
 .remove-image-btn:hover {
-  background-color: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c;
+  background-color: var(--bg-error-wash);
+  border-color: var(--color-error-pale);
+  color: var(--color-error-bold);
 }
 
 
@@ -356,13 +358,13 @@
 
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
 
   margin-bottom: 35px;
   padding: 0;
 
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 
   box-sizing: border-box;
 
@@ -373,13 +375,13 @@
 .receive-method-box {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-16);
   width: fit-content;
   margin-bottom: 35px;
 }
 .form-buttons {
   display: flex;
-  gap: 15px;
+  gap: var(--space-15);
   margin-top: 30px;
 }
 
@@ -387,32 +389,32 @@
   flex: 1;
 }
 .cancel-button {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: #fff;
-  color: #666;
-  font-size: 16px;
-  font-weight: 600;
+  padding: var(--space-12);
+  border-radius: var(--radius-8);
+  border: 1px solid var(--border-input);
+  background: var(--color-white);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: 0.2s ease;
 }
 .cancel-button:hover {
-  background: #f5f5f5;
-  color: #333;
+  background: var(--bg-muted);
+  color: var(--color-text-body);
 }
 .submit-button {
-  padding: 12px;
-  border-radius: 8px;
+  padding: var(--space-12);
+  border-radius: var(--radius-8);
   border: none;
-  background: #ff6b35;
+  background: var(--color-accent);
   color: white;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }
 .submit-button:hover {
-  background: #e85a28;
+  background: var(--color-accent-hover);
 }
 /* =========================
    成功頁
@@ -427,18 +429,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: #22c55e;
-  color: #ffffff;
-  font-size: 32px;
-  font-weight: bold;
+  border-radius: var(--radius-circle);
+  background: var(--color-success-bright);
+  color: var(--color-white);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
 }
 .success-page h1 {
   margin-bottom: 10px;
-  color: #005BAC;
+  color: var(--color-link);
 }
 .success-text {
-  color: #666;
+  color: var(--color-text-secondary);
 }
 /* =========================
    接收地址
@@ -447,29 +449,29 @@
   margin-top: 30px;
   padding: 25px;
   text-align: left;
-  background: #f0f7ff;
-  border: 1px solid #b9dcff;
-  border-radius: 12px;
+  background: var(--bg-action-softer);
+  border: 1px solid var(--color-action-ice);
+  border-radius: var(--radius-12);
 }
 .address-box h2 {
   margin-top: 0;
-  color: #005BAC;
+  color: var(--color-link);
 }
 .address-item {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--space-20);
   padding: 12px 0;
-  border-bottom: 1px solid #dcecff;
+  border-bottom: 1px solid var(--bg-sky-soft);
 }
 .address-item:last-child {
   border-bottom: none;
 }
 .address-item span {
-  color: #666;
+  color: var(--color-text-secondary);
 }
 .address-item strong {
-  color: #333;
+  color: var(--color-text-body);
   text-align: right;
 }
 /* =========================
@@ -477,40 +479,40 @@
 ========================= */
 .address-notice {
   margin-top: 20px;
-  padding: 18px;
+  padding: var(--space-18);
   text-align: left;
   background: #fff4f0;
   border: 1px solid #ffc9b8;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
 }
 .address-notice strong {
-  color: #e85a28;
+  color: var(--color-accent-hover);
 }
 .address-notice p {
   margin: 8px 0 0;
-  color: #555;
-  line-height: 1.7;
+  color: var(--color-text-quiet);
+  line-height: var(--line-height-loose);
 }
 /* =========================
    捐贈摘要
 ========================= */
 .donation-summary {
   margin-top: 25px;
-  padding: 20px;
+  padding: var(--space-20);
   text-align: left;
-  background: #f8fafc;
-  border-radius: 10px;
+  background: var(--bg-page);
+  border-radius: var(--radius-10);
 }
 .donation-summary h2 {
   margin-top: 0;
-  color: #005BAC;
+  color: var(--color-link);
 }
 .donation-summary p {
   margin: 8px 0;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 .donation-summary strong {
-  color: #333;
+  color: var(--color-text-body);
 }
 .success-buttons {
   margin-top: 30px;
@@ -524,13 +526,13 @@
   padding: 14px 20px;
 
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
 
-  background: #005BAC;
-  color: #ffffff;
+  background: var(--color-link);
+  color: var(--color-white);
 
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
 
   cursor: pointer;
 
@@ -538,10 +540,10 @@
 }
 
 .back-button:hover {
-  background: #004a8c;
+  background: var(--color-link-dark);
 }
 /* RWD */
-@media (max-width: 600px) {
+@include bp.mobile {
   .supply-form-page {
     padding: 25px 15px;
   }
@@ -557,19 +559,20 @@
   }
   .radio-group {
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-12);
   }
   .address-item {
     flex-direction: column;
-    gap: 5px;
+    gap: var(--space-5);
   }
   .address-item strong {
     text-align: left;
   }
   .section-title-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-10);
     margin-top: 30px;
     margin-bottom: 20px;
   }
@@ -579,23 +582,38 @@
   .account-fill-option {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #005BAC;
-    font-size: 14px;
-    font-weight: 600;
+    gap: var(--space-8);
+    color: var(--color-link);
+    font-size: var(--font-size-14);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
   }
   .account-fill-option input {
     width: 17px;
     height: 17px;
-    accent-color: #005BAC;
+    accent-color: var(--color-link);
     cursor: pointer;
+  }
+  .upload-controls,
+  .selected-image {
+    flex-wrap: wrap;
+  }
+  .upload-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .image-upload-hint,
+  .selected-image-name {
+    white-space: normal;
+  }
+  .form-header h1 {
+    font-size: var(--font-size-26);
   }
   .input-hint {
     display: block;
     margin-top: 6px;
-    color: #888;
-    font-size: 13px;
+    color: var(--color-text-dim);
+    font-size: var(--font-size-13);
   }
 
 }

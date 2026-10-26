@@ -7,7 +7,7 @@ import { Location } from '@angular/common';
 import { BeneficiaryPublicProfileService } from '../../../../core/services/agency/beneficiary-public-profile.service';
 import { BeneficiaryPanelComponent } from '../../../../components/card/beneficiary-panel/beneficiary-panel.component';
 import { CommentAuthorChipComponent } from '../../../../components/comment/comment-author-chip.component';
-import { commentAuthor, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
+import { canDeleteOwnComment, commentAuthor, commentDeleteError, commentPreviewNotice, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
 import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
 import { AGENCY_OFFICE } from '../../../../models/user/agency';
 import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
@@ -117,10 +117,12 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
     try {
       this.comments = await this.volunteerCommentService.getComments(demandId);
 
+      this.commentNotice = commentPreviewNotice(false);
       this.buildCommentThreads();
     } catch (error) {
       console.error('[志工留言] 載入留言失敗：', error);
       this.comments = [];
+      this.commentNotice = commentPreviewNotice(true);
       this.buildCommentThreads();
     }
   }
@@ -279,6 +281,26 @@ export class DonorDisasterVolunteerDetailPageComponent implements OnInit {
   }
 
   // 判斷目前使用者是否已按愛心
+  canDelete(comment: VolunteerComment): boolean {
+    return canDeleteOwnComment(comment, this.auth.principal().userId);
+  }
+
+  async deleteComment(comment: VolunteerComment): Promise<void> {
+    if (!confirm('刪除這則留言？')) {
+      return;
+    }
+
+    try {
+      await this.volunteerCommentService.deleteComment(comment.id);
+      if (this.volunteer?.id) {
+        await this.loadComments(this.volunteer.id);
+      }
+    } catch (error) {
+      this.commentNotice = commentDeleteError(error);
+      this.cdr.detectChanges();
+    }
+  }
+
   hasLiked(comment: VolunteerComment): boolean {
     return comment.liked_user_ids?.includes(this.currentUserId) ?? false;
   }

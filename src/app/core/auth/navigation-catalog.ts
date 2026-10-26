@@ -55,6 +55,7 @@ const AGENCY_AREA: NavItem = {
   name: '機構作業',
   link: '/agency/dashboard',
   sub: [
+    { name: '收件匣', link: '/agency/inbox' },
     { name: '機構資料', link: '/agency/profile' },
     { name: '總控制台', link: '/agency/dashboard' },
     { name: '日常需求', link: '/agency/daily' },

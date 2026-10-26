@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 /* 強制讓整個頁面元件底部保有寬敞空間 */
 :host {
   display: block;
@@ -15,10 +17,10 @@ app-beneficiary-panel {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  padding: 30px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  padding: var(--space-30);
+  background: var(--color-white);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--radius-12);
   box-sizing: border-box;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
@@ -32,7 +34,7 @@ app-beneficiary-panel {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 30px;
+  gap: var(--space-30);
   min-height: 300px;
 }
 
@@ -44,13 +46,13 @@ app-beneficiary-panel {
   border: none;
   background: none;
   padding: 0;
-  color: #666;
-  font-size: 17px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-17);
   cursor: pointer;
 }
 
 .back-btn:hover {
-  color: #333;
+  color: var(--color-text-body);
 }
 
 /* 左邊圖片 */
@@ -59,7 +61,7 @@ app-beneficiary-panel {
   width: 100%;
   height: 300px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   overflow: hidden;
   background: #f3f3f3;
 }
@@ -77,23 +79,23 @@ app-beneficiary-panel {
   left: 12px;
   z-index: 10;
   padding: 5px 12px;
-  border-radius: 20px;
+  border-radius: var(--radius-20);
   color: white;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-bold);
 }
 
 .detail-image .priority-urgent {
-  background: #f64d4d;
+  background: var(--color-priority-urgent);
 }
 
 .detail-image .priority-normal {
-  background: #f59e0b;
+  background: var(--color-warning-amber);
 }
 
 .detail-image .priority-low,
 .detail-image .priority-default {
-  background: #999;
+  background: var(--color-text-faint);
 }
 
 /* 圖片下方圓點 */
@@ -105,13 +107,13 @@ app-beneficiary-panel {
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-6);
 }
 
 .image-dots span {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -119,7 +121,7 @@ app-beneficiary-panel {
 
 .image-dots span.active {
   width: 18px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   background: white;
 }
 
@@ -133,14 +135,14 @@ app-beneficiary-panel {
 
 .detail-content h2 {
   margin: 0 0 25px;
-  font-size: 28px;
-  color: #333;
+  font-size: var(--font-size-28);
+  color: var(--color-text-body);
 }
 
 .quantity-row {
   display: flex;
   align-items: baseline;
-  gap: 20px;
+  gap: var(--space-20);
   width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -156,15 +158,15 @@ app-beneficiary-panel {
   min-width: 120px;
   text-align: right;
   flex-shrink: 0;
-  color: #555;
-  font-size: 16px;
+  color: var(--color-text-quiet);
+  font-size: var(--font-size-16);
 }
 
 .quantity-row .description {
   margin: 0;
   flex: 1;
-  color: #555;
-  line-height: 1.7;
+  color: var(--color-text-quiet);
+  line-height: var(--line-height-loose);
   white-space: pre-line;
 }
 
@@ -178,82 +180,82 @@ app-beneficiary-panel {
   margin-top: 80px;
   margin-left: auto;
   width: 180px;
-  padding: 12px;
+  padding: var(--space-12);
   border: none;
-  border-radius: 8px;
-  background: #e68a3a;
+  border-radius: var(--radius-8);
+  background: var(--color-accent-warm);
   color: white;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-8);
   margin-top: 8px;
 }
 
 .tag {
   display: inline-block;
   padding: 5px 12px;
-  border-radius: 20px;
-  background: #f3e8dc;
-  color: #b86b2c;
-  font-size: 14px;
+  border-radius: var(--radius-20);
+  background: var(--bg-sand-soft);
+  color: var(--color-accent-tan);
+  font-size: var(--font-size-14);
 }
 
 /* 留言區內部元素樣式 */
 .comment-section h2 {
   margin: 0 0 20px;
-  font-size: 22px;
-  color: #333;
+  font-size: var(--font-size-22);
+  color: var(--color-text-body);
 }
 
 .comment-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-12);
   margin-bottom: 30px;
 }
 
 .comment-form textarea {
   width: 100%;
-  padding: 12px;
+  padding: var(--space-12);
   box-sizing: border-box;
-  border: 1px solid #cccccc;
-  border-radius: 8px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-8);
   resize: vertical;
-  font-size: 15px;
+  font-size: var(--font-size-15);
   font-family: inherit;
   outline: none;
 }
 
 .comment-form textarea:focus {
-  border-color: #ff6b35;
+  border-color: var(--color-accent);
 }
 
 .comment-notice {
   margin: 0;
-  color: #9a3412;
-  font-size: 14px;
+  color: var(--color-accent-brown);
+  font-size: var(--font-size-14);
 }
 
 .comment-button {
   align-self: flex-end;
   padding: 10px 24px;
   border: none;
-  border-radius: 8px;
-  background: #ff6b35;
-  color: #ffffff;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: var(--radius-8);
+  background: var(--color-accent);
+  color: var(--color-white);
+  font-size: var(--font-size-15);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
 }
 
 .comment-button:hover {
-  background: #e85a28;
+  background: var(--color-accent-hover);
 }
 
 .comment-button:disabled {
@@ -264,7 +266,7 @@ app-beneficiary-panel {
 .comment-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--space-15);
   width: 100%;
   box-sizing: border-box;
 }
@@ -274,17 +276,18 @@ app-beneficiary-panel {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 18px;
-  background: #f8f8f8;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  padding: var(--space-18);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--radius-8);
 }
 
 .comment-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 6px 12px;
   margin-bottom: 10px;
   width: 100%;
   box-sizing: border-box;
@@ -292,22 +295,22 @@ app-beneficiary-panel {
 
 .comment-header strong,
 .comment-title strong {
-  font-size: 16px;
-  color: #333;
+  font-size: var(--font-size-16);
+  color: var(--color-text-body);
 }
 
 .comment-header span {
   flex-shrink: 0;
-  font-size: 13px;
-  color: #999;
+  font-size: var(--font-size-13);
+  color: var(--color-text-faint);
   white-space: nowrap;
   text-align: right;
 }
 
 .comment p {
   margin: 0;
-  line-height: 1.6;
-  color: #555;
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-quiet);
 }
 
 .loading-state {
@@ -316,11 +319,11 @@ app-beneficiary-panel {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: var(--space-18);
   padding: 40px 20px;
-  background-color: #fbfbfd;
-  color: #666;
-  font-size: 18px;
+  background-color: var(--bg-page);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-18);
   text-align: center;
 }
 
@@ -333,18 +336,18 @@ app-beneficiary-panel {
   height: 48px;
   box-sizing: border-box;
   border: 4px solid #e2f1fd;
-  border-top-color: #1685da;
-  border-right-color: #1685da;
-  border-radius: 50%;
+  border-top-color: var(--color-link-clear);
+  border-right-color: var(--color-link-clear);
+  border-radius: var(--radius-circle);
   animation: loading-spin 0.85s linear infinite;
 }
 
 .error-state {
-  color: #b42318;
+  color: var(--color-error-strong);
 }
 
 .empty-state {
-  color: #555;
+  color: var(--color-text-quiet);
 }
 
 .loading-state .back-btn {
@@ -352,9 +355,9 @@ app-beneficiary-panel {
   padding: 10px 22px;
   border: 0;
   border-radius: 7px;
-  background-color: #1477bd;
-  color: #fff;
-  font-size: 15px;
+  background-color: var(--color-link-ocean);
+  color: var(--color-white);
+  font-size: var(--font-size-15);
   cursor: pointer;
 }
 
@@ -377,21 +380,26 @@ app-beneficiary-panel {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  min-width: 0;
+  gap: var(--space-6);
+  flex: 1 1 auto;
+  min-width: min(100%, 10rem);
+  max-width: 100%;
 }
 
 .reply-title-text {
-  color: #666;
-  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-14);
 }
 
 .comment-title .reply-target-name {
-  color: #005bac;
-  font-weight: 700;
-  background: #e8f3ff;
+  flex: 0 0 auto;
+  color: var(--color-link);
+  font-weight: var(--font-weight-bold);
+  background: var(--bg-action-chip);
   padding: 2px 8px;
-  border-radius: 5px;
+  border-radius: var(--radius-5);
+  line-height: 1.45;
+  max-width: 100%;
 }
 
 /* 留言內容與右側操作按鈕 */
@@ -399,7 +407,7 @@ app-beneficiary-panel {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--space-16);
   width: 100%;
   box-sizing: border-box;
 }
@@ -408,7 +416,7 @@ app-beneficiary-panel {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: var(--space-6);
   flex-shrink: 0;
 }
 
@@ -416,18 +424,18 @@ app-beneficiary-panel {
 .like-button {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-4);
   padding: 4px 0;
   border: none;
   background: transparent;
-  color: #666;
-  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-14);
   cursor: pointer;
 }
 
 .like-button .material-symbols-outlined {
   color: pink;
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-variation-settings:
     'FILL' 0,
     'wght' 400,
@@ -445,8 +453,8 @@ app-beneficiary-panel {
 }
 
 .like-button span:last-child {
-  color: #777;
-  font-size: 16px;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-16);
 }
 
 /* 回覆按鈕 */
@@ -454,16 +462,16 @@ app-beneficiary-panel {
   align-self: flex-end;
   padding: 6px 14px;
   border: none;
-  border-radius: 8px;
-  background: #ff6b35;
-  color: #fff;
-  font-size: 14px;
+  border-radius: var(--radius-8);
+  background: var(--color-accent);
+  color: var(--color-white);
+  font-size: var(--font-size-14);
   cursor: pointer;
 }
 
 .reply-button:hover {
-  background: #e85a28;
-  color: #fff;
+  background: var(--color-accent-hover);
+  color: var(--color-white);
 }
 
 /* 回覆列表容器 */
@@ -471,7 +479,7 @@ app-beneficiary-panel {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-12);
   width: 100%;
   margin-top: 12px;
   box-sizing: border-box;
@@ -495,7 +503,7 @@ app-beneficiary-panel {
   left: 8px;
   width: 2px;
   height: 22px;
-  background-color: #ff6b35;
+  background-color: var(--color-accent);
 }
 
 /* 第一層回覆不顯示橫線 */
@@ -512,7 +520,7 @@ app-beneficiary-panel {
   left: 8px;
   width: 16px;
   height: 2px;
-  background-color: #ff6b35;
+  background-color: var(--color-accent);
 }
 
 /* 非最後一筆回覆的垂直線延伸 */
@@ -529,7 +537,7 @@ app-beneficiary-panel {
 .reply-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-10);
   margin-top: 14px;
 }
 
@@ -537,14 +545,14 @@ app-beneficiary-panel {
   width: 100%;
   padding: 10px 12px;
   box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-8);
   resize: vertical;
   font: inherit;
 }
 
 .reply-form textarea:focus {
-  border-color: #e68a3a;
+  border-color: var(--color-accent-warm);
   outline: none;
 }
 
@@ -553,7 +561,7 @@ app-beneficiary-panel {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
   margin-top: 8px;
 }
 
@@ -563,21 +571,21 @@ app-beneficiary-panel {
 
 .reply-submit-button {
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .reply-cancel-button {
   padding: 5px 10px;
-  border: 1px solid #f3b27a;
-  border-radius: 6px;
-  background: #fff0e3;
-  color: #e58a45;
+  border: 1px solid var(--color-accent-peach);
+  border-radius: var(--radius-6);
+  background: var(--bg-accent-cream);
+  color: var(--color-accent-warm-deep);
   cursor: pointer;
 }
 
 .reply-cancel-button:hover {
-  background: #ffe3cc;
-  color: #d97832;
+  background: var(--bg-accent-peach);
+  color: var(--color-accent-copper-deep);
 }
 
 /* 顯示更多／收起回覆 */
@@ -586,8 +594,8 @@ app-beneficiary-panel {
   padding: 6px 12px;
   border: none;
   background: transparent;
-  color: #005bac;
-  font-size: 14px;
+  color: var(--color-link);
+  font-size: var(--font-size-14);
   cursor: pointer;
 }
 
@@ -599,32 +607,74 @@ app-beneficiary-panel {
 .no-comments {
   margin: 0;
   padding: 20px 0;
-  color: #888;
+  color: var(--color-text-dim);
   text-align: center;
 }
 
-@media (max-width: 700px) {
+@include bp.tablet {
   .detail-page {
     grid-template-columns: 1fr;
     gap: 25px;
   }
 
+  .detail-image {
+    height: auto;
+    overflow: visible;
+  }
+
   .detail-content {
-    text-align: center;
+    text-align: left;
+  }
+
+  .quantity-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .quantity-row h3,
+  .quantity-row h4 {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .quantity-row .description {
+    width: 100%;
+  }
+
+  .contact-btn {
+    width: 100%;
+    margin-top: 24px;
+    margin-left: 0;
+  }
+
+  .comment-header {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .comment-content-row {
     flex-direction: column;
-    gap: 10px;
+    align-items: stretch;
+    gap: var(--space-10);
   }
 
   .comment-actions {
-    align-self: flex-end;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    gap: 8px 12px;
+  }
+
+  .reply-button {
+    align-self: center;
   }
 
   .comment-header {
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--space-8);
   }
 
   .nested-replies {
@@ -633,5 +683,76 @@ app-beneficiary-panel {
 
   .reply-list {
     margin-left: 6px;
+  }
+}
+
+@include bp.mobile {
+  .detail-info,
+  .comment-section {
+    padding: var(--space-16);
+  }
+
+  .detail-info {
+    margin: 12px auto;
+    padding-top: 52px;
+  }
+
+  .detail-content h2 {
+    margin-bottom: 12px;
+    font-size: var(--font-size-22);
+  }
+
+  .detail-image {
+    height: auto;
+    overflow: visible;
+  }
+
+  .quantity-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .quantity-row h3,
+  .quantity-row h4 {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .quantity-row .description {
+    width: 100%;
+  }
+
+  .contact-btn {
+    width: 100%;
+    margin-top: 24px;
+    margin-left: 0;
+  }
+
+  .comment-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .comment-header span {
+    text-align: left;
+  }
+
+  .comment-title {
+    width: 100%;
+  }
+
+  .reply {
+    margin-left: 0;
+    padding-left: 14px;
+  }
+
+  .nested-replies {
+    padding-left: 8px;
+  }
+
+  .reply-form-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }

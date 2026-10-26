@@ -2,32 +2,32 @@
   width: min(820px, calc(100% - 32px));
   margin: 32px auto 80px;
   padding: 32px 28px 12px;
-  background: #fff;
-  border: 1px solid #d7e4ef;
-  border-radius: 16px;
+  background: var(--color-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-16);
   box-shadow: 0 8px 24px rgba(14, 52, 77, 0.05);
 }
 
 .updated {
   margin: 0 0 8px;
-  color: #005bac;
-  font-weight: 700;
+  color: var(--color-link);
+  font-weight: var(--font-weight-bold);
 }
 
 h1 {
   margin: 0 0 12px;
-  color: #163a53;
-  font-size: 32px;
+  color: var(--color-text-dark);
+  font-size: var(--font-size-32);
 }
 
 .intro,
 p {
   color: #3d5160;
-  line-height: 1.8;
+  line-height: var(--line-height-looser);
 }
 
 h2 {
   margin: 28px 0 8px;
-  color: #163a53;
-  font-size: 20px;
+  color: var(--color-text-dark);
+  font-size: var(--font-size-20);
 }

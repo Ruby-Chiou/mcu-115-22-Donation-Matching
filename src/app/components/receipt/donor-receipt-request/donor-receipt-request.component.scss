@@ -1,23 +1,25 @@
+@use 'breakpoint' as bp;
+
 .receipt-request {
   display: grid;
-  gap: 14px;
+  gap: var(--space-14);
   margin-bottom: 22px;
-  padding: 16px;
+  padding: var(--space-16);
   border: 1px solid #d6e4f0;
-  border-radius: 12px;
-  background: #f8fbff;
+  border-radius: var(--radius-12);
+  background: var(--bg-paper);
 }
 
 .intro,
 small {
   margin: 0;
-  color: #64748b;
-  line-height: 1.6;
+  color: var(--color-text-slate);
+  line-height: var(--line-height-relaxed);
 }
 
 .readonly-grid {
   display: grid;
-  gap: 6px;
+  gap: var(--space-6);
 
   p {
     margin: 0;
@@ -27,17 +29,18 @@ small {
 label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-weight: 700;
+  gap: var(--space-6);
+  font-weight: var(--font-weight-bold);
 }
 
 input[type='email'],
-input[type='text'] {
+input[type='text'],
+input[type='password'] {
   padding: 12px 14px;
-  border: 1px solid #d6d6d6;
-  border-radius: 8px;
+  border: 1px solid var(--border-line);
+  border-radius: var(--radius-8);
   font: inherit;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .lines-head,
@@ -45,7 +48,7 @@ input[type='text'] {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-12);
 }
 
 h3 {
@@ -54,10 +57,10 @@ h3 {
 
 button {
   padding: 8px 14px;
-  border: 1px solid #005bac;
-  border-radius: 8px;
-  background: #fff;
-  color: #005bac;
+  border: 1px solid var(--color-link);
+  border-radius: var(--radius-8);
+  background: var(--color-white);
+  color: var(--color-link);
   font: inherit;
   cursor: pointer;
 }
@@ -65,5 +68,13 @@ button {
 .agree {
   flex-direction: row;
   align-items: center;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+}
+
+@include bp.mobile {
+  .lines-head,
+  .preview-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

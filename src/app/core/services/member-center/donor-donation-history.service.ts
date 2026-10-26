@@ -25,6 +25,7 @@ interface DonationHistoryRow {
   created_at: string;
   ai_checked_at: string | null;
   human_checked_at: string | null;
+  logistics_carrier: string | null;
   tracking_no: string | null;
   receipt_confirmed_at: string | null;
   receipt_partial: boolean | null;
@@ -78,6 +79,7 @@ export class DonorDonationHistoryService {
         created_at,
         ai_checked_at,
         human_checked_at,
+        logistics_carrier,
         tracking_no,
         receipt_confirmed_at,
         receipt_partial,
@@ -151,6 +153,7 @@ export class DonorDonationHistoryService {
       createdAt: row.created_at,
       aiCheckedAt: row.ai_checked_at,
       humanCheckedAt: row.human_checked_at,
+      logisticsCarrier: row.logistics_carrier ?? '',
       trackingNo: row.tracking_no ?? '',
       receiptConfirmedAt: row.receipt_confirmed_at,
       receiptPartial: !!row.receipt_partial,
@@ -158,10 +161,15 @@ export class DonorDonationHistoryService {
     };
   }
 
-  /** 審核已通過的寄送捐助，才能補上物流單號 */
-  async saveTrackingNumber(donationId: string, trackingNo: string): Promise<void> {
+  /** 審核已通過的寄送捐助，才能由捐助者補上物流公司與單號 */
+  async saveTrackingNumber(donationId: string, trackingNo: string, logisticsCarrier: string): Promise<void> {
     const uid = await this.session.getCurrentUid();
     const trimmed = trackingNo.trim();
+    const carrier = logisticsCarrier.trim();
+
+    if (!carrier) {
+      throw new Error('請選擇物流公司');
+    }
 
     if (!trimmed) {
       throw new Error('請輸入物流單號');
@@ -171,15 +179,18 @@ export class DonorDonationHistoryService {
       p_donation_id: donationId,
       p_donor_uid: uid,
       p_tracking: trimmed,
+      p_carrier: carrier,
     });
 
     if (error) {
-      console.error('上傳物流單號失敗：', error);
-      throw new Error('只有審核通過的寄送捐助可以上傳物流單號');
+      console.error('上傳物流資料失敗：', error);
+      throw new Error(error.message || '只有審核通過的寄送捐助可以上傳物流資料');
     }
 
     this.recordsSignal.update((records) =>
-      records.map((record) => (record.id === donationId ? { ...record, trackingNo: trimmed } : record))
+      records.map((record) =>
+        record.id === donationId ? { ...record, trackingNo: trimmed, logisticsCarrier: carrier } : record
+      )
     );
   }
 }

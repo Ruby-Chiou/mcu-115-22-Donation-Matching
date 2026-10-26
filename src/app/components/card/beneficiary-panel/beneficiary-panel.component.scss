@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: block;
   width: 100%;
@@ -5,25 +7,25 @@
 }
 
 .beneficiary-panel {
-  padding: 30px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  padding: var(--space-30);
+  background: var(--color-white);
+  border: 1px solid var(--border-neutral);
+  border-radius: var(--radius-12);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  color: #005bac;
-  font-size: 13px;
-  font-weight: 700;
+  color: var(--color-link);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-bold);
 }
 
 h2 {
   margin: 0;
-  color: #333;
-  font-size: 28px;
+  color: var(--color-text-body);
+  font-size: var(--font-size-28);
 }
 
 .city {
@@ -31,11 +33,11 @@ h2 {
   width: fit-content;
   margin-top: 10px;
   padding: 4px 10px;
-  border-radius: 999px;
-  background: #e7f1fb;
-  color: #005bac;
-  font-size: 13px;
-  font-weight: 700;
+  border-radius: var(--radius-pill);
+  background: var(--bg-action-tint);
+  color: var(--color-link);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-bold);
 }
 
 app-supply-detail-carousel {
@@ -46,7 +48,7 @@ app-supply-detail-carousel {
 .panel-row {
   display: flex;
   align-items: baseline;
-  gap: 20px;
+  gap: var(--space-20);
   width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -64,32 +66,32 @@ app-supply-detail-carousel {
 .panel-row h3 {
   min-width: 120px;
   flex-shrink: 0;
-  color: #555;
-  font-size: 16px;
+  color: var(--color-text-quiet);
+  font-size: var(--font-size-16);
   text-align: right;
 }
 
 .panel-row p {
   flex: 1;
-  color: #555;
-  line-height: 1.7;
+  color: var(--color-text-quiet);
+  line-height: var(--line-height-loose);
   white-space: pre-line;
 }
 
 .panel-row a {
-  color: #005bac;
-  font-weight: 700;
+  color: var(--color-link);
+  font-weight: var(--font-weight-bold);
   word-break: break-all;
 }
 
-@media (max-width: 720px) {
+@include bp.tablet {
   h2 {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 
   .panel-row {
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-4);
   }
 
   .panel-row h3 {

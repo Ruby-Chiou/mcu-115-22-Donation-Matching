@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 import { DailyComment } from '../../../../core/services/comments/daily-comment.service';
 import { CommentAuthorChipComponent } from '../../../../components/comment/comment-author-chip.component';
-import { commentAuthor, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
+import { canDeleteOwnComment, commentAuthor, commentDeleteError, commentPreviewNotice, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
 import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
 
 interface CommentThreadNode {
@@ -79,12 +79,13 @@ export class DailyCommentPageComponent implements OnInit {
 
       console.log('[日常留言頁] 留言資料：', this.comments);
 
+      this.commentNotice = commentPreviewNotice(false);
       this.buildCommentThreads();
     } catch (error) {
       console.error('[日常留言頁] 載入留言失敗：', error);
 
       this.comments = [];
-      this.commentNotice = '真實留言暫時讀不到，下面仍是示範的一問一答。';
+      this.commentNotice = commentPreviewNotice(true);
       this.buildCommentThreads();
     }
   }
@@ -211,6 +212,24 @@ export class DailyCommentPageComponent implements OnInit {
     } catch (error) {
       console.error('[日常留言頁] 新增留言失敗：', error);
       this.commentNotice = commentWriteError(error);
+      this.cdr.detectChanges();
+    }
+  }
+
+  canDelete(comment: DailyComment): boolean {
+    return canDeleteOwnComment(comment, this.auth.principal().userId);
+  }
+
+  async deleteComment(comment: DailyComment): Promise<void> {
+    if (!confirm('刪除這則留言？')) {
+      return;
+    }
+
+    try {
+      await this.dailyCommentService.deleteComment(comment.id);
+      await this.loadComments();
+    } catch (error) {
+      this.commentNotice = commentDeleteError(error);
       this.cdr.detectChanges();
     }
   }

@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { MemberMessageService } from '../../../core/services/member-center/member-message.service';
 import { MESSAGE_CATEGORY_LABELS, MemberMessage, MessageCategory, MessageFolder } from '../../../models/member/member-message';
 
@@ -16,6 +17,7 @@ type InboxFilter = 'ALL' | 'UNREAD' | 'STARRED' | MessageCategory;
 export class MemberInboxComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   protected readonly messageService = inject(MemberMessageService);
+  private readonly auth = inject(AuthSessionService);
 
   readonly categoryLabels = MESSAGE_CATEGORY_LABELS;
   readonly filterOptions: { value: InboxFilter; label: string }[] = [
@@ -170,6 +172,16 @@ export class MemberInboxComponent implements OnInit {
     } finally {
       this.isSending.set(false);
     }
+  }
+
+  protected counterpartLabel(): string {
+    return this.auth.principal().role === 'agency' ? '收件捐助者' : '收件機構';
+  }
+
+  protected emptyContactHint(): string {
+    return this.auth.principal().role === 'agency'
+      ? '目前沒有往來過的捐助者，收到來信後即可回覆。'
+      : '目前沒有往來過的機構，收到機構來信後即可回覆。';
   }
 
   canReply(message: MemberMessage): boolean {
