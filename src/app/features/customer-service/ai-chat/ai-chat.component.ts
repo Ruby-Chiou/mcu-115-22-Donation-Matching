@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiChatService } from '../../../core/services/backend-ai-chat/ai-chat.service.service';
@@ -21,6 +21,7 @@ export class AiChatComponent implements OnInit {
   private readonly assistantApi = inject(AiChatService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly auth = inject(AuthSessionService);
+  @ViewChild('messagePane') private messagePane?: ElementRef<HTMLElement>;
 
   async ngOnInit(): Promise<void> {
     await this.auth.restore();
@@ -80,8 +81,6 @@ export class AiChatComponent implements OnInit {
       return;
     }
 
-    console.log('準備送出訊息：', text);
-
     const history = this.messages.slice(-6);
 
     this.messages = [
@@ -97,11 +96,10 @@ export class AiChatComponent implements OnInit {
     this.isLoading = true;
 
     this.cdr.detectChanges();
+    this.scrollToLatest();
 
     this.assistantApi.chat(text, this.currentRole, history).subscribe({
       next: (response) => {
-        console.log('收到後端回覆：', response);
-
         const answer = this.extractAssistantReply(response);
 
         this.messages = [
@@ -114,13 +112,10 @@ export class AiChatComponent implements OnInit {
 
         this.isLoading = false;
         this.cdr.detectChanges();
-
-        console.log('已停止 loading：', this.isLoading);
+        this.scrollToLatest();
       },
 
-      error: (error) => {
-        console.error('AI 客服 API 呼叫失敗：', error);
-
+      error: () => {
         this.errorMessage = '目前無法連線至 AI 客服，請稍後再試。';
 
         this.messages = [
@@ -133,9 +128,18 @@ export class AiChatComponent implements OnInit {
 
         this.isLoading = false;
         this.cdr.detectChanges();
-
-        console.log('錯誤後已停止 loading：', this.isLoading);
+        this.scrollToLatest();
       },
+    });
+  }
+
+  private scrollToLatest(): void {
+    queueMicrotask(() => {
+      const pane = this.messagePane?.nativeElement;
+
+      if (pane) {
+        pane.scrollTop = pane.scrollHeight;
+      }
     });
   }
 

@@ -36,9 +36,9 @@
           </div>
 
           <div class="emergency-count">
-            <span class="emergency-label">志工需求</span>
+            <span class="emergency-label">協力需求</span>
             <strong>
-              {{ card.volunteerCount ?? '—' }} @if (card.volunteerCount != null) {
+              {{ card.helperCount ?? '—' }} @if (card.helperCount != null) {
               <span>項</span>
               }
             </strong>
@@ -90,15 +90,24 @@
       <ul>
         @for (news of latestNews; track news.title) {
           <li>
-            <a [routerLink]="news.link">
-              <time>{{ news.date }}</time>
-              <span class="news-category">{{ news.category }}</span>
-              <strong>{{ news.title }}</strong>
-              <p>{{ news.content }}</p>
-            </a>
+            @if (isExternalNewsLink(news.link)) {
+              <a [href]="news.link" target="_blank" rel="noopener noreferrer">
+                <ng-container *ngTemplateOutlet="dashboardNews; context: { $implicit: news }" />
+              </a>
+            } @else {
+              <a [routerLink]="news.link">
+                <ng-container *ngTemplateOutlet="dashboardNews; context: { $implicit: news }" />
+              </a>
+            }
           </li>
         }
       </ul>
+      <ng-template #dashboardNews let-news>
+        <time>{{ news.date }}</time>
+        <span class="news-category">{{ news.category }}</span>
+        <strong>{{ news.title }}</strong>
+        <p>{{ news.content }}</p>
+      </ng-template>
     </div>
   </section>
 
@@ -130,7 +139,7 @@
               <span class="reminders-item-detail">
                 @switch (group.key) { @case ('daily-expiring') { {{ item.deadline | date: 'MM/dd' : '+0800' }} 預計下架，尚缺 {{
                 item.remaining }} {{ item.unit }} } @case ('daily-completed') { 剩餘需求為 0，請確認是否下架 } @case ('disaster-expiring') {
-                {{ item.deadline | date: 'MM/dd' : '+0800' }} 截止 } @case ('volunteer-expiring') { {{ item.deadline | date: 'MM/dd' :
+                {{ item.deadline | date: 'MM/dd' : '+0800' }} 截止 } @case ('helper-expiring') { {{ item.deadline | date: 'MM/dd' :
                 '+0800' }} 預計下架 } }
               </span>
             </li>

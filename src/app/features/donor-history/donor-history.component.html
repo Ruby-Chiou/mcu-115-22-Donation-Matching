@@ -171,7 +171,7 @@
           </dl>
 
           <form class="tracking-form" (submit)="$event.preventDefault(); saveVisibility(record)">
-            <p class="shortcut-hint">感謝牆可以改成匿名或全名，也可以改成不公開。公開頁會跟著這筆捐助更新。</p>
+            <p class="shortcut-hint">可調整感謝牆的公開方式與顯示名稱。</p>
             <label>
               <input type="radio" name="history-name-mode" value="masked" [checked]="nameModeDraft() === 'masked'" (change)="nameModeDraft.set('masked')" />
               匿名
@@ -216,7 +216,7 @@
               <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
                 {{ trackingSaving() ? '上傳中...' : (record.trackingNo ? '更新物流資料' : '上傳物流資料') }}
               </button>
-              <p class="shortcut-hint">機構已通過。請選擇你寄出時用的物流公司，並填上單號。受助機構不能代選。</p>
+              <p class="shortcut-hint">請選擇寄出時使用的物流公司，並填上單號。</p>
               @if (trackingMessage()) {
                 <p class="tracking-message">{{ trackingMessage() }}</p>
               }
@@ -237,7 +237,11 @@
           }
           <div class="detail-actions">
             <a class="btn btn-outline" [routerLink]="['/donor/daily/detail', record.demandId]">查看原需求</a>
-            <a class="btn btn-primary" routerLink="/tracking">配送查詢</a>
+            <a
+              class="btn btn-primary"
+              routerLink="/tracking"
+              [queryParams]="record.trackingNo ? { no: record.trackingNo, carrier: record.logisticsCarrier } : null"
+            >配送查詢</a>
             <button type="button" class="btn btn-outline" [disabled]="!receiptOf(record)" (click)="openViewer('receipt')">
               查看捐助發票
             </button>
@@ -248,7 +252,7 @@
               查看系統公開捐助
             </button>
           </div>
-          <p class="shortcut-hint">尚未開立的發票、感謝狀或公開感謝，按鈕會先停用。</p>
+          <p class="shortcut-hint">尚未開立的項目，按鈕會先停用。</p>
         </article>
       } @else {
         <p class="state-text">請從左側選擇一筆捐助紀錄</p>
@@ -278,7 +282,7 @@
                   <app-donation-receipt-sheet [sheet]="receipt" />
                 </div>
                 <div class="viewer-actions">
-                  <p class="shortcut-hint">開啟密碼是身分證字號，按鈕會直接下載檔案。</p>
+                  <p class="shortcut-hint">下載後可用開立收據時登記的證件號碼開啟。</p>
                   <button type="button" class="btn btn-primary" [disabled]="downloadingReceipt()" (click)="downloadPdf(receipt)">
                     {{ downloadingReceipt() ? '準備 PDF...' : '下載 PDF' }}
                   </button>

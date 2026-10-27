@@ -1,11 +1,11 @@
 import { Component, AfterViewInit, OnDestroy, signal, inject } from '@angular/core';
 import * as L from 'leaflet';
 
-import { VolunteerDemandService } from '../../../core/services/agency-volunteer-demand/volunteer-demand.service';
+import { HelperDemandService } from '../../../core/services/agency-helper-demand/helper-demand.service';
 import { addTaiwanBasemap, fontMarkerIcon, releaseLeafletContainer } from '../../../core/map/leaflet-map';
 import { escapeHtml, googleMapsSearchUrl } from '../../../core/map/map-links';
 
-interface VolunteerMapLocation {
+interface HelperMapLocation {
   id: number;
   name: string;
   location: string;
@@ -23,15 +23,15 @@ interface VolunteerMapLocation {
   styleUrl: './disaster-locations.component.scss',
 })
 export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
-  private readonly volunteerDemandService = inject(VolunteerDemandService);
+  private readonly helperDemandService = inject(HelperDemandService);
 
   private map?: L.Map;
   private markers = new Map<number, L.Marker>();
   private resizeObserver?: ResizeObserver;
   private stopBasemap?: () => void;
 
-  protected volunteerList: VolunteerMapLocation[] = [];
-  protected readonly selectedLocation = signal<VolunteerMapLocation | null>(null);
+  protected helperList: HelperMapLocation[] = [];
+  protected readonly selectedLocation = signal<HelperMapLocation | null>(null);
   protected readonly loading = signal(true);
 
   ngAfterViewInit(): void {
@@ -48,7 +48,7 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
     this.resizeObserver.observe(host);
     this.map.invalidateSize();
 
-    void this.loadVolunteerLocations();
+    void this.loadHelperLocations();
   }
 
   ngOnDestroy(): void {
@@ -58,7 +58,7 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
     this.map = undefined;
   }
 
-  protected showLocation(location: VolunteerMapLocation): void {
+  protected showLocation(location: HelperMapLocation): void {
     if (!this.map) {
       return;
     }
@@ -68,9 +68,9 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
     this.markers.get(location.id)?.openPopup();
   }
 
-  private async loadVolunteerLocations(): Promise<void> {
-    const demands = await this.volunteerDemandService.listPublishedForMap();
-    this.volunteerList = demands
+  private async loadHelperLocations(): Promise<void> {
+    const demands = await this.helperDemandService.listPublishedForMap();
+    this.helperList = demands
       .filter(
         (demand) =>
           demand.latitude != null &&
@@ -83,7 +83,7 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
         const lng = Number(demand.longitude);
         return {
           id: Number(demand.id),
-          name: demand.type || `志工需求 ${demand.serialNo}`,
+          name: demand.type || `協力需求 ${demand.serialNo}`,
           location: demand.location,
           lat,
           lng,
@@ -95,20 +95,20 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
         };
       });
 
-    this.showMarkers(this.volunteerList);
+    this.showMarkers(this.helperList);
     this.loading.set(false);
 
-    if (!this.map || this.volunteerList.length === 0) {
+    if (!this.map || this.helperList.length === 0) {
       return;
     }
 
     this.map.fitBounds(
-      L.latLngBounds(this.volunteerList.map((item) => [item.lat, item.lng] as [number, number])),
+      L.latLngBounds(this.helperList.map((item) => [item.lat, item.lng] as [number, number])),
       { padding: [50, 50], maxZoom: 12 },
     );
   }
 
-  private showMarkers(items: VolunteerMapLocation[]): void {
+  private showMarkers(items: HelperMapLocation[]): void {
     if (!this.map) {
       return;
     }
@@ -122,7 +122,7 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
       }
 
       const needs = item.needs.length ? item.needs.map((need) => `・${escapeHtml(need)}`).join('<br>') : '尚未填寫';
-      const marker = L.marker([item.lat, item.lng], { icon: fontMarkerIcon('volunteer') }).addTo(this.map).bindPopup(`
+      const marker = L.marker([item.lat, item.lng], { icon: fontMarkerIcon('helper') }).addTo(this.map).bindPopup(`
           <b>${escapeHtml(item.name)}</b><br><br>
           ${escapeHtml(item.location)}<br><br>
           <b>需要</b><br>${needs}<br><br>

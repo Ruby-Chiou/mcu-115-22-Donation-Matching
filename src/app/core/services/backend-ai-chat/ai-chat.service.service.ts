@@ -22,11 +22,13 @@ export class AiChatService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.aiChatApiUrl;
 
-  chat(message: string, role: string, history: ChatHistoryItem[]): Observable<AiChatResponse> {
+  /** system 預設空白，改由後端 OpenRouterService 內建提示詞負責。 */
+  chat(message: string, role: string, history: ChatHistoryItem[], system = ''): Observable<AiChatResponse> {
     return this.http.post<AiChatResponse>(this.apiUrl, {
       message,
       role,
       history,
+      system,
     });
   }
 }

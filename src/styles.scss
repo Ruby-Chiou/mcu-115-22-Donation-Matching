@@ -30,7 +30,7 @@ video {
   color: var(--color-error-stronger);
 }
 
-.font-marker-volunteer i {
+.font-marker-helper i {
   color: var(--color-success-teal);
 }
 
@@ -114,7 +114,7 @@ body {
 
   app-daily-list,
   app-disaster-list,
-  app-volunteer-list {
+  app-helper-list {
     display: block;
     max-width: 100%;
     min-width: 0;
@@ -122,7 +122,7 @@ body {
 
   app-daily-list .toolbar-row.toolbar-row,
   app-disaster-list .toolbar-row.toolbar-row,
-  app-volunteer-list .toolbar-row.toolbar-row {
+  app-helper-list .toolbar-row.toolbar-row {
     max-width: 100%;
     overflow-x: auto;
     flex-wrap: nowrap;
@@ -130,20 +130,20 @@ body {
 
   app-daily-list .toolbar-row.toolbar-row > *,
   app-disaster-list .toolbar-row.toolbar-row > *,
-  app-volunteer-list .toolbar-row.toolbar-row > * {
+  app-helper-list .toolbar-row.toolbar-row > * {
     flex-shrink: 0;
   }
 
   app-daily-list .table-wrapper.table-wrapper,
   app-disaster-list .table-wrapper.table-wrapper,
-  app-volunteer-list .table-wrapper.table-wrapper {
+  app-helper-list .table-wrapper.table-wrapper {
     max-width: 100%;
     overflow-x: auto;
   }
 
   app-daily-list .table-wrapper table,
   app-disaster-list .table-wrapper table,
-  app-volunteer-list .volunteer-table.volunteer-table {
+  app-helper-list .helper-table.helper-table {
     width: 1120px;
     min-width: 1120px;
   }

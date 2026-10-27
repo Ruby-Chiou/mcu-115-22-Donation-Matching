@@ -1,0 +1,782 @@
+@use 'breakpoint' as bp;
+
+.detail-page {
+  width: min(1100px, 90%);
+  margin: 40px auto 80px;
+}
+
+/* =========================
+返回按鈕
+========================= */
+.back-button {
+  border: none;
+  background: transparent;
+  color: var(--color-link);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+/* =========================
+標題
+========================= */
+.detail-header {
+  margin-bottom: 25px;
+}
+.detail-header h1 {
+  margin: 0;
+  color: var(--color-link);
+  font-size: var(--font-size-32);
+}
+
+/* =========================
+主要資訊
+========================= */
+.detail-main {
+  display: block;
+  padding: var(--space-30);
+  background: white;
+  border-radius: var(--radius-16);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+}
+/* =========================
+右側資訊
+======================== */
+.detail-info {
+  flex: 1;
+}
+.detail-info h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: var(--font-size-30);
+  color: var(--color-text-body);
+}
+
+/* =========================
+緊急程度
+========================= */
+.urgency {
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 20px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  color: var(--color-white);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+/* 緊急 */
+.urgency.urgent {
+  background: var(--color-warning);
+}
+/* 非常緊急 */
+.urgency.very-urgent {
+  background: var(--color-error);
+}
+/* 普通 */
+.urgency.normal {
+  background: var(--color-text-faint);
+}
+
+/* =========================
+數量
+========================= */
+.quantity-info {
+  display: flex;
+  gap: var(--space-20);
+  margin: 30px 0;
+}
+.info-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-15);
+  background: var(--bg-canvas);
+  border-radius: var(--radius-10);
+}
+.info-item span {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-14);
+}
+.info-item strong {
+  color: var(--color-text-body);
+  font-size: var(--font-size-22);
+}
+
+/* =========================
+需求單位
+========================= */
+.organization-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-18);
+  background: var(--bg-canvas);
+  border-radius: var(--radius-10);
+}
+
+.organization-label {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-14);
+}
+
+/* =========================
+服務資訊
+========================= */
+.service-detail,
+.organization-detail,
+.description,
+.requirement-detail,
+.comment-section {
+  background: white;
+  padding: var(--space-30);
+  border-radius: var(--radius-16);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+}
+
+.service-detail h2,
+.organization-detail h2,
+.description h2,
+.requirement-detail h2,
+.comment-section h2 {
+  margin-top: 0;
+  color: var(--color-link);
+  font-size: var(--font-size-24);
+  border-bottom: 2px solid var(--border-neutral);
+  padding-bottom: 12px;
+}
+
+/* =========================
+服務資訊內容
+========================= */
+.service-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-20);
+}
+.service-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-18);
+  background: var(--bg-canvas);
+  border-radius: var(--radius-10);
+}
+.service-item span {
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-14);
+}
+.service-item strong {
+  color: var(--color-text-body);
+  font-size: var(--font-size-16);
+}
+
+/* =========================
+工作內容
+========================= */
+.description p {
+  line-height: var(--line-height-looser);
+  color: var(--color-text-quiet);
+  margin-bottom: 10px;
+}
+
+/* =========================
+協力條件
+========================= */
+.requirement-detail ul {
+  margin: 0;
+  padding-left: 25px;
+}
+.requirement-detail li {
+  margin-bottom: 12px;
+  color: var(--color-text-quiet);
+  line-height: var(--line-height-relaxed);
+}
+
+/* =========================
+需求單位
+========================= */
+.organization-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-15);
+}
+.organization-item {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-20);
+  padding: var(--space-15);
+  border-bottom: 1px solid var(--border-hairline);
+}
+.organization-item span {
+  color: var(--color-text-subtle);
+}
+.organization-item strong {
+  color: var(--color-text-body);
+  text-align: right;
+}
+
+//原版留言區
+.loading-state {
+  min-height: 360px;
+  width: 100%;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-18);
+
+  padding: 40px 20px;
+  background-color: var(--bg-page);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-18);
+  text-align: center;
+}
+
+.loading-state p {
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.loading-spinner {
+  width: 52px;
+  height: 52px;
+  box-sizing: border-box;
+
+  border: 4px solid #e5f3fd;
+  border-right-color: #0878c9;
+
+  border-radius: var(--radius-circle);
+
+  animation: helper-loading-spin 0.8s linear infinite;
+}
+
+@keyframes helper-loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.join-button {
+  min-width: 220px;
+  padding: 15px 40px;
+  border: none;
+  border-radius: var(--radius-10);
+  background: var(--color-link);
+  color: white;
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.join-button:hover {
+  transform: translateY(-2px);
+  background: var(--color-link-dark);
+}
+
+/* =========================
+報名按鈕
+========================= */
+.join-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* =========================
+RWD
+========================= */
+@include bp.tablet {
+  .detail-main {
+    flex-direction: column;
+    gap: 25px;
+  }
+  .detail-image {
+    width: 100%;
+    height: 280px;
+    min-height: 0;
+  }
+  .quantity-info {
+    flex-direction: column;
+  }
+  .service-info {
+    grid-template-columns: 1fr;
+  }
+  .organization-item {
+    flex-direction: column;
+  }
+  .organization-item strong {
+    text-align: left;
+  }
+}
+
+/* =========================
+   留言區：保留協力者頁藍色風格
+========================= */
+
+.comment-section {
+  margin-top: 32px;
+}
+
+.comment-section > h2 {
+  color: var(--color-link);
+  margin-bottom: 20px;
+}
+
+/* =========================
+   新增留言與回覆輸入框
+========================= */
+
+.comment-form,
+.reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.comment-form {
+  margin-bottom: 25px;
+}
+
+.comment-form textarea,
+.reply-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-12);
+  border: 1px solid #d4deeb;
+  border-radius: var(--radius-8);
+  font: inherit;
+  resize: vertical;
+  background: var(--color-white);
+}
+
+.comment-form textarea:focus,
+.reply-form textarea:focus {
+  outline: none;
+  border-color: var(--color-link);
+  box-shadow: 0 0 0 2px rgba(0, 91, 172, 0.12);
+}
+
+/* 發布留言、發布回覆按鈕 */
+.comment-notice {
+  margin: 0;
+  color: var(--color-accent-brown);
+  font-size: var(--font-size-14);
+}
+
+.comment-button {
+  align-self: flex-end;
+  padding: 9px 18px;
+  border: none;
+  border-radius: var(--radius-6);
+  background: var(--color-link);
+  color: var(--color-white);
+  cursor: pointer;
+  font: inherit;
+  transition: background 0.2s;
+}
+
+.comment-button:hover {
+  background: var(--color-link-dark);
+}
+
+.comment-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   留言列表與主留言
+========================= */
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  min-width: 0;
+}
+
+.comment {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--space-16);
+  border: 1px solid #e2eaf4;
+  border-radius: var(--radius-10);
+  background: var(--bg-canvas);
+}
+
+/* 留言者與日期 */
+.comment-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px 12px;
+  margin-bottom: 12px;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  flex: 1 1 auto;
+  min-width: min(100%, 10rem);
+  max-width: 100%;
+}
+
+.reply .comment-author {
+  padding-left: 10px;
+}
+
+.comment-author strong {
+  color: #26364a;
+}
+
+.comment-date {
+  flex-shrink: 0;
+  color: #778399;
+  font-size: var(--font-size-14);
+  white-space: nowrap;
+  text-align: right;
+}
+
+.reply-title-text {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-14);
+}
+
+/* 回覆對象：保留淺藍底與藍色文字 */
+.comment-author .reply-target-name {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border-radius: var(--radius-5);
+  background: var(--bg-action-chip);
+  color: var(--color-link);
+  font-size: var(--font-size-16);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.45;
+  max-width: 100%;
+}
+
+/* =========================
+   留言內容與右側操作區
+========================= */
+
+.comment-content-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-16);
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.comment-content {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: #344054;
+  line-height: var(--line-height-loose);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* 日期在上方，愛心與回覆按鈕依序排列在右側 */
+.comment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-6);
+  flex: 0 0 auto;
+  min-width: 56px;
+}
+
+.comment-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: 3px 0;
+  border: none;
+  background: transparent;
+  color: #667085;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-13);
+}
+
+.comment-action:hover {
+  color: var(--color-link);
+}
+
+/* =========================
+   愛心與喜歡數
+========================= */
+
+.like-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: pink;
+  cursor: pointer;
+  font-size: var(--font-size-16);
+}
+
+.like-action .material-symbols-outlined {
+  display: inline-block;
+  color: pink;
+  font-size: var(--font-size-24);
+  line-height: var(--line-height-none);
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-action .material-symbols-outlined.liked {
+  color: red;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.like-action span:last-child {
+  position: relative;
+  top: -2px;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-16);
+  line-height: var(--line-height-normal);
+}
+
+/* =========================
+   回覆按鈕：保留藍色
+========================= */
+
+.reply-action {
+  align-self: flex-end;
+  padding: 6px 14px;
+  border-radius: var(--radius-8);
+  background: var(--color-link);
+  color: var(--color-white);
+  font-size: var(--font-size-14);
+}
+
+.reply-action:hover {
+  background: var(--color-link-dark);
+  color: var(--color-white);
+}
+
+/* =========================
+   回覆輸入區
+========================= */
+
+.reply-form {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #dce5f0;
+}
+
+.reply-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-10);
+  margin-top: 10px;
+}
+
+.reply-submit-button {
+  padding: 5px 12px;
+  font-size: var(--font-size-13);
+}
+
+.cancel-reply-button {
+  padding: 5px 12px;
+  border: 1px solid var(--border-slate);
+  border-radius: var(--radius-8);
+  background: var(--color-white);
+  color: #475467;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-13);
+}
+
+.cancel-reply-button:hover {
+  background: #eef4fa;
+}
+
+/* =========================
+   巢狀回覆：仿照急難留言串
+   但保留協力者原本的橘色連接線
+========================= */
+
+.reply-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  min-width: 0;
+  margin: 12px 0 0 12px;
+  padding-left: 18px;
+  box-sizing: border-box;
+}
+
+/* 子留言不使用主留言的淺藍框 */
+.reply {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+/* 第一層回覆的橘色垂直線 */
+.reply-list > .reply::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -9px;
+  width: 3px;
+  height: 22px;
+  background-color: var(--color-link);
+}
+
+/* 同一層還有其他回覆時，延長垂直線 */
+.reply-list > .reply:not(:last-child)::before {
+  height: 100%;
+}
+
+/* 第二層及更深的回覆：再往右縮排 */
+.reply-list.nested-replies {
+  margin-left: 8px;
+  padding-left: 18px;
+}
+
+/* 第二層及更深的回覆保留橘色直角連接線 */
+.reply-list.nested-replies > .reply::after {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: -9px;
+  width: 16px;
+  height: 2px;
+  background-color: var(--color-link);
+}
+
+/* 顯示更多／收起回覆 */
+.show-replies-button {
+  align-self: flex-end;
+  padding: 5px 0;
+  border: none;
+  background: transparent;
+  color: var(--color-link);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-14);
+}
+
+.show-replies-button:hover {
+  color: var(--color-link-dark);
+  text-decoration: underline;
+}
+
+/* =========================
+   RWD：留言區
+========================= */
+
+@include bp.tablet {
+  .detail-page {
+    width: auto;
+    margin: 12px 12px 40px;
+  }
+
+  .detail-main,
+  .service-detail,
+  .organization-detail,
+  .description,
+  .requirement-detail {
+    padding: var(--space-16);
+  }
+
+  .comment {
+    padding: var(--space-12);
+  }
+
+  .comment-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .comment-author {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .comment-date {
+    text-align: left;
+    font-size: var(--font-size-12);
+  }
+
+  .comment-content-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-10);
+  }
+
+  .comment-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+    gap: 8px 12px;
+  }
+
+  .reply-action {
+    align-self: center;
+  }
+
+  .reply-list {
+    margin-left: 0;
+    padding-left: 12px;
+  }
+
+  .reply-list.nested-replies {
+    margin-left: 0;
+    padding-left: 10px;
+  }
+}
+
+/* 沒有留言時的提示文字 */
+.no-comments {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-18);
+}

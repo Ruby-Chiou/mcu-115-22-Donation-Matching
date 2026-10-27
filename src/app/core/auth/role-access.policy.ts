@@ -7,7 +7,7 @@ export type AccessDecision = 'allow' | 'login' | 'home';
 const DONOR_PRIVATE_PREFIXES = [
   '/donor/daily/form',
   '/donor/disaster/supply/form',
-  '/donor/disaster/volunteer/form',
+  '/donor/disaster/helper/form',
   '/donor/history',
   '/tracking',
 ];

@@ -1,0 +1,192 @@
+<div class="container">
+  <!-- 資料載入中 -->
+  <app-supply-loading *ngIf="isLoading"></app-supply-loading>
+  <ng-container *ngIf="!isLoading">
+    <div class="helper-section">
+      <!-- 新增協力需求 -->
+      <div class="top-action-bar">
+        <button class="add-btn" routerLink="/agency/helper-form">新增協力需求</button>
+      </div>
+      <div class="toolbar-row">
+        <!-- 左側：全選 / 批次操作 -->
+        <div class="select-area">
+          <div class="select-all">
+            <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()" />
+            <span>全選</span>
+          </div>
+
+          <div class="batch-buttons" *ngIf="hasSelected()">
+            <button (click)="editSelected()">編輯</button>
+            <button class="batch-delete-btn" (click)="openBatchDeleteModal()">刪除</button>
+          </div>
+        </div>
+
+        <!-- 右側操作區：搜尋 + 排序 + 篩選 -->
+        <div class="right-toolbar">
+          <!-- 搜尋 -->
+          <app-helper-search-bar [searchTerm]="searchTerm" (searchChange)="onSearchChange($event)"></app-helper-search-bar>
+
+          <!-- 排序 -->
+          <app-helper-sort-bar (sortChange)="onSortChange($event)"></app-helper-sort-bar>
+
+          <!-- 篩選 -->
+          <app-helper-filter
+            [statusOptions]="statusOptions"
+            [priorityOptions]="priorityOptions"
+            [typeOptions]="typeOptions"
+            [messageOptions]="messageOptions"
+            [selectedFilters]="selectedFilters"
+            (filterApply)="onFilterApply($event)"
+            (filterReset)="resetFilters()"
+          ></app-helper-filter>
+        </div>
+      </div>
+
+      <!-- 協力需求表格 -->
+      <div class="table-wrapper">
+      <table class="helper-table">
+        <thead>
+          <tr>
+            <th class="checkbox-column" style="width: 4%">選取</th>
+            <th style="width: 5%">編號</th>
+            <th class="category-column" style="width: 16%">需求類型</th>
+            <th class="category-column" style="width: 8%">需求人數</th>
+            <th style="width: 10%">緊急優先度</th>
+            <th class="created-time-column" style="width: 10%">建立日期</th>
+            <th class="published-time-column" style="width: 10%">上架日期</th>
+            <th class="off-shelf-time-column" style="width: 11%">預計下架日期</th>
+            <th class="message-column" style="width: 6%">留言區</th>
+            <th class="operation-column" style="width: 20%">操作</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- 有資料 -->
+          <tr *ngFor="let item of pagedDemands">
+            <!-- 選取 -->
+            <td class="checkbox-column">
+              <input type="checkbox" [(ngModel)]="item.selected" />
+            </td>
+
+            <!-- 編號 -->
+            <td class="id-column">C{{ item.serialNo }}</td>
+
+            <!-- 需求類型 -->
+            <td>{{ item.type }}</td>
+
+            <!-- 需求人數 -->
+            <td>{{ item.people ?? 0 }} 人</td>
+
+            <!-- 優先度 -->
+            <td>
+              <span
+                class="priority-pill"
+                [ngClass]="{
+                  'normal': item.priority === '普通',
+                  'urgent': item.priority === '緊急',
+                  'very-urgent': item.priority === '非常緊急'
+                }"
+              >
+                {{ item.priority }}
+              </span>
+            </td>
+
+            <!-- 建立日期 -->
+            <td class="created-time-column">{{ item.displayCreatedAt }}</td>
+
+            <!-- 上架日期 -->
+            <td class="published-time-column">{{ item.displayPublishedAt }}</td>
+
+            <!-- 預計下架日期 -->
+            <td class="off-shelf-time-column">{{ item.displayOffShelfAt }}</td>
+
+            <!-- 留言 -->
+            <td class="message-column">
+              <!-- 上架：可以點擊留言區 -->
+
+              <a
+                *ngIf="item.displayStatus === '已上架'"
+                [routerLink]="[
+    '/agency/helper-comments',
+    item.id
+  ]"
+              >
+                {{ item.messageCount || 0 }}
+              </a>
+
+              <!-- 隱藏：固定顯示 0，不可點擊 -->
+              <span *ngIf="item.displayStatus === '隱藏中'"> 0 </span>
+
+              <!-- 下架：顯示留言數，但不可點擊 -->
+              <span *ngIf="item.displayStatus === '已下架'"> {{ item.messageCount || 0 }} </span>
+            </td>
+
+            <!-- 操作 -->
+            <td class="operation-column">
+              <div class="operation-flex">
+                <button type="button" class="op-btn op-view" (click)="goToDetail(item.id!)">查看</button>
+                <button type="button" class="op-btn op-edit" (click)="goToEdit(item.id!)">編輯</button>
+                <button type="button" class="op-btn op-delete" (click)="openDeleteModal(item.id!)">刪除</button>
+
+                <select
+                  [value]="item.displayStatus"
+                  [(ngModel)]="item.displayStatus"
+                  (change)="changeStatus(item, $event)"
+                  [ngClass]="{
+                'status-on': item.displayStatus === '已上架',
+                'status-hide': item.displayStatus === '隱藏中',
+                'status-off': item.displayStatus === '已下架'
+              }"
+                >
+                  <option value="已上架">已上架</option>
+                  <option value="隱藏中">隱藏中</option>
+                  <option value="已下架">已下架</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+
+          <!-- 沒有資料 -->
+          <tr *ngIf="filteredDemands.length === 0">
+            <td colspan="10" class="empty-message">
+              <div class="empty-title">{{ loadError || '尚未輸入協力需求或無符合條件的需求' }}</div>
+              <div class="empty-description">
+                {{ loadError ? '請稍後重新整理這個頁面。' : '請點選上方「新增協力需求」建立需求。' }}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <app-pagination
+        [pageSize]="pageSize"
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [pageNumbers]="pageNumbers"
+        (pageChange)="goToPage($event)"
+      ></app-pagination>
+    </div>
+  </ng-container>
+  <app-confirm-modal
+    *ngIf="showDeleteModal"
+    message="確定要刪除此筆協力需求嗎？"
+    (cancelled)="closeDeleteModal()"
+    (confirmed)="confirmDelete()"
+  ></app-confirm-modal>
+
+  <app-confirm-modal
+    *ngIf="showOffShelfWarning"
+    mode="off-shelf"
+    (cancelled)="cancelManualOffShelf()"
+    (alternate)="hideInsteadOfOffShelf()"
+    (confirmed)="confirmManualOffShelf()"
+  ></app-confirm-modal>
+
+  <app-confirm-modal
+    *ngIf="showOnShelfWarning"
+    mode="blocked-on-shelf"
+    (cancelled)="closeOnShelfWarning()"
+    (confirmed)="closeOnShelfWarning()"
+  ></app-confirm-modal>
+</div>

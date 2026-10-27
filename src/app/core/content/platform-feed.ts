@@ -27,20 +27,24 @@ export const PLATFORM_ANNOUNCEMENTS: readonly PlatformAnnouncement[] = [
   },
 ];
 
+export function isExternalNewsLink(link: string): boolean {
+  return /^https?:\/\//i.test(link);
+}
+
 export const PLATFORM_NEWS: readonly PlatformNewsItem[] = [
   {
-    date: '26/09/12',
+    date: '26/10/27',
     category: '災情快訊',
-    title: '花蓮部分地區道路通行狀況更新',
-    content: '持續整理受災地區交通與救援相關資訊，協助捐助者掌握目前救援情況。',
-    link: '/donor/disaster',
+    title: '民生示警公開資料：即時災情',
+    content: '國家災害防救科技中心的即時示警會持續更新降雨、淹水、地震等災情，只列示警內容。',
+    link: 'https://alerts.ncdr.nat.gov.tw/web/alerts/immediate',
   },
   {
-    date: '26/09/11',
+    date: '26/10/27',
     category: '救援資訊',
-    title: '受災地區臨時安置與救援資源資訊',
-    content: '提供避難、安置及相關救援資源資訊，方便有需要的民眾快速查詢。',
-    link: '/donor/disaster',
+    title: '消防署災情與救援通報',
+    content: '內政部消防署救災救護指揮中心公布的災情與救援通報，依官方發布內容更新。',
+    link: 'https://www.nfa.gov.tw/pro/index.php?code=list&ids=114',
   },
   {
     date: '26/09/10',

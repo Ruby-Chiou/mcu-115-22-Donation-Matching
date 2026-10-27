@@ -1,7 +1,7 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PLATFORM_ANNOUNCEMENTS, PLATFORM_NEWS, PlatformAnnouncement } from '../../../core/content/platform-feed';
+import { isExternalNewsLink, PLATFORM_ANNOUNCEMENTS, PLATFORM_NEWS, PlatformAnnouncement } from '../../../core/content/platform-feed';
 import { PlatformAnnouncementService } from '../../../core/services/admin/platform-announcement.service';
 import {
   AgencyDashboardService,
@@ -21,13 +21,13 @@ interface DashboardCard {
   type: 'normal' | 'emergency';
   isAvailable: boolean;
   materialCount?: number;
-  volunteerCount?: number;
+  helperCount?: number;
 }
 
 @Component({
   selector: 'app-agency-dashboard',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, NgTemplateOutlet],
   templateUrl: './agency-dashboard.component.html',
   styleUrl: './agency-dashboard.component.scss',
 })
@@ -37,6 +37,7 @@ export class AgencyDashboardComponent implements OnInit {
 
   protected readonly announcements = signal<PlatformAnnouncement[]>([...PLATFORM_ANNOUNCEMENTS]);
   protected readonly latestNews = PLATFORM_NEWS;
+  protected readonly isExternalNewsLink = isExternalNewsLink;
 
   protected get disasterOpen(): boolean {
     return this.disaster.data().isOpen;
@@ -93,7 +94,7 @@ export class AgencyDashboardComponent implements OnInit {
       type: 'emergency',
       isAvailable: true,
       materialCount: 0,
-      volunteerCount: 0,
+      helperCount: 0,
     },
   ];
 
@@ -227,7 +228,7 @@ export class AgencyDashboardComponent implements OnInit {
           return {
             ...card,
             materialCount: summary.emergencyMaterialCount ?? 0,
-            volunteerCount: summary.emergencyVolunteerCount ?? 0,
+            helperCount: summary.emergencyHelperCount ?? 0,
             description: '目前已上架的災害救助需求',
           };
 

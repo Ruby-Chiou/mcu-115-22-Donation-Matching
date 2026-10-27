@@ -23,10 +23,10 @@
     <button
       type="button"
       class="switch-button"
-      [class.active]="activeType() === 'volunteer'"
-      [attr.aria-selected]="activeType() === 'volunteer'"
-      (click)="selectType('volunteer')">
-      志工需求
+      [class.active]="activeType() === 'helper'"
+      [attr.aria-selected]="activeType() === 'helper'"
+      (click)="selectType('helper')">
+      協力需求
     </button>
 
     <!-- 右側地圖 -->
@@ -103,23 +103,23 @@
     </section>
   }
  <!-- ==================== -->
-  <!-- 志工需求 -->
+  <!-- 協力需求 -->
   <!-- ==================== -->
   @else {
     <section
       class="needs-section"
-      aria-labelledby="volunteer-heading">
+      aria-labelledby="helper-heading">
 
-      <h1 id="volunteer-heading">
-        志工需求
+      <h1 id="helper-heading">
+        協力需求
       </h1>
-      <!-- 志工篩選 -->
+      <!-- 協力者篩選 -->
     <div class="filter-area">
       <button
         type="button"
         class="filter-button"
-        (click)="showVolunteerFilter = !showVolunteerFilter"
-        title="開啟志工條件篩選">
+        (click)="showHelperFilter = !showHelperFilter"
+        title="開啟協力條件篩選">
         <svg
           class="filter-icon"
           viewBox="0 0 24 24"
@@ -139,27 +139,27 @@
         </span>
         <!-- 展開 / 收合 -->
         <span class="filter-arrow">
-          {{ showVolunteerFilter ? '▲' : '▼' }}
+          {{ showHelperFilter ? '▲' : '▼' }}
         </span>
 
       </button>
 
 
-      <!-- 志工篩選元件 -->
-      @if (showVolunteerFilter) {
+      <!-- 協力者篩選元件 -->
+      @if (showHelperFilter) {
 
-        <app-donor-disaster-volunteer-filter
-          [filters]="volunteerFilters"
-          (filtersChange)="volunteerFilters = $event">
-        </app-donor-disaster-volunteer-filter>
+        <app-donor-disaster-helper-filter
+          [filters]="helperFilters"
+          (filtersChange)="helperFilters = $event">
+        </app-donor-disaster-helper-filter>
 
       }
 
     </div>
-      <!-- 志工需求卡片 -->
+      <!-- 協力需求卡片 -->
       <app-donor-disaster-card-list
-        type="volunteer"
-        [filters]="volunteerFilters">
+        type="helper"
+        [filters]="helperFilters">
       </app-donor-disaster-card-list>
 
     </section>

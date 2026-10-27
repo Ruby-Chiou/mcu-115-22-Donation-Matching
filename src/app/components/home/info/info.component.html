@@ -54,46 +54,34 @@
   <div class="latest-news-list">
 
     @for (news of latestNewsList; track news.title) {
-
-      <a
-        [routerLink]="news.link"
-        class="latest-news-item"
-      >
-
-        <div class="latest-news-date">
-          {{ news.date }}
-        </div>
-
-
-        <div class="latest-news-category">
-          {{ news.category }}
-        </div>
-
-
-        <div class="latest-news-content">
-
-          <h3>
-            {{ news.title }}
-          </h3>
-
-          <p>
-            {{ news.content }}
-          </p>
-
-        </div>
-
-
-        <div class="latest-news-arrow">
-
-          <i class="fa-solid fa-chevron-right"></i>
-
-        </div>
-
-      </a>
-
+      @if (isExternalNewsLink(news.link)) {
+        <a [href]="news.link" target="_blank" rel="noopener noreferrer" class="latest-news-item">
+          <ng-container *ngTemplateOutlet="newsBody; context: { $implicit: news }" />
+        </a>
+      } @else {
+        <a [routerLink]="news.link" class="latest-news-item">
+          <ng-container *ngTemplateOutlet="newsBody; context: { $implicit: news }" />
+        </a>
+      }
     }
 
   </div>
+
+  <ng-template #newsBody let-news>
+    <div class="latest-news-date">
+      {{ news.date }}
+    </div>
+    <div class="latest-news-category">
+      {{ news.category }}
+    </div>
+    <div class="latest-news-content">
+      <h3>{{ news.title }}</h3>
+      <p>{{ news.content }}</p>
+    </div>
+    <div class="latest-news-arrow">
+      <i class="fa-solid fa-chevron-right"></i>
+    </div>
+  </ng-template>
 
 </section>
 </div>

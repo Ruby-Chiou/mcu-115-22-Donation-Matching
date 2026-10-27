@@ -15,8 +15,8 @@
     [pageNumbers]="pageNumbers"
     (pageChange)="goToPage($event)"
   ></app-pagination>
-  } @else if ( disasterData().isOpen && type === 'volunteer' ) { @for ( volunteer of paginatedVolunteers; track volunteer.serialNo ) {
-  <app-donor-disaster-card type="volunteer" [volunteer]="volunteer"></app-donor-disaster-card>
+  } @else if ( disasterData().isOpen && type === 'helper' ) { @for ( helper of paginatedHelpers; track helper.serialNo ) {
+  <app-donor-disaster-card type="helper" [helper]="helper"></app-donor-disaster-card>
   }
 
   <app-pagination

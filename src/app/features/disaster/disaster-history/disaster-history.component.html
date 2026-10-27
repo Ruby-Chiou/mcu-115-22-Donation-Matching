@@ -43,22 +43,22 @@
           }
         </div>
       </div>
-      <!-- 志工需求 -->
+      <!-- 協力需求 -->
       <div class="card">
-        <h2>志工需求清單</h2>
+        <h2>協力需求清單</h2>
         <div class="card-content">
-        @for (volunteer of section.volunteerNeeds; track volunteer.id) {
+        @for (helper of section.helperNeeds; track helper.id) {
           <div class="row">
             <div>
               <div>
-                {{ volunteer.title }}
+                {{ helper.title }}
               </div>
               <small>
-                {{ volunteer.location }}
+                {{ helper.location }}
               </small>
             </div>
             <span>
-              {{ volunteer.people }} 人
+              {{ helper.people }} 人
             </span>
           </div>
 

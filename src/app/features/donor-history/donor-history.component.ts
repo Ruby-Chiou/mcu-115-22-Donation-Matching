@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { DonationReceiptSheetComponent } from '../../components/receipt/donation-receipt-sheet/donation-receipt-sheet.component';
 import { receiptPdfFileName } from '../../core/receipt/donation-receipt-document';
@@ -39,6 +39,8 @@ export class DonorHistoryComponent implements OnInit {
   private readonly thankService = inject(PublicDonationThankService);
   private readonly receiptPdf = inject(DonationReceiptPdfService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   protected readonly isImageCertificate = isImageCertificate;
   protected readonly isPdfCertificate = isPdfCertificate;
@@ -101,6 +103,12 @@ export class DonorHistoryComponent implements OnInit {
       this.errorText.set('無法載入捐助歷史，請確認已套用資料庫 migration 後再試。');
     }
 
+    const recordId = this.route.snapshot.queryParamMap.get('record');
+    const saved = recordId ? this.historyService.records().find((record) => record.id === recordId) : undefined;
+    if (saved) {
+      this.applySelection(saved);
+    }
+
     this.isLoading.set(false);
   }
 
@@ -108,6 +116,12 @@ export class DonorHistoryComponent implements OnInit {
     this.activeFilter.set(filter);
     this.selectedId.set(null);
     this.viewerKind.set(null);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { record: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   onKeywordInput(event: Event): void {
@@ -124,6 +138,16 @@ export class DonorHistoryComponent implements OnInit {
   readonly visibilityMessage = signal('');
 
   selectRecord(record: DonorDonationHistory): void {
+    this.applySelection(record);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { record: record.id },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  private applySelection(record: DonorDonationHistory): void {
     this.selectedId.set(record.id);
     this.viewerKind.set(null);
     this.trackingDraft.set(record.trackingNo);

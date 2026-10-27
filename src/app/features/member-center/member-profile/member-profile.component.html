@@ -161,12 +161,12 @@
 
             <label class="field">
               <span>新密碼</span>
-              <input type="password" formControlName="newPassword" autocomplete="new-password" />
+              <input type="password" formControlName="newPassword" autocomplete="new-password" minlength="8" maxlength="8" />
               @if (hasPasswordError('newPassword', 'required')) {
                 <small class="field-error">請輸入新密碼</small>
               }
-              @if (hasPasswordError('newPassword', 'minlength')) {
-                <small class="field-error">新密碼至少 8 個字元</small>
+              @if (hasPasswordError('newPassword', 'pattern')) {
+                <small class="field-error">密碼須為 8 碼，且同時包含英文大寫、小寫與數字</small>
               }
             </label>
 

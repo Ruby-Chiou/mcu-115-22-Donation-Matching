@@ -74,17 +74,17 @@
 
     <label class="field full">
       <span>聯絡電話</span>
-      <input type="tel" [(ngModel)]="donorForm.phone" name="phone" />
+      <input type="tel" [(ngModel)]="donorForm.phone" name="phone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10 位數字" />
     </label>
 
     <label class="field">
       <span>密碼</span>
-      <input type="password" [(ngModel)]="donorForm.password" name="donorPassword" />
+      <input type="password" [(ngModel)]="donorForm.password" name="donorPassword" minlength="8" maxlength="8" autocomplete="new-password" placeholder="8 碼，含大小寫與數字" />
     </label>
 
     <label class="field">
       <span>確認密碼</span>
-      <input type="password" [(ngModel)]="donorForm.confirmPassword" name="donorConfirmPassword" />
+      <input type="password" [(ngModel)]="donorForm.confirmPassword" name="donorConfirmPassword" minlength="8" maxlength="8" autocomplete="new-password" />
     </label>
   </div>
 

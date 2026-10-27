@@ -8,7 +8,7 @@ export interface CommentAuthorSample {
   comment: string;
 }
 
-/** 留言區示範。uid 對應既有測試帳號，登入後可以真的寄出站內私訊。 */
+/** 公開名片摘要；uid 對應測試帳號時可從留言開站內私訊。 */
 export const COMMENT_AUTHOR_SAMPLES: CommentAuthorSample[] = [
   {
     userId: '11111111-1111-4111-8111-111111111111',
@@ -67,58 +67,16 @@ export interface CommentListItem {
 const PREVIEW_IDS = new Set([-11, -12, -13]);
 
 export function commentPreviewNotice(loadFailed: boolean): string {
-  if (loadFailed) {
-    return '真實留言暫時讀不到，下面仍是示範的一問一答。';
-  }
-
-  return '下面這幾則是示範留言，用來展示版面。真實留言會接在後面。';
+  return loadFailed ? '留言暫時讀不到，請稍後再試。' : '';
 }
 
-/** 放進既有留言串的一問一答，版面與真實留言相同。 */
-export function commentPreviewItems(demandId: number): CommentListItem[] {
-  return [
-    {
-      id: -11,
-      demand_id: demandId,
-      user_id: '11111111-1111-4111-8111-111111111111',
-      user_role: 'donor',
-      user_name: '測試捐助者',
-      content: '我想協助這項需求，請問方便的收貨時間是？',
-      created_at: '2026-10-24T06:00:00.000Z',
-      parent_comment_id: null,
-      like_count: 1,
-      liked_user_ids: [],
-    },
-    {
-      id: -12,
-      demand_id: demandId,
-      user_id: '22222222-2222-4222-8222-222222222222',
-      user_role: 'agency',
-      user_name: '測試受助者',
-      content: '感謝詢問。平日下午兩點到五點都可以收，到了跟櫃檯說是平台媒合。',
-      created_at: '2026-10-24T07:20:00.000Z',
-      parent_comment_id: -11,
-      like_count: 0,
-      liked_user_ids: [],
-    },
-    {
-      id: -13,
-      demand_id: demandId,
-      user_id: '55555555-5555-4555-8555-555555555555',
-      user_role: 'donor',
-      user_name: '測試愛心企業',
-      content: '我也可以再補一些物資，若還需要請用平台內私訊跟我說。',
-      created_at: '2026-10-24T08:00:00.000Z',
-      parent_comment_id: -11,
-      like_count: 0,
-      liked_user_ids: [],
-    },
-  ];
+/** 相容舊呼叫；留言已改由資料庫提供，不再插入前端示範列。 */
+export function commentPreviewItems(_demandId: number): CommentListItem[] {
+  return [];
 }
 
-export function withCommentPreviews<T extends { id: number }>(comments: T[], demandId: number): T[] {
-  const previews = commentPreviewItems(demandId) as unknown as T[];
-  return [...previews, ...comments.filter((comment) => !PREVIEW_IDS.has(comment.id))];
+export function withCommentPreviews<T extends { id: number }>(comments: T[], _demandId: number): T[] {
+  return comments.filter((comment) => !PREVIEW_IDS.has(comment.id));
 }
 
 export function commentAuthor(

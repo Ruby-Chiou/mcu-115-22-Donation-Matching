@@ -162,6 +162,45 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
     }
     return '';
   }
+
+  contactTimeText(): string {
+    const demand = this.demand;
+
+    if (!demand) {
+      return '無';
+    }
+
+    if (demand.contactTimeDifferent) {
+      const weekday = this.slots(demand.weekdayMorning, demand.weekdayAfternoon, demand.weekdayEvening);
+      const weekend = this.slots(demand.weekendMorning, demand.weekendAfternoon, demand.weekendEvening);
+      const parts = [weekday ? `平日：${weekday}` : '', weekend ? `假日：${weekend}` : ''].filter(Boolean);
+      return parts.join('\n') || '無';
+    }
+
+    return this.slots(demand.contactTimeMorning, demand.contactTimeAfternoon, demand.contactTimeEvening) || '無';
+  }
+
+  conditionsText(): string {
+    const conditions = this.demand?.conditions;
+
+    if (!conditions) {
+      return '無';
+    }
+
+    return Object.entries(conditions)
+      .filter(([, value]) => value)
+      .map(([key, value]) => `${key}：${value}`)
+      .join('\n') || '無';
+  }
+
+  customConditionText(): string {
+    const items = this.demand?.customConditions?.map((item) => item.trim()).filter(Boolean) ?? [];
+    return items.length > 0 ? items.join('、') : '無';
+  }
+
+  private slots(morning?: boolean, afternoon?: boolean, evening?: boolean): string {
+    return [morning ? '上午' : '', afternoon ? '下午' : '', evening ? '晚上' : ''].filter(Boolean).join('、');
+  }
   // =========================
   // 緊急程度樣式
   // =========================

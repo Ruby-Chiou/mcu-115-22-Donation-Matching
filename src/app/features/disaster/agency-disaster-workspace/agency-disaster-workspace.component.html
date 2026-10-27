@@ -18,14 +18,14 @@
   <button
     type="button"
     class="switch-button"
-    [class.active]="activeType === 'volunteer'"
-    [attr.aria-selected]="activeType === 'volunteer'"
-    (click)="selectType('volunteer')"
+    [class.active]="activeType === 'helper'"
+    [attr.aria-selected]="activeType === 'helper'"
+    (click)="selectType('helper')"
   >
-    志工需求
+    協力需求
   </button>
 </div>
 
 <app-disaster-list *ngIf="activeType === 'material'"> </app-disaster-list>
 
-<app-volunteer-list *ngIf="activeType === 'volunteer'"> </app-volunteer-list>
+<app-helper-list *ngIf="activeType === 'helper'"> </app-helper-list>

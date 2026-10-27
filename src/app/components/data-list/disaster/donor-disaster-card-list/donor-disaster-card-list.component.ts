@@ -7,11 +7,11 @@ import { DonorDisasterCardComponent } from '../../../card/disaster/donor-disaste
 import { PaginationComponent } from '../../../pagination/pagination.component';
 
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
-import { VolunteerDemandService } from '../../../../core/services/agency-volunteer-demand/volunteer-demand.service';
+import { HelperDemandService } from '../../../../core/services/agency-helper-demand/helper-demand.service';
 import { DisasterControlService } from '../../../../core/services/disaster-control/disaster-control.service';
 
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
-import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
+import { HelperDemand } from '../../../../models/agency/helper-demand';
 
 export interface MaterialFilters {
   category: string[];
@@ -19,13 +19,13 @@ export interface MaterialFilters {
   hasRemaining: boolean;
 }
 
-export interface VolunteerFilters {
-  volunteerType: string[];
-  volunteerLocation: string[];
+export interface HelperFilters {
+  helperType: string[];
+  helperLocation: string[];
   hasRemaining: boolean;
 }
 
-export type DisasterFilters = MaterialFilters | VolunteerFilters;
+export type DisasterFilters = MaterialFilters | HelperFilters;
 
 @Component({
   selector: 'app-donor-disaster-card-list',
@@ -35,7 +35,7 @@ export type DisasterFilters = MaterialFilters | VolunteerFilters;
   styleUrl: './donor-disaster-card-list.component.scss',
 })
 export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
-  @Input() type: 'material' | 'volunteer' = 'material';
+  @Input() type: 'material' | 'helper' = 'material';
 
   @Input() filters: DisasterFilters = {
     category: [],
@@ -46,7 +46,7 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
   protected disasterData!: DisasterControlService['data'];
 
   demands: DisasterDemand[] = [];
-  volunteers: VolunteerDemand[] = [];
+  helpers: HelperDemand[] = [];
 
   currentPage = 1;
   pageSize = 8;
@@ -56,7 +56,7 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly disasterDemandService: DisasterDemandService,
-    private readonly volunteerDemandService: VolunteerDemandService,
+    private readonly helperDemandService: HelperDemandService,
     private readonly disasterControlService: DisasterControlService
   ) {
     this.disasterData = this.disasterControlService.data;
@@ -71,7 +71,7 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
       }
     });
 
-    await Promise.all([this.disasterDemandService.waitUntilLoaded(), this.volunteerDemandService.waitUntilLoaded()]);
+    await Promise.all([this.disasterDemandService.waitUntilLoaded(), this.helperDemandService.waitUntilLoaded()]);
 
     await this.loadDemands();
   }
@@ -80,18 +80,18 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     try {
-      await Promise.all([this.disasterDemandService.reload(), this.volunteerDemandService.reload()]);
+      await Promise.all([this.disasterDemandService.reload(), this.helperDemandService.reload()]);
 
       this.demands = this.disasterDemandService.getDemands().filter((demand) => demand.status === '上架');
 
-      this.volunteers = this.volunteerDemandService.getVolunteers().filter((volunteer) => volunteer.status === '上架');
+      this.helpers = this.helperDemandService.getHelpers().filter((helper) => helper.status === '上架');
 
       this.currentPage = 1;
     } catch (error) {
       console.error('載入捐贈需求失敗：', error);
 
       this.demands = [];
-      this.volunteers = [];
+      this.helpers = [];
       this.currentPage = 1;
     } finally {
       this.isLoading = false;
@@ -116,18 +116,18 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
     });
   }
 
-  get filteredVolunteers(): VolunteerDemand[] {
-    if (this.type !== 'volunteer') {
-      return this.volunteers;
+  get filteredHelpers(): HelperDemand[] {
+    if (this.type !== 'helper') {
+      return this.helpers;
     }
 
-    const filters = this.filters as VolunteerFilters;
+    const filters = this.filters as HelperFilters;
 
-    return this.volunteers.filter((volunteer) => {
-      const typeMatch = filters.volunteerType.length === 0 || filters.volunteerType.includes(volunteer.type);
+    return this.helpers.filter((helper) => {
+      const typeMatch = filters.helperType.length === 0 || filters.helperType.includes(helper.type);
 
       const locationMatch =
-        filters.volunteerLocation.length === 0 || filters.volunteerLocation.some((location) => volunteer.location.includes(location));
+        filters.helperLocation.length === 0 || filters.helperLocation.some((location) => helper.location.includes(location));
 
       return typeMatch && locationMatch;
     });
@@ -139,14 +139,14 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
     return this.filteredDemands.slice(start, start + this.pageSize);
   }
 
-  get paginatedVolunteers(): VolunteerDemand[] {
+  get paginatedHelpers(): HelperDemand[] {
     const start = (this.currentPage - 1) * this.pageSize;
 
-    return this.filteredVolunteers.slice(start, start + this.pageSize);
+    return this.filteredHelpers.slice(start, start + this.pageSize);
   }
 
   get totalItems(): number {
-    return this.type === 'material' ? this.filteredDemands.length : this.filteredVolunteers.length;
+    return this.type === 'material' ? this.filteredDemands.length : this.filteredHelpers.length;
   }
 
   get totalPages(): number {

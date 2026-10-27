@@ -13,7 +13,7 @@ export interface LegalDocument {
 export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
   service: {
     title: '服務條款與隱私權政策',
-    updated: '2026 年 10 月 24 日',
+    updated: '2026 年 10 月 27 日',
     intro: '建立受助者或捐助者帳號前，請先看完這份同意內容。它同時說明平台怎麼提供服務，以及註冊資料會怎麼被使用。',
     sections: [
       {
@@ -27,6 +27,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
         heading: '平台提供什麼',
         paragraphs: [
           '平台用來刊登日常或災害需求、讓捐助者了解受助機構，以及記錄捐助與回覆。平台協助媒合，不保證每一筆需求都會募滿，也不代替機構收受或轉交實體物資。',
+          '災害期間的現場協助人力，平台稱為「協力者」，不是依法定志願服務運用的志工，也不核發志工證。',
           '資格還沒確認的機構，仍可能先建立帳號；公開頁上的資格狀態會如實顯示，不會因為自己改欄位就變成已確認。',
         ],
       },
@@ -49,7 +50,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
   },
   privacy: {
     title: '隱私權政策',
-    updated: '2026 年 10 月 24 日',
+    updated: '2026 年 10 月 27 日',
     intro: '這份政策說明智慧捐助媒合平台會保存哪些資料、誰看得到，以及你想更正或停用時可以怎麼做。',
     sections: [
       {
@@ -57,6 +58,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
         paragraphs: [
           '註冊時你提供的帳號信箱、密碼驗證資訊、機構或個人聯絡資料，以及之後在機構資料、捐助表單、留言與收據流程裡補上的內容。',
           '使用網站時，伺服器可能留下登入狀態、操作時間與錯誤紀錄，用來維持登入與追查異常，不是用來對民眾做廣告追蹤。',
+          '你與 AI 客服的對話會送到平台後端與外部語言模型服務以產生回覆；請勿在對話中輸入身分證字號、金融帳號或其他不必提供的敏感資料。',
         ],
       },
       {
@@ -84,14 +86,14 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
   },
   terms: {
     title: '網站使用條款',
-    updated: '2026 年 10 月 24 日',
+    updated: '2026 年 10 月 27 日',
     intro: '使用智慧捐助媒合平台的頁面、表單與帳號功能，即表示你願意遵守以下使用方式。',
     sections: [
       {
         heading: '平台的角色',
         paragraphs: [
           '本網站是捐助需求與受助機構的媒合介面。頁面上的需求數量、地址與機構介紹，由登錄的機構維護。平台會標示資格狀態，但不對每一筆物資的後續使用做保證。',
-          '捐助地圖顯示的是受助單位註冊地址，用來辨識大約位置，不是約定的送貨點。',
+          '捐助地圖顯示的是受助單位註冊地址，用來辨識大約位置，不是約定的送貨點。災害大廳關閉時，物資捐助、協力需求與地圖入口仍可能顯示，但無法送出新的捐助或報名。',
         ],
       },
       {
@@ -111,14 +113,14 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
       {
         heading: '服務調整',
         paragraphs: [
-          '平台可能因維護、課程演示或安全原因暫停部分功能。條款若更新，會改這一頁上方的日期；繼續使用網站，代表你接受更新後的版本。',
+          '平台可能因維護或安全原因暫停部分功能。條款若更新，會改這一頁上方的日期；繼續使用網站，代表你接受更新後的版本。',
         ],
       },
     ],
   },
   security: {
     title: '網站安全政策',
-    updated: '2026 年 10 月 24 日',
+    updated: '2026 年 10 月 27 日',
     intro: '這一頁說明平台怎麼保護帳號與資料，以及發現問題時希望你怎麼通知我們。',
     sections: [
       {

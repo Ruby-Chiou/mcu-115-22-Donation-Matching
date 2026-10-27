@@ -22,10 +22,14 @@ export const disasterRoutes: Routes = [
   },
   {
     path: 'donor/disaster/volunteer/detail/:id',
+    redirectTo: 'donor/disaster/helper/detail/:id',
+  },
+  {
+    path: 'donor/disaster/helper/detail/:id',
     canActivate: [donorDisasterGuard],
     loadComponent: () =>
-      import('./pages/donor-disaster-volunteer-detail-page/donor-disaster-volunteer-detail-page.component').then(
-        (m) => m.DonorDisasterVolunteerDetailPageComponent
+      import('./pages/donor-disaster-helper-detail-page/donor-disaster-helper-detail-page.component').then(
+        (m) => m.DonorDisasterHelperDetailPageComponent
       ),
   },
   {
@@ -60,23 +64,43 @@ export const disasterRoutes: Routes = [
   },
   {
     path: 'agency/volunteer-form',
-    loadComponent: () => import('./pages/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
+    redirectTo: 'agency/helper-form',
   },
   {
     path: 'agency/volunteer-edit/:id',
-    loadComponent: () => import('./pages/volunteer-form/volunteer-form.component').then((m) => m.VolunteerFormComponent),
+    redirectTo: 'agency/helper-edit/:id',
   },
   {
     path: 'agency/volunteer-detail/:id',
-    loadComponent: () => import('./pages/volunteer-detail/volunteer-detail.component').then((m) => m.VolunteerDetailComponent),
+    redirectTo: 'agency/helper-detail/:id',
   },
   {
     path: 'agency/volunteer-comments/:id',
-    loadComponent: () => import('./pages/volunteer-comment-page/volunteer-comment-page.component').then((m) => m.VolunteerCommentPageComponent),
+    redirectTo: 'agency/helper-comments/:id',
   },
   {
     path: 'agency/volunteer-batch-edit',
-    loadComponent: () => import('./pages/volunteer-batch-edit/volunteer-batch-edit.component').then((m) => m.VolunteerBatchEditComponent),
+    redirectTo: 'agency/helper-batch-edit',
+  },
+  {
+    path: 'agency/helper-form',
+    loadComponent: () => import('./pages/helper-form/helper-form.component').then((m) => m.HelperFormComponent),
+  },
+  {
+    path: 'agency/helper-edit/:id',
+    loadComponent: () => import('./pages/helper-form/helper-form.component').then((m) => m.HelperFormComponent),
+  },
+  {
+    path: 'agency/helper-detail/:id',
+    loadComponent: () => import('./pages/helper-detail/helper-detail.component').then((m) => m.HelperDetailComponent),
+  },
+  {
+    path: 'agency/helper-comments/:id',
+    loadComponent: () => import('./pages/helper-comment-page/helper-comment-page.component').then((m) => m.HelperCommentPageComponent),
+  },
+  {
+    path: 'agency/helper-batch-edit',
+    loadComponent: () => import('./pages/helper-batch-edit/helper-batch-edit.component').then((m) => m.HelperBatchEditComponent),
   },
   {
     path: 'admin/disaster-control',

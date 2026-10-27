@@ -1,348 +1,174 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
-interface TrackingItem {
-  id: string;
-  carrier: string;
-  status: string;
-}
+import { DonorDonationHistoryService } from '../../../core/services/member-center/donor-donation-history.service';
+import { DonorDonationHistory } from '../../../models/member/donation-history';
+import { RECEIPT_CARRIERS } from '../../../models/agency/receipt-issuance';
 
 interface CarrierOption {
   value: string;
   name: string;
 }
 
+interface ShipmentResult {
+  donationId: string;
+  carrier: string;
+  trackingNo: string;
+  material: string;
+  recipient: string;
+  status: string;
+  officialUrl: string;
+}
+
+interface NoticeDialog {
+  title: string;
+  body: string;
+  officialUrl: string;
+  officialName: string;
+}
+
+const OFFICIAL_SITES: Record<string, string> = {
+  黑貓宅急便: 'https://www.t-cat.com.tw/inquire/trace.aspx',
+  '7-ELEVEN': 'https://eservice.7-11.com.tw/E-Tracking/search.aspx',
+  全家: 'https://www.family.com.tw/Marketing/Convenience/Index.aspx',
+  中華郵政: 'https://postserv.post.gov.tw/pstmail/main_mail.html',
+  新竹物流: 'https://www.hct.com.tw/Search/SearchGoods_n.aspx',
+};
+
 @Component({
   selector: 'app-tracking',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './tracking.component.html',
   styleUrl: './tracking.component.scss',
 })
-export class TrackingComponent {
-
-  // ==========================================
-  // 查詢狀態
-  // ==========================================
+export class TrackingComponent implements OnInit {
+  private readonly history = inject(DonorDonationHistoryService);
+  private readonly route = inject(ActivatedRoute);
 
   showResult = false;
-
+  searching = false;
   keyword = '';
-
   selectedCarrier = 'auto';
+  resultList: ShipmentResult[] = [];
+  notice: NoticeDialog | null = null;
 
-
-  // ==========================================
-  // 物流公司選項
-  // ==========================================
-
-  carriers: CarrierOption[] = [
-    {
-      value: 'auto',
-      name: '自動辨識',
-    },
-    {
-      value: 'black-cat',
-      name: '黑貓宅急便',
-    },
-    {
-      value: '711',
-      name: '7-ELEVEN',
-    },
-    {
-      value: 'family',
-      name: '全家',
-    },
-    {
-      value: 'post',
-      name: '中華郵政',
-    },
+  readonly carriers: CarrierOption[] = [
+    { value: 'auto', name: '依捐助紀錄' },
+    ...RECEIPT_CARRIERS.map((name) => ({ value: name, name })),
   ];
 
+  ngOnInit(): void {
+    const trackingNo = this.route.snapshot.queryParamMap.get('no')?.trim() ?? '';
+    const carrier = this.route.snapshot.queryParamMap.get('carrier')?.trim() ?? '';
 
-  // ==========================================
-  // 模擬物流資料
-  // ==========================================
+    if (!trackingNo) {
+      return;
+    }
 
-  trackingList: TrackingItem[] = [
-    {
-      id: '123456789012',
-      carrier: '黑貓宅急便',
-      status: '配送中',
-    },
-    {
-      id: '12345678',
-      carrier: '7-ELEVEN',
-      status: '寄件完成',
-    },
-    {
-      id: '12345678901',
-      carrier: '全家',
-      status: '配送中',
-    },
-  ];
+    this.keyword = trackingNo;
+    this.selectedCarrier = RECEIPT_CARRIERS.includes(carrier as (typeof RECEIPT_CARRIERS)[number]) ? carrier : 'auto';
+    void this.search();
+  }
 
-
-  resultList: TrackingItem[] = [];
-
-
-  // ==========================================
-  // 查詢
-  // ==========================================
-
-  search(): void {
-
+  async search(): Promise<void> {
     const keyword = this.keyword.trim();
+    this.showResult = false;
+    this.resultList = [];
 
-    // 沒有輸入
     if (!keyword) {
-      alert('請先輸入物流單號！');
-      this.showResult = false;
+      this.openNotice('請輸入物流單號', '請輸入你在捐助紀錄上傳的單號。這裡只查平台上的寄送捐助，沒有另外的測試資料。', '', '');
       return;
     }
 
+    this.searching = true;
 
-    // ------------------------------------------
-    // 如果使用者自己選擇物流公司
-    // ------------------------------------------
+    try {
+      await this.history.loadHistory();
+    } catch {
+      this.openNotice('無法讀取捐助紀錄', '請先以捐助者身分登入。配送進度來自你在捐助紀錄上傳的物流單號。', '', '');
+      this.searching = false;
+      return;
+    }
 
-    if (this.selectedCarrier !== 'auto') {
+    this.searching = false;
 
-      const isValid = this.checkFormat(
-        keyword,
-        this.selectedCarrier
+    const matches = this.history.records().filter((record) => record.trackingNo.trim() === keyword);
+    const carrierName = this.selectedCarrier === 'auto' ? '' : this.selectedCarrier;
+    const scoped = carrierName ? matches.filter((record) => record.logisticsCarrier === carrierName) : matches;
+
+    if (scoped.length > 0) {
+      this.resultList = scoped.map((record) => this.toResult(record));
+      this.showResult = true;
+      return;
+    }
+
+    if (matches.length > 0) {
+      const actual = matches[0].logisticsCarrier || '尚未填寫物流公司';
+      this.openNotice(
+        '物流公司與捐助紀錄不同',
+        `這筆單號在你的捐助紀錄裡是「${actual}」。請改選該物流公司，或改為「依捐助紀錄」。`,
+        OFFICIAL_SITES[actual] ?? '',
+        actual
       );
-
-      if (!isValid) {
-
-        alert(
-          `此物流單號格式可能不符合「${this.getCarrierName(this.selectedCarrier)}」，請確認後再試一次。`
-        );
-
-        this.showResult = false;
-        return;
-      }
-    }
-
-
-    // ------------------------------------------
-    // 自動辨識
-    // ------------------------------------------
-
-    const possibleCarriers = this.detectCarriers(keyword);
-
-
-    // 沒有符合任何已知格式
-    if (
-      this.selectedCarrier === 'auto' &&
-      possibleCarriers.length === 0
-    ) {
-
-      alert(
-        '無法辨識此物流單號格式。\n請確認單號是否正確，或手動選擇物流公司。'
-      );
-
-      this.showResult = false;
       return;
     }
 
-
-    // ------------------------------------------
-    // 模擬資料庫查詢
-    // ------------------------------------------
-
-    this.resultList = this.trackingList.filter(
-      item => item.id === keyword
+    const guessed = this.detectCarrier(keyword);
+    this.openNotice(
+      '平台沒有這筆寄送資料',
+      guessed
+        ? `捐助紀錄裡沒有單號 ${keyword}。若你已經寄出，請先回到該筆捐助上傳單號。單號格式比較像「${guessed}」，最新貨態請到該物流公司官網查。`
+        : `捐助紀錄裡沒有單號 ${keyword}。請確認是你在審核通過後上傳的單號，或到物流公司官網查最新貨態。`,
+      guessed ? OFFICIAL_SITES[guessed] : '',
+      guessed
     );
-
-
-    // ------------------------------------------
-    // 查不到測試資料
-    // ------------------------------------------
-
-    if (this.resultList.length === 0) {
-
-      let message = '目前平台沒有這筆測試資料。';
-
-      if (this.selectedCarrier === 'auto') {
-
-        if (possibleCarriers.length === 1) {
-
-          message =
-            `此單號格式可能符合「${possibleCarriers[0]}」，\n` +
-            '請至下方物流商官方網站確認最新貨態。';
-
-        } else {
-
-          message =
-            `此單號格式可能符合：\n` +
-            possibleCarriers.join('、') +
-            '\n\n請選擇正確的物流公司後再查詢。';
-        }
-
-      } else {
-
-        message =
-          `此單號格式符合「${this.getCarrierName(this.selectedCarrier)}」。\n` +
-          '請至下方物流商官方網站確認最新貨態。';
-      }
-
-      alert(message);
-
-      this.showResult = false;
-      return;
-    }
-
-
-    // 有查詢結果
-    this.showResult = true;
-
-    this.keyword = '';
   }
 
-
-  // ==========================================
-  // 自動辨識可能的物流公司
-  // ==========================================
-
-  detectCarriers(keyword: string): string[] {
-
-    const carriers: string[] = [];
-
-
-    // ------------------------------------------
-    // 黑貓宅急便
-    // 10～12 碼純數字
-    // ------------------------------------------
-
-    if (/^\d{10,12}$/.test(keyword)) {
-
-      carriers.push('黑貓宅急便');
-    }
-
-
-    // ------------------------------------------
-    // 7-ELEVEN
-    // 官方 E-Tracking：
-    // 寄件 8 碼 / 取件 11 碼
-    // ------------------------------------------
-
-    if (
-      /^\d{8}$/.test(keyword) ||
-      /^\d{11}$/.test(keyword)
-    ) {
-
-      carriers.push('7-ELEVEN');
-    }
-
-
-    // ------------------------------------------
-    // 全家
-    // 11 碼數字
-    // 作為「可能」的格式判斷
-    // ------------------------------------------
-
-    if (/^\d{11}$/.test(keyword)) {
-
-      carriers.push('全家');
-    }
-
-
-    return carriers;
+  closeNotice(): void {
+    this.notice = null;
   }
 
-
-  // ==========================================
-  // 指定物流公司的格式檢查
-  // ==========================================
-
-  checkFormat(
-    keyword: string,
-    carrier: string
-  ): boolean {
-
-    switch (carrier) {
-
-      case 'black-cat':
-        return /^\d{10,12}$/.test(keyword);
-
-
-      case '711':
-        return (
-          /^\d{8}$/.test(keyword) ||
-          /^\d{11}$/.test(keyword)
-        );
-
-
-      case 'family':
-        return /^\d{11}$/.test(keyword);
-
-
-      case 'post':
-        // 中華郵政暫時不使用固定 Regex
-        return keyword.length > 0;
-
-
-      default:
-        return true;
-    }
-  }
-
-
-  // ==========================================
-  // 取得物流公司名稱
-  // ==========================================
-
-  getCarrierName(carrier: string): string {
-
-    const option = this.carriers.find(
-      item => item.value === carrier
-    );
-
-    return option?.name ?? '';
-  }
-
-
-  // ==========================================
-  // 前往物流商官方查詢網站
-  // ==========================================
-
-  goToCarrier(
-    carrier: string,
-    event: Event
-  ): void {
-
+  goToCarrier(carrier: string, event: Event): void {
     event.preventDefault();
-
-
-    const urls: Record<string, string> = {
-
-      'black-cat':
-        'https://www.t-cat.com.tw/inquire/trace.aspx',
-
-      '711':
-        'https://eservice.7-11.com.tw/E-Tracking/search.aspx',
-
-      'family':
-        'https://www.family.com.tw/Marketing/Convenience/Index.aspx',
-
-      'post':
-        'https://postserv.post.gov.tw/pstmail/main_mail.html',
-    };
-
-
-    const url = urls[carrier];
+    const url = OFFICIAL_SITES[carrier];
 
     if (!url) {
       return;
     }
 
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 
-    window.open(
-      url,
-      '_blank',
-      'noopener,noreferrer'
-    );
+  private toResult(record: DonorDonationHistory): ShipmentResult {
+    const carrier = record.logisticsCarrier || '尚未選擇物流公司';
+
+    return {
+      donationId: record.id,
+      carrier,
+      trackingNo: record.trackingNo,
+      material: record.actualMaterial || record.demandItem,
+      recipient: record.recipient,
+      status: record.receiptConfirmedAt ? '受助機構已簽收' : '已寄出，等待受助機構簽收',
+      officialUrl: OFFICIAL_SITES[carrier] ?? '',
+    };
+  }
+
+  private openNotice(title: string, body: string, officialUrl: string, officialName: string): void {
+    this.notice = { title, body, officialUrl, officialName };
+  }
+
+  private detectCarrier(keyword: string): string {
+    if (/^\d{10,12}$/.test(keyword)) {
+      return '黑貓宅急便';
+    }
+
+    if (/^\d{8}$/.test(keyword) || /^\d{11}$/.test(keyword)) {
+      return '7-ELEVEN';
+    }
+
+    return '';
   }
 }

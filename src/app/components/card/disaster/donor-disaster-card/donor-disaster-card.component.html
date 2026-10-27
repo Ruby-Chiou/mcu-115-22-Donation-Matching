@@ -1,4 +1,4 @@
-<article class="card" [class.disaster-closed]="isDisasterClosed" [class.volunteer-card]="type === 'volunteer'" (click)="openDetail($event)">
+<article class="card" [class.disaster-closed]="isDisasterClosed" [class.helper-card]="type === 'helper'" (click)="openDetail($event)">
 
   @if (isDisasterClosed) {
     <div class="closed-banner">
@@ -62,41 +62,41 @@
         </strong>
       </div>
     }
-    <!-- 災害志工需求-->
+    <!-- 災害協力需求-->
     @else {
       <h2 class="material-name">
-        {{ volunteer?.type }}
+        {{ helper?.type }}
       </h2>
       <div
         class="urgency"
-        [class.urgent]="volunteer?.priority === '緊急'"
-        [class.very-urgent]="volunteer?.priority === '非常緊急'"
-        [class.normal]="volunteer?.priority === '普通'"
+        [class.urgent]="helper?.priority === '緊急'"
+        [class.very-urgent]="helper?.priority === '非常緊急'"
+        [class.normal]="helper?.priority === '普通'"
       >
-        {{ volunteer?.priority }}
+        {{ helper?.priority }}
       </div>
       <p class="organization">
         需求單位：
         <strong>
-          {{ volunteer?.contact }}
+          {{ helper?.contact }}
         </strong>
       </p>
       <div class="quantity">
         <span>需求人數</span>
         <strong>
-          {{ volunteer?.people ?? 0 }} 人
+          {{ helper?.people ?? 0 }} 人
         </strong>
       </div>
       <div class="quantity">
         <span>服務地點</span>
         <strong>
-          {{ volunteer?.location }}
+          {{ helper?.location }}
         </strong>
       </div>
       <div class="quantity">
         <span>建立時間</span>
         <strong>
-          {{ volunteer?.createdAt || '尚未填寫' }}
+          {{ helper?.createdAt || '尚未填寫' }}
         </strong>
       </div>
     }
@@ -131,7 +131,7 @@
           {{
             type === 'material'
               ? '災害物資需求詳情'
-              : '災害志工需求詳情'
+              : '災害協力需求詳情'
           }}
         </h2>
         <button
@@ -171,40 +171,40 @@
             </div>
           </div>
         }
-        <!-- 災害志工詳情 -->
+        <!-- 災害協力詳情 -->
         @else {
           <div class="modal-info">
             <h3>
-              {{ volunteer?.type }}
+              {{ helper?.type }}
             </h3>
             <div class="modal-item">
               <span>需求類型</span>
               <strong>
-                {{ volunteer?.type }}
+                {{ helper?.type }}
               </strong>
             </div>
             <div class="modal-item">
               <span>需求人數</span>
               <strong>
-                {{ volunteer?.people ?? 0 }} 人
+                {{ helper?.people ?? 0 }} 人
               </strong>
             </div>
             <div class="modal-item">
               <span>服務地點</span>
               <strong>
-                {{ volunteer?.location || '尚未填寫' }}
+                {{ helper?.location || '尚未填寫' }}
               </strong>
             </div>
             <div class="modal-item">
               <span>建立時間</span>
               <strong>
-                {{ volunteer?.createdAt || '尚未填寫' }}
+                {{ helper?.createdAt || '尚未填寫' }}
               </strong>
             </div>
             <div class="modal-item">
               <span>優先程度</span>
               <strong>
-                {{ volunteer?.priority }}
+                {{ helper?.priority }}
               </strong>
             </div>
           </div>

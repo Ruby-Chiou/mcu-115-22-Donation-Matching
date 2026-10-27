@@ -1,5 +1,4 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
@@ -11,6 +10,7 @@ interface DisasterItem {
   text: string;
   highlight: string;
 }
+
 interface DisasterHistoryItem {
   text: string;
   highlight: string;
@@ -19,12 +19,14 @@ interface DisasterHistoryItem {
 @Component({
   selector: 'app-donor-disaster-lobby',
   standalone: true,
-  imports: [DatePipe, RouterLink, DonorDisasterPageComponent, DisasterLocationsComponent],
+  imports: [RouterLink, DonorDisasterPageComponent, DisasterLocationsComponent],
   templateUrl: './donor-disaster-lobby.component.html',
   styleUrl: './donor-disaster-lobby.component.scss',
 })
-export class DonorDisasterLobbyComponent {
+export class DonorDisasterLobbyComponent implements OnInit, OnDestroy {
   protected readonly disasterData = inject(DisasterControlService).data;
+  protected readonly closedNotice = signal('');
+
   protected readonly newsList: DisasterItem[] = [
     {
       image:
@@ -47,25 +49,20 @@ export class DonorDisasterLobbyComponent {
     },
   ];
 
-  // 宣告一個專門存放計時器的變數
   private autoSlideTimer: ReturnType<typeof setInterval> | undefined;
 
-  // 當這個頁面被打開（初始化）時，立刻啟動自動播放
   ngOnInit(): void {
-    this.startAutoSlide();
+    if (this.disasterData().isOpen) {
+      this.startAutoSlide();
+    }
   }
 
-  // 當使用者離開這個頁面（銷毀）時，一定要把計時器殺掉
   ngOnDestroy(): void {
     this.stopAutoSlide();
   }
 
-  // --- 以下是控制邏輯 ---
-
   private startAutoSlide(): void {
-    // 設定每 3000 毫秒（3秒）執行一次括號裡的動作
     this.autoSlideTimer = setInterval(() => {
-      // 邏輯：(目前的數字 + 1) 除以 總張數的餘數。這樣 0->1->2->0 就能無限循環
       const nextIndex = (this.disasterIndex() + 1) % this.newsList.length;
       this.disasterIndex.set(nextIndex);
     }, 3000);
@@ -78,12 +75,20 @@ export class DonorDisasterLobbyComponent {
     }
   }
 
-  // 手動點擊：切換圖片的同時，重新開始計時
   protected setSlide(index: number): void {
-    this.disasterIndex.set(index); // 切換到點擊的那張
-    this.stopAutoSlide(); // 煞車：停掉舊的計時器
-    this.startAutoSlide(); // 重新發車：重新開始倒數 3 秒
+    this.disasterIndex.set(index);
+    this.stopAutoSlide();
+    this.startAutoSlide();
   }
+
+  protected showClosedNotice(label: string): void {
+    this.closedNotice.set(label);
+  }
+
+  protected dismissClosedNotice(): void {
+    this.closedNotice.set('');
+  }
+
   protected readonly historyList: DisasterHistoryItem[] = [
     {
       text: '花蓮地震',
@@ -94,8 +99,32 @@ export class DonorDisasterLobbyComponent {
       highlight: '高雄美濃地震，震央位於台灣高雄市美濃區，芮氏規模達6.6。造成117人死亡，其中115人在台南市永康區維冠金龍大樓，551人受傷。',
     },
   ];
+
   protected readonly disasterIndex = signal(0);
   protected readonly disasterNews = computed(() => this.newsList[this.disasterIndex()]);
+  protected readonly marqueeText = computed(() => {
+    const data = this.disasterData();
+    const parts: string[] = [];
 
+    if (data.announcement.trim()) {
+      parts.push(data.announcement.trim());
+    }
 
+    if (data.scheduledCloseAt) {
+      parts.push(`預計關閉災害捐助時間：${formatCloseAt(data.scheduledCloseAt)}`);
+    }
+
+    return parts.join('　｜　');
+  });
+}
+
+function formatCloseAt(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }

@@ -1,4 +1,5 @@
 -- 選用：開發用種子資料（db push --include-seed 或本地 db reset 才會套用）
+-- 各流程階段完整假資料見 migrations/20261027000005_stage_demo_flow_data.sql
 -- 感謝狀 fileUrl 請指向本專案 Storage 公開路徑
 
 insert into public.donor_profiles

@@ -8,7 +8,7 @@ export const donorDisasterGuard: CanActivateFn = (route, state) => {
   const disasterOpen = localStorage.getItem('disasterOpen') === 'true';
   const path = state.url.split('?')[0] ?? '';
 
-  // 大廳可以進來看到已關閉。物資、志工的內頁在關閉時擋下來。
+  // 大廳可以進來看到已關閉。物資、協力者的內頁在關閉時擋下來。
   if (!disasterOpen && path.startsWith('/donor/disaster/')) {
     closedModal.show();
 

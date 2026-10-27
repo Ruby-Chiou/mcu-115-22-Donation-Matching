@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
 import { AVATAR_ACCEPT_TYPES, MemberProfileService } from '../../../core/services/member-center/member-profile.service';
+import { REGISTRATION_PASSWORD_PATTERN } from '../../../core/auth/registration-rules';
 import { DONOR_LOGIN_PROVIDER_LABELS } from '../../../models/user/donor';
 
 const TW_MOBILE_PATTERN = /^09\d{8}$/;
@@ -51,7 +52,7 @@ export class MemberProfileComponent implements OnInit {
   readonly passwordForm = this.fb.nonNullable.group(
     {
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      newPassword: ['', [Validators.required, Validators.pattern(REGISTRATION_PASSWORD_PATTERN)]],
       confirmPassword: ['', [Validators.required]],
     },
     { validators: passwordMatchValidator }

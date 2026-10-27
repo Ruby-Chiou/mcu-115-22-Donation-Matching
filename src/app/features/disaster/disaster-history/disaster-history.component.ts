@@ -8,7 +8,7 @@ interface MaterialHistory {
   unit: string;
 }
 
-interface VolunteerHistory {
+interface HelperHistory {
   id: number;
   title: string;
   people: number;
@@ -23,7 +23,7 @@ interface DisasterSection {
   backgroundImage: string;
 
   materialNeeds: MaterialHistory[];
-  volunteerNeeds: VolunteerHistory[];
+  helperNeeds: HelperHistory[];
 }
 
 @Component({
@@ -60,7 +60,7 @@ export class DisasterHistoryComponent {
       sectionTitle: '土石流災害救助',
       title: '花蓮馬太鞍溪堰塞湖災害',
       description:
-        '查看目前災區所需的物資與志工需求，您的每一份捐助與每一次參與，都能為受災家庭帶來更多希望。 \n\n' +
+        '查看目前災區所需的物資與協力需求，您的每一份捐助與每一次參與，都能為受災家庭帶來更多希望。 \n\n' +
         '2025年9月23日，台灣花蓮縣馬太鞍溪沿岸區域爆發嚴重水災， \n\n' +
         '其肇因於2024年4月3日花蓮地震鬆動土石與2025年7月21日颱風薇帕外圍環流夾帶的雨勢引發山崩， \n\n' +
         '並於馬太鞍溪上游萬榮鄉處形成巨大的堰塞湖。',
@@ -87,7 +87,7 @@ export class DisasterHistoryComponent {
         },
       ],
 
-      volunteerNeeds: [
+      helperNeeds: [
         {
           id: 1,
           title: '路面清理',
@@ -159,7 +159,7 @@ export class DisasterHistoryComponent {
         },
       ],
 
-      volunteerNeeds: [
+      helperNeeds: [
         {
           id: 1,
           title: '環境清理',
@@ -214,7 +214,7 @@ export class DisasterHistoryComponent {
         },
       ],
 
-      volunteerNeeds: [
+      helperNeeds: [
         {
           id: 1,
           title: '清掃路面',

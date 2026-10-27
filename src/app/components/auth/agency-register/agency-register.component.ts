@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { AgencyCertificateRegistry } from '../../../core/auth/agency-certificate.registry';
-import { AgencyVerificationService } from '../../../core/services/agency-verification/agency-verification.service';
 import { toLoginMessage } from '../../../core/auth/login-message';
+import { registrationPasswordMessage, registrationPhoneMessage } from '../../../core/auth/registration-rules';
+import { AgencyVerificationService } from '../../../core/services/agency-verification/agency-verification.service';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { SupabaseService } from '../../../core/services/database/supabase.service';
 
@@ -76,6 +77,18 @@ export class AgencyRegisterComponent {
 
     if (this.agencyForm.password !== this.agencyForm.confirmPassword) {
       this.submitMessage = '密碼與確認密碼不一致。';
+      return;
+    }
+
+    const phoneMessage = registrationPhoneMessage(this.agencyForm.contactPhone) || registrationPhoneMessage(this.agencyForm.contactPersonPhone);
+    if (phoneMessage) {
+      this.submitMessage = phoneMessage;
+      return;
+    }
+
+    const passwordMessage = registrationPasswordMessage(this.agencyForm.password);
+    if (passwordMessage) {
+      this.submitMessage = passwordMessage;
       return;
     }
 

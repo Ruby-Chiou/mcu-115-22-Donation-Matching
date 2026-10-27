@@ -30,7 +30,7 @@
 
     <label class="field full">
       <span>機構聯絡電話</span>
-      <input type="tel" [(ngModel)]="agencyForm.contactPhone" name="agencyContactPhone" />
+      <input type="tel" [(ngModel)]="agencyForm.contactPhone" name="agencyContactPhone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10 位數字" />
     </label>
 
     <label class="field full">
@@ -59,8 +59,8 @@
         </label>
 
         <label class="field">
-          <span>聯絡人電話 / 分機</span>
-          <input type="tel" [(ngModel)]="agencyForm.contactPersonPhone" name="contactPersonPhone" />
+          <span>聯絡人電話（10 位數字）</span>
+          <input type="tel" [(ngModel)]="agencyForm.contactPersonPhone" name="contactPersonPhone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10 位數字" />
         </label>
 
         <label class="field full">
@@ -94,12 +94,12 @@
 
     <label class="field">
       <span>密碼</span>
-      <input type="password" [(ngModel)]="agencyForm.password" name="agencyPassword" />
+      <input type="password" [(ngModel)]="agencyForm.password" name="agencyPassword" minlength="8" maxlength="8" autocomplete="new-password" placeholder="8 碼，含大小寫與數字" />
     </label>
 
     <label class="field">
       <span>確認密碼</span>
-      <input type="password" [(ngModel)]="agencyForm.confirmPassword" name="agencyConfirmPassword" />
+      <input type="password" [(ngModel)]="agencyForm.confirmPassword" name="agencyConfirmPassword" minlength="8" maxlength="8" autocomplete="new-password" />
     </label>
   </div>
 

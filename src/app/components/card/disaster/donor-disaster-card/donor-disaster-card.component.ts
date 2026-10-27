@@ -2,7 +2,7 @@ import { Component, Input, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
-import { VolunteerDemand } from '../../../../models/agency/volunteer-demand';
+import { HelperDemand } from '../../../../models/agency/helper-demand';
 
 import { DisasterControlService } from '../../../../core/services/disaster-control/disaster-control.service';
 
@@ -13,12 +13,12 @@ import { DisasterControlService } from '../../../../core/services/disaster-contr
   styleUrl: './donor-disaster-card.component.scss',
 })
 export class DonorDisasterCardComponent {
-  @Input() type: 'material' | 'volunteer' = 'material';
+  @Input() type: 'material' | 'helper' = 'material';
 
   // ⭐ 物資改成 DisasterDemand
   @Input() demand?: DisasterDemand;
 
-  @Input() volunteer?: VolunteerDemand;
+  @Input() helper?: HelperDemand;
 
   @Input() demandId?: number;
 
@@ -65,17 +65,17 @@ export class DonorDisasterCardComponent {
       return;
     }
 
-    const id = this.volunteer?.id;
+    const id = this.helper?.id;
 
-    console.log('[災害志工] 前往詳細頁資料庫 id：', id);
+    console.log('[災害協力] 前往詳細頁資料庫 id：', id);
 
     if (id == null) {
-      console.error('災害志工缺少資料庫 id：', this.volunteer);
+      console.error('災害協力缺少資料庫 id：', this.helper);
 
       return;
     }
 
-    void this.router.navigate(['/donor/disaster/volunteer/detail', id]);
+    void this.router.navigate(['/donor/disaster/helper/detail', id]);
   }
 
   closeDetail(event?: Event): void {

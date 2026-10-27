@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { CompanyCertificateRegistry } from '../../../core/auth/company-certificate.registry';
+import { registrationPasswordMessage, registrationPhoneMessage } from '../../../core/auth/registration-rules';
 import { toLoginMessage } from '../../../core/auth/login-message';
 import { SocialAuthService, SocialProvider } from '../../../core/services/auth/social-auth.service';
 import { SupabaseService } from '../../../core/services/database/supabase.service';
@@ -92,6 +93,20 @@ export class DonorRegisterComponent {
     if (this.donorForm.password !== this.donorForm.confirmPassword) {
       this.isError = true;
       this.submitMessage = '密碼與確認密碼不一致。';
+      return;
+    }
+
+    const phoneMessage = registrationPhoneMessage(this.donorForm.phone);
+    if (phoneMessage) {
+      this.isError = true;
+      this.submitMessage = phoneMessage;
+      return;
+    }
+
+    const passwordMessage = registrationPasswordMessage(this.donorForm.password);
+    if (passwordMessage) {
+      this.isError = true;
+      this.submitMessage = passwordMessage;
       return;
     }
 

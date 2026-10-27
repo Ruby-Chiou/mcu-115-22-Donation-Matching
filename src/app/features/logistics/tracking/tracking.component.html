@@ -3,7 +3,7 @@
   <!-- 頁面標題 -->
   <section class="tracking-header">
     <h2>配送查詢</h2>
-    <p>輸入物流單號，快速查詢物資配送進度</p>
+    <p>查詢你在捐助紀錄上傳的物流單號。平台只顯示寄出與機構簽收，最新貨態請到物流公司官網。</p>
   </section>
 
 
@@ -48,9 +48,10 @@
         <button
           type="button"
           (click)="search()"
+          [disabled]="searching"
         >
           <i class="fa-solid fa-magnifying-glass"></i>
-          查詢
+          {{ searching ? '查詢中' : '查詢' }}
         </button>
       </div>
     </div>
@@ -77,7 +78,11 @@
     </p>
 
     <p>
-      中華郵政：請依寄件單據上的「郵件號碼」輸入
+      中華郵政：請依寄件單據上的郵件號碼輸入
+    </p>
+
+    <p>
+      新竹物流：請依託運單上的查貨號碼輸入
     </p>
       </div>
     </div>
@@ -96,7 +101,7 @@
       </div>
 
 
-      @for (item of resultList; track item.id) {
+      @for (item of resultList; track item.donationId) {
 
         <div class="result-card">
 
@@ -107,15 +112,34 @@
 
           <div class="result-row">
             <span class="label">物流單號</span>
-            <span class="value">{{ item.id }}</span>
+            <span class="value">{{ item.trackingNo }}</span>
           </div>
 
           <div class="result-row">
-            <span class="label">配送進度</span>
+            <span class="label">物資</span>
+            <span class="value">{{ item.material }}</span>
+          </div>
+
+          @if (item.recipient) {
+            <div class="result-row">
+              <span class="label">收件</span>
+              <span class="value">{{ item.recipient }}</span>
+            </div>
+          }
+
+          <div class="result-row">
+            <span class="label">平台進度</span>
 
             <span class="status">
               {{ item.status }}
             </span>
+          </div>
+
+          <div class="result-actions">
+            <a class="text-link" [routerLink]="['/donor/history']" [queryParams]="{ record: item.donationId }">回到這筆捐助紀錄</a>
+            @if (item.officialUrl) {
+              <a class="text-link" [href]="item.officialUrl" target="_blank" rel="noopener noreferrer">到{{ item.carrier }}查最新貨態</a>
+            }
           </div>
 
         </div>
@@ -145,7 +169,7 @@
   <a
     href="#"
     class="carrier-card"
-    (click)="goToCarrier('black-cat', $event)"
+    (click)="goToCarrier('黑貓宅急便', $event)"
   >
     <i class="fa-solid fa-box"></i>
     <div>
@@ -158,7 +182,7 @@
   <a
     href="#"
     class="carrier-card"
-    (click)="goToCarrier('711', $event)"
+    (click)="goToCarrier('7-ELEVEN', $event)"
   >
     <i class="fa-solid fa-store"></i>
     <div>
@@ -171,7 +195,7 @@
   <a
     href="#"
     class="carrier-card"
-    (click)="goToCarrier('family', $event)"
+    (click)="goToCarrier('全家', $event)"
   >
     <i class="fa-solid fa-store"></i>
     <div>
@@ -184,7 +208,7 @@
   <a
     href="#"
     class="carrier-card"
-    (click)="goToCarrier('post', $event)"
+    (click)="goToCarrier('中華郵政', $event)"
   >
     <i class="fa-solid fa-envelope"></i>
     <div>
@@ -193,8 +217,35 @@
     </div>
   </a>
 
+  <a
+    href="#"
+    class="carrier-card"
+    (click)="goToCarrier('新竹物流', $event)"
+  >
+    <i class="fa-solid fa-truck"></i>
+    <div>
+      <h4>新竹物流</h4>
+      <span>查詢貨態 →</span>
+    </div>
+  </a>
+
 </div>
 
   </section>
+
+  @if (notice; as dialog) {
+    <div class="notice-backdrop" (click)="closeNotice()">
+      <div class="notice-box" role="dialog" aria-modal="true" [attr.aria-label]="dialog.title" (click)="$event.stopPropagation()">
+        <h3>{{ dialog.title }}</h3>
+        <p>{{ dialog.body }}</p>
+        <div class="notice-actions">
+          @if (dialog.officialUrl) {
+            <a class="notice-link" [href]="dialog.officialUrl" target="_blank" rel="noopener noreferrer">前往{{ dialog.officialName }}官網</a>
+          }
+          <button type="button" (click)="closeNotice()">知道了</button>
+        </div>
+      </div>
+    </div>
+  }
 
 </div>

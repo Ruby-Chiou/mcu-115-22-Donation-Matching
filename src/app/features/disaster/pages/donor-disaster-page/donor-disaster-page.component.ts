@@ -5,19 +5,19 @@ import { DisasterControlService } from '../../../../core/services/disaster-contr
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 
 import { DonorDisasterSupplyFilterComponent } from '../../../../components/filter/donor-disaster-supply-filter/donor-disaster-supply-filter.component';
-import { DonorDisasterVolunteerFilterComponent } from '../../../../components/filter/donor-disaster-volunteer-filter/donor-disaster-volunteer-filter.component';
+import { DonorDisasterHelperFilterComponent } from '../../../../components/filter/donor-disaster-helper-filter/donor-disaster-helper-filter.component';
 
 import { DonorDisasterCardListComponent } from '../../../../components/data-list/disaster/donor-disaster-card-list/donor-disaster-card-list.component';
 
 @Component({
   selector: 'app-donor-disaster-page',
-  imports: [DonorDisasterCardListComponent, DonorDisasterSupplyFilterComponent, DonorDisasterVolunteerFilterComponent],
+  imports: [DonorDisasterCardListComponent, DonorDisasterSupplyFilterComponent, DonorDisasterHelperFilterComponent],
   templateUrl: './donor-disaster-page.component.html',
   styleUrl: './donor-disaster-page.component.scss',
 })
 export class DonorDisasterPageComponent implements OnInit {
   showSupplyFilter = false;
-  showVolunteerFilter = false;
+  showHelperFilter = false;
 
   materialFilters = {
     category: [] as string[],
@@ -25,11 +25,11 @@ export class DonorDisasterPageComponent implements OnInit {
     hasRemaining: false,
   };
   // =========================
-  // 志工篩選條件
+  // 協力者篩選條件
   // =========================
-  volunteerFilters = {
-    volunteerType: [] as string[],
-    volunteerLocation: [] as string[],
+  helperFilters = {
+    helperType: [] as string[],
+    helperLocation: [] as string[],
     hasRemaining: false,
   };
   resetFilters(): void {
@@ -41,29 +41,29 @@ export class DonorDisasterPageComponent implements OnInit {
         hasRemaining: false,
       };
     }
-    // 目前在志工頁面
+    // 目前在協力者頁面
     else {
-      this.volunteerFilters = {
-        volunteerType: [],
-        volunteerLocation: [],
+      this.helperFilters = {
+        helperType: [],
+        helperLocation: [],
         hasRemaining: false,
       };
     }
   }
-  protected readonly activeType = signal<'material' | 'volunteer'>('material');
+  protected readonly activeType = signal<'material' | 'helper'>('material');
   private disasterDemandService = inject(DisasterDemandService);
   protected readonly disasterData = inject(DisasterControlService).data;
   protected readonly demands = this.disasterDemandService.getDemands();
   private route = inject(ActivatedRoute);
   ngOnInit(): void {
     const section = this.route.snapshot.queryParamMap.get('section');
-    if (section === 'volunteer') {
-      this.activeType.set('volunteer');
+    if (section === 'helper' || section === 'volunteer') {
+      this.activeType.set('helper');
     } else {
       this.activeType.set('material');
     }
   }
-  protected selectType(type: 'material' | 'volunteer'): void {
+  protected selectType(type: 'material' | 'helper'): void {
     this.activeType.set(type);
   }
   protected goToMap(): void {

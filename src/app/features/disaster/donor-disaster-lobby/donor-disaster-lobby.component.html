@@ -1,66 +1,73 @@
 <h1 class="title">災害救助大廳</h1>
-@if (disasterData().announcement || disasterData().scheduledCloseAt) {
+@if (disasterData().isOpen && marqueeText()) {
   <section class="disaster-announcement" aria-labelledby="announcement-title">
     <h2 id="announcement-title">災害救助公告</h2>
-     <div class="announcement-marquee">
-    @if (disasterData().announcement) {
-      <p class="marquee">
-          <span>{{ disasterData().announcement }}</span>
-        </p>
-    }
-    @if (disasterData().scheduledCloseAt) {
-      <p class="scheduled-close marquee" role="status">
-        <span>
-          預計關閉災害捐助時間：{{ disasterData().scheduledCloseAt | date:'yyyy/MM/dd HH:mm' }}
-        </span>
+    <div class="announcement-marquee">
+      <p class="marquee" role="status">
+        <span>{{ marqueeText() }}</span>
       </p>
-    }
     </div>
   </section>
 }
+
 <div class="title-row">
-  <div class="title-box">政府最新消息</div>
+  @if (disasterData().isOpen) {
+    <div class="title-box">政府最新消息</div>
+  }
   <a class="title-box" routerLink="/disaster/history">歷史紀錄</a>
 </div>
 
-<div class="menu-container">
-  <aside class="left-menu">
-    <div class="news-card">
-      <div class="card-image">
-        <img [src]="disasterNews().image" [alt]="disasterNews().text" />
+<div class="menu-container" [class.history-only]="!disasterData().isOpen">
+  @if (disasterData().isOpen) {
+    <aside class="left-menu">
+      <div class="news-card">
+        <div class="card-image">
+          <img [src]="disasterNews().image" [alt]="disasterNews().text" />
+        </div>
+        <div class="card-text">
+          <p>{{ disasterNews().text }}</p>
+          <p class="highlight">{{ disasterNews().highlight }}</p>
+        </div>
       </div>
-      <div class="card-text">
-        <p>{{ disasterNews().text }}</p>
-        <p class="highlight">{{ disasterNews().highlight }}</p>
+      <div class="disaster-indicators">
+        @for (i of [0, 1, 2]; track i) {
+          <span class="dot" [class.active]="disasterIndex() === i" (click)="setSlide(i)"></span>
+        }
       </div>
-    </div>
-    <div class="disaster-indicators">
-      @for (i of [0, 1, 2]; track i) {
-      <span class="dot" [class.active]="disasterIndex() === i" (click)="setSlide(i)"> </span>
-      }
-    </div>
-  </aside>
-<aside class="right-menu">
-  @for (item of historyList; track item.text) {
-
-    <div class="info-card">
-
-      <h3>
-        {{ item.text }}
-      </h3>
-
-      <p>
-        {{ item.highlight }}
-      </p>
-
-    </div>
-
+    </aside>
   }
-  <a class="history-link" routerLink="/disaster/history">查看歷史紀錄</a>
+  <aside class="right-menu">
+    @for (item of historyList; track item.text) {
+      <div class="info-card">
+        <h3>{{ item.text }}</h3>
+        <p>{{ item.highlight }}</p>
+      </div>
+    }
+    <a class="history-link" routerLink="/disaster/history">查看歷史紀錄</a>
   </aside>
 </div>
 
-<app-donor-disaster-page></app-donor-disaster-page>
-<app-disaster-locations></app-disaster-locations>
+@if (disasterData().isOpen) {
+  <app-donor-disaster-page></app-donor-disaster-page>
+  <app-disaster-locations></app-disaster-locations>
+} @else {
+  <nav class="closed-actions" aria-label="災害救助入口">
+    <button type="button" class="closed-action" (click)="showClosedNotice('物資捐助')">物資捐助</button>
+    <span class="closed-divider" aria-hidden="true">|</span>
+    <button type="button" class="closed-action" (click)="showClosedNotice('協力需求')">協力需求</button>
+    <button type="button" class="closed-action map-action" (click)="showClosedNotice('地圖')">
+      <span class="material-symbols-outlined" aria-hidden="true">map</span>
+      地圖
+    </button>
+  </nav>
 
-
+  @if (closedNotice()) {
+    <div class="closed-notice-backdrop" (click)="dismissClosedNotice()">
+      <div class="closed-notice-box" role="dialog" aria-modal="true" aria-labelledby="closed-notice-title" (click)="$event.stopPropagation()">
+        <h3 id="closed-notice-title">災害救助目前已關閉</h3>
+        <p>「{{ closedNotice() }}」暫時無法使用。請先查看上方歷史紀錄，或等待管理者再次開啟災害救助。</p>
+        <button type="button" (click)="dismissClosedNotice()">知道了</button>
+      </div>
+    </div>
+  }
+}

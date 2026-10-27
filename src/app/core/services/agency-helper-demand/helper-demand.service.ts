@@ -1,0 +1,401 @@
+import { Injectable } from '@angular/core';
+import { Observable, Subject, from } from 'rxjs';
+
+import { HelperDemand } from '../../../models/agency/helper-demand';
+import { DemandRepository } from '../../demands/demand-repository';
+import { SupabaseService } from '../database/supabase.service';
+interface HelperDemandRow {
+  id: number | string;
+
+  serialNo: number | null;
+  type: string | null;
+  people: number | null;
+
+  location: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  condition: string | null;
+  workContent: string | null;
+  reason: string | null;
+
+  priority: string | null;
+  status: string | null;
+
+  contact: string | null;
+  phone: string | null;
+  note: string | null;
+
+  messageCount: number | null;
+
+  createdAt: string | null;
+  publishedAt: string | null;
+  offShelfAt: string | null;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class HelperDemandService implements DemandRepository<HelperDemand> {
+  private readonly tableName = 'agency_disaster_volunteer_items';
+
+  private demands: HelperDemand[] = [];
+
+  private selectedDemands: HelperDemand[] = [];
+
+  private loadingPromise: Promise<void>;
+
+  private readonly demandChangedSubject = new Subject<void>();
+
+  readonly demandChanged$ = this.demandChangedSubject.asObservable();
+
+  constructor(private readonly supabaseService: SupabaseService) {
+    this.loadingPromise = this.loadFromSupabase();
+  }
+
+  private async loadFromSupabase(): Promise<void> {
+    const { data, error } = await this.supabaseService.client
+      .from(this.tableName)
+      .select('*')
+      .order('serialNo', {
+        ascending: true,
+      })
+      .abortSignal(AbortSignal.timeout(10000));
+
+    if (error) {
+      console.error('讀取協力需求失敗：', error);
+      throw error;
+    }
+
+    // 只讀取主留言，不包含子回覆
+    const { data: comments, error: commentError } = await this.supabaseService.client
+      .from('volunteer_comments')
+      .select('demand_id')
+      .is('parent_comment_id', null);
+
+    if (commentError) {
+      console.error('讀取協力者主留言數失敗：', commentError);
+    }
+
+    // 依照需求資料庫 ID 統計主留言數
+    const rootCommentCounts = new Map<number, number>();
+
+    for (const comment of comments ?? []) {
+      const demandId = Number(comment.demand_id);
+
+      rootCommentCounts.set(demandId, (rootCommentCounts.get(demandId) ?? 0) + 1);
+    }
+
+    // 將實際主留言數放入 messageCount
+    this.demands = (data ?? []).map((row) => {
+      const demand = this.mapRowToDemand(row as HelperDemandRow);
+
+      return {
+        ...demand,
+        messageCount: rootCommentCounts.get(demand.id) ?? 0,
+      };
+    });
+  }
+
+  async waitUntilLoaded(): Promise<void> {
+    await this.loadingPromise;
+  }
+
+  async reload(): Promise<void> {
+    this.loadingPromise = this.loadFromSupabase();
+
+    await this.loadingPromise;
+  }
+
+  private mapRowToDemand(row: HelperDemandRow): HelperDemand {
+    return {
+      id: Number(row.id),
+
+      serialNo: Number(row.serialNo ?? 0),
+
+      type: row.type ?? '',
+      people: row.people ?? 0,
+
+      location: row.location ?? '',
+      latitude: row.latitude ?? undefined,
+      longitude: row.longitude ?? undefined,
+      condition: row.condition ?? '',
+      workContent: row.workContent ?? '',
+      reason: row.reason ?? '',
+
+      priority: row.priority as HelperDemand['priority'],
+
+      status: row.status as HelperDemand['status'],
+
+      contact: row.contact ?? '',
+      phone: row.phone ?? '',
+      note: row.note ?? '',
+
+      messageCount: row.messageCount ?? 0,
+
+      createdAt: row.createdAt ?? '',
+
+      publishedAt: row.publishedAt ?? '',
+
+      expectedOffShelfAt: row.offShelfAt ?? '',
+    };
+  }
+
+  private demandToRow(demand: HelperDemand): Omit<HelperDemandRow, 'id'> {
+    return {
+      serialNo: demand.serialNo,
+
+      type: demand.type,
+      people: demand.people ?? null,
+
+      location: demand.location,
+      latitude: demand.latitude ?? null,
+      longitude: demand.longitude ?? null,
+      condition: demand.condition,
+      workContent: demand.workContent,
+      reason: demand.reason,
+
+      priority: demand.priority,
+      status: demand.status,
+
+      contact: demand.contact,
+      phone: demand.phone,
+      note: demand.note ?? null,
+
+      messageCount: demand.messageCount ?? null,
+
+      createdAt: demand.createdAt || null,
+
+      publishedAt: demand.publishedAt || null,
+
+      offShelfAt: demand.expectedOffShelfAt || null,
+    };
+  }
+
+  getDemands(): HelperDemand[] {
+    return [...this.demands];
+  }
+
+  getHelpers(): HelperDemand[] {
+    return this.demands.filter((demand) => demand.status === '上架');
+  }
+
+  /**
+   * 地圖只需要座標與需求摘要，不等待全表留言統計。
+   * 失敗時回傳空陣列，地圖仍先畫出台灣。
+   */
+  async listPublishedForMap(): Promise<HelperDemand[]> {
+    try {
+      const { data, error } = await this.supabaseService.client
+        .from(this.tableName)
+        .select('id, serialNo, type, location, latitude, longitude, workContent, status')
+        .eq('status', '上架')
+        .abortSignal(AbortSignal.timeout(8000));
+
+      if (error) {
+        console.error('讀取地圖協力需求失敗：', error);
+        return [];
+      }
+
+      return (data ?? []).map((row) => this.mapRowToDemand(row as HelperDemandRow));
+    } catch (error) {
+      console.error('讀取地圖協力需求失敗：', error);
+      return [];
+    }
+  }
+
+  getDemandsFromServer(): Observable<HelperDemand[]> {
+    return from(this.reload().then(() => [...this.demands]));
+  }
+
+  /**
+   * 依資料庫主鍵 id 直接向 Supabase 取得單筆協力需求。
+   * 詳細頁、編輯頁與頁面重整都應呼叫此方法。
+   */
+  async getDemandById(id: number): Promise<HelperDemand | undefined> {
+    if (!Number.isInteger(id) || id <= 0) {
+      console.error('[協力需求] 無效的資料庫 id：', id);
+
+      return undefined;
+    }
+
+    console.log('[協力需求] 以資料庫 id 查詢：', id);
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('id', id).maybeSingle();
+
+    console.log('[協力需求] Supabase 查詢結果：', {
+      id,
+      data,
+      error,
+    });
+
+    if (error) {
+      console.error('讀取單筆協力需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      console.warn('[協力需求] 找不到資料庫資料，id：', id);
+
+      return undefined;
+    }
+
+    const demand = this.mapRowToDemand(data as HelperDemandRow);
+
+    const index = this.demands.findIndex((item) => item.id === demand.id);
+
+    if (index === -1) {
+      this.demands = [...this.demands, demand];
+    } else {
+      this.demands = this.demands.map((item) => (item.id === demand.id ? demand : item));
+    }
+
+    return demand;
+  }
+
+  /**
+   * 保留舊方法名稱，讓舊元件仍可使用；
+   * 現在也改為以資料庫 id 向 Supabase 查詢。
+   */
+  async getHelperById(id: number): Promise<HelperDemand | undefined> {
+    return this.getDemandById(id);
+  }
+
+  /**
+   * 保留舊方法名稱，讓現有詳細頁程式可直接使用。
+   */
+  async getHelperByDatabaseId(id: number): Promise<HelperDemand | undefined> {
+    return this.getDemandById(id);
+  }
+
+  async getHelperBySerialNo(serialNo: number): Promise<HelperDemand | undefined> {
+    if (!Number.isInteger(serialNo) || serialNo <= 0) {
+      console.error('[協力需求] 無效的 serialNo：', serialNo);
+
+      return undefined;
+    }
+
+    console.log('[協力需求] 以 serialNo 查詢：', serialNo);
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).select('*').eq('serialNo', serialNo).maybeSingle();
+
+    console.log('[協力需求] Supabase serialNo 查詢結果：', {
+      serialNo,
+      data,
+      error,
+    });
+
+    if (error) {
+      console.error('讀取單筆協力需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      console.warn('[協力需求] 找不到資料庫資料，serialNo：', serialNo);
+
+      return undefined;
+    }
+
+    const demand = this.mapRowToDemand(data as HelperDemandRow);
+
+    const index = this.demands.findIndex((item) => item.id === demand.id);
+
+    if (index === -1) {
+      this.demands = [...this.demands, demand];
+    } else {
+      this.demands = this.demands.map((item) => (item.id === demand.id ? demand : item));
+    }
+
+    return demand;
+  }
+
+  async addDemand(demand: HelperDemand): Promise<HelperDemand> {
+    const row = this.demandToRow(demand);
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).insert(row).select('*').single();
+
+    if (error) {
+      console.error('新增協力需求失敗：', error);
+
+      throw error;
+    }
+
+    const newDemand = this.mapRowToDemand(data as HelperDemandRow);
+
+    this.demands = [...this.demands, newDemand];
+
+    this.demandChangedSubject.next();
+
+    return newDemand;
+  }
+
+  async updateDemand(updatedDemand: HelperDemand): Promise<HelperDemand> {
+    if (updatedDemand.id == null || !Number.isInteger(Number(updatedDemand.id)) || Number(updatedDemand.id) <= 0) {
+      throw new Error(`找不到資料庫 id，無法修改協力需求。serialNo：${updatedDemand.serialNo}`);
+    }
+
+    const row = this.demandToRow(updatedDemand);
+
+    const { data, error } = await this.supabaseService.client
+      .from(this.tableName)
+      .update(row)
+      .eq('id', updatedDemand.id)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('修改協力需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error(`找不到更新後的協力需求，id：${updatedDemand.id}`);
+    }
+
+    const savedDemand = this.mapRowToDemand(data as HelperDemandRow);
+
+    this.demands = this.demands.map((item) => (item.id === savedDemand.id ? savedDemand : item));
+
+    this.demandChangedSubject.next();
+
+    return savedDemand;
+  }
+
+  async deleteDemand(id: number): Promise<void> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error(`無效的協力需求資料庫 id：${id}`);
+    }
+
+    const { data, error } = await this.supabaseService.client.from(this.tableName).delete().eq('id', id).select('id');
+
+    if (error) {
+      console.error('刪除協力需求失敗：', error);
+
+      throw error;
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error(`找不到或沒有權限刪除協力需求，id：${id}`);
+    }
+
+    this.demands = this.demands.filter((item) => item.id !== id);
+
+    this.demandChangedSubject.next();
+  }
+
+  async updateBatchDemands(updatedDemands: HelperDemand[]): Promise<void> {
+    for (const demand of updatedDemands) {
+      await this.updateDemand(demand);
+    }
+  }
+
+  setSelectedDemands(demands: HelperDemand[]): void {
+    this.selectedDemands = structuredClone(demands);
+  }
+
+  getSelectedDemands(): HelperDemand[] {
+    return structuredClone(this.selectedDemands);
+  }
+}

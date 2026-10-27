@@ -9,7 +9,7 @@ export interface AgencyDashboardSummary {
   pendingReceiptReviewCount: number | null;
   pendingReceivingCount: number | null;
   emergencyMaterialCount: number | null;
-  emergencyVolunteerCount: number | null;
+  emergencyHelperCount: number | null;
 }
 
 export interface UrgentDailyNeed {
@@ -30,7 +30,7 @@ export interface DashboardReminderItem {
 }
 
 export interface DashboardReminderGroup {
-  key: 'daily-expiring' | 'daily-completed' | 'disaster-expiring' | 'volunteer-expiring';
+  key: 'daily-expiring' | 'daily-completed' | 'disaster-expiring' | 'helper-expiring';
   label: string;
   title: string;
   type: 'normal' | 'emergency';
@@ -77,14 +77,14 @@ export class AgencyDashboardService {
       pendingReceiptReviewCount,
       pendingReceivingCount,
       emergencyMaterialCount,
-      emergencyVolunteerCount,
+      emergencyHelperCount,
     ] = await Promise.all([
       this.loadCount(() => this.getPublishedDailyDemandCount()),
       this.loadCount(() => this.getPendingItemReviewCount()),
       this.receiptIssuanceService.countPending().catch(() => null),
       this.deliveries.list().then((shipments) => this.deliveries.waitingCount(shipments)).catch(() => null),
       this.loadCount(() => this.getPublishedEmergencyMaterialCount()),
-      this.loadCount(() => this.getPublishedEmergencyVolunteerCount()),
+      this.loadCount(() => this.getPublishedEmergencyHelperCount()),
     ]);
 
     return {
@@ -93,7 +93,7 @@ export class AgencyDashboardService {
       pendingReceiptReviewCount,
       pendingReceivingCount,
       emergencyMaterialCount,
-      emergencyVolunteerCount,
+      emergencyHelperCount,
     };
   }
 
@@ -115,7 +115,7 @@ export class AgencyDashboardService {
     const end = deadline.toISOString();
     const client = this.supabaseService.client;
 
-    const [dailyExpiring, dailyCompleted, disasterExpiring, volunteerExpiring] = await Promise.all([
+    const [dailyExpiring, dailyCompleted, disasterExpiring, helperExpiring] = await Promise.all([
       // 日常：即將下架，仍未募足
       client
         .from('agency_daily_supply_items')
@@ -143,7 +143,7 @@ export class AgencyDashboardService {
         .lte('expectedOffShelfAt', end)
         .order('expectedOffShelfAt', { ascending: true }),
 
-      // 急難志工：依下架時間提醒
+      // 急難協力：依下架時間提醒
       client
         .from('agency_disaster_volunteer_items')
         .select('id, type, workContent, offShelfAt')
@@ -153,7 +153,7 @@ export class AgencyDashboardService {
         .order('offShelfAt', { ascending: true }),
     ]);
 
-    for (const result of [dailyExpiring, dailyCompleted, disasterExpiring, volunteerExpiring]) {
+    for (const result of [dailyExpiring, dailyCompleted, disasterExpiring, helperExpiring]) {
       if (result.error) {
         throw result.error;
       }
@@ -200,11 +200,11 @@ export class AgencyDashboardService {
         })),
       },
       {
-        key: 'volunteer-expiring',
-        label: '災害志工',
+        key: 'helper-expiring',
+        label: '災害協力',
         title: '即將下架',
         type: 'emergency',
-        items: (volunteerExpiring.data ?? []).map((row) => ({
+        items: (helperExpiring.data ?? []).map((row) => ({
           id: String(row.id),
           name: row.workContent || row.type,
           deadline: row.offShelfAt,
@@ -256,7 +256,7 @@ export class AgencyDashboardService {
     return count ?? 0;
   }
 
-  private async getPublishedEmergencyVolunteerCount(): Promise<number> {
+  private async getPublishedEmergencyHelperCount(): Promise<number> {
     const { count, error } = await this.supabaseService.client
       .from('agency_disaster_volunteer_items')
       .select('*', { count: 'exact', head: true })

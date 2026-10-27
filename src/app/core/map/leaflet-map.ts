@@ -2,11 +2,11 @@ import * as L from 'leaflet';
 
 const OSM_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-export type FontMarkerKind = 'agency' | 'volunteer' | 'user';
+export type FontMarkerKind = 'agency' | 'helper' | 'user';
 
 /** 用 Font Awesome，避免 Leaflet 預設針圖檔載入失敗。 */
 export function fontMarkerIcon(kind: FontMarkerKind): L.DivIcon {
-  const glyph = kind === 'user' ? 'fa-location-crosshairs' : kind === 'volunteer' ? 'fa-hand-holding-heart' : 'fa-location-dot';
+  const glyph = kind === 'user' ? 'fa-location-crosshairs' : kind === 'helper' ? 'fa-hand-holding-heart' : 'fa-location-dot';
   const anchor = kind === 'user' ? 18 : 36;
 
   return L.divIcon({
