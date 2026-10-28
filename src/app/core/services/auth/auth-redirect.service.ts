@@ -5,6 +5,8 @@ import { donorActionsOpen, isDonorPrivatePath, RoleAccessPolicy } from '../../au
 import { safeReturnUrl } from '../../auth/safe-return-url';
 import { AuthSessionService } from './auth-session.service';
 
+const HOME_REDIRECT_MS = 1600;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -13,9 +15,19 @@ export class AuthRedirectService {
   private readonly router = inject(Router);
   private readonly policy = inject(RoleAccessPolicy);
 
-  async signIn(email: string, password: string, remember: boolean, returnUrl: string | null): Promise<void> {
+  async signIn(email: string, password: string, remember: boolean, returnUrl: string | null): Promise<string> {
     await this.auth.signIn(email, password, remember);
-    await this.router.navigateByUrl(this.destination(returnUrl));
+    const target = this.destination(returnUrl);
+    await this.navigateAfterNotice(target);
+    return target;
+  }
+
+  /** 註冊或登入成功後先留提示，再導向該身分首頁，避免停在表單頁。 */
+  async navigateAfterNotice(url: string, delayMs = HOME_REDIRECT_MS): Promise<void> {
+    await new Promise<void>((resolve) => {
+      window.setTimeout(() => resolve(), delayMs);
+    });
+    await this.router.navigateByUrl(url);
   }
 
   /** 訪客點捐物或報名時先去登入；已登入但身分不符則回自己的首頁。 */

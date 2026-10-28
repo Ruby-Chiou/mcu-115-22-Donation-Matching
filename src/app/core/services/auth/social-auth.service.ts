@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Provider } from '@supabase/supabase-js';
 
+import { beginOAuthPersistence } from '../../auth/auth-storage';
 import { oauthRedirectUrl } from '../../auth/oauth-redirect-url';
 import { safeReturnUrl } from '../../auth/safe-return-url';
 import { SupabaseService } from '../database/supabase.service';
@@ -18,10 +19,14 @@ export class SocialAuthService {
   private readonly supabase = inject(SupabaseService);
 
   async start(provider: SocialProvider, returnUrl: string | null): Promise<void> {
+    beginOAuthPersistence();
+
     const safe = safeReturnUrl(returnUrl);
     if (safe) {
+      localStorage.setItem(RETURN_KEY, safe);
       sessionStorage.setItem(RETURN_KEY, safe);
     } else {
+      localStorage.removeItem(RETURN_KEY);
       sessionStorage.removeItem(RETURN_KEY);
     }
 

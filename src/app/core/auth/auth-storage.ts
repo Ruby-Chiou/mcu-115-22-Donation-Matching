@@ -1,12 +1,13 @@
 const PERSIST_KEY = 'dm-auth-persist';
+const OAUTH_PERSIST_KEY = 'dm-auth-oauth';
 
 function canUseStorage(): boolean {
   return typeof localStorage !== 'undefined' && typeof sessionStorage !== 'undefined';
 }
 
-/** 未勾選記住我時，工作階段只留在這個分頁。 */
+/** 勾選記住我，或第三方登入進行中時，工作階段改放 localStorage，避免換分頁／App 內瀏覽器回站後遺失。 */
 function activeStore(): Storage {
-  if (localStorage.getItem(PERSIST_KEY) === '1') {
+  if (localStorage.getItem(PERSIST_KEY) === '1' || localStorage.getItem(OAUTH_PERSIST_KEY) === '1') {
     return localStorage;
   }
 
@@ -24,6 +25,23 @@ export function setAuthPersistence(remember: boolean): void {
   }
 
   localStorage.removeItem(PERSIST_KEY);
+}
+
+/** 第三方登入離開前呼叫；回站並套用工作階段後再 clearOAuthPersistence。 */
+export function beginOAuthPersistence(): void {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  localStorage.setItem(OAUTH_PERSIST_KEY, '1');
+}
+
+export function clearOAuthPersistence(): void {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  localStorage.removeItem(OAUTH_PERSIST_KEY);
 }
 
 export const authStorage = {

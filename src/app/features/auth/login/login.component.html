@@ -1,38 +1,99 @@
 <section class="login-shell">
-  <!-- 1. 尚未選擇身分時，顯示身分選擇器 -->
-  <ng-container *ngIf="showRoleModal; else formView">
+  @if (showRecoveryPassword) {
+    <div class="form-card">
+      <form class="login-form" (ngSubmit)="saveRecoveryPassword()">
+        <div class="form-header">
+          <div>
+            <h2>設定新密碼</h2>
+            <p>請為這個信箱設定密碼。之後就能用帳密密碼登入（含 Gmail，即使以前只用過 Google）。</p>
+          </div>
+        </div>
+
+        <div class="input-grid">
+          <label class="field full">
+            <span>新密碼</span>
+            <div class="password-field">
+              <input
+                [type]="showRecoveryPasswordVisible ? 'text' : 'password'"
+                [(ngModel)]="recoveryPassword"
+                name="recoveryPassword"
+                minlength="8"
+                maxlength="64"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="toggleRecoveryPassword()"
+                [attr.aria-label]="showRecoveryPasswordVisible ? '隱藏密碼' : '顯示密碼'"
+              >
+                <i class="fa-solid" [class.fa-eye]="!showRecoveryPasswordVisible" [class.fa-eye-slash]="showRecoveryPasswordVisible"></i>
+              </button>
+            </div>
+          </label>
+          <label class="field full">
+            <span>確認新密碼</span>
+            <div class="password-field">
+              <input
+                [type]="showRecoveryPasswordVisible ? 'text' : 'password'"
+                [(ngModel)]="recoveryConfirm"
+                name="recoveryConfirm"
+                minlength="8"
+                maxlength="64"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="toggleRecoveryPassword()"
+                [attr.aria-label]="showRecoveryPasswordVisible ? '隱藏密碼' : '顯示密碼'"
+              >
+                <i class="fa-solid" [class.fa-eye]="!showRecoveryPasswordVisible" [class.fa-eye-slash]="showRecoveryPasswordVisible"></i>
+              </button>
+            </div>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button type="submit" class="primary-btn" [disabled]="recoverySubmitting">
+            {{ recoverySubmitting ? '儲存中...' : '儲存並登入' }}
+          </button>
+        </div>
+
+        @if (recoveryMessage) {
+          <p class="submit-message" [class.is-error]="recoveryError">{{ recoveryMessage }}</p>
+        }
+      </form>
+    </div>
+  } @else if (showRoleModal) {
     <div class="role-page">
       <app-role-selector
         title="請選擇登入身份"
-        description="個人捐助者可使用第三方登入；公司名義使用帳密或自然人憑證，並需通過身分審核。受助者使用行動自然人憑證。"
+        description="個人捐助者可用信箱密碼（含 Gmail）或第三方登入；公司名義使用帳號或自然人憑證。受助者使用行動自然人憑證。"
         (roleSelected)="selectRole($event)"
       >
       </app-role-selector>
     </div>
-  </ng-container>
-
-  <!-- 2. 選擇身分後，載入對應的子元件 -->
-  <ng-template #formView>
+  } @else {
     <div class="form-card">
-      <!-- 捐助者登入獨立元件 (注意這裡改接 forgotPasswordClicked) -->
       <app-donor-login
         *ngIf="!isForgotPasswordStep && !isAgency"
         heading="捐助者登入"
-        lead="個人名義可使用 Google、LINE 或 Facebook；公司名義請用帳號密碼或自然人憑證。"
+        lead="個人名義可用信箱與密碼登入（含 Gmail），也可使用 Google、LINE 或 Facebook；公司名義請用帳號密碼或自然人憑證。"
         (backToRoleSelection)="backToRoleSelection()"
         (forgotPasswordClicked)="goToForgotPassword()"
       >
       </app-donor-login>
 
-      <!-- 受助機構登入獨立元件 (如果 agency 那邊也是用 forgotPasswordClicked，這裡也一樣接) -->
       <app-agency-login
         *ngIf="!isForgotPasswordStep && isAgency"
         (backToRoleSelection)="backToRoleSelection()"
       >
       </app-agency-login>
 
-      <!-- 忘記密碼獨立元件 -->
-      <app-forgot-password *ngIf="isForgotPasswordStep" (backToLoginClicked)="backToLogin()"> </app-forgot-password>
+      <app-forgot-password *ngIf="isForgotPasswordStep" (backToLoginClicked)="backToLogin()"></app-forgot-password>
     </div>
-  </ng-template>
+  }
 </section>

@@ -36,23 +36,6 @@
     }
   }
 
-  <div class="social-login" *ngIf="showSocial && kind === 'individual' && !gateOpen">
-    <div class="social-row">
-      <p>或使用其它應用登入帳號</p>
-      <div class="social-buttons">
-        <button type="button" class="social-btn google" (click)="socialRegister('google')" [disabled]="submitting">
-          Google<i class="fa-brands fa-google" style="color: var(--color-google)"></i>
-        </button>
-        <button type="button" class="social-btn line" (click)="socialRegister('line')" [disabled]="submitting">
-          LINE<i class="fa-brands fa-line" style="color: var(--color-line)"></i>
-        </button>
-        <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')" [disabled]="submitting">
-          Facebook<i class="fa-brands fa-facebook" style="color: var(--color-facebook)"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
   @if (!gateOpen) {
   <div class="input-grid">
     <label class="field full">
@@ -62,7 +45,24 @@
 
     <label class="field full">
       <span>密碼</span>
-      <input type="password" [(ngModel)]="loginForm.password" name="password" autocomplete="current-password" required />
+      <div class="password-field">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="loginForm.password"
+          name="password"
+          autocomplete="current-password"
+          required
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword ? '隱藏密碼' : '顯示密碼'"
+          [attr.aria-pressed]="showPassword"
+        >
+          <i class="fa-solid" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword" aria-hidden="true"></i>
+        </button>
+      </div>
     </label>
   </div>
 
@@ -80,6 +80,23 @@
 
   <div class="button-row">
     <button type="submit" class="primary-btn" [disabled]="submitting">{{ submitting ? '登入中...' : '登入' }}</button>
+  </div>
+
+  <div class="social-login" *ngIf="showSocial && kind === 'individual'">
+    <div class="social-row">
+      <p>Gmail 也可用上方帳密密碼；或改用其它應用</p>
+      <div class="social-buttons">
+        <button type="button" class="social-btn google" (click)="socialRegister('google')" [disabled]="submitting">
+          Google<i class="fa-brands fa-google" style="color: var(--color-google)"></i>
+        </button>
+        <button type="button" class="social-btn line" (click)="socialRegister('line')" [disabled]="submitting">
+          LINE<i class="fa-brands fa-line" style="color: var(--color-line)"></i>
+        </button>
+        <button type="button" class="social-btn facebook" (click)="socialRegister('facebook')" [disabled]="submitting">
+          Facebook<i class="fa-brands fa-facebook" style="color: var(--color-facebook)"></i>
+        </button>
+      </div>
+    </div>
   </div>
   }
 

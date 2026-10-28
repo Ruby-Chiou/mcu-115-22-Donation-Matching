@@ -36,11 +36,16 @@ export class DonorLoginComponent {
   isError = false;
   submitting = false;
   rememberMe = false;
+  showPassword = false;
 
   loginForm = {
     email: '',
     password: '',
   };
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   protected certificateCards() {
     return this.certificates.list();
@@ -77,12 +82,12 @@ export class DonorLoginComponent {
     this.submitMessage = '';
 
     try {
+      this.submitMessage = '憑證驗證成功，即將進入頁面…';
       await this.redirect.signIn(login.email, login.password, false, this.route.snapshot.queryParamMap.get('returnUrl'));
     } catch (error) {
       this.gateOpen = false;
       this.isError = true;
-      this.submitMessage = toLoginMessage(error);
-    } finally {
+      this.submitMessage = toLoginMessage(error, login.email);
       this.submitting = false;
     }
   }
@@ -121,6 +126,7 @@ export class DonorLoginComponent {
     this.submitMessage = '';
 
     try {
+      this.submitMessage = '登入成功，即將進入頁面…';
       await this.redirect.signIn(
         this.loginForm.email,
         this.loginForm.password,
@@ -129,8 +135,7 @@ export class DonorLoginComponent {
       );
     } catch (error) {
       this.isError = true;
-      this.submitMessage = toLoginMessage(error);
-    } finally {
+      this.submitMessage = toLoginMessage(error, this.loginForm.email);
       this.submitting = false;
     }
   }

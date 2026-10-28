@@ -56,6 +56,11 @@ export const loginPageGuard: CanActivateFn = async (route) => {
 
   await auth.restore();
 
+  // 重設密碼流程必須留在登入頁完成設密，不可被導去身分首頁
+  if (auth.passwordRecovery() || route.queryParamMap.get('reset') === '1' || !!route.queryParamMap.get('token')) {
+    return true;
+  }
+
   const principal = auth.principal();
   const role = principal.role;
 
@@ -78,12 +83,13 @@ function resumeStoredReturn(
   principal: AuthPrincipal,
   queryReturnUrl: string | null = null,
 ): UrlTree | null {
-  const storedReturn = sessionStorage.getItem('dm-auth-return');
+  const storedReturn = sessionStorage.getItem('dm-auth-return') || localStorage.getItem('dm-auth-return');
   if (principal.role === 'guest') {
     return null;
   }
 
   sessionStorage.removeItem('dm-auth-return');
+  localStorage.removeItem('dm-auth-return');
   const returnUrl = safeReturnUrl(queryReturnUrl ?? storedReturn);
 
   if (!returnUrl || !policy.canActivate(principal.role, returnUrl)) {

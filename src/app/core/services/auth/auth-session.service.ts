@@ -9,7 +9,7 @@ import {
   LoginPortal,
   isAppRole,
 } from '../../../models/auth/app-role';
-import { setAuthPersistence } from '../../auth/auth-storage';
+import { clearOAuthPersistence, setAuthPersistence } from '../../auth/auth-storage';
 import { SupabaseService } from '../database/supabase.service';
 
 interface AccountRow {
@@ -33,6 +33,8 @@ export class AuthSessionService {
   private readonly zone = inject(NgZone);
 
   readonly principal = signal<AuthPrincipal>(GUEST_PRINCIPAL);
+  /** 點了重設密碼信後，需在站內設定新密碼。 */
+  readonly passwordRecovery = signal(false);
 
   private restorePromise: Promise<void> | null = null;
   private accountError: Error | null = null;
@@ -77,12 +79,32 @@ export class AuthSessionService {
   private async restoreOnce(): Promise<void> {
     const { data } = await this.supabase.client.auth.getSession();
     await this.applySession(data.session);
+    if (data.session?.user) {
+      clearOAuthPersistence();
+    }
 
-    this.supabase.client.auth.onAuthStateChange((_event, session) => {
-      queueMicrotask(() => {
-        void this.applySession(session);
+    this.supabase.client.auth.onAuthStateChange((event, session) => {
+      this.zone.run(() => {
+        if (event === 'PASSWORD_RECOVERY') {
+          this.passwordRecovery.set(true);
+        }
+
+        void this.applySession(session).then(() => {
+          if (session?.user) {
+            clearOAuthPersistence();
+          }
+        });
       });
     });
+  }
+
+  async updateRecoveredPassword(password: string): Promise<void> {
+    const { error } = await this.supabase.client.auth.updateUser({ password });
+    if (error) {
+      throw error;
+    }
+
+    this.passwordRecovery.set(false);
   }
 
   private async applySession(session: Session | null): Promise<void> {

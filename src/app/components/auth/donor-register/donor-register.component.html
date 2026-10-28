@@ -13,31 +13,13 @@
   </div>
 
   <div class="input-grid">
-    @if (kind === 'individual') {
-      <div class="social-login">
-        <div class="social-row">
-          <p>或使用其他應用註冊</p>
-          <div class="social-buttons">
-            <button type="button" class="social-btn" (click)="socialRegister('google')" [disabled]="submitting">
-              Google<i class="fa-brands fa-google" style="color: var(--color-google)"></i>
-            </button>
-            <button type="button" class="social-btn" (click)="socialRegister('line')" [disabled]="submitting">
-              LINE<i class="fa-brands fa-line" style="color: var(--color-line)"></i>
-            </button>
-            <button type="button" class="social-btn" (click)="socialRegister('facebook')" [disabled]="submitting">
-              Facebook
-              <i class="fa-brands fa-facebook" style="color: var(--color-facebook)"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    } @else {
+    @if (kind === 'company') {
       <p class="kind-note">公司只能用帳號密碼註冊，完成後會把負責人的行動自然人憑證核發到這台裝置。身分是否真實，由管理者查公開公司登記並打電話確認，不是寄確認信到這個信箱。Google、LINE、Facebook 不開放給公司。</p>
     }
 
     <label class="field full">
       <span>電子信箱</span>
-      <input type="email" [(ngModel)]="donorForm.email" name="donorEmail" />
+      <input type="email" [(ngModel)]="donorForm.email" name="donorEmail" placeholder="可用 Gmail 或學校信箱" />
     </label>
 
     @if (kind === 'individual') {
@@ -79,12 +61,49 @@
 
     <label class="field">
       <span>密碼</span>
-      <input type="password" [(ngModel)]="donorForm.password" name="donorPassword" minlength="8" maxlength="8" autocomplete="new-password" placeholder="8 碼，含大小寫與數字" />
+      <div class="password-field">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="donorForm.password"
+          name="donorPassword"
+          minlength="8"
+          maxlength="64"
+          autocomplete="new-password"
+          placeholder="至少 8 碼，含大小寫與數字"
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePassword('password')"
+          [attr.aria-label]="showPassword ? '隱藏密碼' : '顯示密碼'"
+          [attr.aria-pressed]="showPassword"
+        >
+          <i class="fa-solid" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword" aria-hidden="true"></i>
+        </button>
+      </div>
     </label>
 
     <label class="field">
       <span>確認密碼</span>
-      <input type="password" [(ngModel)]="donorForm.confirmPassword" name="donorConfirmPassword" minlength="8" maxlength="8" autocomplete="new-password" />
+      <div class="password-field">
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          [(ngModel)]="donorForm.confirmPassword"
+          name="donorConfirmPassword"
+          minlength="8"
+          maxlength="64"
+          autocomplete="new-password"
+        />
+        <button
+          type="button"
+          class="password-toggle"
+          (click)="togglePassword('confirm')"
+          [attr.aria-label]="showConfirmPassword ? '隱藏密碼' : '顯示密碼'"
+          [attr.aria-pressed]="showConfirmPassword"
+        >
+          <i class="fa-solid" [class.fa-eye]="!showConfirmPassword" [class.fa-eye-slash]="showConfirmPassword" aria-hidden="true"></i>
+        </button>
+      </div>
     </label>
   </div>
 
@@ -97,6 +116,26 @@
   <div class="button-row">
     <button type="submit" class="primary-btn" [disabled]="submitting">{{ submitting ? '送出中...' : '送出註冊' }}</button>
   </div>
+
+  @if (kind === 'individual') {
+    <div class="social-login">
+      <div class="social-row">
+        <p>也可用其他應用註冊（與上方信箱密碼擇一即可）</p>
+        <div class="social-buttons">
+          <button type="button" class="social-btn" (click)="socialRegister('google')" [disabled]="submitting">
+            Google<i class="fa-brands fa-google" style="color: var(--color-google)"></i>
+          </button>
+          <button type="button" class="social-btn" (click)="socialRegister('line')" [disabled]="submitting">
+            LINE<i class="fa-brands fa-line" style="color: var(--color-line)"></i>
+          </button>
+          <button type="button" class="social-btn" (click)="socialRegister('facebook')" [disabled]="submitting">
+            Facebook
+            <i class="fa-brands fa-facebook" style="color: var(--color-facebook)"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <p class="submit-message" [class.is-error]="isError" *ngIf="submitMessage">{{ submitMessage }}</p>
 </form>

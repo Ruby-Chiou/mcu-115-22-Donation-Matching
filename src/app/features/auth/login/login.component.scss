@@ -35,6 +35,59 @@
   gap: 24px;
 }
 
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.form-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+}
+
+.form-header p,
+.submit-message {
+  margin: 0;
+  color: var(--color-text-light);
+  line-height: var(--line-height-relaxed);
+}
+
+.submit-message.is-error {
+  color: var(--color-error);
+}
+
+.input-grid {
+  display: grid;
+  gap: var(--space-14);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  font-weight: var(--font-weight-semibold);
+}
+
+.field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-lighter);
+  border-radius: var(--border-radius-main);
+  box-sizing: border-box;
+}
+
+.button-row .primary-btn {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--border-radius-pill);
+  background: var(--color-brand-primary);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
 @include bp.tablet {
   .form-card {
     padding: 24px;

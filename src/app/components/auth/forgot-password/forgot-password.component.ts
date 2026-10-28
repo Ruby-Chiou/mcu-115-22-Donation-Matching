@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+
+import { toLoginMessage } from '../../../core/auth/login-message';
+import { PasswordResetService } from '../../../core/services/auth/password-reset.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -10,25 +13,38 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './forgot-password.component.scss',
 })
 export class ForgotPasswordComponent {
+  private readonly passwordReset = inject(PasswordResetService);
+
   @Output() backToLoginClicked = new EventEmitter<void>();
 
   submitMessage = '';
+  isError = false;
+  submitting = false;
 
   forgotPasswordForm = {
     email: '',
   };
 
-  onSubmit(): void {
-    if (!this.forgotPasswordForm.email) {
+  async onSubmit(): Promise<void> {
+    const email = this.forgotPasswordForm.email.trim();
+    if (!email) {
+      this.isError = true;
       this.submitMessage = '請輸入您的電子信箱。';
       return;
     }
 
-    // TODO: 呼叫忘記密碼 API，寄送重設連結
-    this.submitMessage = '重設連結已寄送至您的電子信箱（示意）';
-    setTimeout(() => {
-      this.backToLogin();
-    }, 2000);
+    this.submitting = true;
+    this.isError = false;
+    this.submitMessage = '';
+
+    try {
+      this.submitMessage = await this.passwordReset.requestResetEmail(email);
+    } catch (error) {
+      this.isError = true;
+      this.submitMessage = toLoginMessage(error, email);
+    } finally {
+      this.submitting = false;
+    }
   }
 
   backToLogin(): void {

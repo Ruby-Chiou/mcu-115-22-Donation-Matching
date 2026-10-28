@@ -4,8 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { CompanyCertificateRegistry } from '../../../core/auth/company-certificate.registry';
+import { oauthRedirectUrl } from '../../../core/auth/oauth-redirect-url';
 import { registrationPasswordMessage, registrationPhoneMessage } from '../../../core/auth/registration-rules';
 import { toLoginMessage } from '../../../core/auth/login-message';
+import { AuthRedirectService } from '../../../core/services/auth/auth-redirect.service';
+import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
+import { PasswordResetService } from '../../../core/services/auth/password-reset.service';
 import { SocialAuthService, SocialProvider } from '../../../core/services/auth/social-auth.service';
 import { SupabaseService } from '../../../core/services/database/supabase.service';
 
@@ -21,6 +25,9 @@ export class DonorRegisterComponent {
   private readonly social = inject(SocialAuthService);
   private readonly certificates = inject(CompanyCertificateRegistry);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthSessionService);
+  private readonly redirect = inject(AuthRedirectService);
+  private readonly passwordReset = inject(PasswordResetService);
 
   @Output() backToRoleSelection = new EventEmitter<void>();
   @ViewChild('donorFormRef') donorFormRef!: ElementRef;
@@ -29,6 +36,17 @@ export class DonorRegisterComponent {
   submitMessage = '';
   isError = false;
   submitting = false;
+  showPassword = false;
+  showConfirmPassword = false;
+
+  togglePassword(field: 'password' | 'confirm' = 'password'): void {
+    if (field === 'confirm') {
+      this.showConfirmPassword = !this.showConfirmPassword;
+      return;
+    }
+
+    this.showPassword = !this.showPassword;
+  }
 
   donorForm = {
     email: '',
@@ -128,6 +146,7 @@ export class DonorRegisterComponent {
         email,
         password: this.donorForm.password,
         options: {
+          emailRedirectTo: oauthRedirectUrl(window.location.origin, document.querySelector('base')?.getAttribute('href')),
           data: {
             role: 'donor',
             donor_kind: this.kind,
@@ -146,8 +165,29 @@ export class DonorRegisterComponent {
 
       if (error) {
         this.isError = true;
-        this.submitMessage = /already registered/i.test(error.message) ? '此信箱已經註冊，請直接登入。' : toLoginMessage(error);
+        if (/already registered/i.test(error.message)) {
+          try {
+            await this.passwordReset.requestResetEmail(email);
+            this.submitMessage =
+              '此信箱已經註冊。若曾用 Google 登入、現在要改用密碼，客服信箱已寄出設定密碼連結（請查收件匣與垃圾郵件）。';
+          } catch {
+            this.submitMessage = '此信箱已經註冊。請直接登入；若曾用 Google，請改按 Google 或到忘記密碼設定密碼。';
+          }
+          return;
+        }
+
+        this.submitMessage = toLoginMessage(error, email);
         return;
+      }
+
+      let hasSession = !!data.session;
+      if (!hasSession) {
+        try {
+          await this.auth.signIn(email, this.donorForm.password, true);
+          hasSession = this.auth.principal().role !== 'guest';
+        } catch {
+          hasSession = false;
+        }
       }
 
       if (this.kind === 'company') {
@@ -158,20 +198,20 @@ export class DonorRegisterComponent {
           email,
           password: this.donorForm.password,
         });
-        const verifyHint = data.session ? '' : '若登入時提示信箱尚未啟用，請先點啟用連結；那只是開啟帳號，不是身分審核。';
-        this.submitMessage = `公司註冊已送出。管理者會查公開公司登記並打電話確認，不會用確認信當作身分審核。${verifyHint}這台裝置的憑證是「${card.agencyName}／${card.holderName}」。`;
-        if (data.session) {
-          await this.router.navigate(['/member'], { queryParams: { notice: 'company-review' } });
+        this.submitMessage = `公司註冊已送出。管理者會查公開公司登記並打電話確認。這台裝置的憑證是「${card.agencyName}／${card.holderName}」。即將進入會員專區…`;
+        if (hasSession) {
+          await this.redirect.navigateAfterNotice('/member?notice=company-review');
         }
         return;
       }
 
-      if (data.session) {
-        await this.router.navigateByUrl('/home');
+      if (hasSession) {
+        this.submitMessage = '註冊成功，即將進入首頁…';
+        await this.redirect.navigateAfterNotice('/home');
         return;
       }
 
-      this.submitMessage = '註冊已送出。請到信箱點啟用連結後即可登入，個人捐助者不需另外審核。';
+      this.submitMessage = '註冊已送出。Gmail 或學校信箱都可直接用帳密密碼登入；若仍提示未啟用，請到收件匣（含垃圾郵件）點啟用連結後再登入。';
     } catch (error) {
       this.isError = true;
       this.submitMessage = toLoginMessage(error);
