@@ -6,7 +6,7 @@
 }
 
 @if (embedded()) {
-  <p class="section-hint">審核通過的寄送捐助，由捐助者在這裡選擇物流公司並上傳單號。機構只看得到你上傳的資料，貨到了才做簽收回報。</p>
+  <p class="section-hint">左邊點一筆就能在右邊直接修改、撤回或上傳物流。收件匣的審核信也會帶你回到對應這一筆。</p>
 }
 
 <div class="history-toolbar">
@@ -65,6 +65,17 @@
               <span>收件：{{ record.recipient }}</span>
             }
           </div>
+          @if (nextStep(record); as step) {
+            <p class="next-action" [attr.data-tone]="statusTone(record.status)">
+              @if (step.kind === 'action') {
+                下一步：{{ step.listLabel }}
+              } @else if (step.kind === 'wait') {
+                狀態：{{ step.listLabel }}
+              } @else {
+                下一步：{{ step.listLabel }}
+              }
+            </p>
+          }
         </li>
       } @empty {
         <li class="empty">
@@ -92,6 +103,136 @@
               </li>
             }
           </ol>
+
+          @if (nextStep(record); as step) {
+            @if (step.kind === 'action') {
+              <p class="detail-next-action" data-tone="review">現在可操作：{{ step.detailLabel }}</p>
+            } @else if (step.kind === 'wait') {
+              <p class="detail-next-action" data-tone="review">目前狀態：{{ step.detailLabel }}</p>
+            } @else {
+              <p class="detail-next-action" data-tone="rejected">{{ step.detailLabel }}</p>
+            }
+          }
+
+          @if (canSupplement(record)) {
+            <div class="tracking-form pending-revise closed-action-panel">
+              <p class="shortcut-hint">
+                在<strong>同一筆申請</strong>補上傳物資照片後再送審即可，不必重跑整段捐助流程。
+                @if (record.aiReason) {
+                  <br />原因：{{ record.aiReason }}
+                }
+                @if (record.humanReason) {
+                  <br />機構說明：{{ record.humanReason }}
+                }
+              </p>
+              <label>
+                補上傳物資照片
+                <input type="file" accept="image/*" multiple (change)="onSupplementFilesSelected($event)" />
+              </label>
+              @if (supplementFiles().length > 0) {
+                <p class="shortcut-hint">已選 {{ supplementFiles().length }} 張照片</p>
+              }
+              @if (record.status === 'needs_supplement') {
+                <label>
+                  實際物資（可一併修正）
+                  <input [value]="materialDraft()" (input)="materialDraft.set($any($event.target).value)" />
+                </label>
+                <label>
+                  數量
+                  <input type="number" min="1" [value]="quantityDraft()" (input)="quantityDraft.set(+$any($event.target).value || 1)" />
+                </label>
+              }
+              <div class="detail-actions">
+                <button type="button" class="btn btn-primary" [disabled]="pendingSaving()" (click)="submitSupplement(record)">
+                  {{ pendingSaving() ? '送出中...' : '補件並重新送審' }}
+                </button>
+              </div>
+              @if (pendingMessage()) {
+                <p class="tracking-message">{{ pendingMessage() }}</p>
+              }
+            </div>
+          }
+
+          @if (canRevise(record) && !canSupplement(record)) {
+            <div class="tracking-form pending-revise">
+              <p class="shortcut-hint">機構尚未決定前，可以修改物資內容或撤回這筆申請。</p>
+              @if (!editingPending()) {
+                <div class="detail-actions">
+                  <button type="button" class="btn btn-primary" [disabled]="pendingSaving()" (click)="startEditPending()">修改申請</button>
+                  <button type="button" class="btn btn-outline" [disabled]="pendingSaving()" (click)="withdrawPending(record)">撤回申請</button>
+                </div>
+              } @else {
+                <label>
+                  實際物資
+                  <input [value]="materialDraft()" (input)="materialDraft.set($any($event.target).value)" />
+                </label>
+                <label>
+                  數量
+                  <input type="number" min="1" [value]="quantityDraft()" (input)="quantityDraft.set(+$any($event.target).value || 1)" />
+                </label>
+                <label>
+                  捐贈方式
+                  <select [value]="methodDraft()" (change)="methodDraft.set($any($event.target).value)">
+                    <option value="寄送">寄送</option>
+                    <option value="面交">面交</option>
+                  </select>
+                </label>
+                <label>
+                  備註
+                  <textarea rows="2" [value]="noteDraft()" (input)="noteDraft.set($any($event.target).value)"></textarea>
+                </label>
+                <div class="detail-actions">
+                  <button type="button" class="btn btn-primary" [disabled]="pendingSaving()" (click)="savePending(record)">
+                    {{ pendingSaving() ? '儲存中...' : '儲存修改' }}
+                  </button>
+                  <button type="button" class="btn btn-outline" [disabled]="pendingSaving()" (click)="cancelEditPending(record)">取消</button>
+                </div>
+              }
+              @if (pendingMessage()) {
+                <p class="tracking-message">{{ pendingMessage() }}</p>
+              }
+            </div>
+          }
+
+          @if (record.status === 'human_approved' && record.donationMethod === '寄送') {
+            <form class="tracking-form" (submit)="$event.preventDefault(); saveTracking(record)">
+              <p class="shortcut-hint">審核已通過：請選擇物流公司並上傳單號，機構才能簽收。</p>
+              <label for="logistics-carrier">物流公司</label>
+              <select id="logistics-carrier" [value]="carrierDraft()" (change)="onCarrierChange($event)">
+                <option value="">請選擇</option>
+                @for (carrier of carriers; track carrier) {
+                  <option [value]="carrier">{{ carrier }}</option>
+                }
+              </select>
+              <label for="tracking-no">物流單號</label>
+              <input
+                id="tracking-no"
+                [value]="trackingDraft()"
+                (input)="onTrackingInput($event)"
+                placeholder="寄出後填上單號"
+                autocomplete="off"
+              />
+              <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
+                {{ trackingSaving() ? '上傳中...' : (record.trackingNo ? '更新物流資料' : '上傳物流資料') }}
+              </button>
+              @if (trackingMessage()) {
+                <p class="tracking-message">{{ trackingMessage() }}</p>
+              }
+            </form>
+          }
+
+          @if (record.status === 'human_approved' && record.donationMethod === '寄送' && record.trackingNo) {
+            <p class="shortcut-hint">
+              {{ record.logisticsCarrier || '尚未選擇物流公司' }}，單號 {{ record.trackingNo }} 已給受助機構。
+              @if (record.receiptConfirmedAt) {
+                機構已簽收。
+                @if (record.receiptPartial) { 數量較多，沒有全部拆箱拍攝。 }
+                @if (record.receiptDeclinedVideo) { 這次沒有錄影，之後爭議由雙方各自承擔。 }
+              } @else {
+                機構收到貨後會拍照回報。
+              }
+            </p>
+          }
 
           <dl class="detail-list">
             <dt>需求物資</dt>
@@ -127,6 +268,8 @@
                 通過
               } @else if (record.aiDecision === 'rejected') {
                 不通過
+              } @else if (record.status === 'pending_ai_review') {
+                審核中
               } @else {
                 尚未完成
               }
@@ -171,7 +314,7 @@
           </dl>
 
           <form class="tracking-form" (submit)="$event.preventDefault(); saveVisibility(record)">
-            <p class="shortcut-hint">可調整感謝牆的公開方式與顯示名稱。</p>
+            <p class="shortcut-hint">可調整感謝牆的公開方式與顯示名稱（與審核結果無關）。</p>
             <label>
               <input type="radio" name="history-name-mode" value="masked" [checked]="nameModeDraft() === 'masked'" (change)="nameModeDraft.set('masked')" />
               匿名
@@ -196,45 +339,6 @@
             }
           </form>
 
-          @if (record.status === 'human_approved' && record.donationMethod === '寄送') {
-            <form class="tracking-form" (submit)="$event.preventDefault(); saveTracking(record)">
-              <label for="logistics-carrier">物流公司</label>
-              <select id="logistics-carrier" [value]="carrierDraft()" (change)="onCarrierChange($event)">
-                <option value="">請選擇</option>
-                @for (carrier of carriers; track carrier) {
-                  <option [value]="carrier">{{ carrier }}</option>
-                }
-              </select>
-              <label for="tracking-no">物流單號</label>
-              <input
-                id="tracking-no"
-                [value]="trackingDraft()"
-                (input)="onTrackingInput($event)"
-                placeholder="寄出後填上單號"
-                autocomplete="off"
-              />
-              <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
-                {{ trackingSaving() ? '上傳中...' : (record.trackingNo ? '更新物流資料' : '上傳物流資料') }}
-              </button>
-              <p class="shortcut-hint">請選擇寄出時使用的物流公司，並填上單號。</p>
-              @if (trackingMessage()) {
-                <p class="tracking-message">{{ trackingMessage() }}</p>
-              }
-            </form>
-          }
-
-          @if (record.status === 'human_approved' && record.donationMethod === '寄送' && record.trackingNo) {
-            <p class="shortcut-hint">
-              {{ record.logisticsCarrier || '尚未選擇物流公司' }}，單號 {{ record.trackingNo }} 已給受助機構。
-              @if (record.receiptConfirmedAt) {
-                機構已簽收。
-                @if (record.receiptPartial) { 數量較多，沒有全部拆箱拍攝。 }
-                @if (record.receiptDeclinedVideo) { 這次沒有錄影，之後爭議由雙方各自承擔。 }
-              } @else {
-                機構收到貨後會拍照回報。
-              }
-            </p>
-          }
           <div class="detail-actions">
             <a class="btn btn-outline" [routerLink]="['/donor/daily/detail', record.demandId]">查看原需求</a>
             <a

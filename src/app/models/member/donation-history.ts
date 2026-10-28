@@ -38,6 +38,7 @@ export interface DonorDonationHistory {
 export const DONATION_HISTORY_STATUS_LABELS: Record<DonationStatus, string> = {
   pending_ai_review: 'AI 審核中',
   pending_human_review: '機構審核中',
+  needs_supplement: '需補件',
   human_approved: '已通過',
   human_rejected: '未通過',
 };
@@ -46,5 +47,5 @@ export const DONATION_HISTORY_FILTER_OPTIONS: { value: DonationHistoryFilter; la
   { value: 'ALL', label: '全部' },
   { value: 'IN_REVIEW', label: '審核中' },
   { value: 'APPROVED', label: '已通過' },
-  { value: 'REJECTED', label: '未通過' },
+  { value: 'REJECTED', label: '未通過／需補件' },
 ];

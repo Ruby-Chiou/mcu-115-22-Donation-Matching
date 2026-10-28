@@ -7,6 +7,46 @@ html {
   overflow-x: clip;
 }
 
+/* 隱藏瀏覽器內建顯示密碼鈕，改由表單常駐的切換按鈕控制 */
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+  display: none;
+}
+
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.password-field input {
+  padding-right: 48px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-8, 8px);
+  background: transparent;
+  color: var(--color-text-medium, #5c6b7a);
+  cursor: pointer;
+}
+
+.password-toggle:hover,
+.password-toggle:focus-visible {
+  color: var(--color-brand-primary, #1b6ca8);
+  outline: none;
+}
+
 img,
 video {
   max-width: 100%;

@@ -50,6 +50,58 @@
   line-height: var(--line-height-relaxed);
 }
 
+.scope-switch {
+  display: inline-flex;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+}
+
+.scope-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.15rem;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &.active {
+    background: var(--primary);
+    color: #fff;
+  }
+}
+
+.scope-count {
+  min-width: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 16%, transparent);
+  font-size: 0.8rem;
+  line-height: 1.35rem;
+  text-align: center;
+}
+
+.filter-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-small);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .filter-panel {
   margin-bottom: 30px;
 }

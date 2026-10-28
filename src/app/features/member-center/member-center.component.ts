@@ -37,7 +37,7 @@ export class MemberCenterComponent {
   private readonly notifications = inject(MemberNotificationSettingsService);
   private readonly mail = inject(MemberMailDispatchService);
 
-  readonly activeTab = signal<MemberTab>('profile');
+  readonly activeTab = signal<MemberTab>('inbox');
   protected readonly companyNotice = computed(() => companyNoticeText(this.auth.principal()));
 
   constructor() {
@@ -49,6 +49,12 @@ export class MemberCenterComponent {
       const raw = params.get('tab');
       const tab = (raw === 'certificates' ? 'acknowledgements' : raw) as MemberTab | null;
 
+      // 從信件帶 record 進來時，自動切到捐助紀錄
+      if (params.get('record') && (!tab || tab === 'history')) {
+        this.activeTab.set('history');
+        return;
+      }
+
       if (tab && MEMBER_TABS.includes(tab)) {
         this.activeTab.set(tab);
       }
@@ -58,7 +64,7 @@ export class MemberCenterComponent {
   selectTab(tab: MemberTab): void {
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { tab },
+      queryParams: { tab, record: tab === 'history' ? this.route.snapshot.queryParamMap.get('record') : null },
       queryParamsHandling: 'merge',
     });
   }

@@ -54,43 +54,39 @@ $$;
 
 revoke all on function public.seed_dev_login(uuid, text, text, text, text) from public, anon, authenticated;
 
--- 企業捐助者（留言名片與企業審核流程用）
+-- 企業捐助者（留言名片與企業審核流程用）。只依公司信箱對帳，勿硬改其他測試個人 UUID。
 select public.seed_dev_login(
-  '55555555-5555-4555-8555-555555555555',
+  '44444444-4444-4444-8444-444444444444',
   'dev.company@example.com',
   'Km7#company-Gate',
   '測試愛心企業',
   'donor'
 );
 
--- 信箱可能已掛在別的 user_id：只補缺，並把既有列標成企業捐助者
 insert into public.user_accounts (user_id, email, display_name, role, donor_kind)
 select
-  '55555555-5555-4555-8555-555555555555',
+  u.id,
   'dev.company@example.com',
   '測試愛心企業',
   'donor',
   'company'
-where not exists (
-  select 1 from public.user_accounts
-  where user_id = '55555555-5555-4555-8555-555555555555'
-     or email = 'dev.company@example.com'
-);
+from auth.users u
+where u.email = 'dev.company@example.com'
+  and not exists (
+    select 1 from public.user_accounts a where a.email = 'dev.company@example.com' or a.user_id = u.id
+  )
+limit 1;
 
 update public.user_accounts
 set display_name = '測試愛心企業',
     role = 'donor',
     donor_kind = 'company'
-where email = 'dev.company@example.com'
-   or user_id = '55555555-5555-4555-8555-555555555555';
+where email = 'dev.company@example.com';
 
 insert into public.donor_profiles
   ("uid", "email", "displayName", "accountName", "fullName", "phoneNumber", "city", "loginProvider", "accountStatus")
 select
-  coalesce(
-    (select user_id::text from public.user_accounts where email = 'dev.company@example.com' limit 1),
-    '55555555-5555-4555-8555-555555555555'
-  ),
+  a.user_id::text,
   'dev.company@example.com',
   '測試愛心企業',
   'demo_company',
@@ -99,33 +95,28 @@ select
   '台北市',
   'email',
   'ACTIVE'
-where not exists (
-  select 1 from public.donor_profiles
-  where "email" = 'dev.company@example.com'
-     or "uid" in (
-       '55555555-5555-4555-8555-555555555555',
-       (select user_id::text from public.user_accounts where email = 'dev.company@example.com' limit 1)
-     )
-);
+from public.user_accounts a
+where a.email = 'dev.company@example.com'
+  and not exists (
+    select 1 from public.donor_profiles p
+    where p."email" = 'dev.company@example.com' or p."uid" = a.user_id::text
+  )
+limit 1;
 
 insert into public.member_notification_settings ("uid")
-select coalesce(
-  (select user_id::text from public.user_accounts where email = 'dev.company@example.com' limit 1),
-  '55555555-5555-4555-8555-555555555555'
-)
-where not exists (
-  select 1 from public.member_notification_settings s
-  where s."uid" = coalesce(
-    (select user_id::text from public.user_accounts where email = 'dev.company@example.com' limit 1),
-    '55555555-5555-4555-8555-555555555555'
+select a.user_id::text
+from public.user_accounts a
+where a.email = 'dev.company@example.com'
+  and not exists (
+    select 1 from public.member_notification_settings s where s."uid" = a.user_id::text
   )
-);
+limit 1;
 
 insert into public.donor_company_applications (
   user_id, company_name, tax_id, representative, contact_phone, address, document_name, status, reviewed_at
 )
 select
-  u.id,
+  a.user_id,
   '測試愛心企業',
   '12345678',
   '王經理',
@@ -134,10 +125,8 @@ select
   'company-registration.pdf',
   'approved',
   now()
-from auth.users u
-where u.email = 'dev.company@example.com'
-   or u.id = '55555555-5555-4555-8555-555555555555'
-order by case when u.id = '55555555-5555-4555-8555-555555555555' then 0 else 1 end
+from public.user_accounts a
+where a.email = 'dev.company@example.com'
 limit 1
 on conflict (user_id) do update
 set status = 'approved',
@@ -156,7 +145,7 @@ where uid = '22222222-2222-4222-8222-222222222222';
 do $$
 declare
   donor_uid text := '11111111-1111-4111-8111-111111111111';
-  company_uid text := '55555555-5555-4555-8555-555555555555';
+  company_uid text := '44444444-4444-4444-8444-444444444444';
   agency_uid text := '22222222-2222-4222-8222-222222222222';
   daily_id bigint;
   disaster_id bigint;
@@ -439,13 +428,13 @@ begin
         (
           donor_uid, '測試捐助者', agency_uid, '示範社福機構',
           'DONATION', '捐助審核結果：台糖礦泉水',
-          '您的面交捐助已通過。請依約定時間送達台北市大安區希望路 10 號。',
+          '您的面交捐助已通過。請依約定時間送達台北市大安區希望路 10 號。' || E'\n捐助編號：a1111111-1111-4111-8111-111111111103',
           false, now() - interval '1 day'
         ),
         (
           donor_uid, '測試捐助者', agency_uid, '示範社福機構',
           'DONATION', '捐助審核結果：過期飲用水',
-          '很抱歉，這筆捐助因有效期限不符合需求而未通過。',
+          '很抱歉，這筆捐助因有效期限不符合需求而未通過。' || E'\n捐助編號：a1111111-1111-4111-8111-111111111106',
           true, now() - interval '6 days'
         ),
         (
@@ -457,7 +446,7 @@ begin
         (
           company_uid, '測試愛心企業', agency_uid, '示範社福機構',
           'DONATION', '企業捐助已通過',
-          '企業批量瓶裝水已通過審核，請到捐助紀錄上傳物流單號。',
+          '企業批量瓶裝水已通過審核，請到捐助紀錄上傳物流單號。' || E'\n捐助編號：a1111111-1111-4111-8111-111111111107',
           false, now() - interval '1 day'
         );
     end if;

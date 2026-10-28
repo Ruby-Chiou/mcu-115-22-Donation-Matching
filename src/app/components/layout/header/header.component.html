@@ -22,7 +22,7 @@
             @for (item of navItems; track item.name) {
               <div class="nav-item-with-dropdown">
                 <a [routerLink]="item.link">
-                  {{ item.name }}
+                  <span class="nav-label">{{ navLabel(item.name) }}</span>
                   @if (item.sub.length) {
                     <i class="fa-solid fa-chevron-down arrow"></i>
                   }

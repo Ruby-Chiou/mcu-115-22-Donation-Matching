@@ -53,6 +53,7 @@ export class AgencyLoginComponent {
     this.submitMessage = '';
 
     try {
+      this.submitMessage = '憑證驗證成功，即將進入受助者後台…';
       await this.redirect.signIn(
         login.email,
         login.password,
@@ -63,7 +64,6 @@ export class AgencyLoginComponent {
       this.gateOpen = false;
       this.isError = true;
       this.submitMessage = toLoginMessage(error);
-    } finally {
       this.submitting = false;
     }
   }

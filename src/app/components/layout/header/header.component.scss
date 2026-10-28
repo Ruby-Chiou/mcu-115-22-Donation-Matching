@@ -81,8 +81,18 @@ header {
         display: flex;
         align-items: center;
         gap: var(--space-6);
+        white-space: normal;
+
+        .nav-label {
+          display: inline-block;
+          line-height: 1.2;
+          text-align: center;
+          overflow-wrap: anywhere;
+          word-break: keep-all;
+        }
 
         .arrow {
+          flex-shrink: 0;
           font-size: var(--font-size-11);
           transition: transform 0.2s;
         }
@@ -222,6 +232,33 @@ header {
     }
   }
 
+  /* 平板橫向／窄筆電仍用橫向導覽時：兩字一行，避免「專區」只剩一個字掉下去。 */
+  @media (min-width: #{bp.$screen-desktop}) and (max-width: 1280px) {
+    .nav-wrapper {
+      height: auto;
+      min-height: var(--layout-header-height);
+      padding-block: 8px;
+    }
+
+    .center nav {
+      gap: 14px;
+
+      .nav-item-with-dropdown {
+        padding-bottom: 8px;
+        margin-bottom: -8px;
+
+        & > a {
+          align-items: flex-start;
+
+          .nav-label {
+            max-width: 2.05em;
+            word-break: break-all;
+          }
+        }
+      }
+    }
+  }
+
   @include bp.below-desktop {
     .container {
       position: relative;
@@ -316,10 +353,20 @@ header {
 
         & > a {
           padding: 14px 20px;
+          align-items: center;
+
+          .nav-label {
+            max-width: none;
+            word-break: keep-all;
+            text-align: left;
+          }
         }
 
         .arrow {
-          display: none;
+          display: inline-block;
+          margin-left: 6px;
+          font-size: 0.75em;
+          opacity: 0.75;
         }
 
         &:hover > a .arrow {

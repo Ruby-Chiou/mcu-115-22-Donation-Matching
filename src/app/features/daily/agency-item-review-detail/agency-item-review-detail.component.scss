@@ -133,6 +133,20 @@
   }
 }
 
+.ai-action-panel {
+  margin-top: 16px;
+  padding: var(--space-16);
+  border: 1px solid color-mix(in srgb, var(--color-action) 28%, var(--border-soft));
+  border-radius: var(--radius-12);
+  background: color-mix(in srgb, var(--color-action) 6%, #fff);
+}
+
+.ai-action-message {
+  margin: 12px 0 0;
+  color: var(--color-action-dark, #0f56a8);
+  font-weight: var(--font-weight-semibold);
+}
+
 .media-button-list {
   display: flex;
   flex-wrap: wrap;

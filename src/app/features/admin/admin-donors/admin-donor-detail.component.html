@@ -40,6 +40,10 @@
         <button type="button" class="ghost" [class.active-action]="panel() === 'blacklist'" (click)="showPanel('blacklist')">黑名單</button>
         @if (person.accountStatus === 'ACTIVE') {
           <button type="button" class="warn" [disabled]="saving()" (click)="setStatus('SUSPENDED')">停用帳號</button>
+          <button type="button" class="warn" [disabled]="saving()" (click)="cancelAccount()">註銷帳號</button>
+        } @else if (person.accountStatus === 'SUSPENDED') {
+          <button type="button" [disabled]="saving()" (click)="setStatus('ACTIVE')">恢復使用</button>
+          <button type="button" class="warn" [disabled]="saving()" (click)="cancelAccount()">註銷帳號</button>
         } @else {
           <button type="button" [disabled]="saving()" (click)="setStatus('ACTIVE')">恢復使用</button>
         }

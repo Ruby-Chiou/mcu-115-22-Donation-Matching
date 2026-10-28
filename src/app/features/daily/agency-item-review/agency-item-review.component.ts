@@ -7,6 +7,9 @@ import { DonationService } from '../../../core/services/agency-daily-demand/dail
 
 import { RecipientDonationReview } from '../../../models/agency/item-review';
 
+type ListScope = 'open' | 'done';
+type CreatedWithin = 'all' | '7d' | '30d' | '90d';
+
 @Component({
   selector: 'app-agency-item-review',
   standalone: true,
@@ -22,30 +25,20 @@ export class AgencyItemReviewComponent implements OnInit {
 
   isFilterExpanded = false;
   searchTerm = '';
+  listScope: ListScope = 'open';
+  createdWithin: CreatedWithin = 'all';
 
   readonly aiDecisionOptions = [
     { value: 'accepted', label: '通過' },
     { value: 'rejected', label: '不通過' },
   ] as const;
 
-  readonly categoryOptions = [
-    '食品與飲用水',
-    '衣物與保暖用品',
-    '醫療與照護用品',
-    '清潔與衛生用品',
-    '嬰幼兒用品',
-    '長者與身心障礙用品',
-    '女性生理用品',
-    '寵物與動物用品',
-    '防災與照明用品',
-    '通訊與求救用品',
-    '生活與炊事用品',
-    '居住安置與修繕用品',
-    '其他',
+  readonly createdWithinOptions: { value: CreatedWithin; label: string }[] = [
+    { value: 'all', label: '全部時間' },
+    { value: '7d', label: '近 7 天' },
+    { value: '30d', label: '近 30 天' },
+    { value: '90d', label: '近 90 天' },
   ];
-
-  readonly priorityOptions = ['普通', '緊急', '非常緊急'];
-  readonly receiveMethodOptions: Array<'寄送' | '面交'> = ['寄送', '面交'];
 
   selectedFilters = {
     aiDecision: [] as string[],
@@ -80,6 +73,7 @@ export class AgencyItemReviewComponent implements OnInit {
       this.donations = [...donations];
 
       await this.loadDonationConditions();
+      this.pruneUnavailableFilters();
     } catch (error) {
       console.error('讀取物資審核列表失敗：', error);
 
@@ -90,10 +84,40 @@ export class AgencyItemReviewComponent implements OnInit {
     }
   }
 
-  /**
-   * 每一筆 donation 用自己的 demand_id
-   * 查詢 agency_daily_supply_items.conditions
-   */
+  /** 類別／優先度／接收方式：只顯示目前列表實際有的選項。 */
+  get categoryOptions(): string[] {
+    return this.uniqueSorted(this.donations.map((donation) => donation.demand_category ?? ''));
+  }
+
+  get priorityOptions(): string[] {
+    return this.uniqueSorted(this.donations.map((donation) => donation.demand_priority ?? ''));
+  }
+
+  get receiveMethodOptions(): string[] {
+    return this.uniqueSorted(this.donations.map((donation) => donation.donation_method ?? ''));
+  }
+
+  get openCount(): number {
+    return this.openDonations.length;
+  }
+
+  get doneCount(): number {
+    return this.doneDonations.length;
+  }
+
+  get openDonations(): RecipientDonationReview[] {
+    return this.donations.filter((donation) => this.isOpenStatus(donation.status));
+  }
+
+  get doneDonations(): RecipientDonationReview[] {
+    return this.donations.filter((donation) => this.isDoneStatus(donation.status));
+  }
+
+  get filteredDonations(): RecipientDonationReview[] {
+    const source = this.listScope === 'open' ? this.openDonations : this.doneDonations;
+    return this.filterDonations(source);
+  }
+
   private async loadDonationConditions(): Promise<void> {
     this.donationConditions.clear();
 
@@ -112,27 +136,10 @@ export class AgencyItemReviewComponent implements OnInit {
     );
   }
 
-  /**
-   * 取得這筆物資對應的原始 conditions
-   */
   getConditions(donation: RecipientDonationReview): string[] {
     return this.donationConditions.get(donation.id) ?? [];
   }
 
-  /**
-   * 只保留「接受」的狀態名稱
-   *
-   * 例如：
-   * [
-   *   '全新:接受',
-   *   '二手:接受',
-   *   '有擦痕:接受',
-   *   '毀損:不接受'
-   * ]
-   *
-   * 回傳：
-   * ['全新', '二手', '有擦痕']
-   */
   getAcceptedConditions(donation: RecipientDonationReview): string[] {
     return this.getConditions(donation)
       .filter((condition) => {
@@ -147,28 +154,16 @@ export class AgencyItemReviewComponent implements OnInit {
       });
   }
 
-  /**
-   * 直接顯示：
-   * 全新、二手、有擦痕
-   */
   getAcceptedConditionsText(donation: RecipientDonationReview): string {
     return this.getAcceptedConditions(donation).join('、');
   }
 
-  get pendingDonations(): RecipientDonationReview[] {
-    return this.donations.filter((donation) => donation.status === 'pending_ai_review' || donation.status === 'pending_human_review');
+  setListScope(scope: ListScope): void {
+    this.listScope = scope;
   }
 
-  get completedDonations(): RecipientDonationReview[] {
-    return this.donations.filter((donation) => donation.status === 'human_approved' || donation.status === 'human_rejected');
-  }
-
-  get filteredPendingDonations(): RecipientDonationReview[] {
-    return this.filterDonations(this.pendingDonations);
-  }
-
-  get filteredCompletedDonations(): RecipientDonationReview[] {
-    return this.filterDonations(this.completedDonations);
+  setCreatedWithin(value: CreatedWithin): void {
+    this.createdWithin = value;
   }
 
   toggleFilter(key: 'aiDecision' | 'category' | 'priority' | 'receiveMethod', value: string): void {
@@ -189,13 +184,32 @@ export class AgencyItemReviewComponent implements OnInit {
       priority: [],
       receiveMethod: [],
     };
+    this.createdWithin = 'all';
+    this.searchTerm = '';
   }
 
   private filterDonations(donations: RecipientDonationReview[]): RecipientDonationReview[] {
     const searchTerm = this.searchTerm.trim().toLocaleLowerCase();
+    const oldest = this.createdWithinCutoff();
 
     return donations.filter((donation) => {
-      if (searchTerm && !(donation.demand_material ?? '').toLocaleLowerCase().includes(searchTerm)) {
+      if (searchTerm) {
+        const haystack = [
+          donation.demand_material,
+          donation.actual_material,
+          donation.donor_name,
+          donation.demand_category,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLocaleLowerCase();
+
+        if (!haystack.includes(searchTerm)) {
+          return false;
+        }
+      }
+
+      if (oldest && new Date(donation.created_at).getTime() < oldest) {
         return false;
       }
 
@@ -228,6 +242,37 @@ export class AgencyItemReviewComponent implements OnInit {
     });
   }
 
+  private createdWithinCutoff(): number | null {
+    if (this.createdWithin === 'all') {
+      return null;
+    }
+
+    const days = this.createdWithin === '7d' ? 7 : this.createdWithin === '30d' ? 30 : 90;
+    return Date.now() - days * 24 * 60 * 60 * 1000;
+  }
+
+  private pruneUnavailableFilters(): void {
+    const categories = new Set(this.categoryOptions);
+    const priorities = new Set(this.priorityOptions);
+    const methods = new Set(this.receiveMethodOptions);
+
+    this.selectedFilters.category = this.selectedFilters.category.filter((item) => categories.has(item));
+    this.selectedFilters.priority = this.selectedFilters.priority.filter((item) => priorities.has(item));
+    this.selectedFilters.receiveMethod = this.selectedFilters.receiveMethod.filter((item) => methods.has(item));
+  }
+
+  private uniqueSorted(values: string[]): string[] {
+    return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right, 'zh-Hant'));
+  }
+
+  private isOpenStatus(status: RecipientDonationReview['status']): boolean {
+    return status === 'pending_human_review' || status === 'pending_ai_review' || status === 'needs_supplement';
+  }
+
+  private isDoneStatus(status: RecipientDonationReview['status']): boolean {
+    return status === 'human_approved' || status === 'human_rejected';
+  }
+
   getAiDecisionText(decision: string | null): string {
     if (decision === 'accepted') {
       return '通過';
@@ -240,16 +285,28 @@ export class AgencyItemReviewComponent implements OnInit {
     return '等待 AI 審核';
   }
 
-  getFinalDecisionText(donation: RecipientDonationReview): string {
+  statusLabel(donation: RecipientDonationReview): string {
+    if (donation.status === 'pending_ai_review') {
+      return 'AI 審核中';
+    }
+
+    if (donation.status === 'needs_supplement') {
+      return '待捐助者補件';
+    }
+
+    if (donation.status === 'pending_human_review') {
+      return '待機構決定';
+    }
+
     if (donation.status === 'human_approved') {
       return '已接受';
     }
 
     if (donation.status === 'human_rejected') {
-      return '不接受';
+      return '未通過';
     }
 
-    return '尚未決定';
+    return '處理中';
   }
 
   openDonation(donation: RecipientDonationReview): void {

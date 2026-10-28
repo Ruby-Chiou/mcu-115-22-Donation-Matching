@@ -30,6 +30,17 @@ export class AgencyRegisterComponent {
 
   submitMessage = '';
   submitting = false;
+  showPassword = false;
+  showConfirmPassword = false;
+
+  togglePassword(field: 'password' | 'confirm' = 'password'): void {
+    if (field === 'confirm') {
+      this.showConfirmPassword = !this.showConfirmPassword;
+      return;
+    }
+
+    this.showPassword = !this.showPassword;
+  }
 
   agencyForm = {
     email: '',

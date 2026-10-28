@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: block;
   height: 100%;
@@ -135,5 +137,12 @@
     background-color: var(--color-action-deep);
 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@include bp.tablet {
+  .right-sidebar {
+    height: auto;
+    min-height: 0;
   }
 }

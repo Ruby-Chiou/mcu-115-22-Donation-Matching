@@ -1,8 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
+import { memberMessageActions } from '../../../core/auth/member-message-actions';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
+import { DonorDonationHistoryService } from '../../../core/services/member-center/donor-donation-history.service';
 import { MemberMessageService } from '../../../core/services/member-center/member-message.service';
 import { MESSAGE_CATEGORY_LABELS, MemberMessage, MessageCategory, MessageFolder } from '../../../models/member/member-message';
 
@@ -10,13 +13,14 @@ type InboxFilter = 'ALL' | 'UNREAD' | 'STARRED' | MessageCategory;
 
 @Component({
   selector: 'app-member-inbox',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, RouterLink],
   templateUrl: './member-inbox.component.html',
   styleUrl: './member-inbox.component.scss',
 })
 export class MemberInboxComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   protected readonly messageService = inject(MemberMessageService);
+  private readonly historyService = inject(DonorDonationHistoryService);
   private readonly auth = inject(AuthSessionService);
 
   readonly categoryLabels = MESSAGE_CATEGORY_LABELS;
@@ -73,12 +77,24 @@ export class MemberInboxComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      await this.messageService.loadAll();
+      const tasks: Promise<unknown>[] = [this.messageService.loadAll()];
+      if (this.auth.principal().role === 'donor') {
+        tasks.push(this.historyService.loadHistory().catch(() => undefined));
+      }
+      await Promise.all(tasks);
     } catch {
       this.errorText.set('無法載入信件，請稍後再試。');
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  /** 捐助／審核信的快捷操作，與捐助紀錄同一套處理頁。 */
+  actionsFor(message: MemberMessage) {
+    return memberMessageActions(message, {
+      role: this.auth.principal().role,
+      records: this.historyService.records(),
+    });
   }
 
   switchFolder(folder: MessageFolder): void {

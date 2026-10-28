@@ -17,6 +17,8 @@ export interface MemberMessage {
   category: MessageCategory;
   subject: string;
   content: string;
+  /** 捐贈進度信對應的日常捐助 id，方便收件匣直接操作 */
+  relatedDonationId: string | null;
   parentId: number | null; // 回覆的原始信件 id
   isRead: boolean;
   isStarred: boolean;

@@ -10,6 +10,7 @@ export interface MemberMessageRow {
   category: string | null;
   subject: string | null;
   content: string | null;
+  relatedDonationId?: string | null;
   parentId: number | string | null;
   isRead: boolean | null;
   isStarred: boolean | null;
@@ -27,6 +28,7 @@ export function mapRowToMemberMessage(row: MemberMessageRow): MemberMessage {
     category: (row.category ?? 'SYSTEM') as MessageCategory,
     subject: row.subject ?? '',
     content: row.content ?? '',
+    relatedDonationId: row.relatedDonationId?.trim() || null,
     parentId: row.parentId == null ? null : Number(row.parentId),
     isRead: row.isRead ?? false,
     isStarred: row.isStarred ?? false,

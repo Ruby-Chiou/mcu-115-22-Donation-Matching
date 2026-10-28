@@ -69,6 +69,11 @@ export class HeaderComponent implements OnInit {
     return navigationFor(this.auth.principal().role, this.disaster.data().isOpen);
   }
 
+  /** 每兩個字插入軟斷行，避免平板寬度只剩「三＋一」的彆扭換行。 */
+  protected navLabel(name: string): string {
+    return name.replace(/(.{2})(?=.)/gu, '$1\u200B');
+  }
+
   protected homeLink(): string {
     return this.auth.principal().role === 'agency' ? '/agency/dashboard' : '/home';
   }

@@ -68,6 +68,9 @@
               }
               {{ message.subject }}
             </div>
+            @if (actionsFor(message).length > 0) {
+              <p class="list-action-hint">可直接處理</p>
+            }
           </div>
         </li>
       } @empty {
@@ -135,6 +138,28 @@
           </header>
 
           <p class="content">{{ message.content }}</p>
+
+          @if (actionsFor(message); as actions) {
+            @if (actions.length > 0) {
+              <div class="message-shortcuts" role="group" aria-label="這封信可直接處理">
+                <p class="shortcut-title">直接處理</p>
+                <div class="shortcut-buttons">
+                  @for (action of actions; track action.label) {
+                    <a
+                      class="btn btn-primary"
+                      [routerLink]="action.commands"
+                      [queryParams]="action.queryParams || null"
+                    >
+                      {{ action.label }}
+                    </a>
+                    @if (action.hint) {
+                      <p class="shortcut-hint">{{ action.hint }}</p>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          }
 
           <div class="detail-actions">
             @if (folder() === 'inbox') {

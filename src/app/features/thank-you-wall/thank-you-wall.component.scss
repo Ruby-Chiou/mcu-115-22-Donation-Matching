@@ -304,6 +304,29 @@
   background-color: var(--color-brand-primary);
 }
 
+@include bp.tablet {
+  .thank-you-page {
+    padding: 24px var(--layout-page-padding) 40px;
+  }
+
+  .wall-layout {
+    flex-direction: column;
+    gap: var(--space-20);
+  }
+
+  .thank-you-wall,
+  .blacklist {
+    flex: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .thank-you-card {
+    flex-wrap: wrap;
+    gap: var(--space-8);
+  }
+}
+
 @include bp.mobile {
   .thank-you-page {
     padding: 20px var(--layout-page-padding) 32px;

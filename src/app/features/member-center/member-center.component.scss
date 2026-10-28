@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 .workspace-title {
   text-align: center;
   margin-top: 60px;
@@ -8,6 +10,13 @@
     font-weight: var(--font-weight-bold);
     color: var(--color-action);
     letter-spacing: var(--tracking-5);
+  }
+
+  .lead {
+    max-width: 40rem;
+    margin: 0.75rem auto 0;
+    color: var(--color-text-medium);
+    line-height: var(--line-height-relaxed);
   }
 }
 
@@ -51,12 +60,14 @@
 
 .switch-area {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
   gap: var(--space-md);
   max-width: 1200px;
   margin: 1.5rem auto 0;
   padding: 0 40px;
+  row-gap: var(--space-8);
 }
 
 .switch-button {
@@ -99,4 +110,27 @@
   max-width: 1200px;
   margin: 1.5rem auto 60px;
   padding: 0 40px;
+}
+
+@include bp.tablet {
+  .workspace-title {
+    margin-top: 32px;
+
+    h1 {
+      font-size: var(--font-size-26);
+    }
+  }
+
+  .switch-area,
+  .member-content {
+    padding: 0 var(--layout-page-padding);
+  }
+
+  .switch-button {
+    font-size: 1rem;
+  }
+
+  .switch-divider {
+    display: none;
+  }
 }

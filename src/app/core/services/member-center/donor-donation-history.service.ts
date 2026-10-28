@@ -161,6 +161,118 @@ export class DonorDonationHistoryService {
     };
   }
 
+  canRevise(record: DonorDonationHistory): boolean {
+    return (
+      record.status === 'pending_ai_review' ||
+      record.status === 'pending_human_review' ||
+      record.status === 'needs_supplement'
+    );
+  }
+
+  /** 需補件或機構未通過：同一筆補圖後再送審，不必重跑申請。 */
+  canSupplement(record: DonorDonationHistory): boolean {
+    return record.status === 'needs_supplement' || record.status === 'human_rejected';
+  }
+
+  async updatePendingDonation(
+    donationId: string,
+    patch: { actualMaterial: string; quantity: number; note: string; donationMethod: string },
+  ): Promise<void> {
+    const uid = await this.session.getCurrentUid();
+    const material = patch.actualMaterial.trim();
+    const quantity = Math.max(1, Math.floor(Number(patch.quantity) || 0));
+    const method = patch.donationMethod.trim();
+
+    if (!material) {
+      throw new Error('請填寫實際物資名稱');
+    }
+
+    if (!method) {
+      throw new Error('請選擇捐贈方式');
+    }
+
+    const { data, error } = await this.supabaseService.client
+      .from(this.donationTable)
+      .update({
+        actual_material: material,
+        quantity,
+        note: patch.note.trim(),
+        donation_method: method,
+      })
+      .eq('id', donationId)
+      .eq('donor_uid', uid)
+      .in('status', ['pending_ai_review', 'pending_human_review', 'needs_supplement'])
+      .select('id')
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message || '無法更新這筆審核中的捐助');
+    }
+
+    if (!data) {
+      throw new Error('只有尚未結案或需補件的捐助可以修改');
+    }
+
+    this.recordsSignal.update((records) =>
+      records.map((record) =>
+        record.id === donationId
+          ? { ...record, actualMaterial: material, quantity, note: patch.note.trim(), donationMethod: method }
+          : record,
+      ),
+    );
+  }
+
+  async withdrawPendingDonation(donationId: string): Promise<void> {
+    const uid = await this.session.getCurrentUid();
+    const { data, error } = await this.supabaseService.client
+      .from(this.donationTable)
+      .delete()
+      .eq('id', donationId)
+      .eq('donor_uid', uid)
+      .in('status', ['pending_ai_review', 'pending_human_review', 'needs_supplement'])
+      .select('id')
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message || '無法撤回這筆捐助');
+    }
+
+    if (!data) {
+      throw new Error('只有尚未結案或需補件的捐助可以撤回');
+    }
+
+    this.recordsSignal.update((records) => records.filter((record) => record.id !== donationId));
+  }
+
+  async resubmitAfterSupplement(donationId: string): Promise<void> {
+    const { data, error } = await this.supabaseService.client.rpc('resubmit_donation_after_supplement', {
+      p_donation_id: donationId,
+    });
+
+    if (error) {
+      throw new Error(error.message || '補件送審失敗，請確認已上傳物資照片');
+    }
+
+    const status = (data as { status?: string } | null)?.status ?? 'pending_ai_review';
+
+    this.recordsSignal.update((records) =>
+      records.map((record) =>
+        record.id === donationId
+          ? {
+              ...record,
+              status: status as DonationStatus,
+              aiDecision: null,
+              aiReason: null,
+              aiCheckedAt: null,
+              humanDecision: null,
+              humanReason: null,
+              humanCheckedAt: null,
+            }
+          : record,
+      ),
+    );
+  }
+
   /** 審核已通過的寄送捐助，才能由捐助者補上物流公司與單號 */
   async saveTrackingNumber(donationId: string, trackingNo: string, logisticsCarrier: string): Promise<void> {
     const uid = await this.session.getCurrentUid();

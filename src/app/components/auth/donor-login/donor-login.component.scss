@@ -1,3 +1,5 @@
+@use 'breakpoint' as bp;
+
 :host {
   display: block;
 }
@@ -130,31 +132,40 @@ textarea:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-16);
+  gap: var(--space-12);
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   width: 100%;
 }
 
 .remember {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   flex-direction: row;
   gap: var(--space-8);
+  flex: 0 0 auto;
   flex-wrap: nowrap;
   white-space: nowrap;
   font-size: var(--font-size-ui);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-medium);
+
+  input {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    margin: 0;
+  }
 }
 
 .action-links {
   display: flex;
   align-items: center;
   flex-direction: row;
-  gap: var(--space-16);
-  flex-wrap: nowrap;
+  gap: var(--space-12);
+  flex-wrap: wrap;
   justify-content: flex-end;
+  margin-left: auto;
 }
 
 .link-btn {
@@ -258,4 +269,22 @@ textarea:focus {
 .cert-link:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+@include bp.mobile {
+  .actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-10);
+  }
+
+  .action-links {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .remember {
+    width: 100%;
+  }
 }

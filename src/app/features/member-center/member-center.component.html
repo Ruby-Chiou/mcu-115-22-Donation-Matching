@@ -1,5 +1,6 @@
 <div class="workspace-title">
   <h1>會員專區</h1>
+  <p class="lead">收件匣看通知並直接處理；捐助紀錄改物資、上傳物流、看審核結果。</p>
 </div>
 
 @if (companyNotice()) {
@@ -8,12 +9,53 @@
 
 @if (messageService.unreadCount() > 0) {
   <p class="inbox-notice" role="status">
-    收件匣有 {{ messageService.unreadCount() }} 封未讀。物資有沒有通過、機構來信，都會在這裡。
+    收件匣有 {{ messageService.unreadCount() }} 封未讀。點開信件可直接處理捐助或回覆機構。
     <button type="button" (click)="selectTab('inbox')">打開收件匣</button>
   </p>
 }
 
 <div class="switch-area" role="tablist">
+  <button
+    type="button"
+    role="tab"
+    class="switch-button"
+    [class.active]="activeTab() === 'inbox'"
+    [attr.aria-selected]="activeTab() === 'inbox'"
+    (click)="selectTab('inbox')"
+  >
+    收件匣 @if (messageService.unreadCount() > 0) {
+    <span class="unread-badge">{{ messageService.unreadCount() }}</span>
+    }
+  </button>
+
+  <span class="switch-divider" aria-hidden="true"> | </span>
+
+  <button
+    type="button"
+    role="tab"
+    class="switch-button"
+    [class.active]="activeTab() === 'history'"
+    [attr.aria-selected]="activeTab() === 'history'"
+    (click)="selectTab('history')"
+  >
+    捐助紀錄
+  </button>
+
+  <span class="switch-divider" aria-hidden="true"> | </span>
+
+  <button
+    type="button"
+    role="tab"
+    class="switch-button"
+    [class.active]="activeTab() === 'acknowledgements'"
+    [attr.aria-selected]="activeTab() === 'acknowledgements'"
+    (click)="selectTab('acknowledgements')"
+  >
+    捐贈回饋
+  </button>
+
+  <span class="switch-divider" aria-hidden="true"> | </span>
+
   <button
     type="button"
     role="tab"
@@ -36,46 +78,6 @@
     (click)="selectTab('notifications')"
   >
     通知設定
-  </button>
-  <span class="switch-divider" aria-hidden="true"> | </span>
-
-  <button
-    type="button"
-    role="tab"
-    class="switch-button"
-    [class.active]="activeTab() === 'inbox'"
-    [attr.aria-selected]="activeTab() === 'inbox'"
-    (click)="selectTab('inbox')"
-  >
-    收件匣 @if (messageService.unreadCount() > 0) {
-    <span class="unread-badge">{{ messageService.unreadCount() }}</span>
-    }
-  </button>
-
-  <span class="switch-divider" aria-hidden="true"> | </span>
-
-  <button
-    type="button"
-    role="tab"
-    class="switch-button"
-    [class.active]="activeTab() === 'acknowledgements'"
-    [attr.aria-selected]="activeTab() === 'acknowledgements'"
-    (click)="selectTab('acknowledgements')"
-  >
-    捐贈回饋
-  </button>
-
-  <span class="switch-divider" aria-hidden="true"> | </span>
-
-  <button
-    type="button"
-    role="tab"
-    class="switch-button"
-    [class.active]="activeTab() === 'history'"
-    [attr.aria-selected]="activeTab() === 'history'"
-    (click)="selectTab('history')"
-  >
-    捐助紀錄
   </button>
 </div>
 

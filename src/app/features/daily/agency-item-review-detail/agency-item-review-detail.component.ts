@@ -34,6 +34,8 @@ export class AgencyItemReviewDetailComponent implements OnInit {
 
   isRejectModalOpen = false;
   isSubmittingDecision = false;
+  isRunningAi = false;
+  aiActionMessage = '';
 
   humanReasonControl = new FormControl<string>('', {
     nonNullable: true,
@@ -112,20 +114,40 @@ export class AgencyItemReviewDetailComponent implements OnInit {
   getStatusText(donation: RecipientDonationReview): string {
     switch (donation.status) {
       case 'pending_human_review':
-        return '待決定';
+        return '機構審核中';
 
       case 'human_approved':
         return '已接受';
 
       case 'human_rejected':
-        return '不接受';
+        return '未通過';
+
+      case 'needs_supplement':
+        return '待捐助者補件';
 
       case 'pending_ai_review':
-        return '等待 AI 審核';
+        return 'AI 審核中';
 
       default:
         return '處理中';
     }
+  }
+
+  /** 與列表／捐助者端一致：沒照片時不要硬顯示未通過，除非 AI 已判定需補件。 */
+  aiDecisionLabel(donation: RecipientDonationReview): string {
+    if (donation.status === 'needs_supplement') {
+      return '不通過（待補件）';
+    }
+
+    if (donation.ai_decision === 'accepted' || donation.ai_decision === 'rejected') {
+      return this.getAiDecisionText(donation.ai_decision);
+    }
+
+    if (!this.hasMaterialMedia) {
+      return '尚無媒體，待補件後再審';
+    }
+
+    return this.getAiDecisionText(donation.ai_decision);
   }
 
   get imageFiles(): DonationFile[] {
@@ -182,6 +204,71 @@ export class AgencyItemReviewDetailComponent implements OnInit {
 
   get hasMaterialMedia(): boolean {
     return this.imageFiles.length > 0 || this.videoFiles.length > 0;
+  }
+
+  /** 卡在 AI 審核時，機構可手動重跑或改走人工，方便確認 AI 有沒有在跑。 */
+  async rerunAiReview(): Promise<void> {
+    if (!this.donation || this.isRunningAi || this.donation.status !== 'pending_ai_review') {
+      return;
+    }
+
+    const donationId = this.getDonationId();
+    if (!donationId) {
+      this.errorMessage = '找不到物資資料 ID。';
+      return;
+    }
+
+    this.isRunningAi = true;
+    this.aiActionMessage = '正在呼叫 AI 審核…';
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
+    try {
+      const result = await this.donationService.runAiReviewAfterSubmit(donationId);
+      this.aiActionMessage = `AI 回應：${result.decisionText || result.status}（判定 ${result.decision || '無'}）`;
+      await this.loadDonation(donationId);
+    } catch (error) {
+      console.error('手動重跑 AI 失敗：', error);
+      this.aiActionMessage = '';
+      this.errorMessage = error instanceof Error ? error.message : 'AI 沒有回應，請稍後再試或改走人工審核。';
+    } finally {
+      this.isRunningAi = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async skipAiToHumanReview(): Promise<void> {
+    if (!this.donation || this.isRunningAi || this.donation.status !== 'pending_ai_review') {
+      return;
+    }
+
+    if (!this.hasMaterialMedia) {
+      this.errorMessage = '沒有照片時不能轉人工接受流程，請先請捐助者補件。';
+      return;
+    }
+
+    const donationId = this.getDonationId();
+    if (!donationId) {
+      this.errorMessage = '找不到物資資料 ID。';
+      return;
+    }
+
+    this.isRunningAi = true;
+    this.aiActionMessage = '正在改為機構人工審核…';
+    this.errorMessage = '';
+
+    try {
+      const result = await this.donationService.skipAiToHumanReview(donationId);
+      this.aiActionMessage = `已可人工審核：${result.decisionText || result.status}`;
+      await this.loadDonation(donationId);
+    } catch (error) {
+      console.error('轉人工審核失敗：', error);
+      this.aiActionMessage = '';
+      this.errorMessage = error instanceof Error ? error.message : '無法改為人工審核，請稍後再試。';
+    } finally {
+      this.isRunningAi = false;
+      this.cdr.detectChanges();
+    }
   }
 
   async acceptDonation(): Promise<void> {

@@ -126,7 +126,38 @@ export class DonationService {
       throw error;
     }
 
+    const imageCount = data.materialFiles.length;
+    if (imageCount < 1) {
+      const { error: markError } = await this.supabase.rpc('mark_donation_needs_supplement', {
+        p_donation_id: donation.id,
+        p_reason: '沒有上傳物資照片或影片，AI 無法完成審核。請在同一筆申請補上傳照片後再送審。',
+      });
+      if (markError) {
+        console.error('缺照片需補件通知沒有寫入：', markError);
+      }
+    }
+
     return donation;
+  }
+
+  /** 捐助者對既有申請補上傳物資照片／影片。 */
+  async uploadSupplementFiles(donationId: string, images: File[], videos: File[] = []): Promise<void> {
+    const files: DonationFileUpload[] = [
+      ...images.map((file): DonationFileUpload => ({ file, fileType: 'material_image' })),
+      ...videos.map((file): DonationFileUpload => ({ file, fileType: 'material_video' })),
+    ];
+
+    if (files.length === 0) {
+      throw new Error('請選擇至少一張物資照片');
+    }
+
+    const existing = await this.getDonationFiles(donationId);
+    let index = existing.length;
+
+    for (const currentFile of files) {
+      await this.uploadDonationFile(donationId, currentFile.file, currentFile.fileType, index);
+      index += 1;
+    }
   }
 
   async reviewDonationWithAi(donationId: string): Promise<AiReviewResult> {
@@ -153,7 +184,11 @@ export class DonationService {
     const decision = payload?.aiDecision ?? payload?.AiDecision ?? '';
 
     if (!response.ok || (decision !== 'accepted' && decision !== 'rejected') || reason.length < 8) {
-      throw new Error(payload?.message || '這次沒有辨識完成，機構會直接看照片確認。');
+      // 辨識失敗時仍交給機構人工看照片，避免一直卡在 AI 審核中、受助端看不到
+      return this.handoffAiToHumanReview(
+        donationId,
+        payload?.message || '系統影像辨識未完成，請機構直接依照片人工確認。',
+      );
     }
 
     return {
@@ -164,6 +199,53 @@ export class DonationService {
       detectedCondition: payload?.detectedCondition ?? payload?.DetectedCondition ?? '',
       reason,
       conditionMatches: Boolean(payload?.conditionMatches ?? payload?.ConditionMatches),
+    };
+  }
+
+  /** 補件或初次送出後：跑 AI；缺照片會進需補件，成功／辨識失敗都會讓機構列表看得到。 */
+  async runAiReviewAfterSubmit(donationId: string): Promise<AiReviewResult> {
+    return this.reviewDonationWithAi(donationId);
+  }
+
+  /** 機構端略過卡住的 AI，直接進人工審核。 */
+  async skipAiToHumanReview(donationId: string, reason?: string): Promise<AiReviewResult> {
+    return this.handoffAiToHumanReview(
+      donationId,
+      reason || '機構選擇略過 AI，改由人工依照片確認。',
+    );
+  }
+
+  private async handoffAiToHumanReview(donationId: string, reason: string): Promise<AiReviewResult> {
+    const safeReason = reason.trim().length >= 8 ? reason.trim() : '系統影像辨識未完成，請機構直接依照片人工確認。';
+    const { data, error } = await this.supabase.rpc('record_ai_donation_review', {
+      p_donation_id: donationId,
+      p_decision: 'rejected',
+      p_condition: '無法自動判定',
+      p_reason: safeReason,
+    });
+
+    if (error) {
+      throw new Error(error.message || '無法轉交機構人工審核。');
+    }
+
+    const body = data as {
+      donationId?: string;
+      status?: string;
+      decision?: string;
+      decisionText?: string;
+      detectedCondition?: string;
+      reason?: string;
+      conditionMatches?: boolean;
+    } | null;
+
+    return {
+      donationId: body?.donationId ?? donationId,
+      status: body?.status ?? 'pending_human_review',
+      decision: body?.decision ?? 'rejected',
+      decisionText: body?.decisionText ?? '已轉交機構人工審核',
+      detectedCondition: body?.detectedCondition ?? '無法自動判定',
+      reason: body?.reason ?? safeReason,
+      conditionMatches: Boolean(body?.conditionMatches),
     };
   }
 

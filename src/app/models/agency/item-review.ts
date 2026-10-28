@@ -1,6 +1,11 @@
 export type AiDecision = 'accepted' | 'rejected';
 
-export type DonationStatus = 'pending_ai_review' | 'pending_human_review' | 'human_approved' | 'human_rejected';
+export type DonationStatus =
+  | 'pending_ai_review'
+  | 'pending_human_review'
+  | 'needs_supplement'
+  | 'human_approved'
+  | 'human_rejected';
 
 export type DonationFileType = 'material_image' | 'material_video';
 

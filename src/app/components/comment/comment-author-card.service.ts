@@ -56,6 +56,15 @@ const DONOR_SAMPLES = new Map<string, DonorAuthorCard>([
     '55555555-5555-4555-8555-555555555555',
     {
       type: 'donor',
+      donorKind: 'individual',
+      city: '台北市',
+      thanks: [{ item: '礦泉水 5 箱', agencyName: '宜蘭家庭資源中心', publishedAt: '2026-10-18T05:00:00.000Z' }],
+    },
+  ],
+  [
+    '44444444-4444-4444-8444-444444444444',
+    {
+      type: 'donor',
       donorKind: 'company',
       city: '新北市',
       thanks: [{ item: '白米 50 包', agencyName: '宜蘭家庭資源中心', publishedAt: '2026-10-18T05:00:00.000Z' }],

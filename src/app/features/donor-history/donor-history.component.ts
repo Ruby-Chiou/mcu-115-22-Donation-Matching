@@ -1,11 +1,14 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { DonationReceiptSheetComponent } from '../../components/receipt/donation-receipt-sheet/donation-receipt-sheet.component';
+import { donationNextActionLabel, donationNextStep } from '../../core/auth/member-message-actions';
 import { receiptPdfFileName } from '../../core/receipt/donation-receipt-document';
 import { DonationReceiptPdfService } from '../../core/receipt/donation-receipt-pdf.service';
+import { DonationService } from '../../core/services/agency-daily-demand/daily-donation.service';
 import { AgencyCertificateService } from '../../core/services/member-center/agency-certificate.service';
 import { DonationReceiptService } from '../../core/services/member-center/donation-receipt.service';
 import { DonorDonationHistoryService } from '../../core/services/member-center/donor-donation-history.service';
@@ -34,6 +37,7 @@ export class DonorHistoryComponent implements OnInit {
   readonly embedded = input(false);
 
   protected readonly historyService = inject(DonorDonationHistoryService);
+  private readonly donationService = inject(DonationService);
   private readonly receiptService = inject(DonationReceiptService);
   private readonly certificateService = inject(AgencyCertificateService);
   private readonly thankService = inject(PublicDonationThankService);
@@ -63,7 +67,12 @@ export class DonorHistoryComponent implements OnInit {
     const keyword = this.keyword().trim().toLowerCase();
 
     return this.historyService.records().filter((record) => {
-      if (filter === 'IN_REVIEW' && record.status !== 'pending_ai_review' && record.status !== 'pending_human_review') {
+      if (
+        filter === 'IN_REVIEW' &&
+        record.status !== 'pending_ai_review' &&
+        record.status !== 'pending_human_review' &&
+        record.status !== 'needs_supplement'
+      ) {
         return false;
       }
 
@@ -71,7 +80,7 @@ export class DonorHistoryComponent implements OnInit {
         return false;
       }
 
-      if (filter === 'REJECTED' && record.status !== 'human_rejected') {
+      if (filter === 'REJECTED' && record.status !== 'human_rejected' && record.status !== 'needs_supplement') {
         return false;
       }
 
@@ -91,6 +100,20 @@ export class DonorHistoryComponent implements OnInit {
     return this.historyService.records().find((record) => record.id === id) ?? null;
   });
 
+  constructor() {
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const recordId = params.get('record') || params.get('donationId');
+      if (!recordId || this.isLoading()) {
+        return;
+      }
+
+      const saved = this.historyService.records().find((record) => record.id === recordId);
+      if (saved && this.selectedId() !== saved.id) {
+        this.applySelection(saved);
+      }
+    });
+  }
+
   async ngOnInit(): Promise<void> {
     const [historyResult] = await Promise.allSettled([
       this.historyService.loadHistory(),
@@ -103,13 +126,26 @@ export class DonorHistoryComponent implements OnInit {
       this.errorText.set('無法載入捐助歷史，請確認已套用資料庫 migration 後再試。');
     }
 
-    const recordId = this.route.snapshot.queryParamMap.get('record');
+    const recordId = this.route.snapshot.queryParamMap.get('record') || this.route.snapshot.queryParamMap.get('donationId');
     const saved = recordId ? this.historyService.records().find((record) => record.id === recordId) : undefined;
     if (saved) {
       this.applySelection(saved);
+    } else if (!this.selectedId() && this.filteredRecords().length > 0) {
+      const needsAction =
+        this.filteredRecords().find((record) => !!donationNextActionLabel(record) && record.status !== 'human_rejected') ??
+        this.filteredRecords()[0];
+      this.applySelection(needsAction);
     }
 
     this.isLoading.set(false);
+  }
+
+  nextActionLabel(record: DonorDonationHistory): string | null {
+    return donationNextActionLabel(record);
+  }
+
+  nextStep(record: DonorDonationHistory) {
+    return donationNextStep(record);
   }
 
   setFilter(filter: DonationHistoryFilter): void {
@@ -136,6 +172,14 @@ export class DonorHistoryComponent implements OnInit {
   readonly publicDraft = signal(true);
   readonly visibilitySaving = signal(false);
   readonly visibilityMessage = signal('');
+  readonly editingPending = signal(false);
+  readonly pendingSaving = signal(false);
+  readonly pendingMessage = signal('');
+  readonly materialDraft = signal('');
+  readonly quantityDraft = signal(1);
+  readonly noteDraft = signal('');
+  readonly methodDraft = signal('寄送');
+  readonly supplementFiles = signal<File[]>([]);
 
   selectRecord(record: DonorDonationHistory): void {
     this.applySelection(record);
@@ -156,6 +200,138 @@ export class DonorHistoryComponent implements OnInit {
     this.nameModeDraft.set(record.thankNameMode);
     this.publicDraft.set(record.thankPublic);
     this.visibilityMessage.set('');
+    this.editingPending.set(false);
+    this.pendingMessage.set('');
+    this.materialDraft.set(record.actualMaterial);
+    this.quantityDraft.set(record.quantity || 1);
+    this.noteDraft.set(record.note);
+    this.methodDraft.set(record.donationMethod || '寄送');
+  }
+
+  canRevise(record: DonorDonationHistory): boolean {
+    return this.historyService.canRevise(record);
+  }
+
+  canSupplement(record: DonorDonationHistory): boolean {
+    return this.historyService.canSupplement(record);
+  }
+
+  onSupplementFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.supplementFiles.set(Array.from(input.files ?? []));
+  }
+
+  async submitSupplement(record: DonorDonationHistory): Promise<void> {
+    const files = this.supplementFiles();
+    if (files.length === 0) {
+      this.pendingMessage.set('請先選擇至少一張物資照片再送審。');
+      return;
+    }
+
+    this.pendingSaving.set(true);
+    this.pendingMessage.set('');
+
+    try {
+      await this.historyService.updatePendingDonation(record.id, {
+        actualMaterial: this.materialDraft() || record.actualMaterial,
+        quantity: this.quantityDraft() || record.quantity,
+        note: this.noteDraft(),
+        donationMethod: this.methodDraft() || record.donationMethod,
+      }).catch(() => undefined);
+
+      await this.donationService.uploadSupplementFiles(record.id, files);
+      await this.historyService.resubmitAfterSupplement(record.id);
+
+      let reviewNote = '已補件並重新送審。';
+      try {
+        const ai = await this.donationService.runAiReviewAfterSubmit(record.id);
+        if (ai.status === 'needs_supplement') {
+          reviewNote = '照片仍不足，請再補上傳後送審。';
+        } else if (ai.status === 'pending_human_review') {
+          reviewNote = 'AI 已審完，已送到受助機構待人工確認。';
+        } else {
+          reviewNote = `已補件送審：${ai.decisionText || ai.status}`;
+        }
+      } catch (aiError) {
+        reviewNote =
+          aiError instanceof Error
+            ? `已補件，但 AI 沒跑完：${aiError.message}`
+            : '已補件，但 AI 沒跑完，請稍後再試或等機構查看。';
+      }
+
+      this.supplementFiles.set([]);
+      this.editingPending.set(false);
+      this.pendingMessage.set(reviewNote);
+      await this.historyService.loadHistory();
+      const refreshed = this.historyService.records().find((item) => item.id === record.id);
+      if (refreshed) {
+        this.applySelection(refreshed);
+      }
+    } catch (error) {
+      this.pendingMessage.set(error instanceof Error ? error.message : '補件送審失敗，請稍後再試。');
+    } finally {
+      this.pendingSaving.set(false);
+    }
+  }
+
+  startEditPending(): void {
+    this.editingPending.set(true);
+    this.pendingMessage.set('');
+  }
+
+  cancelEditPending(record: DonorDonationHistory): void {
+    this.editingPending.set(false);
+    this.materialDraft.set(record.actualMaterial);
+    this.quantityDraft.set(record.quantity || 1);
+    this.noteDraft.set(record.note);
+    this.methodDraft.set(record.donationMethod || '寄送');
+    this.pendingMessage.set('');
+  }
+
+  async savePending(record: DonorDonationHistory): Promise<void> {
+    this.pendingSaving.set(true);
+    this.pendingMessage.set('');
+
+    try {
+      await this.historyService.updatePendingDonation(record.id, {
+        actualMaterial: this.materialDraft(),
+        quantity: this.quantityDraft(),
+        note: this.noteDraft(),
+        donationMethod: this.methodDraft(),
+      });
+      this.editingPending.set(false);
+      this.pendingMessage.set('已更新這筆審核中的捐助。');
+    } catch (error) {
+      this.pendingMessage.set(error instanceof Error ? error.message : '更新失敗，請稍後再試。');
+    } finally {
+      this.pendingSaving.set(false);
+    }
+  }
+
+  async withdrawPending(record: DonorDonationHistory): Promise<void> {
+    if (!window.confirm('確定撤回這筆尚未審核完成的捐助？撤回後需重新送出。')) {
+      return;
+    }
+
+    this.pendingSaving.set(true);
+    this.pendingMessage.set('');
+
+    try {
+      await this.historyService.withdrawPendingDonation(record.id);
+      this.selectedId.set(null);
+      this.editingPending.set(false);
+      this.pendingMessage.set('已撤回這筆捐助。');
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { record: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    } catch (error) {
+      this.pendingMessage.set(error instanceof Error ? error.message : '撤回失敗，請稍後再試。');
+    } finally {
+      this.pendingSaving.set(false);
+    }
   }
 
   async saveVisibility(record: DonorDonationHistory): Promise<void> {
@@ -245,7 +421,7 @@ export class DonorHistoryComponent implements OnInit {
       return 'approved';
     }
 
-    if (status === 'human_rejected') {
+    if (status === 'human_rejected' || status === 'needs_supplement') {
       return 'rejected';
     }
 
@@ -256,13 +432,14 @@ export class DonorHistoryComponent implements OnInit {
     const status = record.status;
     const approved = status === 'human_approved';
     const rejected = status === 'human_rejected';
+    const needsSupplement = status === 'needs_supplement';
     const shipped = record.donationMethod === '寄送';
     const steps = [
       { label: '提交申請', done: true, current: false },
       {
         label: 'AI 審核',
-        done: status !== 'pending_ai_review',
-        current: status === 'pending_ai_review',
+        done: status !== 'pending_ai_review' && !needsSupplement,
+        current: status === 'pending_ai_review' || needsSupplement,
       },
       {
         label: '機構審核',
@@ -271,8 +448,13 @@ export class DonorHistoryComponent implements OnInit {
       },
     ];
 
+    if (needsSupplement) {
+      steps.push({ label: '需補件', done: false, current: true });
+      return steps;
+    }
+
     if (rejected) {
-      steps.push({ label: '未通過', done: true, current: true });
+      steps.push({ label: '未通過／可補件', done: true, current: true });
       return steps;
     }
 

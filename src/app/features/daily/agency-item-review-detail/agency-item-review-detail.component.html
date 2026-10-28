@@ -20,17 +20,10 @@
       <span
         class="status-label"
         [class.pending]="
-            donation.status ===
-            'pending_human_review'
-          "
-        [class.approved]="
-            donation.status ===
-            'human_approved'
-          "
-        [class.rejected]="
-            donation.status ===
-            'human_rejected'
-          "
+          donation.status === 'pending_human_review' || donation.status === 'pending_ai_review'
+        "
+        [class.approved]="donation.status === 'human_approved'"
+        [class.rejected]="donation.status === 'human_rejected'"
       >
         {{ getStatusText(donation) }}
       </span>
@@ -59,19 +52,39 @@
     <section class="detail-section">
       <h2>AI 審核結果</h2>
 
-      <p>AI 判定： {{ hasMaterialMedia ? getAiDecisionText( donation.ai_decision ) : '不通過' }}</p>
+      <p>AI 判定： {{ aiDecisionLabel(donation) }}</p>
+      @if (donation.ai_checked_at) {
+      <p>AI 完成時間：{{ donation.ai_checked_at | date: 'yyyy/MM/dd HH:mm' }}</p>
+      }
 
       @if (!hasMaterialMedia) {
       <div class="reason-box">
         <h3>說明</h3>
 
-        <p>沒有上傳物資照片或影片，不能判定通過。</p>
+        <p>捐助者尚未上傳物資照片或影片。整體狀態仍是「{{ getStatusText(donation) }}」，還不能當成已審核未通過。</p>
       </div>
       } @else if (donation.ai_reason) {
       <div class="reason-box">
         <h3>說明</h3>
 
         <p>{{ donation.ai_reason }}</p>
+      </div>
+      }
+
+      @if (donation.status === 'pending_ai_review') {
+      <div class="ai-action-panel">
+        <p class="reason-error">這筆還停在 AI 審核。可手動重跑確認後端有沒有回應，或改由人工審核。</p>
+        <div class="decision-buttons">
+          <button type="button" class="accept-button" [disabled]="isRunningAi || !hasMaterialMedia" (click)="rerunAiReview()">
+            {{ isRunningAi ? '處理中...' : '重新執行 AI 審核' }}
+          </button>
+          <button type="button" class="reject-button" [disabled]="isRunningAi || !hasMaterialMedia" (click)="skipAiToHumanReview()">
+            略過 AI，改人工審核
+          </button>
+        </div>
+        @if (aiActionMessage) {
+        <p class="ai-action-message">{{ aiActionMessage }}</p>
+        }
       </div>
       }
     </section>

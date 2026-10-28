@@ -256,11 +256,49 @@
   }
 }
 
+.message-shortcuts {
+  margin: 0 0 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-action) 28%, var(--border-light));
+  border-radius: var(--radius-8);
+  background: color-mix(in srgb, var(--color-action) 8%, var(--color-white));
+}
+
+.shortcut-title {
+  margin: 0 0 0.55rem;
+  color: var(--color-text-dark);
+  font-weight: var(--font-weight-semibold);
+}
+
+.shortcut-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.shortcut-hint {
+  margin: 0;
+  color: var(--color-text-medium);
+  font-size: var(--font-size-small);
+}
+
+.list-action-hint {
+  margin: 0.35rem 0 0;
+  color: var(--color-action);
+  font-size: var(--font-size-compact);
+  font-weight: var(--font-weight-semibold);
+}
+
 .detail-actions,
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-sm);
+}
+
+a.btn {
+  text-decoration: none;
 }
 
 .compose-form {

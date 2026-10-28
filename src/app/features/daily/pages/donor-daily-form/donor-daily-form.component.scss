@@ -542,6 +542,26 @@
 .back-button:hover {
   background: var(--color-link-dark);
 }
+@include bp.tablet {
+  .section-title-row {
+    align-items: flex-start;
+  }
+
+  .account-fill-option {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .radio-group {
+    justify-content: flex-start;
+  }
+
+  .radio-option {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
 /* RWD */
 @include bp.mobile {
   .supply-form-page {
@@ -560,6 +580,7 @@
   .radio-group {
     flex-direction: column;
     gap: var(--space-12);
+    align-items: flex-start;
   }
   .address-item {
     flex-direction: column;
@@ -582,10 +603,12 @@
   .account-fill-option {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: var(--space-8);
     color: var(--color-link);
     font-size: var(--font-size-14);
     font-weight: var(--font-weight-semibold);
+    text-align: left;
     cursor: pointer;
   }
   .account-fill-option input {

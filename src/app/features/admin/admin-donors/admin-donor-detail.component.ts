@@ -130,13 +130,30 @@ export class AdminDonorDetailComponent implements OnInit {
       await this.accounts.setStatus(donor, status);
       const donors = await this.accounts.list();
       this.donor.set(donors.find((item) => item.uid === donor.uid) ?? donor);
-      this.show(status === 'ACTIVE' ? '已恢復這個捐助帳號。' : '已停用這個捐助帳號，對方將無法登入。', false);
+      this.show(
+        status === 'ACTIVE' ? '已恢復這個捐助帳號。' : status === 'DELETED' ? '已註銷這個捐助帳號，對方將無法登入。' : '已停用這個捐助帳號，對方將無法登入。',
+        false,
+      );
     } catch (error) {
       console.error(error);
       this.show('帳號狀態沒有更新，請稍後再試。', true);
     } finally {
       this.saving.set(false);
     }
+  }
+
+  protected async cancelAccount(): Promise<void> {
+    const donor = this.donor();
+    if (!donor || this.saving()) {
+      return;
+    }
+
+    const confirmed = window.confirm(`確定要註銷「${donor.displayName || donor.email}」？註銷後對方無法登入，此操作可再改回使用中。`);
+    if (!confirmed) {
+      return;
+    }
+
+    await this.setStatus('DELETED');
   }
 
   protected async saveBoard(board: BoardName): Promise<void> {

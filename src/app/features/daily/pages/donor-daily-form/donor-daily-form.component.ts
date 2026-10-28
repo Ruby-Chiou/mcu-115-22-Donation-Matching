@@ -58,9 +58,45 @@ export class DonorDailyFormComponent implements OnInit {
         return;
       }
 
+      this.applyDefaultDonationMethod();
       await this.loadProfileDefaults();
     } catch (error) {
       console.error('讀取捐贈表單需求資料失敗：', error);
+    }
+  }
+
+  get allowsShipping(): boolean {
+    return !!this.demand?.receiveMethod?.寄送;
+  }
+
+  get allowsMeetup(): boolean {
+    return !!this.demand?.receiveMethod?.面交;
+  }
+
+  /** 區塊編號：有捐贈方式時從 3 起算，否則從 2 起算。 */
+  sectionNo(section: 'receipt' | 'thankYou' | 'publicThank' | 'other'): number {
+    const base = this.allowsShipping || this.allowsMeetup ? 3 : 2;
+    const offset = { receipt: 0, thankYou: 1, publicThank: 2, other: 3 }[section];
+    return base + offset;
+  }
+
+  private applyDefaultDonationMethod(): void {
+    if (this.allowsShipping && !this.allowsMeetup) {
+      this.donationMethod = '寄送';
+      return;
+    }
+
+    if (!this.allowsShipping && this.allowsMeetup) {
+      this.donationMethod = '面交';
+      return;
+    }
+
+    if (this.donationMethod === '面交' && !this.allowsMeetup) {
+      this.donationMethod = this.allowsShipping ? '寄送' : '';
+    }
+
+    if (this.donationMethod === '寄送' && !this.allowsShipping) {
+      this.donationMethod = this.allowsMeetup ? '面交' : '';
     }
   }
 
@@ -226,6 +262,16 @@ export class DonorDailyFormComponent implements OnInit {
 
     if (this.donationMethod !== '寄送' && this.donationMethod !== '面交') {
       alert('請選擇捐贈方式');
+      return;
+    }
+
+    if (this.donationMethod === '寄送' && !this.allowsShipping) {
+      alert('此需求不接受寄送，請改選面交');
+      return;
+    }
+
+    if (this.donationMethod === '面交' && !this.allowsMeetup) {
+      alert('此需求不接受面交，請改選寄送');
       return;
     }
 

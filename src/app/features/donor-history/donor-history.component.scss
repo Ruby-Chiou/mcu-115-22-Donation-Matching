@@ -164,6 +164,52 @@
   font-size: var(--font-size-compact);
 }
 
+.next-action,
+.detail-next-action {
+  margin: 0.55rem 0 0;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--border-radius-pill);
+  background: color-mix(in srgb, var(--color-action) 12%, var(--color-white));
+  color: var(--color-action-dark);
+  font-size: var(--font-size-compact);
+  font-weight: var(--font-weight-semibold);
+}
+
+.next-action[data-tone='rejected'],
+.detail-next-action[data-tone='rejected'] {
+  background: color-mix(in srgb, var(--color-error) 12%, var(--color-white));
+  color: var(--color-error);
+}
+
+.detail-next-action {
+  margin: 0.85rem 0 0.75rem;
+  border-radius: var(--radius-8);
+}
+
+.closed-action-panel {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-error) 28%, var(--border-light));
+  border-radius: var(--radius-8);
+  background: color-mix(in srgb, var(--color-error) 6%, var(--color-white));
+
+  .detail-next-action {
+    margin-top: 0;
+  }
+
+  .shortcut-hint {
+    margin: 0.35rem 0 0.75rem;
+  }
+}
+
+.pending-revise {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-action) 28%, var(--border-light));
+  border-radius: var(--radius-8);
+  background: color-mix(in srgb, var(--color-action) 6%, var(--color-white));
+}
+
 .empty {
   padding: 2rem 1rem;
   text-align: center;
@@ -353,11 +399,28 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--space-sm);
   margin-top: 1.25rem;
+  text-align: left;
 
   label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
     font-weight: var(--font-weight-bold);
+    text-align: left;
+    white-space: nowrap;
+
+    input[type='radio'],
+    input[type='checkbox'] {
+      width: 1rem;
+      height: 1rem;
+      min-width: 0;
+      flex: 0 0 auto;
+      margin: 0;
+    }
   }
 
   input,
