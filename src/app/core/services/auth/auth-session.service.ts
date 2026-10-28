@@ -113,11 +113,6 @@ export class AuthSessionService {
       return;
     }
 
-    const { data: current } = await this.supabase.client.auth.getSession();
-    if (!current.session || current.session.user.id !== session.user.id) {
-      return;
-    }
-
     try {
       const account = await this.loadAccount(session.user.id);
 

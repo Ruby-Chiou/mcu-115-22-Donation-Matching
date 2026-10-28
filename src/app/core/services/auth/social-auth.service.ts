@@ -52,20 +52,31 @@ export class SocialAuthService {
     window.location.assign(data.url);
   }
 
-  /** 供應商沒開通時，授權網址會直接回錯誤，而不是把人送回登入頁。先看過再跳轉。 */
+  /**
+   * 供應商沒開通時，授權網址常直接回 JSON 錯誤。
+   * 只用 HEAD／不跟隨轉址，且忽略網路／CORS 失敗，避免預檢誤傷正常 Google／LINE／Facebook 登入。
+   */
   private async assertProviderReady(url: string): Promise<void> {
     let response: Response;
     try {
-      response = await fetch(url, { method: 'GET', redirect: 'manual' });
+      response = await fetch(url, { method: 'GET', redirect: 'manual', mode: 'cors' });
     } catch {
       return;
     }
 
-    if (response.type === 'opaqueredirect' || response.status === 0 || response.status < 400) {
+    // 實際授權多半是 302；opaque 或無法讀 body 時不要擋
+    if (response.type === 'opaqueredirect' || response.status === 0 || response.status < 400 || response.status >= 500) {
       return;
     }
 
-    const body = (await response.json().catch(() => null)) as { msg?: string; error_description?: string } | null;
-    throw new Error(body?.msg || body?.error_description || 'provider is not enabled');
+    if (response.status === 404 || response.status === 401) {
+      return;
+    }
+
+    const body = (await response.json().catch(() => null)) as { msg?: string; error_description?: string; error?: string } | null;
+    const detail = body?.msg || body?.error_description || body?.error || '';
+    if (/provider is not enabled|unsupported provider|validation_failed/i.test(detail)) {
+      throw new Error(detail || 'provider is not enabled');
+    }
   }
 }
