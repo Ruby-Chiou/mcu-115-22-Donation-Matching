@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
@@ -21,6 +21,7 @@ import { DailyFormLogic } from '../../../../components/logic/daily/daily-form.lo
 })
 export class DailyFormComponent implements OnInit, AfterViewInit {
   private readonly logic: DailyFormLogic;
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('itemInput') itemInput!: ElementRef;
   @ViewChild('amountInput') amountInput!: ElementRef;
@@ -113,6 +114,7 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
 
   async ngOnInit(): Promise<void> {
     await this.logic.ngOnInit();
+    this.cdr.detectChanges();
   }
 
   ngAfterViewInit(): void {

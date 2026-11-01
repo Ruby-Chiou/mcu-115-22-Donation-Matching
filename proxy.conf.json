@@ -1,7 +1,10 @@
 {
   "/api/ai-donation-reviews": {
-    "target": "https://mcu-115-22-donation-matching-backend.onrender.com",
+    "target": "https://wxryryyiakzkeeoorlrq.supabase.co",
     "secure": true,
-    "changeOrigin": true
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/ai-donation-reviews/donations/([^/]+)/ai-review": "/functions/v1/ai-donation-review?donationId=$1"
+    }
   }
 }

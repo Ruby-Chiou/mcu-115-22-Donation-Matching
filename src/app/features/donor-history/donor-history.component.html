@@ -196,14 +196,36 @@
 
           @if (record.status === 'human_approved' && record.donationMethod === '寄送') {
             <form class="tracking-form" (submit)="$event.preventDefault(); saveTracking(record)">
-              <p class="shortcut-hint">審核已通過：請選擇物流公司並上傳單號，機構才能簽收。</p>
+              <p class="shortcut-hint">審核已通過：請選擇物流公司並上傳單號，機構才能簽收。超商請再填門市與地址。</p>
               <label for="logistics-carrier">物流公司</label>
-              <select id="logistics-carrier" [value]="carrierDraft()" (change)="onCarrierChange($event)">
-                <option value="">請選擇</option>
+              <select
+                id="logistics-carrier"
+                [value]="carrierDraft()"
+                (change)="onCarrierChange($event)"
+              >
+                <option value="" [selected]="!carrierDraft()">請選擇</option>
                 @for (carrier of carriers; track carrier) {
-                  <option [value]="carrier">{{ carrier }}</option>
+                  <option [value]="carrier" [selected]="carrierDraft() === carrier">{{ carrier }}</option>
                 }
               </select>
+              @if (needsStoreFields()) {
+                <label for="store-name">超商門市</label>
+                <input
+                  id="store-name"
+                  [value]="storeNameDraft()"
+                  (input)="onStoreNameInput($event)"
+                  placeholder="例如：台北站前店"
+                  autocomplete="off"
+                />
+                <label for="store-address">門市地址</label>
+                <input
+                  id="store-address"
+                  [value]="storeAddressDraft()"
+                  (input)="onStoreAddressInput($event)"
+                  placeholder="方便機構查詢取件"
+                  autocomplete="street-address"
+                />
+              }
               <label for="tracking-no">物流單號</label>
               <input
                 id="tracking-no"
@@ -223,7 +245,10 @@
 
           @if (record.status === 'human_approved' && record.donationMethod === '寄送' && record.trackingNo) {
             <p class="shortcut-hint">
-              {{ record.logisticsCarrier || '尚未選擇物流公司' }}，單號 {{ record.trackingNo }} 已給受助機構。
+              {{ record.logisticsCarrier || carrierDraft() || '尚未選擇物流公司' }}，單號 {{ record.trackingNo }} 已給受助機構。
+              @if (record.logisticsStoreName || record.logisticsStoreAddress) {
+                門市 {{ record.logisticsStoreName }}{{ record.logisticsStoreAddress ? '（' + record.logisticsStoreAddress + '）' : '' }}。
+              }
               @if (record.receiptConfirmedAt) {
                 機構已簽收。
                 @if (record.receiptPartial) { 數量較多，沒有全部拆箱拍攝。 }

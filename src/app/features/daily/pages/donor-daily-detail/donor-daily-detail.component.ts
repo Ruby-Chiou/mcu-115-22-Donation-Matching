@@ -11,6 +11,7 @@ import { BeneficiaryPanelComponent } from '../../../../components/card/beneficia
 import { CommentAuthorChipComponent } from '../../../../components/comment/comment-author-chip.component';
 import { canDeleteOwnComment, commentAuthor, commentDeleteError, commentPreviewNotice, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
 import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
 import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 import { DailyComment } from '../../../../core/services/comments/daily-comment.service';
 import { AuthRedirectService } from '../../../../core/services/auth/auth-redirect.service';
@@ -32,6 +33,7 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000011';
   private readonly authRedirect = inject(AuthRedirectService);
   private readonly auth = inject(AuthSessionService);
+  private readonly uiNotice = inject(UiNoticeService);
   protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
   demand?: DailyDemand;
   currentImageIndex = 0;
@@ -375,7 +377,7 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   }
 
   async deleteComment(comment: DailyComment): Promise<void> {
-    if (!confirm('刪除這則留言？')) {
+    if (!(await this.uiNotice.confirm('刪除這則留言？'))) {
       return;
     }
 

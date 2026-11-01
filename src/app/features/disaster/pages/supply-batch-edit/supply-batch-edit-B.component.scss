@@ -163,16 +163,26 @@ hr {
 /*接受物資狀態*/
 .condition-area {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 35px;
+  margin-bottom: 35px;
+}
+
+.condition-columns {
+  display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 24px 32px;
-  margin-top: 35px;
-  margin-bottom: 35px;
+  width: 100%;
+  min-width: 0;
 }
 
 .condition-section {
   width: 280px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .condition-left {
@@ -240,17 +250,17 @@ hr {
   margin-bottom: 8px !important;
 }
 
-/* 說明文字 */
+/* 說明文字：滿寬換行，避免溢出蓋住右側輸入 */
 .condition-hint {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-18);
-  margin-bottom: 12px;
+  gap: 8px 18px;
+  margin: 0;
   padding-left: 2px;
   font-size: var(--font-size-13);
   font-weight: var(--font-weight-regular);
   color: var(--color-text-quiet);
-  white-space: nowrap;
 }
 
 .hint-item {
@@ -294,6 +304,10 @@ hr {
   width: auto;
   min-width: 0;
   max-width: 100%;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  box-sizing: border-box;
 }
 
 .custom-condition-list {

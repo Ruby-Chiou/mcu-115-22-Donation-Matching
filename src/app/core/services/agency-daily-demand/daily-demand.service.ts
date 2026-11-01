@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 
+import { priorityCode, priorityLabel } from '../../codes/demand-codes';
 import { DailyDemand, CreateDailyDemand, DailyConditions } from '../../../models/agency/daily-demand';
 import { DemandRepository } from '../../demands/demand-repository';
 import { SupabaseService } from '../database/supabase.service';
@@ -105,7 +106,7 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
 
       reason: row.reason,
       description: row.description,
-      priority: row.priority as DailyDemand['priority'],
+      priority: this.mapPriorityLabel(row.priority),
       category: row.category as DailyDemand['category'],
 
       receiveMethod: {
@@ -209,7 +210,7 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
 
       customConditions: demand.customConditions ?? [],
 
-      priority: demand.priority,
+      priority: this.mapPriorityCode(demand.priority),
       status: demand.status,
       offShelfReason: demand.offShelfReason ?? 'natural',
 
@@ -415,6 +416,14 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
     }
 
     return Math.max(...this.demands.map((item) => item.serialNo)) + 1;
+  }
+
+  private mapPriorityLabel(value: string | null | undefined): DailyDemand['priority'] {
+    return priorityLabel(value);
+  }
+
+  private mapPriorityCode(value: string | null | undefined): string {
+    return priorityCode(value);
   }
 
   private toStringArray(value: unknown): string[] {

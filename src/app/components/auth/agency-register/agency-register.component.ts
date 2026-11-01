@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { AgencyCertificateRegistry } from '../../../core/auth/agency-certificate.registry';
-import { toLoginMessage } from '../../../core/auth/login-message';
+import { toRegisterMessage } from '../../../core/auth/login-message';
 import { registrationPasswordMessage, registrationPhoneMessage } from '../../../core/auth/registration-rules';
 import { AgencyVerificationService } from '../../../core/services/agency-verification/agency-verification.service';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
@@ -139,7 +139,7 @@ export class AgencyRegisterComponent {
           return;
         }
 
-        this.submitMessage = toLoginMessage(error);
+        this.submitMessage = toRegisterMessage(error);
         return;
       }
 
@@ -160,7 +160,7 @@ export class AgencyRegisterComponent {
       const mailboxNote = data.session ? '' : '若信箱收到系統信，那只是確認信箱可以收信，點了也不算資格通過。';
       this.submitMessage = `註冊已送出。管理者會用這些資料到公開可查的社福網站核對，再撥打網站上公布的電話，確認機構存在、註冊人存在，以及是否向本平台註冊。${mailboxNote}${fileNote}核對完成後，用這台裝置的憑證登入，請選擇「${card.agencyName}／${card.holderName}」，憑證序號 ${card.serial}。`;
     } catch (error) {
-      this.submitMessage = toLoginMessage(error);
+      this.submitMessage = toRegisterMessage(error);
     } finally {
       this.zone.run(() => {
         this.submitting = false;

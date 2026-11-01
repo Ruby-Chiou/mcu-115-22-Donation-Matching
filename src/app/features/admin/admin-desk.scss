@@ -282,6 +282,13 @@ dd {
   white-space: pre-wrap;
 }
 
+.badge-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
 .badge {
   width: fit-content;
   padding: 2px 8px;

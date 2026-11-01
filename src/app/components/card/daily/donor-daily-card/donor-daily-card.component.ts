@@ -21,12 +21,15 @@ export class DonorDailyCardComponent {
   getPriorityClass(priority: string | undefined): string {
     switch (priority) {
       case '非常緊急':
+      case 'P1':
         return 'priority-urgent';
 
       case '緊急':
+      case 'P2':
         return 'priority-normal';
 
       case '普通':
+      case 'P3':
         return 'priority-low';
 
       default:

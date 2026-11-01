@@ -103,7 +103,7 @@
 
   align-items: flex-start;
 
-  gap: var(--space-10);
+  gap: var(--space-16);
 
   min-height: 45px;
 
@@ -127,7 +127,9 @@
 // 日期
 
 .announcement-date {
-  flex: 0 0 75px;
+  flex: 0 0 84px;
+
+  margin-right: 6px;
 
   color: var(--color-brand-primary);
 
@@ -228,11 +230,11 @@
 .latest-news-item {
   display: grid;
 
-  grid-template-columns: 75px 75px minmax(0, 1fr) 20px;
+  grid-template-columns: 84px 84px minmax(0, 1fr) 20px;
 
   align-items: center;
 
-  gap: var(--space-12);
+  gap: var(--space-16);
 
   min-height: 75px;
 
@@ -265,6 +267,8 @@
 // 日期
 
 .latest-news-date {
+  padding-right: 4px;
+
   color: var(--color-brand-primary);
 
   font-size: var(--font-size-14);
@@ -420,11 +424,19 @@
 
 
   .latest-news-item {
-    grid-template-columns: 68px minmax(0, 1fr) 18px;
+    grid-template-columns: 76px minmax(0, 1fr) 18px;
 
-    gap: var(--space-8);
+    gap: var(--space-14);
 
     padding: var(--space-12);
+  }
+
+  .latest-news-date {
+    padding-right: 8px;
+  }
+
+  .announcement-item {
+    gap: var(--space-14);
   }
 
 

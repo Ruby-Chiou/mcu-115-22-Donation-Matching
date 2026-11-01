@@ -9,10 +9,10 @@ export const environment = {
   memberDemoUid: null as string | null,
 
   /**
-   * 捐助照片審核。開發時走 Angular proxy，正式站直接打後端。
-   * 後端再呼叫 OpenRouter，並把結果寫回資料庫。
+   * AI 審核／客服：Supabase Edge Functions（免費、不長睡）。
+   * 需在 Dashboard Secrets 設定 OPENROUTER_API_KEY。
    */
-  aiReviewApiUrl: 'https://mcu-115-22-donation-matching-backend.onrender.com',
-  aiChatApiUrl: 'https://mcu-115-22-donation-matching-backend.onrender.com/api/assistant/chat',
+  aiReviewApiUrl: 'https://wxryryyiakzkeeoorlrq.supabase.co/functions/v1/ai-donation-review',
+  aiChatApiUrl: 'https://wxryryyiakzkeeoorlrq.supabase.co/functions/v1/ai-assistant-chat',
   aiInspectionApiUrl: 'http://127.0.0.1:8000',
 };

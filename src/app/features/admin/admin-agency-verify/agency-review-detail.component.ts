@@ -6,6 +6,7 @@ import {
   AgencyApplication,
   ReviewStatus,
 } from '../../../core/services/agency-verification/agency-verification.service';
+import { UiNoticeService } from '../../../core/ui/ui-notice.service';
 import {
   PUBLIC_WELFARE_REGISTRIES,
   PublicRegistryCheck,
@@ -25,6 +26,7 @@ import { VerificationDocumentPreview } from './verification-document-preview';
 export class AgencyReviewDetailComponent implements OnDestroy {
   private readonly documents = inject(AGENCY_DOCUMENT_READER);
   private readonly changes = inject(ChangeDetectorRef);
+  private readonly uiNotice = inject(UiNoticeService);
   private seenId = '';
 
   readonly application = input.required<AgencyApplication>();
@@ -121,14 +123,16 @@ export class AgencyReviewDetailComponent implements OnDestroy {
     this.reviewed.emit({ application, status, note });
   }
 
-  protected requestCancel(): void {
+  protected async requestCancel(): Promise<void> {
     const application = this.application();
     const note = this.reviewReason.trim();
     if (application.accountStatus === 'DELETED' || this.cancelling() || !note) {
       return;
     }
 
-    const confirmed = window.confirm(`確定註銷「${application.name}」？註銷後不能再登入，民眾頁也不再顯示這個機構。`);
+    const confirmed = await this.uiNotice.confirm(
+      `確定註銷「${application.name}」？註銷後不能再登入，民眾頁也不再顯示這個機構。`,
+    );
     if (!confirmed) {
       return;
     }

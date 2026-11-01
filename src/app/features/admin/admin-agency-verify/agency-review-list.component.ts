@@ -1,7 +1,8 @@
-import { Component, input, model, output } from '@angular/core';
+import { Component, inject, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AgencyApplication } from '../../../core/services/agency-verification/agency-verification.service';
+import { UiNoticeService } from '../../../core/ui/ui-notice.service';
 import { AgencyListFilter } from './agency-application-query';
 import { agencyStatusClass, agencyStatusText } from './agency-review-status';
 
@@ -12,6 +13,8 @@ import { agencyStatusClass, agencyStatusText } from './agency-review-status';
   styleUrl: './agency-review-list.component.scss',
 })
 export class AgencyReviewListComponent {
+  private readonly uiNotice = inject(UiNoticeService);
+
   readonly applications = input.required<AgencyApplication[]>();
   readonly keyword = model('');
   readonly status = model<AgencyListFilter>('all');
@@ -32,17 +35,19 @@ export class AgencyReviewListComponent {
     this.status.set('all');
   }
 
-  protected requestCancel(application: AgencyApplication): void {
+  protected async requestCancel(application: AgencyApplication): Promise<void> {
     if (application.accountStatus === 'DELETED' || this.cancellingId() === application.id) {
       return;
     }
 
-    const note = window.prompt(`請填寫註銷「${application.name}」的原因`);
+    const note = await this.uiNotice.prompt(`請填寫註銷「${application.name}」的原因`);
     if (!note?.trim()) {
       return;
     }
 
-    const confirmed = window.confirm(`確定註銷「${application.name}」？註銷後不能再登入，民眾頁也不再顯示這個機構。`);
+    const confirmed = await this.uiNotice.confirm(
+      `確定註銷「${application.name}」？註銷後不能再登入，民眾頁也不再顯示這個機構。`,
+    );
     if (!confirmed) {
       return;
     }

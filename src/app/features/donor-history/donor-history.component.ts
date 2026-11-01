@@ -13,6 +13,7 @@ import { AgencyCertificateService } from '../../core/services/member-center/agen
 import { DonationReceiptService } from '../../core/services/member-center/donation-receipt.service';
 import { DonorDonationHistoryService } from '../../core/services/member-center/donor-donation-history.service';
 import { PublicDonationThankService } from '../../core/services/member-center/public-donation-thank.service';
+import { UiNoticeService } from '../../core/ui/ui-notice.service';
 import { AgencyCertificate, isImageCertificate, isPdfCertificate } from '../../models/member/agency-certificate';
 import {
   DONATION_HISTORY_FILTER_OPTIONS,
@@ -45,6 +46,7 @@ export class DonorHistoryComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly uiNotice = inject(UiNoticeService);
 
   protected readonly isImageCertificate = isImageCertificate;
   protected readonly isPdfCertificate = isPdfCertificate;
@@ -166,6 +168,8 @@ export class DonorHistoryComponent implements OnInit {
 
   readonly trackingDraft = signal('');
   readonly carrierDraft = signal('');
+  readonly storeNameDraft = signal('');
+  readonly storeAddressDraft = signal('');
   readonly trackingSaving = signal(false);
   readonly trackingMessage = signal('');
   readonly nameModeDraft = signal<'masked' | 'full'>('masked');
@@ -195,7 +199,9 @@ export class DonorHistoryComponent implements OnInit {
     this.selectedId.set(record.id);
     this.viewerKind.set(null);
     this.trackingDraft.set(record.trackingNo);
-    this.carrierDraft.set(record.logisticsCarrier);
+    this.carrierDraft.set(record.logisticsCarrier || '');
+    this.storeNameDraft.set(record.logisticsStoreName || '');
+    this.storeAddressDraft.set(record.logisticsStoreAddress || '');
     this.trackingMessage.set('');
     this.nameModeDraft.set(record.thankNameMode);
     this.publicDraft.set(record.thankPublic);
@@ -309,7 +315,7 @@ export class DonorHistoryComponent implements OnInit {
   }
 
   async withdrawPending(record: DonorDonationHistory): Promise<void> {
-    if (!window.confirm('確定撤回這筆尚未審核完成的捐助？撤回後需重新送出。')) {
+    if (!(await this.uiNotice.confirm('確定撤回這筆尚未審核完成的捐助？撤回後需重新送出。'))) {
       return;
     }
 
@@ -357,12 +363,30 @@ export class DonorHistoryComponent implements OnInit {
     this.trackingDraft.set((event.target as HTMLInputElement).value);
   }
 
+  onStoreNameInput(event: Event): void {
+    this.storeNameDraft.set((event.target as HTMLInputElement).value);
+  }
+
+  onStoreAddressInput(event: Event): void {
+    this.storeAddressDraft.set((event.target as HTMLInputElement).value);
+  }
+
+  needsStoreFields(carrier = this.carrierDraft()): boolean {
+    return carrier === '7-ELEVEN' || carrier === '全家';
+  }
+
   async saveTracking(record: DonorDonationHistory): Promise<void> {
     this.trackingSaving.set(true);
     this.trackingMessage.set('');
 
     try {
-      await this.historyService.saveTrackingNumber(record.id, this.trackingDraft(), this.carrierDraft());
+      await this.historyService.saveTrackingNumber(
+        record.id,
+        this.trackingDraft(),
+        this.carrierDraft(),
+        this.storeNameDraft(),
+        this.storeAddressDraft(),
+      );
       await this.thankService.loadBroadcasts();
       this.trackingMessage.set('物流公司與單號已上傳，受助機構看得到這筆寄送資料。');
     } catch (error) {

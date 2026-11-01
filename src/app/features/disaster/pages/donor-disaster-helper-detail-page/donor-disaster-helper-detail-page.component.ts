@@ -9,6 +9,7 @@ import { BeneficiaryPanelComponent } from '../../../../components/card/beneficia
 import { CommentAuthorChipComponent } from '../../../../components/comment/comment-author-chip.component';
 import { canDeleteOwnComment, commentAuthor, commentDeleteError, commentPreviewNotice, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
 import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
 import { AGENCY_OFFICE } from '../../../../models/user/agency';
 import { HelperDemandService } from '../../../../core/services/agency-helper-demand/helper-demand.service';
 import { HelperDemand } from '../../../../models/agency/helper-demand';
@@ -30,6 +31,7 @@ interface CommentThreadNode {
 export class DonorDisasterHelperDetailPageComponent implements OnInit {
   private readonly authRedirect = inject(AuthRedirectService);
   private readonly auth = inject(AuthSessionService);
+  private readonly uiNotice = inject(UiNoticeService);
   commentNotice = '';
   commentSending = false;
   protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
@@ -286,7 +288,7 @@ export class DonorDisasterHelperDetailPageComponent implements OnInit {
   }
 
   async deleteComment(comment: HelperComment): Promise<void> {
-    if (!confirm('刪除這則留言？')) {
+    if (!(await this.uiNotice.confirm('刪除這則留言？'))) {
       return;
     }
 

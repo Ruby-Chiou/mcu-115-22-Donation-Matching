@@ -161,7 +161,14 @@ export class DonationService {
   }
 
   async reviewDonationWithAi(donationId: string): Promise<AiReviewResult> {
-    const response = await fetch(this.aiReviewUrl(donationId), { method: 'POST' });
+    const response = await fetch(this.aiReviewUrl(donationId), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: environment.supabasePublishableKey,
+        Authorization: `Bearer ${environment.supabasePublishableKey}`,
+      },
+    });
     const payload = (await response.json().catch(() => null)) as {
       message?: string;
       donationId?: string;
@@ -249,16 +256,10 @@ export class DonationService {
     };
   }
 
-  /** 本機開發走 proxy，避免 127.0.0.1 被後端 CORS 擋住。正式站直接打 Render。 */
+  /** 直接打 Supabase Edge Function（本機／正式站同一網址）。 */
   private aiReviewUrl(donationId: string): string {
-    const path = `/api/ai-donation-reviews/donations/${encodeURIComponent(donationId)}/ai-review`;
-    const host = typeof location === 'undefined' ? '' : location.hostname;
-
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return path;
-    }
-
-    return `${environment.aiReviewApiUrl}${path}`;
+    const base = environment.aiReviewApiUrl.replace(/\/$/, '');
+    return `${base}?donationId=${encodeURIComponent(donationId)}`;
   }
 
   private toAiReviewResult(donationId: string, data: unknown): AiReviewResult {

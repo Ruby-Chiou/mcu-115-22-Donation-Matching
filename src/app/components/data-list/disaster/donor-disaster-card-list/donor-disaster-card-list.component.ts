@@ -10,6 +10,7 @@ import { DisasterDemandService } from '../../../../core/services/agency-disaster
 import { HelperDemandService } from '../../../../core/services/agency-helper-demand/helper-demand.service';
 import { DisasterControlService } from '../../../../core/services/disaster-control/disaster-control.service';
 
+import { sortByPriorityThenDate } from '../../../../core/codes/demand-codes';
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 import { HelperDemand } from '../../../../models/agency/helper-demand';
 
@@ -105,7 +106,7 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
     const filters = this.filters as MaterialFilters;
 
-    return this.demands.filter((demand) => {
+    const filtered = this.demands.filter((demand) => {
       const categoryMatch = filters.category.length === 0 || filters.category.includes(demand.category);
 
       const priorityMatch = filters.priority.length === 0 || filters.priority.includes(demand.priority);
@@ -114,6 +115,8 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
       return categoryMatch && priorityMatch && remainingMatch;
     });
+
+    return sortByPriorityThenDate(filtered);
   }
 
   get filteredHelpers(): HelperDemand[] {
@@ -123,7 +126,7 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
     const filters = this.filters as HelperFilters;
 
-    return this.helpers.filter((helper) => {
+    const filtered = this.helpers.filter((helper) => {
       const typeMatch = filters.helperType.length === 0 || filters.helperType.includes(helper.type);
 
       const locationMatch =
@@ -131,6 +134,8 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
       return typeMatch && locationMatch;
     });
+
+    return sortByPriorityThenDate(filtered);
   }
 
   get paginatedDemands(): DisasterDemand[] {

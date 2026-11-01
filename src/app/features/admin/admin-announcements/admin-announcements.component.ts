@@ -6,6 +6,7 @@ import {
   PlatformAnnouncementRecord,
   PlatformAnnouncementService,
 } from '../../../core/services/admin/platform-announcement.service';
+import { UiNoticeService } from '../../../core/ui/ui-notice.service';
 
 @Component({
   selector: 'app-admin-announcements',
@@ -15,6 +16,7 @@ import {
 })
 export class AdminAnnouncementsComponent implements OnInit {
   private readonly announcements = inject(PlatformAnnouncementService);
+  private readonly uiNotice = inject(UiNoticeService);
 
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
@@ -78,7 +80,7 @@ export class AdminAnnouncementsComponent implements OnInit {
   }
 
   protected async remove(item: PlatformAnnouncementRecord): Promise<void> {
-    if (!window.confirm('確定刪除這則系統公告？')) {
+    if (!(await this.uiNotice.confirm('確定刪除這則系統公告？'))) {
       return;
     }
 

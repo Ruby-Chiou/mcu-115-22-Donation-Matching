@@ -1,0 +1,66 @@
+<section class="thank-you-list-panel">
+  <h2 class="wall-title">感謝名單</h2>
+
+  @if (wallNotices().length) {
+    <div class="board-notices">
+      @for (notice of wallNotices(); track notice.id) {
+        <article class="board-notice">
+          @if (notice.headline) {
+            <strong>{{ notice.headline }}</strong>
+          }
+          <p>{{ notice.body }}</p>
+        </article>
+      }
+    </div>
+  }
+
+  <div
+    #wallViewport
+    class="thank-you-viewport"
+    (wheel)="onWheel($event)"
+    (touchstart)="onTouchStart($event)"
+  >
+    @if (isLoading()) {
+      <p class="wall-empty">感謝牆載入中...</p>
+    } @else if (errorText()) {
+      <p class="wall-empty">{{ errorText() }}</p>
+    } @else if (!thankService.wall().length) {
+      <p class="wall-empty">目前尚無名單。捐助完成並公開後，會出現在這裡。</p>
+    } @else {
+      <div #wallTrack class="thank-you-track">
+        @for (card of marqueeCards(); track card.trackId) {
+          <article class="thank-you-card">
+            <div class="card-row">
+              <time class="card-date" [attr.datetime]="card.item.publishedAt">
+                {{ card.item.publishedAt | date: 'yyyy/MM/dd' }}
+              </time>
+              <span class="card-label">感謝</span>
+              <span class="donor-name">
+                {{ card.item.displayName }}
+                @if (card.item.honorific) {
+                  <span>{{ card.item.honorific }}</span>
+                }
+              </span>
+            </div>
+            <div class="card-row">
+              <span class="donation-action">捐贈</span>
+              <span class="donation-item">{{ card.item.donationItem }}</span>
+              <span class="organization">至{{ card.item.agencyName }}</span>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div
+        class="thank-scrub"
+        [class.is-visible]="scrubVisible()"
+        (pointerdown)="onScrubPointerDown($event)"
+        role="scrollbar"
+        aria-label="感謝名單位置"
+        aria-orientation="vertical"
+      >
+        <span class="thank-scrub-thumb" [style.top]="thumbTop()"></span>
+      </div>
+    }
+  </div>
+</section>

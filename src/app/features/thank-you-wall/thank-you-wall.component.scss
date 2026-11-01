@@ -1,384 +1,133 @@
 @use 'breakpoint' as bp;
 
-// 感謝牆與黑名單專區
-
-
 .thank-you-page {
   min-height: 100vh;
-  padding: 40px 30px 60px;
-
-  background-color: #dcecf5;
+  padding: 40px 0 0;
+  background-color: var(--bg-action-mist);
+  display: grid;
+  gap: 0;
 }
 
-
-
-// 頁面標題
 .page-title {
-  margin: 0 0 35px;
-
+  margin: 0;
+  padding: 0 50px 20px;
   text-align: center;
-
   color: var(--color-text-main);
   font-size: var(--font-size-32);
   font-weight: var(--font-weight-bold);
+  box-sizing: border-box;
 }
 
-
-
-// 左右主要版面
-
-.wall-layout {
-  display: flex;
-  align-items: stretch;
-
-  max-width: 1500px;
-  width: 100%;
-  margin: 0 auto;
-
-  gap: 24px;
-}
-
-
-
-// 左側：感謝牆
-
-.thank-you-wall {
-  flex: 4;
-
-  background-color: #fff5cb;
-  border-radius: 25px;
-
-  padding: 25px 30px 25px;
-
-  overflow: hidden;
-}
-
-
-// 標題
-.wall-title {
-  margin: 0 0 15px;
-
-  text-align: center;
-
-  color: var(--color-text-main);
-  font-size: var(--font-size-26);
-  font-weight: var(--font-weight-semibold);
-}
-
-
-// 感謝卡區域
 .wall-empty {
-  grid-column: 1 / -1;
   margin: 1rem 0;
   text-align: center;
   color: var(--color-text-main);
 }
 
-.board-notices {
-  display: grid;
-  gap: var(--space-8);
+app-thank-you-list {
+  width: 100%;
+}
+
+.blacklist-section {
+  width: 100%;
+  margin: 0;
+  padding: 28px 50px 48px;
+  background-color: var(--bg-action-mist);
+  box-sizing: border-box;
+}
+
+.blacklist-panel {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 28px;
+  background-color: #c7d3dd;
+  border-radius: 25px;
+  box-sizing: border-box;
+}
+
+.blacklist-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
-.board-notice {
-  padding: 12px 14px;
-  border-radius: var(--radius-12);
-  background: var(--bg-gradient-end);
-  color: #7c2d12;
-  text-align: left;
-
-  p {
-    margin: 4px 0 0;
-  }
-}
-
-.thank-you-list {
-  display: flex;
-  flex-direction: column;
-
-  gap: var(--space-10);
-
-  max-height: 68vh;
-
-  padding: 4px 4px 8px;
-
-  overflow-y: auto;
-}
-
-
-
-// 感謝卡
-
-.thank-you-card {
-  min-height: 0;
-
-  padding: 10px 16px;
-
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  justify-content: flex-start;
-  gap: 8px 18px;
-
-  text-align: left;
-
-  background-color: var(--color-white);
-
-  border-radius: var(--radius-12);
-
-  color: var(--color-text-main);
-
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-
-.card-who,
-.card-what {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 6px;
-}
-
-.card-what {
-  justify-content: flex-start;
-  text-align: left;
-}
-
-
-// 「感謝」
-.card-label {
-  font-size: var(--font-size-13);
-}
-
-
-// 捐助者
-.donor-name {
-  font-size: var(--font-size-16);
-  font-weight: var(--font-weight-bold);
-
-  color: var(--color-brand-primary);
-
-  span {
-    color: var(--color-text-main);
-    font-size: var(--font-size-13);
-    font-weight: var(--font-weight-regular);
-    margin-left: 4px;
-  }
-}
-
-
-// 捐贈
-.donation-action {
-  font-size: var(--font-size-13);
-}
-
-
-// 物品
-.donation-item {
-  font-size: var(--font-size-15);
-  font-weight: var(--font-weight-bold);
-
-  color: var(--color-brand-primary);
-}
-
-
-// 機構
-.organization {
-  font-size: var(--font-size-13);
-  line-height: var(--line-height-snug);
-}
-
-
-
-// 感謝牆捲軸
-
-.thank-you-list::-webkit-scrollbar {
-  width: 7px;
-}
-
-.thank-you-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.5);
-
-  border-radius: var(--radius-10);
-}
-
-.thank-you-list::-webkit-scrollbar-thumb {
-  background-color: #adb9c2;
-
-  border-radius: var(--radius-10);
-}
-
-.thank-you-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-brand-primary);
-}
-
-
-
-// 右側：黑名單
-
-.blacklist {
-  flex: 1;
-
-  padding: var(--space-30);
-
-  background-color: #c7d3dd;
-
-  border-radius: 25px;
-
-  overflow: hidden;
-}
-
-
-// 標題
 .blacklist-title {
-  margin: 0 0 25px;
-
+  margin: 0;
   text-align: center;
-
   color: var(--color-text-main);
-
   font-size: var(--font-size-26);
   font-weight: var(--font-weight-semibold);
 }
 
+.blacklist-load-btn {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-8);
+  background: var(--color-action);
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
 
-// 黑名單內容
 .blacklist-list {
-  max-height: 500px;
-
+  max-height: 420px;
   overflow-y: auto;
 }
 
-
-// 黑名單單筆
 .blacklist-item {
-  padding: 8px 0 14px;
-
+  padding: 10px 0 14px;
   border-bottom: 3px dashed #8d979f;
 
   &:not(:last-child) {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 }
 
-
-// 使用者
 .blacklist-user {
-  font-size: var(--font-size-20);
-  font-weight: var(--font-weight-medium);
-
-  color: var(--color-text-main);
-
   margin-bottom: 4px;
-}
-
-
-// 原因
-.blacklist-reason {
-  font-size: var(--font-size-17);
-
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-main);
+  text-align: center;
 }
 
-
-
-// 黑名單捲軸
-
-.blacklist-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.blacklist-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.25);
-
-  border-radius: var(--radius-10);
-}
-
-.blacklist-list::-webkit-scrollbar-thumb {
-  background-color: #9ba8b1;
-
-  border-radius: var(--radius-10);
-}
-
-.blacklist-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-brand-primary);
+.blacklist-reason {
+  font-size: var(--font-size-16);
+  color: var(--color-text-main);
+  text-align: center;
+  line-height: var(--line-height-normal);
 }
 
 @include bp.tablet {
-  .thank-you-page {
+  .page-title {
+    padding: 0 var(--layout-page-padding) 16px;
+  }
+
+  .blacklist-section {
     padding: 24px var(--layout-page-padding) 40px;
   }
 
-  .wall-layout {
-    flex-direction: column;
-    gap: var(--space-20);
-  }
-
-  .thank-you-wall,
-  .blacklist {
-    flex: none;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .thank-you-card {
-    flex-wrap: wrap;
-    gap: var(--space-8);
+  .blacklist-panel {
+    padding: var(--space-20);
+    border-radius: var(--radius-16);
   }
 }
 
 @include bp.mobile {
-  .thank-you-page {
-    padding: 20px var(--layout-page-padding) 32px;
-  }
-
   .page-title {
-    margin-bottom: 16px;
     font-size: var(--font-size-22);
-    line-height: 1.35;
   }
 
-  .wall-layout {
-    flex-direction: column;
-    gap: var(--space-16);
-  }
-
-  .thank-you-wall,
-  .blacklist {
-    flex: none;
-    width: 100%;
-    padding: var(--space-16);
-    border-radius: var(--radius-16);
-    box-sizing: border-box;
-  }
-
-  .wall-title,
   .blacklist-title {
     font-size: var(--font-size-20);
   }
 
-  .thank-you-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-6);
-  }
-
-  .card-who,
-  .card-what {
-    width: 100%;
-  }
-
-  .thank-you-list,
   .blacklist-list {
     max-height: none;
-  }
-
-  .blacklist-user {
-    font-size: var(--font-size-17);
-  }
-
-  .blacklist-reason {
-    font-size: var(--font-size-15);
-    line-height: var(--line-height-normal);
   }
 }

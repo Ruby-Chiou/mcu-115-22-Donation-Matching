@@ -1,0 +1,164 @@
+@use 'breakpoint' as bp;
+
+.urgent-strip {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 36px;
+  padding: 0 var(--layout-page-padding);
+  box-sizing: border-box;
+}
+
+.urgent-panel {
+  padding: 20px 18px 22px;
+  border: 1px solid var(--border-default);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
+  box-shadow: var(--shadow-soft);
+  box-sizing: border-box;
+}
+
+.urgent-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: var(--font-size-26);
+    color: var(--color-text-main);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-14);
+  }
+}
+
+.urgent-link {
+  color: var(--color-brand-primary);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.urgent-empty {
+  margin: 0;
+  padding: 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-white);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-12);
+}
+
+.urgent-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.urgent-track {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  gap: var(--layout-gap);
+  min-width: 0;
+}
+
+.urgent-card-wrap {
+  min-width: 0;
+
+  :host-context(.urgent-strip) ::ng-deep .featured-card,
+  ::ng-deep .featured-card {
+    height: 420px;
+  }
+
+  ::ng-deep .featured-image,
+  ::ng-deep .featured-image img {
+    height: 150px;
+    flex-basis: 150px;
+  }
+}
+
+.urgent-placeholder {
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  border: 1px dashed #9aa7b5;
+  border-radius: var(--radius-10);
+  background: #f7fafc;
+  box-sizing: border-box;
+  text-align: center;
+
+  p {
+    margin: 0;
+    max-width: 9em;
+    color: #5b6b7c;
+    font-size: var(--font-size-15);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.5;
+  }
+}
+
+.nav {
+  align-self: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-circle);
+  background: var(--color-white);
+  color: var(--color-brand-primary);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@include bp.tablet {
+  .urgent-head h2 {
+    font-size: var(--font-size-22);
+  }
+
+  .urgent-card-wrap ::ng-deep .featured-card {
+    height: 390px;
+  }
+}
+
+@include bp.mobile {
+  .urgent-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .nav {
+    position: absolute;
+    z-index: 2;
+    top: 40%;
+  }
+
+  .nav.prev {
+    left: 4px;
+  }
+
+  .nav.next {
+    right: 4px;
+  }
+
+  .urgent-card-wrap ::ng-deep .featured-card {
+    height: 360px;
+  }
+
+  .urgent-card-wrap ::ng-deep .featured-content h3,
+  .urgent-card-wrap ::ng-deep .info p {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+}

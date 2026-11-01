@@ -57,6 +57,7 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
   showOffShelfWarning = false;
   showOnShelfWarning = false;
   pendingOffShelfItem?: DailyListItem;
+  private pendingOffShelfPreviousStatus?: DailyDisplayStatus;
   statusOptions: DailyDisplayStatus[] = ['已上架', '隱藏中', '已下架'];
   priorityOptions: DailyDemand['priority'][] = ['普通', '緊急', '非常緊急'];
   receiveMethodOptions: ReceiveMethod[] = ['寄送', '面交'];
@@ -488,6 +489,8 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       this.pendingOffShelfItem = item;
+      this.pendingOffShelfPreviousStatus =
+        originalStatus === '隱藏' ? '隱藏中' : originalStatus === '上架' ? '已上架' : item.displayStatus;
       this.refreshItemReference(item);
       this.showOffShelfWarning = true;
 
@@ -579,7 +582,7 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
       await this.dailyDemandService.updateDemand(item);
 
       this.refreshItemReference(item);
-      this.closeOffShelfWarning();
+      this.dismissOffShelfWarning();
       this.cdr.detectChanges();
     } catch (error) {
       console.error('下架更新失敗：', error);
@@ -617,7 +620,7 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
       await this.dailyDemandService.updateDemand(item);
 
       this.refreshItemReference(item);
-      this.closeOffShelfWarning();
+      this.dismissOffShelfWarning();
       this.cdr.detectChanges();
     } catch (error) {
       console.error('隱藏失敗：', error);
@@ -629,9 +632,20 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /** 取消下架時還原下拉選單狀態。 */
   closeOffShelfWarning(): void {
+    if (this.pendingOffShelfItem && this.pendingOffShelfPreviousStatus) {
+      this.pendingOffShelfItem.displayStatus = this.pendingOffShelfPreviousStatus;
+      this.refreshItemReference(this.pendingOffShelfItem);
+    }
+    this.dismissOffShelfWarning();
+  }
+
+  private dismissOffShelfWarning(): void {
     this.showOffShelfWarning = false;
     this.pendingOffShelfItem = undefined;
+    this.pendingOffShelfPreviousStatus = undefined;
+    this.cdr.detectChanges();
   }
 
   closeOnShelfWarning(): void {

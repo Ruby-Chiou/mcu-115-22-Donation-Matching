@@ -9,7 +9,7 @@ export interface DisasterConditions {
   毀損: ConditionStatus;
 }
 
-// 急難救助需求資料
+// 災害救助需求資料
 export interface DisasterDemand {
   id?: number;
   // 基本資料

@@ -16,6 +16,7 @@
   width: auto;
   min-width: 0;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
 .custom-service-list,
@@ -108,13 +109,22 @@
   color: var(--color-action);
 }
 
-/* 物資狀態區 */
+/* 物資狀態區：說明列獨立滿寬，避免溢出蓋住右側輸入框 */
 .condition-area {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin: 35px 0;
+}
+
+.condition-columns {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 24px 32px;
-  margin: 35px 0;
+  width: 100%;
+  min-width: 0;
 }
 
 .condition-title {
@@ -124,14 +134,14 @@
 
 .condition-hint {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-18);
-  margin-bottom: 12px;
+  gap: 8px 18px;
+  margin: 0;
   padding-left: 2px;
   color: var(--color-text-quiet);
   font-size: var(--font-size-13);
   font-weight: var(--font-weight-regular);
-  white-space: nowrap;
 }
 
 .category-field {

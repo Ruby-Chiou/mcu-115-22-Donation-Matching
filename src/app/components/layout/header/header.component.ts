@@ -1,4 +1,4 @@
-import { Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
@@ -7,6 +7,7 @@ import { navigationFor } from '../../../core/auth/navigation-catalog';
 import { APP_ROLE_LABEL } from '../../../models/auth/app-role';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
+import { GuidedTourService } from '../../../core/services/guided-tour/guided-tour.service';
 import { MemberMessageService } from '../../../core/services/member-center/member-message.service';
 import { MemberMailDispatchService } from '../../../core/services/member-center/member-mail-dispatch.service';
 import { MemberNotificationSettingsService } from '../../../core/services/member-center/member-notification-settings.service';
@@ -20,6 +21,7 @@ import { MemberNotificationSettingsService } from '../../../core/services/member
 export class HeaderComponent implements OnInit {
   protected readonly auth = inject(AuthSessionService);
   protected readonly messageService = inject(MemberMessageService);
+  protected readonly tour = inject(GuidedTourService);
   private readonly notifications = inject(MemberNotificationSettingsService);
   private readonly mail = inject(MemberMailDispatchService);
   private readonly disaster = inject(DisasterControlService);
@@ -36,8 +38,43 @@ export class HeaderComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {
-        this.menuOpen = false;
+        if (!this.tour.isActive()) {
+          this.menuOpen = false;
+        }
       });
+
+    effect(() => {
+      // 導覽用 menuForcedOpen 控制選單顯示，不要寫進 menuOpen，否則導覽結束後選單會卡住。
+      if (this.tour.isActive() && !this.tour.menuForcedOpen()) {
+        this.menuOpen = false;
+      }
+      const role = this.auth.principal().role;
+      if (role === 'donor' || role === 'admin') {
+        this.menuOpen = false;
+      }
+    });
+  }
+
+  protected tourKey(name: string): string | null {
+    if (name === '捐助專區') return 'guest-donate-area';
+    if (name === '關於我們') return 'guest-about-area';
+    if (name === '客服中心') return 'guest-service-area';
+    if (name === '機構作業') return 'agency-work-area';
+    if (name === '災害救助') return 'agency-disaster';
+    return null;
+  }
+
+  protected subTourKey(link: string): string | null {
+    if (link === '/donor/daily') return 'guest-daily';
+    if (link === '/platform-guide') return 'guest-guide';
+    if (link === '/customer-service/faq') return 'guest-faq';
+    if (link === '/agency/disaster') return 'agency-disaster';
+    return null;
+  }
+
+  protected isTourDropdownOpen(name: string): boolean {
+    const key = this.tourKey(name);
+    return !!key && this.tour.dropdownForced() === key;
   }
 
   ngOnInit(): void {

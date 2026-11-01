@@ -7,6 +7,7 @@ import { memberMessageActions } from '../../../core/auth/member-message-actions'
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { DonorDonationHistoryService } from '../../../core/services/member-center/donor-donation-history.service';
 import { MemberMessageService } from '../../../core/services/member-center/member-message.service';
+import { UiNoticeService } from '../../../core/ui/ui-notice.service';
 import { MESSAGE_CATEGORY_LABELS, MemberMessage, MessageCategory, MessageFolder } from '../../../models/member/member-message';
 
 type InboxFilter = 'ALL' | 'UNREAD' | 'STARRED' | MessageCategory;
@@ -22,6 +23,7 @@ export class MemberInboxComponent implements OnInit {
   protected readonly messageService = inject(MemberMessageService);
   private readonly historyService = inject(DonorDonationHistoryService);
   private readonly auth = inject(AuthSessionService);
+  private readonly uiNotice = inject(UiNoticeService);
 
   readonly categoryLabels = MESSAGE_CATEGORY_LABELS;
   readonly filterOptions: { value: InboxFilter; label: string }[] = [
@@ -128,7 +130,7 @@ export class MemberInboxComponent implements OnInit {
   }
 
   async deleteMessage(message: MemberMessage): Promise<void> {
-    if (!window.confirm(`確定要刪除「${message.subject}」嗎？`)) {
+    if (!(await this.uiNotice.confirm(`確定要刪除「${message.subject}」嗎？`))) {
       return;
     }
 

@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 import { AuthPrincipal, GUEST_PRINCIPAL } from '../../../models/auth/app-role';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { DisasterControlData, DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
+import { GuidedTourService } from '../../../core/services/guided-tour/guided-tour.service';
 import { HeaderComponent } from './header.component';
 
 describe('HeaderComponent', () => {
@@ -40,6 +41,15 @@ describe('HeaderComponent', () => {
         {
           provide: DisasterControlService,
           useValue: { data: disaster.asReadonly() },
+        },
+        {
+          provide: GuidedTourService,
+          useValue: {
+            isActive: signal(false).asReadonly(),
+            menuForcedOpen: signal(false).asReadonly(),
+            dropdownForced: signal('').asReadonly(),
+            showPrompt: signal(false).asReadonly(),
+          },
         },
       ],
     }).compileComponents();
@@ -91,7 +101,7 @@ describe('HeaderComponent', () => {
       displayName: '測試受助者',
     });
 
-    expect(component.navItems.find((item) => item.name === '急難救助')).toBeUndefined();
+    expect(component.navItems.find((item) => item.name === '災害救助')).toBeUndefined();
     expect(component.navItems.find((item) => item.name === '前台頁面')?.sub.map((item) => item.name)).toEqual([
       '日常捐助',
       '捐助地圖',
@@ -101,7 +111,7 @@ describe('HeaderComponent', () => {
 
     disaster.update((current) => ({ ...current, isOpen: true }));
 
-    expect(component.navItems.find((item) => item.name === '急難救助')?.link).toBe('/agency/disaster');
+    expect(component.navItems.find((item) => item.name === '災害救助')?.link).toBe('/agency/disaster');
     expect(component.navItems.find((item) => item.name === '前台頁面')?.sub.map((item) => item.name)).toContain('災害救助');
   });
 });

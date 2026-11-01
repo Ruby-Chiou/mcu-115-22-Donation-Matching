@@ -19,34 +19,34 @@
 
     <label class="field full">
       <span>電子信箱</span>
-      <input type="email" [(ngModel)]="donorForm.email" name="donorEmail" placeholder="可用 Gmail 或學校信箱" />
+      <input type="email" [(ngModel)]="donorForm.email" name="donorEmail" placeholder="可用 Gmail 或學校信箱" (input)="clearFieldError($event)" />
     </label>
 
     @if (kind === 'individual') {
       <label class="field full">
         <span>帳號名稱</span>
-        <input type="text" [(ngModel)]="donorForm.accountName" name="donorAccountName" />
+        <input type="text" [(ngModel)]="donorForm.accountName" name="donorAccountName" (input)="clearFieldError($event)" />
       </label>
       <label class="field full">
         <span>真實姓名</span>
-        <input type="text" [(ngModel)]="donorForm.fullName" name="fullName" />
+        <input type="text" [(ngModel)]="donorForm.fullName" name="fullName" (input)="clearFieldError($event)" />
       </label>
     } @else {
       <label class="field full">
         <span>公司名稱</span>
-        <input type="text" [(ngModel)]="donorForm.companyName" name="companyName" />
+        <input type="text" [(ngModel)]="donorForm.companyName" name="companyName" (input)="clearFieldError($event)" />
       </label>
       <label class="field full">
         <span>統一編號</span>
-        <input type="text" [(ngModel)]="donorForm.taxId" name="taxId" inputmode="numeric" maxlength="8" />
+        <input type="text" [(ngModel)]="donorForm.taxId" name="taxId" inputmode="numeric" maxlength="8" (input)="clearFieldError($event)" />
       </label>
       <label class="field full">
         <span>負責人姓名</span>
-        <input type="text" [(ngModel)]="donorForm.representative" name="representative" />
+        <input type="text" [(ngModel)]="donorForm.representative" name="representative" (input)="clearFieldError($event)" />
       </label>
       <label class="field full">
         <span>公司地址</span>
-        <input type="text" [(ngModel)]="donorForm.address" name="address" />
+        <input type="text" [(ngModel)]="donorForm.address" name="address" (input)="clearFieldError($event)" />
       </label>
       <label class="field full">
         <span>公司登記文件</span>
@@ -56,7 +56,7 @@
 
     <label class="field full">
       <span>聯絡電話</span>
-      <input type="tel" [(ngModel)]="donorForm.phone" name="phone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10 位數字" />
+      <input type="tel" [(ngModel)]="donorForm.phone" name="phone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10 位數字" (input)="clearFieldError($event)" />
     </label>
 
     <label class="field">
@@ -70,6 +70,7 @@
           maxlength="64"
           autocomplete="new-password"
           placeholder="至少 8 碼，含大小寫與數字"
+          (input)="clearFieldError($event)"
         />
         <button
           type="button"
@@ -93,6 +94,7 @@
           minlength="8"
           maxlength="64"
           autocomplete="new-password"
+          (input)="clearFieldError($event)"
         />
         <button
           type="button"
@@ -117,6 +119,8 @@
     <button type="submit" class="primary-btn" [disabled]="submitting">{{ submitting ? '送出中...' : '送出註冊' }}</button>
   </div>
 
+  <p class="submit-message" [class.is-error]="isError" *ngIf="submitMessage" role="alert">{{ submitMessage }}</p>
+
   @if (kind === 'individual') {
     <div class="social-login">
       <div class="social-row">
@@ -136,6 +140,4 @@
       </div>
     </div>
   }
-
-  <p class="submit-message" [class.is-error]="isError" *ngIf="submitMessage">{{ submitMessage }}</p>
 </form>

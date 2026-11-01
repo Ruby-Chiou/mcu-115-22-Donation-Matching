@@ -6,7 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CompanyCertificateRegistry } from '../../../core/auth/company-certificate.registry';
 import { oauthRedirectUrl } from '../../../core/auth/oauth-redirect-url';
 import { registrationPasswordMessage, registrationPhoneMessage } from '../../../core/auth/registration-rules';
-import { toLoginMessage } from '../../../core/auth/login-message';
+import { toRegisterMessage } from '../../../core/auth/login-message';
 import { AuthRedirectService } from '../../../core/services/auth/auth-redirect.service';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { PasswordResetService } from '../../../core/services/auth/password-reset.service';
@@ -91,9 +91,14 @@ export class DonorRegisterComponent {
       await this.social.start(provider, null);
     } catch (error) {
       this.isError = true;
-      this.submitMessage = toLoginMessage(error);
+      this.submitMessage = toRegisterMessage(error);
       this.submitting = false;
     }
+  }
+
+  clearFieldError(event: Event): void {
+    const target = event.target as HTMLElement | null;
+    target?.classList.remove('input-error', 'shake');
   }
 
   async onSubmit(): Promise<void> {
@@ -176,7 +181,7 @@ export class DonorRegisterComponent {
           return;
         }
 
-        this.submitMessage = toLoginMessage(error, email);
+        this.submitMessage = toRegisterMessage(error, email);
         return;
       }
 
@@ -214,7 +219,7 @@ export class DonorRegisterComponent {
       this.submitMessage = '註冊已送出。Gmail 或學校信箱都可直接用帳密密碼登入；若仍提示未啟用，請到收件匣（含垃圾郵件）點啟用連結後再登入。';
     } catch (error) {
       this.isError = true;
-      this.submitMessage = toLoginMessage(error);
+      this.submitMessage = toRegisterMessage(error);
     } finally {
       this.submitting = false;
     }

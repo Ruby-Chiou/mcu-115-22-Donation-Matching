@@ -106,7 +106,8 @@ header {
         }
       }
 
-      &:hover .dropdown-menu {
+      &:hover .dropdown-menu,
+      &.tour-open .dropdown-menu {
         display: block;
       }
     }
@@ -232,7 +233,7 @@ header {
     }
   }
 
-  /* 平板橫向／窄筆電仍用橫向導覽時：兩字一行，避免「專區」只剩一個字掉下去。 */
+  /* 1024–1280：維持四字一排橫向導覽，不強制兩字換行。 */
   @media (min-width: #{bp.$screen-desktop}) and (max-width: 1280px) {
     .nav-wrapper {
       height: auto;
@@ -241,21 +242,27 @@ header {
     }
 
     .center nav {
-      gap: 14px;
+      gap: 12px;
 
       .nav-item-with-dropdown {
         padding-bottom: 8px;
         margin-bottom: -8px;
 
         & > a {
-          align-items: flex-start;
+          white-space: nowrap;
 
           .nav-label {
-            max-width: 2.05em;
-            word-break: break-all;
+            max-width: none;
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow-wrap: normal;
           }
         }
       }
+    }
+
+    .nav-panel {
+      gap: 12px;
     }
   }
 

@@ -8,6 +8,7 @@ import { DailyComment } from '../../../../core/services/comments/daily-comment.s
 import { CommentAuthorChipComponent } from '../../../../components/comment/comment-author-chip.component';
 import { canDeleteOwnComment, commentAuthor, commentDeleteError, commentPreviewNotice, commentWriteError, withCommentPreviews } from '../../../../components/comment/comment-author.data';
 import { AuthSessionService } from '../../../../core/services/auth/auth-session.service';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
 
 interface CommentThreadNode {
   comment: DailyComment;
@@ -25,6 +26,7 @@ interface CommentThreadNode {
 export class DailyCommentPageComponent implements OnInit {
   private readonly currentUserId = '00000000-0000-0000-0000-000000000002';
   private readonly auth = inject(AuthSessionService);
+  private readonly uiNotice = inject(UiNoticeService);
   commentNotice = '';
 
   demandId = 0;
@@ -221,7 +223,7 @@ export class DailyCommentPageComponent implements OnInit {
   }
 
   async deleteComment(comment: DailyComment): Promise<void> {
-    if (!confirm('刪除這則留言？')) {
+    if (!(await this.uiNotice.confirm('刪除這則留言？'))) {
       return;
     }
 

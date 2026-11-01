@@ -53,13 +53,13 @@ export class AgencyLoginComponent {
     this.submitMessage = '';
 
     try {
-      this.submitMessage = '憑證驗證成功，即將進入受助者後台…';
       await this.redirect.signIn(
         login.email,
         login.password,
         false,
         this.route.snapshot.queryParamMap.get('returnUrl'),
       );
+      this.submitMessage = '憑證驗證成功，即將進入受助者後台…';
     } catch (error) {
       this.gateOpen = false;
       this.isError = true;

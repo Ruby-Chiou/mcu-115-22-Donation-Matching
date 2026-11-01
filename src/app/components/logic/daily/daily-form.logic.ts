@@ -22,38 +22,24 @@ export class DailyFormLogic extends DailyFormLogicBase {
 
     this.fromDetail = this.route.snapshot.queryParamMap.get('from') === 'detail';
 
-    console.log('[DailyFormLogic] 取得路由資料庫 id：', {
-      rawId,
-      id,
-    });
-
     if (rawId === null) {
       this.isEditMode = false;
-      console.log('[DailyFormLogic] 新增模式');
       return;
     }
 
     if (!Number.isInteger(id) || id <= 0) {
       console.error('[DailyFormLogic] 編輯網址的資料庫 id 不正確：', rawId);
-
       await this.router.navigate(['/agency/daily']);
       return;
     }
 
     this.isEditMode = true;
 
-    console.log('[DailyFormLogic] 編輯模式，資料庫 id：', id);
-
     try {
       const data = await this.dailyDemandService.getDemandById(id);
 
-      console.log('[DailyFormLogic] Service 回傳編輯資料：', data);
-
-      console.log('[DailyFormLogic] 編輯 conditions：', data?.conditions);
-
       if (!data) {
         console.error('[DailyFormLogic] 找不到要編輯的日常需求，id：', id);
-
         await this.router.navigate(['/agency/daily']);
         return;
       }
@@ -96,7 +82,6 @@ export class DailyFormLogic extends DailyFormLogicBase {
 
       this.imageFiles = [];
 
-      console.log('[DailyFormLogic] 編輯資料已載入：', this.demand);
     } catch (error) {
       console.error('[DailyFormLogic] 載入日常編輯資料失敗：', error);
 

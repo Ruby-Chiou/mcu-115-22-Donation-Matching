@@ -150,7 +150,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     ];
 
     if (this.disasterOpen) {
-      work.push({ name: '急難救助', desc: '管理這家的災害需求', path: open ? '/agency/disaster' : null });
+      work.push({ name: '災害救助', desc: '管理這家的災害需求', path: open ? '/agency/disaster' : null });
     }
 
     return [

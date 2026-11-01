@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, from } from 'rxjs';
 
+import { priorityCode, priorityLabel } from '../../codes/demand-codes';
 import { DisasterDemand, CreateDisasterDemand } from '../../../models/agency/disaster-demand';
 import { DemandRepository } from '../../demands/demand-repository';
 import { SupabaseService } from '../database/supabase.service';
@@ -134,7 +135,7 @@ export class DisasterDemandService implements DemandRepository<DisasterDemand> {
 
       customConditions: this.toCustomConditions(row.conditionDescription),
 
-      priority: row.priority as DisasterDemand['priority'],
+      priority: this.mapPriorityLabel(row.priority),
 
       status: row.status as DisasterDemand['status'],
 
@@ -200,7 +201,7 @@ export class DisasterDemandService implements DemandRepository<DisasterDemand> {
 
       conditionDescription: this.conditionsToStored(demand),
 
-      priority: demand.priority,
+      priority: this.mapPriorityCode(demand.priority),
 
       status: demand.status,
 
@@ -230,6 +231,14 @@ export class DisasterDemandService implements DemandRepository<DisasterDemand> {
 
       note: demand.note ?? '',
     };
+  }
+
+  private mapPriorityLabel(value: string | null | undefined): DisasterDemand['priority'] {
+    return priorityLabel(value);
+  }
+
+  private mapPriorityCode(value: string | null | undefined): string {
+    return priorityCode(value);
   }
 
   private toStringArray(value: unknown): string[] {

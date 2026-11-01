@@ -27,6 +27,8 @@ interface DonationHistoryRow {
   human_checked_at: string | null;
   logistics_carrier: string | null;
   tracking_no: string | null;
+  logistics_store_name: string | null;
+  logistics_store_address: string | null;
   receipt_confirmed_at: string | null;
   receipt_partial: boolean | null;
   receipt_declined_video: boolean | null;
@@ -81,6 +83,8 @@ export class DonorDonationHistoryService {
         human_checked_at,
         logistics_carrier,
         tracking_no,
+        logistics_store_name,
+        logistics_store_address,
         receipt_confirmed_at,
         receipt_partial,
         receipt_declined_video
@@ -88,6 +92,10 @@ export class DonorDonationHistoryService {
       )
       .eq('donor_uid', uid)
       .order('created_at', { ascending: false });
+
+    if (error && /logistics_store_/i.test(error.message ?? '')) {
+      return this.loadHistoryWithoutStoreColumns(uid);
+    }
 
     if (error) {
       console.error('讀取個人捐助歷史失敗：', error);
@@ -100,6 +108,52 @@ export class DonorDonationHistoryService {
     const records = rows.map((row) => this.mapRow(row, demandMap.get(row.demand_id)));
     this.recordsSignal.set(records);
 
+    return records;
+  }
+
+  private async loadHistoryWithoutStoreColumns(uid: string): Promise<DonorDonationHistory[]> {
+    const { data, error } = await this.supabaseService.client
+      .from(this.donationTable)
+      .select(
+        `
+        id,
+        donor_uid,
+        demand_id,
+        actual_material,
+        quantity,
+        donation_method,
+        status,
+        ai_decision,
+        ai_reason,
+        human_decision,
+        human_reason,
+        need_receipt,
+        need_thank_you,
+        thank_name_mode,
+        thank_public,
+        note,
+        created_at,
+        ai_checked_at,
+        human_checked_at,
+        logistics_carrier,
+        tracking_no,
+        receipt_confirmed_at,
+        receipt_partial,
+        receipt_declined_video
+      `,
+      )
+      .eq('donor_uid', uid)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('讀取個人捐助歷史失敗：', error);
+      throw error;
+    }
+
+    const rows = (data ?? []) as DonationHistoryRow[];
+    const demandMap = await this.loadDemandMeta(rows.map((row) => row.demand_id));
+    const records = rows.map((row) => this.mapRow(row, demandMap.get(row.demand_id)));
+    this.recordsSignal.set(records);
     return records;
   }
 
@@ -155,6 +209,8 @@ export class DonorDonationHistoryService {
       humanCheckedAt: row.human_checked_at,
       logisticsCarrier: row.logistics_carrier ?? '',
       trackingNo: row.tracking_no ?? '',
+      logisticsStoreName: row.logistics_store_name ?? '',
+      logisticsStoreAddress: row.logistics_store_address ?? '',
       receiptConfirmedAt: row.receipt_confirmed_at,
       receiptPartial: !!row.receipt_partial,
       receiptDeclinedVideo: !!row.receipt_declined_video,
@@ -274,10 +330,19 @@ export class DonorDonationHistoryService {
   }
 
   /** 審核已通過的寄送捐助，才能由捐助者補上物流公司與單號 */
-  async saveTrackingNumber(donationId: string, trackingNo: string, logisticsCarrier: string): Promise<void> {
+  async saveTrackingNumber(
+    donationId: string,
+    trackingNo: string,
+    logisticsCarrier: string,
+    storeName = '',
+    storeAddress = '',
+  ): Promise<void> {
     const uid = await this.session.getCurrentUid();
     const trimmed = trackingNo.trim();
     const carrier = logisticsCarrier.trim();
+    const store = storeName.trim();
+    const address = storeAddress.trim();
+    const needsStore = carrier === '7-ELEVEN' || carrier === '全家';
 
     if (!carrier) {
       throw new Error('請選擇物流公司');
@@ -287,12 +352,28 @@ export class DonorDonationHistoryService {
       throw new Error('請輸入物流單號');
     }
 
-    const { error } = await this.supabaseService.client.rpc('upload_donation_tracking', {
+    if (needsStore && (!store || !address)) {
+      throw new Error('超商取件請填寫門市名稱與地址');
+    }
+
+    let { error } = await this.supabaseService.client.rpc('upload_donation_tracking', {
       p_donation_id: donationId,
       p_donor_uid: uid,
       p_tracking: trimmed,
       p_carrier: carrier,
+      p_store_name: needsStore ? store : null,
+      p_store_address: needsStore ? address : null,
     });
+
+    // 舊版 RPC 尚未含門市欄位時，退回四參數上傳。
+    if (error && /could not find|function.*does not exist|p_store_/i.test(error.message ?? '')) {
+      ({ error } = await this.supabaseService.client.rpc('upload_donation_tracking', {
+        p_donation_id: donationId,
+        p_donor_uid: uid,
+        p_tracking: needsStore && store ? `${trimmed}｜${store}｜${address}` : trimmed,
+        p_carrier: carrier,
+      }));
+    }
 
     if (error) {
       console.error('上傳物流資料失敗：', error);
@@ -301,8 +382,16 @@ export class DonorDonationHistoryService {
 
     this.recordsSignal.update((records) =>
       records.map((record) =>
-        record.id === donationId ? { ...record, trackingNo: trimmed, logisticsCarrier: carrier } : record
-      )
+        record.id === donationId
+          ? {
+              ...record,
+              trackingNo: trimmed,
+              logisticsCarrier: carrier,
+              logisticsStoreName: needsStore ? store : '',
+              logisticsStoreAddress: needsStore ? address : '',
+            }
+          : record,
+      ),
     );
   }
 }

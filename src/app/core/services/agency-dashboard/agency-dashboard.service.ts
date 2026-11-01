@@ -52,7 +52,7 @@ export class AgencyDashboardService {
       .from('agency_daily_supply_items')
       .select('id, serialNo, item, amount, remaining, unit')
       .eq('status', '上架')
-      .eq('priority', '非常緊急')
+      .in('priority', ['非常緊急', 'P1'])
       .order('publishedAt', { ascending: false });
 
     if (error) {

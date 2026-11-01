@@ -10,6 +10,8 @@ import {
   DonorAdminStatus,
 } from '../../../core/services/admin/donor-account-admin.service';
 import { DonorActivity, DonorActivityItem, DonorActivityKind, DonorDeskService } from '../../../core/services/admin/donor-desk.service';
+import { UiNoticeService } from '../../../core/ui/ui-notice.service';
+import { DONOR_LOGIN_PROVIDER_LABELS, DonorLoginProvider } from '../../../models/user/donor';
 
 type DonorPanel = 'activity' | 'message' | 'thank' | 'blacklist';
 
@@ -33,6 +35,7 @@ export class AdminDonorDetailComponent implements OnInit {
   private readonly accounts = inject(DonorAccountAdminService);
   private readonly desk = inject(DonorDeskService);
   private readonly route = inject(ActivatedRoute);
+  private readonly uiNotice = inject(UiNoticeService);
 
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
@@ -88,6 +91,26 @@ export class AdminDonorDetailComponent implements OnInit {
       return '個人';
     }
     return '未標記';
+  }
+
+  protected isSocialLogin(person: DonorAccountRecord): boolean {
+    const provider = (person.loginProvider || '').toLowerCase();
+    return provider === 'google' || provider === 'line' || provider === 'facebook' || (!person.email && provider !== 'email');
+  }
+
+  protected providerLabel(person: DonorAccountRecord): string {
+    const raw = (person.loginProvider || '').toLowerCase();
+    if (raw === 'google' || raw === 'line' || raw === 'facebook' || raw === 'email') {
+      const label = DONOR_LOGIN_PROVIDER_LABELS[raw as DonorLoginProvider];
+      if (!person.email && raw !== 'email') {
+        return `${label}（未綁定信箱）`;
+      }
+      return label;
+    }
+    if (!person.email) {
+      return '第三方登入（未標示來源）';
+    }
+    return person.loginProvider || 'Email 帳號';
   }
 
   protected mark(uid: string): { thank: boolean; blacklist: boolean } {
@@ -148,7 +171,10 @@ export class AdminDonorDetailComponent implements OnInit {
       return;
     }
 
-    const confirmed = window.confirm(`確定要註銷「${donor.displayName || donor.email}」？註銷後對方無法登入，此操作可再改回使用中。`);
+    const confirmed = await this.uiNotice.confirm(
+      `確定要註銷「${donor.displayName || donor.email}」？註銷後對方無法登入，此操作可再改回使用中。`,
+      '註銷帳號',
+    );
     if (!confirmed) {
       return;
     }

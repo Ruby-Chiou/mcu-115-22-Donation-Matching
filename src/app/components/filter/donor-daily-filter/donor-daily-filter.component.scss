@@ -90,10 +90,19 @@
   display: none;
 }
 
+.sort-row {
+  border-bottom: 1px solid var(--border-hairline);
+}
+
 @include bp.mobile {
   .filter-section {
     width: auto;
     margin: 0 var(--layout-page-padding) 16px;
+  }
+
+  .sort-row {
+    display: flex;
+    flex-direction: column;
   }
 
   .filter-toggle {

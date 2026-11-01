@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { DonorAccountAdminService, DonorAccountRecord, DonorAdminStatus } from '../../../core/services/admin/donor-account-admin.service';
 import { DonorDeskService } from '../../../core/services/admin/donor-desk.service';
+import { DONOR_LOGIN_PROVIDER_LABELS, DonorLoginProvider } from '../../../models/user/donor';
 
 @Component({
   selector: 'app-admin-donors',
@@ -44,6 +45,20 @@ export class AdminDonorsComponent implements OnInit {
       return '已註銷';
     }
     return '使用中';
+  }
+
+  protected isSocialLogin(donor: DonorAccountRecord): boolean {
+    const provider = (donor.loginProvider || '').toLowerCase();
+    return provider === 'google' || provider === 'line' || provider === 'facebook' || (!donor.email && provider !== 'email');
+  }
+
+  protected providerLabel(donor: DonorAccountRecord): string {
+    const raw = (donor.loginProvider || '').toLowerCase();
+    if (raw === 'google' || raw === 'line' || raw === 'facebook' || raw === 'email') {
+      const label = DONOR_LOGIN_PROVIDER_LABELS[raw as DonorLoginProvider];
+      return !donor.email && raw !== 'email' ? `${label}（未綁定信箱）` : label;
+    }
+    return donor.email ? 'Email 帳號' : '第三方登入（未標示來源）';
   }
 
   protected mark(uid: string): { thank: boolean; blacklist: boolean } {

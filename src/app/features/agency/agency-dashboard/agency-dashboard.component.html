@@ -1,4 +1,4 @@
-<section class="agency-dashboard">
+<section class="agency-dashboard" data-tour="agency-dashboard">
   <header class="dashboard-header">
     <div>
       <h1>社福機構總控制台</h1>
@@ -13,9 +13,9 @@
           <i class="card-icon" [class]="card.icon" aria-hidden="true"></i>
           <span class="coming-soon-badge">已關閉</span>
         </div>
-        <p class="card-title">急難救助</p>
+        <p class="card-title">災害救助</p>
         <p class="card-value card-value-unavailable">關閉</p>
-        <p class="card-description">管理者已關閉此模式，前台與機構作業都不會顯示急難救助。</p>
+        <p class="card-description">管理者已關閉此模式，前台與機構作業都不會顯示災害救助。</p>
       </article>
       } @else if (card.isAvailable) {
       <a class="summary-card" [class.emergency-card]="card.type === 'emergency'" [routerLink]="card.route">
@@ -73,11 +73,11 @@
         <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
         平台通知
       </h2>
-      <ul>
+      <ul class="feed-announcement-list">
         @for (item of announcements(); track item.date + item.text) {
-          <li>
-            <time>{{ item.date }}</time>
-            <p>{{ item.text }}</p>
+          <li class="feed-announcement-item">
+            <time class="feed-announcement-date">{{ item.date }}</time>
+            <p class="feed-announcement-text">{{ item.text }}</p>
           </li>
         }
       </ul>
@@ -87,15 +87,15 @@
         <i class="fa-solid fa-newspaper" aria-hidden="true"></i>
         最新消息
       </h2>
-      <ul>
+      <ul class="feed-news-list">
         @for (news of latestNews; track news.title) {
           <li>
             @if (isExternalNewsLink(news.link)) {
-              <a [href]="news.link" target="_blank" rel="noopener noreferrer">
+              <a [href]="news.link" target="_blank" rel="noopener noreferrer" class="feed-news-item">
                 <ng-container *ngTemplateOutlet="dashboardNews; context: { $implicit: news }" />
               </a>
             } @else {
-              <a [routerLink]="news.link">
+              <a [routerLink]="news.link" class="feed-news-item">
                 <ng-container *ngTemplateOutlet="dashboardNews; context: { $implicit: news }" />
               </a>
             }
@@ -103,10 +103,12 @@
         }
       </ul>
       <ng-template #dashboardNews let-news>
-        <time>{{ news.date }}</time>
-        <span class="news-category">{{ news.category }}</span>
-        <strong>{{ news.title }}</strong>
-        <p>{{ news.content }}</p>
+        <div class="feed-news-date">{{ news.date }}</div>
+        <div class="feed-news-category">{{ news.category }}</div>
+        <div class="feed-news-content">
+          <strong>{{ news.title }}</strong>
+          <p>{{ news.content }}</p>
+        </div>
       </ng-template>
     </div>
   </section>

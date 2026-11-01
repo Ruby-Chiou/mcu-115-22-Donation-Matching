@@ -1,4 +1,4 @@
-export function toLoginMessage(error: unknown, email = ''): string {
+function authFailureMessage(error: unknown, email: string, fallback: string): string {
   const message = error instanceof Error ? error.message : '';
   const looksGmail = /@gmail\.com$/i.test(email.trim()) || /@googlemail\.com$/i.test(email.trim());
 
@@ -12,6 +12,10 @@ export function toLoginMessage(error: unknown, email = ''): string {
 
   if (/email not confirmed/i.test(message)) {
     return '信箱尚未完成驗證。請到收件匣（含垃圾郵件）點啟用連結，或到「忘記密碼」重設後再登入。';
+  }
+
+  if (/user already registered|already been registered|already registered/i.test(message)) {
+    return '此信箱已經註冊。請直接登入；若曾用 Google，請改按 Google 或到忘記密碼設定密碼。';
   }
 
   if (/provider is not enabled|unsupported provider/i.test(message)) {
@@ -38,5 +42,17 @@ export function toLoginMessage(error: unknown, email = ''): string {
     return '註冊時寫入身分資料失敗，請稍後再試。';
   }
 
-  return '登入失敗，請稍後再試。';
+  if (/password should be|password.*weak|signup_disabled/i.test(message)) {
+    return '密碼不符合規則，或此信箱目前無法註冊，請確認後再試。';
+  }
+
+  return fallback;
+}
+
+export function toLoginMessage(error: unknown, email = ''): string {
+  return authFailureMessage(error, email, '登入失敗，請稍後再試。');
+}
+
+export function toRegisterMessage(error: unknown, email = ''): string {
+  return authFailureMessage(error, email, '註冊失敗，請稍後再試。');
 }

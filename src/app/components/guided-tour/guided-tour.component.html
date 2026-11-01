@@ -1,0 +1,35 @@
+@if (tour.showPrompt()) {
+  <aside class="tour-prompt" role="dialog" aria-label="導覽教學詢問">
+    <button type="button" class="close" (click)="tour.dismissPrompt()" aria-label="關閉">×</button>
+    <p class="eyebrow">導覽提示</p>
+    <h2>需要導覽教學嗎？</h2>
+    <p>
+      @if (tour.currentAudience() === 'agency') {
+        初次使用受助者後台時，可用幾步標示常用按鈕位置（含審核、收件與災害入口）。
+      } @else {
+        會先說明平台用途，再標示捐助專區、平台導覽與常見問題等入口。
+      }
+    </p>
+    <div class="actions">
+      <button type="button" class="primary" (click)="tour.accept()">開始導覽</button>
+      <button type="button" class="ghost" (click)="tour.decline()">暫時不用</button>
+    </div>
+  </aside>
+}
+
+@if (tour.isActive() && tour.currentStep(); as step) {
+  @if (spotlight(); as box) {
+    <div class="tour-spotlight" [ngStyle]="box" aria-hidden="true"></div>
+  }
+  <aside class="tour-tip" role="dialog" aria-live="polite" [ngStyle]="tipStyle()">
+    <p class="step-count">{{ tour.stepNumber() }} / {{ tour.stepTotal() }}</p>
+    <h3>{{ step.title }}</h3>
+    <p>{{ step.body }}</p>
+    <div class="actions">
+      <button type="button" class="ghost" (click)="tour.skip()">結束</button>
+      <button type="button" class="primary" (click)="tour.next()">
+        {{ tour.stepNumber() >= tour.stepTotal() ? '完成' : '下一步' }}
+      </button>
+    </div>
+  </aside>
+}

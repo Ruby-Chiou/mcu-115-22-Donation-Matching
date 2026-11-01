@@ -31,9 +31,10 @@ $screen-mobile: 767px !default;
   }
 }
 
-// 欄數依卡片最小寬度自動決定，不綁死某一台裝置。
+// 欄數依卡片最小寬度自動決定。用 auto-fill 避免篩選後只剩少數卡片被拉滿整列。
 @mixin auto-grid($min: 240px) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, #{$min}), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, #{$min}), 1fr));
   gap: var(--layout-gap);
+  align-items: start;
 }

@@ -1,18 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <title>DonationMatching</title>
     <base href="/" />
+    <script>
+      (function () {
+        var baseNode = document.querySelector('base');
+        var base = (baseNode && baseNode.getAttribute('href')) || '/';
+        if (base.charAt(base.length - 1) !== '/') {
+          base += '/';
+        }
+        var path = location.pathname + location.search + location.hash;
+        try {
+          sessionStorage.setItem('dm-pages-path', path);
+        } catch (e) {}
+        location.replace(base + location.search + location.hash);
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   </head>
   <body>
-    <app-root></app-root>
+    <p>頁面載入中…</p>
   </body>
 </html>

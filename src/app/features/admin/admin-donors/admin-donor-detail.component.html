@@ -16,7 +16,7 @@
       <h2>{{ person.displayName || '未命名捐助者' }}</h2>
       <dl>
         <dt>信箱</dt>
-        <dd>{{ person.email || '尚未填寫' }}</dd>
+        <dd>{{ person.email || (isSocialLogin(person) ? '第三方登入未綁定信箱' : '尚未填寫') }}</dd>
         <dt>真實姓名</dt>
         <dd>{{ person.fullName || '尚未填寫' }}</dd>
         <dt>電話</dt>
@@ -26,7 +26,7 @@
         <dt>類型</dt>
         <dd>{{ kindLabel(person.donorKind) }}</dd>
         <dt>登入方式</dt>
-        <dd>{{ person.loginProvider || '尚未填寫' }}</dd>
+        <dd>{{ providerLabel(person) }}</dd>
         <dt>建立時間</dt>
         <dd>{{ person.createdAt ? (person.createdAt | date: 'yyyy/MM/dd HH:mm') : '尚未記錄' }}</dd>
         <dt>狀態</dt>

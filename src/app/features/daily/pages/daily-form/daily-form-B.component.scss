@@ -294,6 +294,13 @@
 .condition-section {
   width: 280px;
   flex-shrink: 0;
+  min-width: 0;
+}
+
+.custom-condition-section {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
 }
 
 .service-target-section {

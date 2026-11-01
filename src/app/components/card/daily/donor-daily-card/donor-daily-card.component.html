@@ -42,6 +42,11 @@
     <div class="info">
       <p>{{ getRegion(demand.address) }}</p>
     </div>
+    @if (demand.publishedAt) {
+      <div class="info">
+        <p>發布日期：{{ demand.publishedAt | date: 'yyyy/MM/dd' }}</p>
+      </div>
+    }
   </div>
   <button class="detail-btn" type="button" (click)="onView()">查看詳情</button>
 </div>

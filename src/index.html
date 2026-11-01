@@ -15,14 +15,21 @@
         var path = location.pathname;
         var rest = path.slice(prefix.length) || '/';
         var isFile = /\/[^/]+\.[A-Za-z0-9]+$/.test(path);
-        var saved = sessionStorage.getItem('dm-pages-path');
+        var saved = null;
+        try {
+          saved = sessionStorage.getItem('dm-pages-path');
+        } catch (e) {}
         if (rest !== '/' && !isFile) {
-          sessionStorage.setItem('dm-pages-path', path + location.search + location.hash);
+          try {
+            sessionStorage.setItem('dm-pages-path', path + location.search + location.hash);
+          } catch (e) {}
           location.replace(base + location.search + location.hash);
           return;
         }
-        if (saved && saved.indexOf(prefix + '/') === 0) {
-          sessionStorage.removeItem('dm-pages-path');
+        if (saved && (saved.indexOf(prefix + '/') === 0 || (prefix === '' && saved.charAt(0) === '/'))) {
+          try {
+            sessionStorage.removeItem('dm-pages-path');
+          } catch (e) {}
           history.replaceState(null, '', saved);
         }
       })();

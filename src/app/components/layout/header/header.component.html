@@ -1,5 +1,8 @@
-<header [class.header-hidden]="isHeaderHidden" [class.menu-open]="menuOpen">
-  @if (menuOpen) {
+<header
+  [class.header-hidden]="isHeaderHidden"
+  [class.menu-open]="menuOpen || tour.menuForcedOpen()"
+>
+  @if (menuOpen || tour.menuForcedOpen()) {
     <button type="button" class="nav-backdrop" aria-label="關閉選單" (click)="toggleMenu()"></button>
   }
 
@@ -20,7 +23,11 @@
         <div class="center">
           <nav>
             @for (item of navItems; track item.name) {
-              <div class="nav-item-with-dropdown">
+              <div
+                class="nav-item-with-dropdown"
+                [class.tour-open]="isTourDropdownOpen(item.name)"
+                [attr.data-tour]="tourKey(item.name)"
+              >
                 <a [routerLink]="item.link">
                   <span class="nav-label">{{ navLabel(item.name) }}</span>
                   @if (item.sub.length) {
@@ -30,7 +37,12 @@
                 @if (item.sub.length) {
                   <ul class="dropdown-menu">
                     @for (sub of item.sub; track sub.name) {
-                      <li><a [routerLink]="sub.link">{{ sub.name }}</a></li>
+                      <li>
+                        <a
+                          [routerLink]="sub.link"
+                          [attr.data-tour]="subTourKey(sub.link)"
+                        >{{ sub.name }}</a>
+                      </li>
                     }
                   </ul>
                 }
@@ -41,7 +53,7 @@
 
         <div class="right">
           @if (auth.principal().role === 'guest') {
-            <a class="nav-login" routerLink="/login">登入</a>
+            <a class="nav-login" routerLink="/login" data-tour="guest-login">登入</a>
             <span class="nav-divider">|</span>
             <a class="nav-register" routerLink="/register">註冊</a>
           } @else {
@@ -83,12 +95,12 @@
         type="button"
         class="nav-toggle"
         (click)="toggleMenu()"
-        [attr.aria-expanded]="menuOpen"
+        [attr.aria-expanded]="menuOpen || tour.menuForcedOpen()"
         aria-controls="site-nav"
-        [attr.aria-label]="menuOpen ? '關閉選單' : '開啟選單'"
+        [attr.aria-label]="menuOpen || tour.menuForcedOpen() ? '關閉選單' : '開啟選單'"
       >
-        <i class="fa-solid" [class.fa-xmark]="menuOpen" [class.fa-bars]="!menuOpen"></i>
-        <span>{{ menuOpen ? '關閉' : '選單' }}</span>
+        <i class="fa-solid" [class.fa-xmark]="menuOpen || tour.menuForcedOpen()" [class.fa-bars]="!(menuOpen || tour.menuForcedOpen())"></i>
+        <span>{{ menuOpen || tour.menuForcedOpen() ? '關閉' : '選單' }}</span>
       </button>
     </div>
   </div>

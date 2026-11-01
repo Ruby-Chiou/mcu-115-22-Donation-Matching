@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 
 import { donorActionsOpen, isDonorPrivatePath, RoleAccessPolicy } from '../../auth/role-access.policy';
 import { safeReturnUrl } from '../../auth/safe-return-url';
+import { GuidedTourService } from '../guided-tour/guided-tour.service';
 import { AuthSessionService } from './auth-session.service';
 
 const HOME_REDIRECT_MS = 1600;
@@ -14,6 +15,7 @@ export class AuthRedirectService {
   private readonly auth = inject(AuthSessionService);
   private readonly router = inject(Router);
   private readonly policy = inject(RoleAccessPolicy);
+  private readonly tour = inject(GuidedTourService);
 
   async signIn(email: string, password: string, remember: boolean, returnUrl: string | null): Promise<string> {
     await this.auth.signIn(email, password, remember);
@@ -28,6 +30,9 @@ export class AuthRedirectService {
       window.setTimeout(() => resolve(), delayMs);
     });
     await this.router.navigateByUrl(url);
+    if (this.auth.principal().role === 'agency') {
+      window.setTimeout(() => this.tour.offerAgencyAfterLogin(), 400);
+    }
   }
 
   /** 訪客點捐物或報名時先去登入；已登入但身分不符則回自己的首頁。 */

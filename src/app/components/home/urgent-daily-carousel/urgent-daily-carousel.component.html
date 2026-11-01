@@ -1,0 +1,38 @@
+@if (isLoading || items.length) {
+  <section class="urgent-strip" aria-labelledby="urgent-strip-title">
+    <div class="urgent-panel">
+      <div class="urgent-head">
+        <div>
+          <h2 id="urgent-strip-title">非常緊急物資</h2>
+          <p>快速瀏覽近期最急的日常需求，方便立刻伸出援手。</p>
+        </div>
+        <a class="urgent-link" routerLink="/donor/daily">查看全部日常物資</a>
+      </div>
+
+      @if (isLoading) {
+        <p class="urgent-empty">載入中…</p>
+      } @else {
+        <div class="urgent-stage">
+          @if (canPage) {
+            <button type="button" class="nav prev" (click)="prev()" aria-label="上一組">‹</button>
+          }
+          <div class="urgent-track" [style.--cols]="visibleCount">
+            @for (item of pageItems; track item.id) {
+              <div class="urgent-card-wrap">
+                <app-donor-daily-card [demand]="item" (view)="openDetail(item)"></app-donor-daily-card>
+              </div>
+            }
+            @for (slot of emptySlots; track $index) {
+              <div class="urgent-placeholder" role="status">
+                <p>沒有更多緊急物資</p>
+              </div>
+            }
+          </div>
+          @if (canPage) {
+            <button type="button" class="nav next" (click)="next()" aria-label="下一組">›</button>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}

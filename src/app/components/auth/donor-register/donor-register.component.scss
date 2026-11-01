@@ -223,14 +223,18 @@ input:focus {
 }
 
 .submit-message {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-8);
+  background: var(--bg-success-soft, #e8f5e9);
   color: var(--color-success-strong);
   font-weight: var(--font-weight-bold);
   grid-column: span 2;
-  text-align: right;
+  text-align: left;
 }
 
 .submit-message.is-error {
+  background: var(--bg-error-rose, #fdecea);
   color: var(--color-error);
 }
 

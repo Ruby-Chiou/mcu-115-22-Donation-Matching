@@ -1,0 +1,33 @@
+@if (notices.active(); as dialog) {
+  <div class="ui-notice-backdrop" (click)="onBackdrop(dialog.kind)">
+    <div
+      class="ui-notice-box"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="'ui-notice-title'"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="ui-notice-title">{{ dialog.title }}</h2>
+      <p>{{ dialog.body }}</p>
+      @if (dialog.kind === 'prompt') {
+        <label class="ui-notice-field">
+          <span class="visually-hidden">輸入內容</span>
+          <textarea
+            rows="3"
+            [placeholder]="dialog.inputPlaceholder"
+            [ngModel]="dialog.inputValue"
+            (ngModelChange)="updateInput($event)"
+          ></textarea>
+        </label>
+      }
+      <div class="ui-notice-actions">
+        @if (dialog.kind === 'confirm' || dialog.kind === 'prompt') {
+          <button type="button" class="ghost" (click)="cancel(dialog.kind)">{{ dialog.cancelLabel }}</button>
+          <button type="button" class="primary" (click)="confirm(dialog)">{{ dialog.confirmLabel }}</button>
+        } @else {
+          <button type="button" class="primary" (click)="notices.close(true)">{{ dialog.confirmLabel }}</button>
+        }
+      </div>
+    </div>
+  </div>
+}

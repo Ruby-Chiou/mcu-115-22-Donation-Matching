@@ -1,5 +1,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+import { DemandSortMode } from '../../../core/codes/demand-codes';
+
 export interface DailyFilter {
   categories: string[];
   targets: string[];
@@ -18,9 +21,16 @@ export interface DailyFilter {
 export class DonorDailyFilterComponent {
 
   @Output() filterChange = new EventEmitter<DailyFilter>();
+  @Output() sortChange = new EventEmitter<DemandSortMode>();
 
   filtersOpen = false;
   openFilter: string | null = null;
+  selectedSort: DemandSortMode = 'priority-then-newest';
+
+  readonly sortOptions: { value: DemandSortMode; label: string }[] = [
+    { value: 'priority-then-newest', label: '緊急度優先（同緊急度看最新）' },
+    { value: 'newest-then-priority', label: '最新上架優先（同時間看緊急度）' },
+  ];
 
   selectedCategories: string[] = [];
   selectedTargets: string[] = [];
@@ -117,6 +127,11 @@ priorityMethodOptions = [
     );
 
     this.emitFilter();
+  }
+
+  setSort(mode: DemandSortMode): void {
+    this.selectedSort = mode;
+    this.sortChange.emit(mode);
   }
   private toggleValue(
     array: string[],

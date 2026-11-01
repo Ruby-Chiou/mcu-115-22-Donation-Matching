@@ -168,30 +168,59 @@
 }
 
 @include bp.mobile {
+  .footer-main {
+    padding: 28px var(--layout-page-padding) 20px;
+  }
+
   .footer-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 16px;
   }
 
   .footer-about {
-    grid-column: auto;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: var(--font-size-17);
+    }
   }
 
   .footer-logo {
-    width: 180px;
+    width: 72px;
+    margin-top: 0;
+  }
+
+  .footer-column {
+    h3 {
+      margin-bottom: 12px;
+      font-size: var(--font-size-16);
+    }
+
+    a {
+      margin-bottom: 8px;
+      font-size: var(--font-size-14);
+    }
   }
 
   .footer-bottom-container {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .footer-links {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
     gap: var(--space-8);
   }
 
   .footer-links span {
-    display: none;
+    display: inline;
   }
 }

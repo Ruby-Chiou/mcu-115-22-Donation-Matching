@@ -1,4 +1,20 @@
 <div class="filter-section" [class.is-open]="filtersOpen">
+  <div class="filter-row sort-row">
+    <div class="filter-title">
+      排序
+    </div>
+    <div class="filter-options">
+      <button
+        *ngFor="let option of sortOptions"
+        type="button"
+        class="filter-option"
+        [class.active]="selectedSort === option.value"
+        (click)="setSort(option.value)">
+        {{ option.label }}
+      </button>
+    </div>
+  </div>
+
   <button
     type="button"
     class="filter-toggle"

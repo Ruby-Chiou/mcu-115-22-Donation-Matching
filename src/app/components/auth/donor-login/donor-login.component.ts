@@ -82,8 +82,8 @@ export class DonorLoginComponent {
     this.submitMessage = '';
 
     try {
-      this.submitMessage = '憑證驗證成功，即將進入頁面…';
       await this.redirect.signIn(login.email, login.password, false, this.route.snapshot.queryParamMap.get('returnUrl'));
+      this.submitMessage = '憑證驗證成功，即將進入頁面…';
     } catch (error) {
       this.gateOpen = false;
       this.isError = true;
@@ -126,13 +126,13 @@ export class DonorLoginComponent {
     this.submitMessage = '';
 
     try {
-      this.submitMessage = '登入成功，即將進入頁面…';
       await this.redirect.signIn(
         this.loginForm.email,
         this.loginForm.password,
         this.rememberMe,
         this.route.snapshot.queryParamMap.get('returnUrl'),
       );
+      this.submitMessage = '登入成功，即將進入頁面…';
     } catch (error) {
       this.isError = true;
       this.submitMessage = toLoginMessage(error, this.loginForm.email);

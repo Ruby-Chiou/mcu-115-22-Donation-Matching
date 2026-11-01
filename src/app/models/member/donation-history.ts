@@ -30,6 +30,10 @@ export interface DonorDonationHistory {
   logisticsCarrier: string;
   /** 審核通過後，捐助者上傳的物流單號 */
   trackingNo: string;
+  /** 超商取件門市名稱 */
+  logisticsStoreName: string;
+  /** 超商取件門市地址 */
+  logisticsStoreAddress: string;
   receiptConfirmedAt: string | null;
   receiptPartial: boolean;
   receiptDeclinedVideo: boolean;

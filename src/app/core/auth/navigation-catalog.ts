@@ -66,12 +66,12 @@ const AGENCY_AREA: NavItem = {
 };
 
 const AGENCY_DISASTER: NavItem = {
-  name: '急難救助',
+  name: '災害救助',
   link: '/agency/disaster',
   sub: [],
 };
 
-/** 捐助者在前台看得到的公開頁。急難救助關閉時，前台也不列出災害救助。 */
+/** 捐助者在前台看得到的公開頁。災害救助關閉時，前台也不列出災害救助。 */
 function agencyPublicFront(disasterOpen: boolean): NavItem {
   const sub: NavLink[] = [
     { name: '日常捐助', link: '/donor/daily' },

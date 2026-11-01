@@ -51,9 +51,9 @@
 
 .back-to-top {
   position: fixed;
-  right: 16px;
-  bottom: 20px;
-  z-index: 1100;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 1600;
   display: inline-flex;
   align-items: center;
   gap: var(--space-6);
@@ -61,11 +61,36 @@
   padding: 0 16px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-brand-primary, var(--color-brand-primary));
+  background: var(--color-brand-primary);
   color: var(--color-white);
   box-shadow: 0 8px 24px rgba(0, 92, 187, 0.28);
   font: inherit;
   font-size: var(--font-size-15);
   font-weight: var(--font-weight-bold);
   cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s ease;
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+}
+
+@media (max-width: 1023px) {
+  .back-to-top {
+    right: max(12px, env(safe-area-inset-right));
+    /* 避開右下導覽提示框，改偏左一點仍在右下區域 */
+    bottom: max(72px, calc(env(safe-area-inset-bottom) + 56px));
+    min-height: 44px;
+    padding: 0 14px;
+  }
 }

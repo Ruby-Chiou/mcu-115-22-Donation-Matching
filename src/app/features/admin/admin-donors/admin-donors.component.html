@@ -33,14 +33,19 @@
         <li>
           <a class="record-link" [routerLink]="['/admin/donors', donor.uid]">
             <strong>{{ donor.displayName || donor.email || '未命名捐助者' }}</strong>
-            <span>{{ donor.email || '沒有信箱' }}</span>
-            <span class="badge" [class.stopped]="donor.accountStatus !== 'ACTIVE'">{{ statusLabel(donor.accountStatus) }}</span>
-            @if (mark(donor.uid).thank) {
-              <span class="badge">感謝牆</span>
-            }
-            @if (mark(donor.uid).blacklist) {
-              <span class="badge stopped">黑名單</span>
-            }
+            <span>{{ donor.email || '未綁定信箱' }}</span>
+            <span class="badge-row">
+              @if (!donor.email || isSocialLogin(donor)) {
+                <span class="badge">{{ providerLabel(donor) }}</span>
+              }
+              <span class="badge" [class.stopped]="donor.accountStatus !== 'ACTIVE'">{{ statusLabel(donor.accountStatus) }}</span>
+              @if (mark(donor.uid).thank) {
+                <span class="badge">感謝牆</span>
+              }
+              @if (mark(donor.uid).blacklist) {
+                <span class="badge stopped">黑名單</span>
+              }
+            </span>
           </a>
         </li>
       } @empty {

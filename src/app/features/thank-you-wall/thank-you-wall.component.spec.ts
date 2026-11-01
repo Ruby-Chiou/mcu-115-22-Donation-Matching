@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { BoardAnnouncementService } from '../../core/services/admin/board-announcement.service';
 import { PublicDonationThankService } from '../../core/services/member-center/public-donation-thank.service';
 import { ThankYouWallComponent } from './thank-you-wall.component';
 
@@ -16,6 +17,12 @@ describe('ThankYouWallComponent', () => {
           useValue: {
             wall: () => [],
             loadWall: async () => [],
+          },
+        },
+        {
+          provide: BoardAnnouncementService,
+          useValue: {
+            published: async () => [],
           },
         },
       ],
