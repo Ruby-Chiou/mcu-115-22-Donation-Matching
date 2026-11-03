@@ -58,3 +58,11 @@
     transform: rotate(360deg);
   }
 }
+
+.empty-hint {
+  grid-column: 1 / -1;
+  margin: 24px 0 8px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  font-size: var(--font-size-15);
+}

@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 interface MaterialHistory {
   id: number;
@@ -28,7 +28,7 @@ interface DisasterSection {
 
 @Component({
   selector: 'app-disaster-history',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './disaster-history.component.html',
   styleUrl: './disaster-history.component.scss',
 })

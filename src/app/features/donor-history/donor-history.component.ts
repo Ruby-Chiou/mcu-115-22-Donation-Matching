@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { DonationReceiptSheetComponent } from '../../components/receipt/donation-receipt-sheet/donation-receipt-sheet.component';
 import { donationNextActionLabel, donationNextStep } from '../../core/auth/member-message-actions';
+import { detectCarrier } from '../../core/logistics/detect-carrier';
 import { receiptPdfFileName } from '../../core/receipt/donation-receipt-document';
 import { DonationReceiptPdfService } from '../../core/receipt/donation-receipt-pdf.service';
 import { DonationService } from '../../core/services/agency-daily-demand/daily-donation.service';
@@ -168,6 +169,8 @@ export class DonorHistoryComponent implements OnInit {
 
   readonly trackingDraft = signal('');
   readonly carrierDraft = signal('');
+  readonly carrierTouched = signal(false);
+  readonly carrierAutoFilled = signal(false);
   readonly storeNameDraft = signal('');
   readonly storeAddressDraft = signal('');
   readonly trackingSaving = signal(false);
@@ -184,6 +187,9 @@ export class DonorHistoryComponent implements OnInit {
   readonly noteDraft = signal('');
   readonly methodDraft = signal('寄送');
   readonly supplementFiles = signal<File[]>([]);
+  readonly proofFile = signal<File | null>(null);
+  readonly proofSaving = signal(false);
+  readonly proofMessage = signal('');
 
   selectRecord(record: DonorDonationHistory): void {
     this.applySelection(record);
@@ -199,7 +205,18 @@ export class DonorHistoryComponent implements OnInit {
     this.selectedId.set(record.id);
     this.viewerKind.set(null);
     this.trackingDraft.set(record.trackingNo);
-    this.carrierDraft.set(record.logisticsCarrier || '');
+    this.carrierTouched.set(false);
+    const detectedOnOpen = detectCarrier(record.trackingNo || '');
+    if (record.logisticsCarrier) {
+      this.carrierDraft.set(record.logisticsCarrier);
+      this.carrierAutoFilled.set(false);
+    } else if (detectedOnOpen) {
+      this.carrierDraft.set(detectedOnOpen);
+      this.carrierAutoFilled.set(true);
+    } else {
+      this.carrierDraft.set('');
+      this.carrierAutoFilled.set(false);
+    }
     this.storeNameDraft.set(record.logisticsStoreName || '');
     this.storeAddressDraft.set(record.logisticsStoreAddress || '');
     this.trackingMessage.set('');
@@ -212,6 +229,41 @@ export class DonorHistoryComponent implements OnInit {
     this.quantityDraft.set(record.quantity || 1);
     this.noteDraft.set(record.note);
     this.methodDraft.set(record.donationMethod || '寄送');
+    this.proofFile.set(null);
+    this.proofMessage.set('');
+  }
+
+  needsHandoverProof(record: DonorDonationHistory): boolean {
+    return record.donationMethod === '面交' && !record.proofUploadedAt && record.status !== 'human_rejected';
+  }
+
+  onProofSelected(event: Event): void {
+    this.proofFile.set((event.target as HTMLInputElement).files?.[0] ?? null);
+    this.proofMessage.set('');
+  }
+
+  async uploadHandoverProof(record: DonorDonationHistory): Promise<void> {
+    const file = this.proofFile();
+    if (!file) {
+      this.proofMessage.set('請先選擇面交證明圖片或 PDF。');
+      return;
+    }
+
+    this.proofSaving.set(true);
+    this.proofMessage.set('');
+    try {
+      await this.donationService.uploadHandoverProof(record.id, file);
+      await this.historyService.loadHistory();
+      const refreshed = this.historyService.records().find((item) => item.id === record.id);
+      if (refreshed) {
+        this.applySelection(refreshed);
+      }
+      this.proofMessage.set('面交證明已上傳，受助單位可以查看。');
+    } catch (error) {
+      this.proofMessage.set(error instanceof Error ? error.message : '證明上傳失敗，請稍後再試。');
+    } finally {
+      this.proofSaving.set(false);
+    }
   }
 
   canRevise(record: DonorDonationHistory): boolean {
@@ -357,10 +409,20 @@ export class DonorHistoryComponent implements OnInit {
 
   onCarrierChange(event: Event): void {
     this.carrierDraft.set((event.target as HTMLSelectElement).value);
+    this.carrierTouched.set(true);
+    this.carrierAutoFilled.set(false);
   }
 
   onTrackingInput(event: Event): void {
-    this.trackingDraft.set((event.target as HTMLInputElement).value);
+    const trackingNo = (event.target as HTMLInputElement).value;
+    this.trackingDraft.set(trackingNo);
+
+    const detected = detectCarrier(trackingNo);
+    // 使用者還沒手動改物流商時，輸入單號就即時更新右側選項。
+    if (detected && !this.carrierTouched()) {
+      this.carrierDraft.set(detected);
+      this.carrierAutoFilled.set(true);
+    }
   }
 
   onStoreNameInput(event: Event): void {
@@ -376,6 +438,11 @@ export class DonorHistoryComponent implements OnInit {
   }
 
   async saveTracking(record: DonorDonationHistory): Promise<void> {
+    if (record.receiptConfirmedAt) {
+      this.trackingMessage.set('機構已簽收，物流資料不可再修改。');
+      return;
+    }
+
     this.trackingSaving.set(true);
     this.trackingMessage.set('');
 
@@ -488,9 +555,18 @@ export class DonorHistoryComponent implements OnInit {
         done: approved && !!record.trackingNo && !!record.logisticsCarrier,
         current: approved && (!record.trackingNo || !record.logisticsCarrier),
       });
+    } else {
+      steps.push({
+        label: '完成面交並上傳證明',
+        done: !!record.proofUploadedAt,
+        current: approved && !record.proofUploadedAt,
+      });
     }
 
-    const waitingReceipt = approved && (!shipped || (!!record.trackingNo && !!record.logisticsCarrier)) && !record.receiptConfirmedAt;
+    const handoverReady = shipped
+      ? !!record.trackingNo && !!record.logisticsCarrier
+      : !!record.proofUploadedAt;
+    const waitingReceipt = approved && handoverReady && !record.receiptConfirmedAt;
     steps.push({
       label: '受助者簽收',
       done: !!record.receiptConfirmedAt,

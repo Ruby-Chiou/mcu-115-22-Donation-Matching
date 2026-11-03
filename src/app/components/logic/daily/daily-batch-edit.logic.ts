@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { normalizeServiceTargets } from '../../../core/codes/service-targets';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { EditableDailyDemand } from '../../../models/agency/daily-demand';
 import { DailyBatchEditLogicBase, DailyTextField } from './daily-batch-edit-logic-base';
@@ -19,10 +20,13 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
       return;
     }
 
-    this.editDemands = JSON.parse(data).map((item: any) => ({
+    this.editDemands = JSON.parse(data).map((item: any) => {
+      const normalizedTargets = normalizeServiceTargets(item.serviceTargets, item.customServiceTargets);
+
+      return {
       ...item,
-      serviceTargets: this.convertServiceTargets(item.serviceTargets),
-      customServiceTargets: item.customServiceTargets?.length ? item.customServiceTargets : [''],
+      serviceTargets: normalizedTargets.serviceTargets,
+      customServiceTargets: normalizedTargets.customServiceTargets,
       conditions: item.conditions || {
         全新: '',
         二手: '',
@@ -61,7 +65,8 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
       contactTimeWeekendEvening: item.contactTimeWeekendEvening ?? false,
       serviceTargetDescription: item.serviceTargetDescription ?? '',
       conditionDescription: item.conditionDescription ?? '',
-    }));
+    };
+    });
 
     this.editDemands.forEach((item) => {
       this.originalStatusMap[item.serialNo] = item.status ?? '隱藏';

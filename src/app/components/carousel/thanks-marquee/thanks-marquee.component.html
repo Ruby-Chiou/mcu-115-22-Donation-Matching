@@ -4,7 +4,7 @@
   @if (marqueeItems().length && !finished()) {
   <div
   class="global-thanks-bar"
-  [class.marquee-top]="isHeaderHidden"
+  [class.marquee-top]="isHeaderHidden()"
 >
     <div class="thanks-track">
       <div class="thanks-content" [style.animation-duration.s]="scrollSeconds()" (animationend)="onMarqueeEnd($event)">

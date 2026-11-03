@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 
 import { SupabaseService } from '../database/supabase.service';
+import { MemberMailDispatchService } from '../member-center/member-mail-dispatch.service';
 
 export type DonorAdminStatus = 'ACTIVE' | 'SUSPENDED' | 'DELETED';
 
@@ -43,6 +44,7 @@ interface AccountRow {
 })
 export class DonorAccountAdminService {
   private readonly supabase = inject(SupabaseService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   async list(): Promise<DonorAccountRecord[]> {
     const [profiles, accounts] = await Promise.all([this.loadProfiles(), this.loadAccounts()]);
@@ -97,6 +99,9 @@ export class DonorAccountAdminService {
       if (error) {
         throw error;
       }
+      if (accountStatus === 'SUSPENDED' || accountStatus === 'DELETED') {
+        void this.mail.sweep();
+      }
       return;
     }
 
@@ -111,6 +116,9 @@ export class DonorAccountAdminService {
 
     if (error) {
       throw error;
+    }
+    if (accountStatus === 'SUSPENDED' || accountStatus === 'DELETED') {
+      void this.mail.sweep();
     }
   }
 

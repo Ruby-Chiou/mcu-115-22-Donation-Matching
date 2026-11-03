@@ -37,6 +37,11 @@ Deno.serve(async (req) => {
       return json(401, { message: '請先登入。' });
     }
 
+    const { error: scheduledError } = await admin.rpc('process_due_member_scheduled_messages');
+    if (scheduledError) {
+      console.error('到期站內提醒沒有建立', scheduledError.message);
+    }
+
     const sent = await dispatch(admin);
     return json(200, { mailed: true, mailNotice: sent === 0 ? '' : `已寄出 ${sent} 封通知。` });
   } catch (error) {

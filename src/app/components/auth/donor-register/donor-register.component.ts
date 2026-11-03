@@ -249,14 +249,13 @@ export class DonorRegisterComponent {
         : [
             { val: this.donorForm.email, name: 'donorEmail' },
             { val: this.donorForm.accountName, name: 'donorAccountName' },
-            { val: this.donorForm.fullName, name: 'fullName' },
             { val: this.donorForm.phone, name: 'phone' },
             { val: this.donorForm.password, name: 'donorPassword' },
             { val: this.donorForm.confirmPassword, name: 'donorConfirmPassword' },
           ];
 
     for (const item of checks) {
-      if (!item.val) {
+      if (!item.val.trim()) {
         const el = formElement.querySelector(`[name="${item.name}"]`) as HTMLElement;
         if (el && !firstInvalidElement) firstInvalidElement = el;
       }

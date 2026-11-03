@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { detectCarrier } from '../../../core/logistics/detect-carrier';
 import { DonorDonationHistoryService } from '../../../core/services/member-center/donor-donation-history.service';
 import { DonorDonationHistory } from '../../../models/member/donation-history';
 import { RECEIPT_CARRIERS } from '../../../models/agency/receipt-issuance';
@@ -35,6 +36,8 @@ const OFFICIAL_SITES: Record<string, string> = {
   全家: 'https://www.family.com.tw/Marketing/Convenience/Index.aspx',
   中華郵政: 'https://postserv.post.gov.tw/pstmail/main_mail.html',
   新竹物流: 'https://www.hct.com.tw/Search/SearchGoods_n.aspx',
+  // 舊版 search.aspx 已失效，改官方查貨頁
+  嘉里物流: 'https://www.kerrytj.com/zh/checking',
 };
 
 @Component({
@@ -45,6 +48,7 @@ const OFFICIAL_SITES: Record<string, string> = {
   styleUrl: './tracking.component.scss',
 })
 export class TrackingComponent implements OnInit {
+  readonly officialSites = OFFICIAL_SITES;
   private readonly history = inject(DonorDonationHistoryService);
   private readonly route = inject(ActivatedRoute);
 
@@ -79,7 +83,7 @@ export class TrackingComponent implements OnInit {
     this.resultList = [];
 
     if (!keyword) {
-      this.openNotice('請輸入物流單號', '請輸入你在捐助紀錄上傳的單號。這裡只查平台上的寄送捐助，沒有另外的測試資料。', '', '');
+      this.openNotice('請輸入物流單號', '請輸入你在捐助紀錄上傳的單號。這裡只查平台上的寄送捐助。', '', '');
       return;
     }
 
@@ -95,9 +99,22 @@ export class TrackingComponent implements OnInit {
 
     this.searching = false;
 
-    const matches = this.history.records().filter((record) => record.trackingNo.trim() === keyword);
+    const normalizedKeyword = this.normalizeTrackingNo(keyword);
+    const matches = this.history.records().filter((record) => {
+      const stored = this.normalizeTrackingNo(record.trackingNo);
+      if (!stored) {
+        return false;
+      }
+      if (stored === normalizedKeyword) {
+        return true;
+      }
+      // 容許單號多打空白／符號後仍對得上；避免過短關鍵字誤中。
+      return normalizedKeyword.length >= 6 && (stored.includes(normalizedKeyword) || normalizedKeyword.includes(stored));
+    });
     const carrierName = this.selectedCarrier === 'auto' ? '' : this.selectedCarrier;
-    const scoped = carrierName ? matches.filter((record) => record.logisticsCarrier === carrierName) : matches;
+    const scoped = carrierName
+      ? matches.filter((record) => !record.logisticsCarrier || record.logisticsCarrier === carrierName)
+      : matches;
 
     if (scoped.length > 0) {
       this.resultList = scoped.map((record) => this.toResult(record));
@@ -116,14 +133,14 @@ export class TrackingComponent implements OnInit {
       return;
     }
 
-    const guessed = this.detectCarrier(keyword);
+    const guessed = detectCarrier(keyword);
     this.openNotice(
       '平台沒有這筆寄送資料',
       guessed
         ? `捐助紀錄裡沒有單號 ${keyword}。若你已經寄出，請先回到該筆捐助上傳單號。單號格式比較像「${guessed}」，最新貨態請到該物流公司官網查。`
         : `捐助紀錄裡沒有單號 ${keyword}。請確認是你在審核通過後上傳的單號，或到物流公司官網查最新貨態。`,
       guessed ? OFFICIAL_SITES[guessed] : '',
-      guessed
+      guessed ?? ''
     );
   }
 
@@ -160,15 +177,8 @@ export class TrackingComponent implements OnInit {
     this.notice = { title, body, officialUrl, officialName };
   }
 
-  private detectCarrier(keyword: string): string {
-    if (/^\d{10,12}$/.test(keyword)) {
-      return '黑貓宅急便';
-    }
-
-    if (/^\d{8}$/.test(keyword) || /^\d{11}$/.test(keyword)) {
-      return '7-ELEVEN';
-    }
-
-    return '';
+  private normalizeTrackingNo(value: string): string {
+    return value.trim().replace(/[\s\-_.]/g, '').toUpperCase();
   }
+
 }

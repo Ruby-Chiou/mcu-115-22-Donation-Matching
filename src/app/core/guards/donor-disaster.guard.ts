@@ -1,11 +1,14 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { DisasterClosedModalService } from '../services/disaster-control/disaster-closed-modal.service';
-export const donorDisasterGuard: CanActivateFn = (route, state) => {
+import { DisasterControlService } from '../services/disaster-control/disaster-control.service';
+export const donorDisasterGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
   const closedModal = inject(DisasterClosedModalService);
+  const disasterControl = inject(DisasterControlService);
 
-  const disasterOpen = localStorage.getItem('disasterOpen') === 'true';
+  await disasterControl.initialized;
+  const disasterOpen = disasterControl.data().isOpen;
   const path = state.url.split('?')[0] ?? '';
 
   // 大廳可以進來看到已關閉。物資、協力者的內頁在關閉時擋下來。

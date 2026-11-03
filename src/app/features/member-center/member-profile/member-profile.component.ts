@@ -43,9 +43,10 @@ export class MemberProfileComponent implements OnInit {
 
   readonly profileForm = this.fb.nonNullable.group({
     displayName: ['', [Validators.required, Validators.maxLength(20)]],
-    accountName: ['', [Validators.pattern(ACCOUNT_NAME_PATTERN)]],
+    accountName: ['', [Validators.required, Validators.pattern(ACCOUNT_NAME_PATTERN)]],
     fullName: ['', [Validators.maxLength(40)]],
-    phoneNumber: ['', [Validators.pattern(TW_MOBILE_PATTERN)]],
+    phoneNumber: ['', [Validators.required, Validators.pattern(TW_MOBILE_PATTERN)]],
+    email: ['', [Validators.required, Validators.email]],
     city: [''],
   });
 
@@ -80,6 +81,7 @@ export class MemberProfileComponent implements OnInit {
       accountName: profile.accountName ?? '',
       fullName: profile.fullName ?? '',
       phoneNumber: profile.phoneNumber ?? '',
+      email: profile.email,
       city: profile.city ?? '',
     });
     this.notice.set(null);
@@ -91,8 +93,17 @@ export class MemberProfileComponent implements OnInit {
   }
 
   async saveProfile(): Promise<void> {
+    const raw = this.profileForm.getRawValue();
+    this.profileForm.patchValue({
+      displayName: raw.displayName.trim(),
+      accountName: raw.accountName.trim(),
+      phoneNumber: raw.phoneNumber.trim(),
+      email: raw.email.trim(),
+    });
+
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
+      this.notice.set({ type: 'error', text: '帳號名稱、聯絡電話、電子信箱與顯示名稱不可空白，請填寫後再儲存。' });
       return;
     }
 
@@ -193,7 +204,7 @@ export class MemberProfileComponent implements OnInit {
   }
 
   hasError(
-    controlName: 'displayName' | 'accountName' | 'fullName' | 'phoneNumber' | 'city',
+    controlName: 'displayName' | 'accountName' | 'fullName' | 'phoneNumber' | 'email' | 'city',
     errorCode: string
   ): boolean {
     const control = this.profileForm.controls[controlName];

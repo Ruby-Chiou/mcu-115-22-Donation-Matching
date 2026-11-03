@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
-import { ActivatedRoute, RouterModule, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -25,7 +25,7 @@ interface CommentThreadNode {
 @Component({
   selector: 'app-donor-daily-detail',
   standalone: true,
-  imports: [RouterLink, CommonModule, RouterModule, FormsModule, SupplyDetailCarouselComponent, BeneficiaryPanelComponent, CommentAuthorChipComponent],
+  imports: [CommonModule, FormsModule, SupplyDetailCarouselComponent, BeneficiaryPanelComponent, CommentAuthorChipComponent],
   templateUrl: './donor-daily-detail.component.html',
   styleUrl: './donor-daily-detail.component.scss',
 })

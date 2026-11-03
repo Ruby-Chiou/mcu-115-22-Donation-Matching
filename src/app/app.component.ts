@@ -1,6 +1,7 @@
 import { Component, DestroyRef, NgZone, effect, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { ThanksMarqueeComponent } from './components/carousel/thanks-marquee/thanks-marquee.component';
+import { DisasterBroadcastMarqueeComponent } from './components/carousel/disaster-broadcast-marquee/disaster-broadcast-marquee.component';
 import { AgencyAccessBannerComponent } from './components/agency/agency-access-banner.component';
 import { GuidedTourComponent } from './components/guided-tour/guided-tour.component';
 import { HeaderComponent } from './components/layout/header/header.component'; // 引入導覽列
@@ -17,6 +18,7 @@ import { UiNoticeService, installUiNoticeBridge } from './core/ui/ui-notice.serv
     HeaderComponent,
     FooterComponent,
     ThanksMarqueeComponent,
+    DisasterBroadcastMarqueeComponent,
     AgencyAccessBannerComponent,
     GuidedTourComponent,
     UiNoticeComponent,
@@ -63,7 +65,7 @@ export class App {
         return;
       }
 
-      const isClosed = localStorage.getItem('disasterOpen') !== 'true';
+      const isClosed = !this.disasterControl.data().isOpen;
       const isDisasterOpenPage = this.router.url.startsWith('/disaster/open') || this.router.url === '/donor/disaster';
       const isInteractiveControl = target?.closest('button, a, input, textarea, select, [role="button"]');
       const isDisasterControl =

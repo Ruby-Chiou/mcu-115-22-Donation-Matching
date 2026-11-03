@@ -50,6 +50,21 @@ export class GuidedTourComponent {
     }
 
     node.classList.add('tour-target-active');
+    node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.measureAnchor(selector));
+    });
+    window.setTimeout(() => this.measureAnchor(selector), 220);
+    window.setTimeout(() => this.measureAnchor(selector), 480);
+  }
+
+  private measureAnchor(selector: string): void {
+    const node = this.findAnchor(selector);
+    if (!node || !this.tour.isActive()) {
+      return;
+    }
+
+    node.classList.add('tour-target-active');
     const rect = node.getBoundingClientRect();
     this.spotlight.set({
       top: `${Math.max(8, rect.top - 6)}px`,
@@ -59,12 +74,41 @@ export class GuidedTourComponent {
     });
 
     const tipWidth = Math.min(320, window.innerWidth - 24);
-    const preferBelow = rect.bottom + 200 < window.innerHeight;
-    const top = preferBelow ? Math.min(window.innerHeight - 210, rect.bottom + 12) : Math.max(12, rect.top - 190);
+    const tipHeight = 210;
+    const gap = 14;
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+
+    let top = rect.bottom + gap;
     let left = Math.min(Math.max(12, rect.left), window.innerWidth - tipWidth - 12);
-    if (window.innerWidth < 768) {
-      left = 12;
+
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const spaceRight = window.innerWidth - rect.right;
+    const spaceLeft = rect.left;
+
+    // 優先放在錨點右側，避免蓋住正在介紹的卡片內容。
+    if (!isMobile && spaceRight >= tipWidth + gap + 8) {
+      left = Math.min(rect.right + gap, window.innerWidth - tipWidth - 12);
+      top = Math.min(Math.max(12, rect.top), window.innerHeight - tipHeight - 12);
+    } else if (!isMobile && spaceLeft >= tipWidth + gap + 8) {
+      left = Math.max(12, rect.left - tipWidth - gap);
+      top = Math.min(Math.max(12, rect.top), window.innerHeight - tipHeight - 12);
+    } else if (spaceBelow >= tipHeight + gap || spaceBelow >= spaceAbove) {
+      top = Math.min(rect.bottom + gap, window.innerHeight - tipHeight - 12);
+      if (isMobile || isTablet) {
+        left = 12;
+      }
+    } else {
+      top = Math.max(12, rect.top - tipHeight - gap);
+      if (isMobile || isTablet) {
+        left = 12;
+      }
     }
+
+    // 最後再夾進可視範圍，避免第一步卡出版面。
+    top = Math.min(Math.max(12, top), window.innerHeight - tipHeight - 12);
+    left = Math.min(Math.max(12, left), window.innerWidth - tipWidth - 12);
 
     this.tipStyle.set({
       top: `${top}px`,
@@ -73,8 +117,6 @@ export class GuidedTourComponent {
       right: 'auto',
       width: `${tipWidth}px`,
     });
-
-    node.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }
 
   private findAnchor(selector: string): HTMLElement | null {

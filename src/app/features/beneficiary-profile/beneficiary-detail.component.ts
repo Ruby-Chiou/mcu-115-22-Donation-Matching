@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { BeneficiaryPanelComponent } from '../../components/card/beneficiary-panel/beneficiary-panel.component';
 import { BeneficiaryPublicProfileService } from '../../core/services/agency/beneficiary-public-profile.service';
@@ -8,7 +8,7 @@ import { BeneficiaryPublicProfile } from '../../models/agency/beneficiary-public
 @Component({
   selector: 'app-beneficiary-detail',
   standalone: true,
-  imports: [RouterLink, BeneficiaryPanelComponent],
+  imports: [BeneficiaryPanelComponent],
   templateUrl: './beneficiary-detail.component.html',
   styleUrl: './beneficiary-detail.component.scss',
 })

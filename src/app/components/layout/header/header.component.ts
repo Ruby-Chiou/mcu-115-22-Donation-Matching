@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 
 import { navigationFor } from '../../../core/auth/navigation-catalog';
+import { ChromeVisibilityService } from '../../../core/layout/chrome-visibility.service';
 import { APP_ROLE_LABEL } from '../../../models/auth/app-role';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
 import { DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
@@ -27,9 +28,11 @@ export class HeaderComponent implements OnInit {
   private readonly disaster = inject(DisasterControlService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly chrome = inject(ChromeVisibilityService);
 
   isHeaderHidden = false;
   menuOpen = false;
+  expandedNavItem: string | null = null;
 
   constructor() {
     this.router.events
@@ -40,6 +43,7 @@ export class HeaderComponent implements OnInit {
       .subscribe(() => {
         if (!this.tour.isActive()) {
           this.menuOpen = false;
+          this.expandedNavItem = null;
         }
       });
 
@@ -47,6 +51,9 @@ export class HeaderComponent implements OnInit {
       // 導覽用 menuForcedOpen 控制選單顯示，不要寫進 menuOpen，否則導覽結束後選單會卡住。
       if (this.tour.isActive() && !this.tour.menuForcedOpen()) {
         this.menuOpen = false;
+      }
+      if (this.tour.isActive() || this.tour.menuForcedOpen()) {
+        this.setHeaderHidden(false);
       }
       const role = this.auth.principal().role;
       if (role === 'donor' || role === 'admin') {
@@ -141,23 +148,44 @@ export class HeaderComponent implements OnInit {
 
   protected logout(): void {
     this.menuOpen = false;
+    this.expandedNavItem = null;
     void this.auth.signOut().then(() => this.router.navigateByUrl('/home'));
   }
 
   protected toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
     if (this.menuOpen) {
-      this.isHeaderHidden = false;
+      this.setHeaderHidden(false);
+    } else {
+      this.expandedNavItem = null;
     }
+  }
+
+  protected toggleNavItem(name: string): void {
+    this.expandedNavItem = this.expandedNavItem === name ? null : name;
+  }
+
+  protected closeMenu(): void {
+    this.menuOpen = false;
+    this.expandedNavItem = null;
+  }
+
+  protected isLoggedIn(): boolean {
+    return this.auth.principal().role !== 'guest';
   }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    if (this.menuOpen) {
-      this.isHeaderHidden = false;
+    if (this.menuOpen || this.tour.isActive() || this.tour.menuForcedOpen()) {
+      this.setHeaderHidden(false);
       return;
     }
 
-    this.isHeaderHidden = window.scrollY > 70;
+    this.setHeaderHidden(window.scrollY > 70);
+  }
+
+  private setHeaderHidden(hidden: boolean): void {
+    this.isHeaderHidden = hidden;
+    this.chrome.setHeaderHidden(hidden);
   }
 }

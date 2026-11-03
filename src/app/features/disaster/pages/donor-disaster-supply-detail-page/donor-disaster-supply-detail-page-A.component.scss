@@ -119,6 +119,17 @@
   color: var(--color-text-body);
   font-size: var(--font-size-16);
 }
+.face-to-face-note {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #f0c28a;
+  border-radius: 8px;
+  background: #fff7eb;
+  color: #8a4b12;
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.5;
+}
 .donate-action {
   margin-top: 30px;
   display: flex;

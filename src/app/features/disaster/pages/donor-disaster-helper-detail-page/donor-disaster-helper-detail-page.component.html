@@ -5,8 +5,6 @@
 </div>
 } @else if (helper) {
 <div class="detail-page">
-  <!-- 返回需求清單 -->
-  <button type="button" class="back-button" (click)="goBackToList()">← 返回需求清單</button>
   <!-- 頁面標題 -->
   <div class="detail-header">
     <h1>災害協力需求詳情</h1>
@@ -250,6 +248,5 @@
 <div class="loading-state empty-state">
   <p>{{ loadError || '找不到此筆協力需求。' }}</p>
 
-  <button type="button" class="back-button" (click)="goBackToList()">← 返回需求清單</button>
 </div>
 }

@@ -78,18 +78,12 @@
 
   :host-context(.urgent-strip) ::ng-deep .featured-card,
   ::ng-deep .featured-card {
-    height: 420px;
-  }
-
-  ::ng-deep .featured-image,
-  ::ng-deep .featured-image img {
-    height: 150px;
-    flex-basis: 150px;
+    height: auto;
   }
 }
 
 .urgent-placeholder {
-  min-height: 420px;
+  min-height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,9 +122,6 @@
     font-size: var(--font-size-22);
   }
 
-  .urgent-card-wrap ::ng-deep .featured-card {
-    height: 390px;
-  }
 }
 
 @include bp.mobile {
@@ -150,15 +141,5 @@
 
   .nav.next {
     right: 4px;
-  }
-
-  .urgent-card-wrap ::ng-deep .featured-card {
-    height: 360px;
-  }
-
-  .urgent-card-wrap ::ng-deep .featured-content h3,
-  .urgent-card-wrap ::ng-deep .info p {
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
   }
 }

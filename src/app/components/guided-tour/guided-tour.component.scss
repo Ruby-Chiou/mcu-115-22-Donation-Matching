@@ -11,6 +11,66 @@
   background: var(--color-white);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
   color: var(--color-text-main);
+
+  h2,
+  h3 {
+    margin: 0 0 8px;
+    font-size: var(--font-size-18);
+  }
+
+  p {
+    margin: 0 0 14px;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-14);
+    line-height: 1.5;
+  }
+
+  .eyebrow,
+  .step-count {
+    margin: 0 0 6px;
+    color: var(--color-brand-primary);
+    font-size: var(--font-size-12);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .primary,
+  .ghost {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 0;
+    cursor: pointer;
+    font-weight: var(--font-weight-bold);
+  }
+
+  .primary {
+    background: var(--color-action);
+    color: var(--color-white);
+  }
+
+  .ghost {
+    background: #eceff3;
+    color: var(--color-text-main);
+  }
 }
 
 .tour-prompt {
@@ -35,64 +95,9 @@
   pointer-events: none;
 }
 
-.eyebrow,
-.step-count {
-  margin: 0 0 6px;
-  color: var(--color-brand-primary);
-  font-size: var(--font-size-12);
-  font-weight: var(--font-weight-bold);
-}
-
-h2,
-h3 {
-  margin: 0 0 8px;
-  font-size: var(--font-size-18);
-}
-
-p {
-  margin: 0 0 14px;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-14);
-  line-height: 1.5;
-}
-
-.close {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  border: 0;
-  background: transparent;
-  color: var(--color-text-muted);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.primary,
-.ghost {
-  min-height: 38px;
-  padding: 0 14px;
-  border-radius: 8px;
-  border: 0;
-  cursor: pointer;
-  font-weight: var(--font-weight-bold);
-}
-
-.primary {
-  background: var(--color-action);
-  color: var(--color-white);
-}
-
-.ghost {
-  background: #eceff3;
-  color: var(--color-text-main);
+.tour-target-active {
+  position: relative;
+  z-index: 1395;
 }
 
 @include bp.mobile {
@@ -104,13 +109,12 @@ p {
   }
 
   .tour-tip {
-    left: 12px !important;
-    right: 12px;
-    width: auto !important;
+    max-width: calc(100vw - 24px);
   }
 }
 
-.tour-target-active {
-  position: relative;
-  z-index: 1395;
+@include bp.tablet {
+  .tour-tip {
+    max-width: min(320px, calc(100vw - 24px));
+  }
 }

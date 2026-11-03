@@ -34,6 +34,6 @@ export class PlatformGuideComponent implements OnInit {
   }
 
   protected selectGuide(guide: 'donor' | 'agency'): void {
-    this.selectedGuide.set(guide);
+    this.selectedGuide.update((selected) => selected === guide ? null : guide);
   }
 }

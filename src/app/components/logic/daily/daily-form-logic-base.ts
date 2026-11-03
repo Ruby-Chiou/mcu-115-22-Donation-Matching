@@ -1,4 +1,5 @@
 import { Router, ActivatedRoute } from '@angular/router';
+import { DAILY_SERVICE_TARGET_OPTIONS } from '../../../core/codes/service-targets';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../models/agency/daily-demand';
 
@@ -19,7 +20,7 @@ export class DailyFormLogicBase {
   showOffShelfWarning = false;
   showOnShelfWarning = false;
 
-  serviceTargetOptions: string[] = ['老人', '嬰幼兒', '孩童', '青少年', '身障', '貧困', '重症照護', '動物', '無家者'];
+  serviceTargetOptions: string[] = [...DAILY_SERVICE_TARGET_OPTIONS];
 
   imageFiles: File[] = [];
   showImagePreview = false;
@@ -30,7 +31,7 @@ export class DailyFormLogicBase {
   categoryOptions: NonNullable<DailyDemand['category']>[] = [
     '食品與飲用水',
     '衣物與保暖用品',
-    '醫療與照護用品',
+    '健康與照護用品',
     '清潔與衛生用品',
     '嬰幼兒用品',
     '長者與身心障礙用品',

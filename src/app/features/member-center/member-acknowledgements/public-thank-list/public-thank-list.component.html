@@ -23,10 +23,20 @@
         <div class="published">{{ item.publishedAt | date: 'yyyy/MM/dd' }}</div>
         <p class="visibility-state">{{ item.isPublic === false ? '只有自己看得到' : '公開中' }} · {{ item.nameMode === 'full' ? '全名' : '匿名' }}</p>
         <div class="visibility-actions">
-          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, 'masked', item.isPublic !== false)">匿名</button>
-          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, 'full', item.isPublic !== false)">全名</button>
-          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, item.nameMode === 'full' ? 'full' : 'masked', true)">公開</button>
-          <button type="button" [disabled]="savingId() === item.id" (click)="save(item, item.nameMode === 'full' ? 'full' : 'masked', false)">只有自己看得到</button>
+          <fieldset>
+            <legend>感謝牆顯示名稱</legend>
+            <div class="visibility-options">
+              <button type="button" [class.active]="item.nameMode !== 'full'" [attr.aria-pressed]="item.nameMode !== 'full'" [disabled]="savingId() === item.id" (click)="save(item, 'masked', item.isPublic !== false)">匿名</button>
+              <button type="button" [class.active]="item.nameMode === 'full'" [attr.aria-pressed]="item.nameMode === 'full'" [disabled]="savingId() === item.id" (click)="save(item, 'full', item.isPublic !== false)">全名</button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>是否公開</legend>
+            <div class="visibility-options">
+              <button type="button" [class.active]="item.isPublic !== false" [attr.aria-pressed]="item.isPublic !== false" [disabled]="savingId() === item.id" (click)="save(item, item.nameMode === 'full' ? 'full' : 'masked', true)">公開</button>
+              <button type="button" [class.active]="item.isPublic === false" [attr.aria-pressed]="item.isPublic === false" [disabled]="savingId() === item.id" (click)="save(item, item.nameMode === 'full' ? 'full' : 'masked', false)">不公開</button>
+            </div>
+          </fieldset>
         </div>
       </article>
     } @empty {

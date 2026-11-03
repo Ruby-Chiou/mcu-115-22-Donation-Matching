@@ -6,6 +6,7 @@ import type {
   AgencyReviewWriter,
 } from './agency-review.ports';
 import { SupabaseService } from '../database/supabase.service';
+import { MemberMailDispatchService } from '../member-center/member-mail-dispatch.service';
 
 export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'supplement';
 
@@ -68,6 +69,7 @@ const FILE_LIMIT = 8 * 1024 * 1024;
 })
 export class AgencyVerificationService implements AgencyApplicationReader, AgencyReviewWriter, AgencyDocumentReader {
   private readonly supabase = inject(SupabaseService);
+  private readonly mail = inject(MemberMailDispatchService);
 
   async list(): Promise<AgencyApplication[]> {
     const { data, error } = await this.supabase.client
@@ -120,6 +122,7 @@ export class AgencyVerificationService implements AgencyApplicationReader, Agenc
       return false;
     }
 
+    void this.mail.sweep();
     return true;
   }
 

@@ -23,7 +23,7 @@ export class DailyFilterComponent {
   @Input() categoryOptions: NonNullable<DailyDemand['category']>[] = [
     '食品與飲用水',
     '衣物與保暖用品',
-    '醫療與照護用品',
+    '健康與照護用品',
     '清潔與衛生用品',
     '嬰幼兒用品',
     '長者與身心障礙用品',

@@ -38,3 +38,21 @@ export function sameTaiwanCity(left: string, right: string): boolean {
 export function taiwanCityView(name: string): TaiwanCityView | undefined {
   return TAIWAN_CITY_VIEWS.find((city) => sameTaiwanCity(city.name, name));
 }
+
+export interface TaiwanAddressRegion {
+  city: string;
+  district: string;
+}
+
+/** Extracts the city and following township/district from a normal Taiwan address. */
+export function taiwanAddressRegion(address: string): TaiwanAddressRegion {
+  const normalized = address.replace(/台/g, '臺').replace(/\s+/g, '');
+  const city = TAIWAN_CITY_VIEWS.find((item) => normalized.includes(item.name))?.name ?? '';
+  if (!city) {
+    return { city: '', district: '' };
+  }
+
+  const remainder = normalized.slice(normalized.indexOf(city) + city.length);
+  const district = remainder.match(/^(.{1,5}?(?:區|鄉|鎮|市))/)?.[1] ?? '';
+  return { city, district };
+}

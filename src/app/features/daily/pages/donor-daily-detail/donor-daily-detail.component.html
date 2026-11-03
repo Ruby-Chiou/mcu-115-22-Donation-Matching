@@ -7,19 +7,10 @@
 <div class="loading-state error-state">
   <p>{{ loadError }}</p>
 
-  <button type="button" class="back-btn" routerLink="/donor/daily">
-    <i class="fa-solid fa-arrow-left-long"></i>
-    返回日常捐助
-  </button>
 </div>
 } @else if (demand) {
 <div class="detail-info">
   <div class="detail-page">
-    <button type="button" class="back-btn" routerLink="/donor/daily">
-      <i class="fa-solid fa-arrow-left-long"></i>
-      返回
-    </button>
-
     <!-- 左邊圖片 -->
     <div class="detail-image">
       <!-- 優先度 -->
@@ -55,12 +46,12 @@
 
       <div class="quantity-row">
         <h3>需求數量</h3>
-        <p>{{ demand.amount }} {{ demand.unit }}</p>
+        <p class="quantity-value">{{ demand.amount ?? '—' }} {{ demand.unit || '' }}</p>
       </div>
 
       <div class="quantity-row">
         <h3>接收方</h3>
-        <p>{{ demand.recipient }}</p>
+        <p class="quantity-value">{{ demand.recipient || '—' }}</p>
       </div>
 
       <button type="button" class="contact-btn" (click)="requestDonate()">我要捐助</button>
@@ -259,9 +250,5 @@
 <div class="loading-state empty-state">
   <p>找不到此筆物資需求。</p>
 
-  <button type="button" class="back-btn" routerLink="/donor/daily">
-    <i class="fa-solid fa-arrow-left-long"></i>
-    返回日常捐助
-  </button>
 </div>
 }

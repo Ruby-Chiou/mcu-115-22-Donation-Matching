@@ -57,6 +57,9 @@
         <h1 id="material-heading">
           物資捐助
         </h1>
+        <p class="face-to-face-banner" role="note">
+          災害物資僅限面交、不提供寄送。收貨位置為受助單位指定地點，完成申請並約定時間後再前往。
+        </p>
       }
       <!-- 篩選區 -->
       <div class="filter-area">
@@ -91,7 +94,7 @@
         @if (showSupplyFilter) {
           <app-donor-disaster-supply-filter
             [filters]="materialFilters"
-            (filtersChange)="materialFilters = $event">
+            (filtersChange)="onMaterialFiltersChange($event)">
           </app-donor-disaster-supply-filter>
         }
       </div>
@@ -150,7 +153,7 @@
 
         <app-donor-disaster-helper-filter
           [filters]="helperFilters"
-          (filtersChange)="helperFilters = $event">
+          (filtersChange)="onHelperFiltersChange($event)">
         </app-donor-disaster-helper-filter>
 
       }

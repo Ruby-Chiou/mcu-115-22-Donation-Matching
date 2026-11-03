@@ -194,49 +194,77 @@
             </div>
           }
 
-          @if (record.status === 'human_approved' && record.donationMethod === '寄送') {
-            <form class="tracking-form" (submit)="$event.preventDefault(); saveTracking(record)">
-              <p class="shortcut-hint">審核已通過：請選擇物流公司並上傳單號，機構才能簽收。超商請再填門市與地址。</p>
-              <label for="logistics-carrier">物流公司</label>
-              <select
-                id="logistics-carrier"
-                [value]="carrierDraft()"
-                (change)="onCarrierChange($event)"
-              >
-                <option value="" [selected]="!carrierDraft()">請選擇</option>
-                @for (carrier of carriers; track carrier) {
-                  <option [value]="carrier" [selected]="carrierDraft() === carrier">{{ carrier }}</option>
-                }
-              </select>
-              @if (needsStoreFields()) {
-                <label for="store-name">超商門市</label>
+          @if (needsHandoverProof(record)) {
+            <form class="tracking-form proof-upload-form" (submit)="$event.preventDefault(); uploadHandoverProof(record)">
+              <p class="shortcut-hint">
+                面交完成後，請在這裡上傳照片或 PDF 作為捐贈證明，供受助單位確認。
+              </p>
+              <label for="handover-proof">面交證明</label>
+              <input id="handover-proof" type="file" accept="image/*,.pdf" (change)="onProofSelected($event)" />
+              <button type="submit" class="btn btn-primary" [disabled]="proofSaving()">
+                {{ proofSaving() ? '上傳中...' : '上傳面交證明' }}
+              </button>
+              @if (proofMessage()) {
+                <p class="tracking-message">{{ proofMessage() }}</p>
+              }
+            </form>
+          } @else if (record.donationMethod === '面交' && record.proofUploadedAt) {
+            <p class="shortcut-hint proof-complete">面交證明已於 {{ record.proofUploadedAt | date: 'yyyy/MM/dd HH:mm' }} 上傳。</p>
+          }
+
+          @if (record.status === 'human_approved' && record.donationMethod === '寄送' && !record.receiptConfirmedAt) {
+            <form class="tracking-form logistics-edit-form" (submit)="$event.preventDefault(); saveTracking(record)">
+              <p class="shortcut-hint">審核已通過：先填物流單號可自動辨識物流公司（仍可手動改）。超商請再填門市與地址。</p>
+              <div class="logistics-field">
+                <label for="tracking-no">物流單號</label>
                 <input
-                  id="store-name"
-                  [value]="storeNameDraft()"
-                  (input)="onStoreNameInput($event)"
-                  placeholder="例如：台北站前店"
+                  id="tracking-no"
+                  [value]="trackingDraft()"
+                  (input)="onTrackingInput($event)"
+                  placeholder="寄出後填上單號"
                   autocomplete="off"
                 />
-                <label for="store-address">門市地址</label>
-                <input
-                  id="store-address"
-                  [value]="storeAddressDraft()"
-                  (input)="onStoreAddressInput($event)"
-                  placeholder="方便機構查詢取件"
-                  autocomplete="street-address"
-                />
+              </div>
+              <div class="logistics-field">
+                <label for="logistics-carrier">物流公司</label>
+                <select
+                  id="logistics-carrier"
+                  [value]="carrierDraft()"
+                  (change)="onCarrierChange($event)"
+                >
+                  <option value="" [selected]="!carrierDraft()">請選擇</option>
+                  @for (carrier of carriers; track carrier) {
+                    <option [value]="carrier" [selected]="carrierDraft() === carrier">{{ carrier }}</option>
+                  }
+                </select>
+              </div>
+              @if (needsStoreFields()) {
+                <div class="logistics-field">
+                  <label for="store-name">超商門市</label>
+                  <input
+                    id="store-name"
+                    [value]="storeNameDraft()"
+                    (input)="onStoreNameInput($event)"
+                    placeholder="例如：台北站前店"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="logistics-field">
+                  <label for="store-address">門市地址</label>
+                  <input
+                    id="store-address"
+                    [value]="storeAddressDraft()"
+                    (input)="onStoreAddressInput($event)"
+                    placeholder="方便機構查詢取件"
+                    autocomplete="street-address"
+                  />
+                </div>
               }
-              <label for="tracking-no">物流單號</label>
-              <input
-                id="tracking-no"
-                [value]="trackingDraft()"
-                (input)="onTrackingInput($event)"
-                placeholder="寄出後填上單號"
-                autocomplete="off"
-              />
-              <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
-                {{ trackingSaving() ? '上傳中...' : (record.trackingNo ? '更新物流資料' : '上傳物流資料') }}
-              </button>
+              <div class="logistics-actions">
+                <button type="submit" class="btn btn-primary" [disabled]="trackingSaving()">
+                  {{ trackingSaving() ? '上傳中...' : (record.trackingNo ? '更新物流資料' : '上傳物流資料') }}
+                </button>
+              </div>
               @if (trackingMessage()) {
                 <p class="tracking-message">{{ trackingMessage() }}</p>
               }
@@ -250,9 +278,10 @@
                 門市 {{ record.logisticsStoreName }}{{ record.logisticsStoreAddress ? '（' + record.logisticsStoreAddress + '）' : '' }}。
               }
               @if (record.receiptConfirmedAt) {
-                機構已簽收。
+                機構已簽收，物流資料已鎖定為唯讀。
                 @if (record.receiptPartial) { 數量較多，沒有全部拆箱拍攝。 }
                 @if (record.receiptDeclinedVideo) { 這次沒有錄影，之後爭議由雙方各自承擔。 }
+                @if (record.receiptNote) { 簽收說明：{{ record.receiptNote }} }
               } @else {
                 機構收到貨後會拍照回報。
               }
@@ -338,27 +367,41 @@
             }
           </dl>
 
-          <form class="tracking-form" (submit)="$event.preventDefault(); saveVisibility(record)">
+          <form class="tracking-form thank-visibility-form" (submit)="$event.preventDefault(); saveVisibility(record)">
             <p class="shortcut-hint">可調整感謝牆的公開方式與顯示名稱（與審核結果無關）。</p>
-            <label>
-              <input type="radio" name="history-name-mode" value="masked" [checked]="nameModeDraft() === 'masked'" (change)="nameModeDraft.set('masked')" />
-              匿名
-            </label>
-            <label>
-              <input type="radio" name="history-name-mode" value="full" [checked]="nameModeDraft() === 'full'" (change)="nameModeDraft.set('full')" />
-              全名
-            </label>
-            <label>
-              <input type="radio" name="history-public" value="public" [checked]="publicDraft()" (change)="publicDraft.set(true)" />
-              公開
-            </label>
-            <label>
-              <input type="radio" name="history-public" value="private" [checked]="!publicDraft()" (change)="publicDraft.set(false)" />
-              只有自己看得到
-            </label>
-            <button type="submit" class="btn btn-primary" [disabled]="visibilitySaving()">
-              {{ visibilitySaving() ? '儲存中...' : '儲存顯示方式' }}
-            </button>
+            <div class="visibility-groups">
+              <fieldset>
+                <legend>感謝牆顯示名稱</legend>
+                <div class="visibility-options">
+                  <label>
+                    <input type="radio" name="history-name-mode" value="masked" [checked]="nameModeDraft() === 'masked'" (change)="nameModeDraft.set('masked')" />
+                    匿名
+                  </label>
+                  <label>
+                    <input type="radio" name="history-name-mode" value="full" [checked]="nameModeDraft() === 'full'" (change)="nameModeDraft.set('full')" />
+                    全名
+                  </label>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>是否公開</legend>
+                <div class="visibility-options">
+                  <label>
+                    <input type="radio" name="history-public" value="public" [checked]="publicDraft()" (change)="publicDraft.set(true)" />
+                    公開
+                  </label>
+                  <label>
+                    <input type="radio" name="history-public" value="private" [checked]="!publicDraft()" (change)="publicDraft.set(false)" />
+                    不公開
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+            <div class="visibility-save-row">
+              <button type="submit" class="btn btn-primary" [disabled]="visibilitySaving()">
+                {{ visibilitySaving() ? '儲存中...' : '儲存顯示方式' }}
+              </button>
+            </div>
             @if (visibilityMessage()) {
               <p class="tracking-message">{{ visibilityMessage() }}</p>
             }

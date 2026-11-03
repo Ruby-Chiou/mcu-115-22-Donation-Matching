@@ -15,8 +15,13 @@
     [pageNumbers]="pageNumbers"
     (pageChange)="goToPage($event)"
   ></app-pagination>
-  } @else if ( disasterData().isOpen && type === 'helper' ) { @for ( helper of paginatedHelpers; track helper.serialNo ) {
+  } @else if ( disasterData().isOpen && type === 'helper' ) {
+  @if (paginatedHelpers.length === 0) {
+  <p class="empty-hint">目前沒有符合條件的協力需求，可重置篩選後再試。</p>
+  } @else {
+  @for ( helper of paginatedHelpers; track helper.serialNo ) {
   <app-donor-disaster-card type="helper" [helper]="helper"></app-donor-disaster-card>
+  }
   }
 
   <app-pagination

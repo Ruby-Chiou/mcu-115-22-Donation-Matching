@@ -1,0 +1,12 @@
+@if (visible()) {
+  <aside class="disaster-broadcast" aria-live="assertive" aria-label="災害模式公告">
+    <a
+      class="disaster-broadcast__message"
+      routerLink="/donor/disaster"
+      (animationend)="finish()"
+    >
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      災害模式已開啟，可至災害專區查看物資與協力需求
+    </a>
+  </aside>
+}

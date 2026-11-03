@@ -150,6 +150,19 @@
   margin-bottom: 30px;
 }
 
+.guide-selector-item {
+  min-width: 0;
+}
+
+.guide-selector-content {
+  width: calc(200% + var(--space-18));
+  margin-top: 30px;
+}
+
+.guide-selector-item:nth-child(2) .guide-selector-content {
+  margin-left: calc(-100% - var(--space-18));
+}
+
 
 .guide-selector-button {
   display: flex;
@@ -252,6 +265,31 @@
 // RWD
 // ==========================================
 
+@include bp.tablet {
+
+  .guide-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+
+  .guide-selector-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .guide-selector-content {
+    width: 100%;
+    margin-top: 10px;
+    margin-left: 0;
+  }
+
+  .guide-selector-item:nth-child(2) .guide-selector-content {
+    margin-left: 0;
+  }
+
+}
+
 @include bp.mobile {
 
   .guide-hero {
@@ -279,11 +317,20 @@
     font-size: var(--font-size-25);
   }
 
-}
-@include bp.tablet {
-
   .guide-selector {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .guide-selector-content {
+    width: 100%;
+    margin-top: 8px;
+    margin-left: 0;
+  }
+
+  .guide-selector-item:nth-child(2) .guide-selector-content {
+    margin-left: 0;
   }
 
 }

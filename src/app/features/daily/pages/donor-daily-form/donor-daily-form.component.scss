@@ -42,6 +42,17 @@
   border: 1px solid var(--border-gray);
   border-radius: var(--radius-12);
 }
+
+.material-info.is-loading {
+  min-height: 100px;
+  align-items: center;
+}
+
+.material-loading {
+  margin: 0;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-15);
+}
 .material-image {
   width: 120px;
   height: 100px;

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { normalizeServiceTargets } from '../../../core/codes/service-targets';
 import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -47,22 +48,14 @@ export class DailyFormLogic extends DailyFormLogicBase {
       this.originalStatus = data.status ?? '隱藏';
       this.originalOffShelfReason = data.offShelfReason;
 
-      let serviceTargets: string[] = [];
-
-      if (Array.isArray(data.serviceTargets)) {
-        serviceTargets = [...data.serviceTargets];
-      } else if (data.serviceTargets && typeof data.serviceTargets === 'object') {
-        serviceTargets = Object.entries(data.serviceTargets)
-          .filter(([, value]) => Boolean(value))
-          .map(([key]) => key);
-      }
+      const normalizedTargets = normalizeServiceTargets(data.serviceTargets, data.customServiceTargets);
 
       this.demand = {
         ...data,
         status: data.status ?? '上架',
         remaining: data.remaining ?? null,
-        serviceTargets,
-        customServiceTargets: data.customServiceTargets?.length ? [...data.customServiceTargets] : [''],
+        serviceTargets: normalizedTargets.serviceTargets,
+        customServiceTargets: normalizedTargets.customServiceTargets,
         conditions: data.conditions
           ? { ...data.conditions }
           : {
@@ -79,6 +72,9 @@ export class DailyFormLogic extends DailyFormLogicBase {
         image: [...(data.image ?? [])],
         imageFileNames: [...(data.imageFileNames ?? [])],
       };
+
+      this.hasServiceTarget =
+        this.demand.serviceTargets.length > 0 || this.demand.customServiceTargets.some((target) => target.trim());
 
       this.imageFiles = [];
 

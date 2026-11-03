@@ -8,7 +8,7 @@ import { MemberSessionService } from '../member-center/member-session.service';
 import { PublicDonationThankService } from '../member-center/public-donation-thank.service';
 import { MemberMailDispatchService } from '../member-center/member-mail-dispatch.service';
 
-type DonationFileType = 'material_image' | 'material_video';
+type DonationFileType = 'material_image' | 'material_video' | 'proof';
 
 type HumanDecision = 'accepted' | 'rejected';
 
@@ -160,6 +160,24 @@ export class DonationService {
     }
   }
 
+  /** 面交完成後由捐助紀錄補上捐贈證明。 */
+  async uploadHandoverProof(donationId: string, file: File): Promise<void> {
+    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+      throw new Error('捐贈證明僅支援圖片或 PDF');
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error('捐贈證明不可超過 10MB');
+    }
+
+    await this.uploadDonationFile(donationId, file, 'proof', Date.now());
+    const { error } = await this.supabase.rpc('mark_handover_proof_uploaded', {
+      p_donation_id: donationId,
+    });
+    if (error) {
+      throw new Error(error.message || '證明已上傳，但狀態更新失敗');
+    }
+  }
+
   async reviewDonationWithAi(donationId: string): Promise<AiReviewResult> {
     const response = await fetch(this.aiReviewUrl(donationId), {
       method: 'POST',
@@ -169,7 +187,8 @@ export class DonationService {
         Authorization: `Bearer ${environment.supabasePublishableKey}`,
       },
     });
-    const payload = (await response.json().catch(() => null)) as {
+    const rawBody = await response.text();
+    const payload = ((): {
       message?: string;
       donationId?: string;
       DonationId?: string;
@@ -185,17 +204,35 @@ export class DonationService {
       Reason?: string;
       conditionMatches?: boolean;
       ConditionMatches?: boolean;
-    } | null;
+    } | null => {
+      try {
+        return JSON.parse(rawBody);
+      } catch {
+        return null;
+      }
+    })();
 
-    const reason = (payload?.reason ?? payload?.Reason ?? '').trim();
+    let reason = (payload?.reason ?? payload?.Reason ?? '').trim();
     const decision = payload?.aiDecision ?? payload?.AiDecision ?? '';
 
-    if (!response.ok || (decision !== 'accepted' && decision !== 'rejected') || reason.length < 8) {
+    if (!response.ok || (decision !== 'accepted' && decision !== 'rejected')) {
+      console.error('AI 捐助審核失敗：', {
+        status: response.status,
+        body: rawBody.slice(0, 300),
+      });
+
       // 辨識失敗時仍交給機構人工看照片，避免一直卡在 AI 審核中、受助端看不到
+      const detail = payload?.message?.trim();
       return this.handoffAiToHumanReview(
         donationId,
-        payload?.message || '系統影像辨識未完成，請機構直接依照片人工確認。',
+        detail
+          ? `系統影像辨識未完成（基礎設施），請機構直接依照片人工確認。服務訊息：${detail}`
+          : '系統影像辨識未完成（基礎設施），請機構直接依照片人工確認。',
       );
+    }
+
+    if (reason.length < 8) {
+      reason = `${reason || (decision === 'accepted' ? '照片符合需求。' : '照片未通過審核。')}後續仍由機構依照片人工確認。`;
     }
 
     return {
@@ -258,7 +295,9 @@ export class DonationService {
 
   /** 直接打 Supabase Edge Function（本機／正式站同一網址）。 */
   private aiReviewUrl(donationId: string): string {
-    const base = environment.aiReviewApiUrl.replace(/\/$/, '');
+    const configuredSupabaseUrl = environment.supabaseUrl?.replace(/\/$/, '');
+    const fallbackUrl = environment.aiReviewApiUrl.replace(/\/$/, '');
+    const base = configuredSupabaseUrl ? `${configuredSupabaseUrl}/functions/v1/ai-donation-review` : fallbackUrl;
     return `${base}?donationId=${encodeURIComponent(donationId)}`;
   }
 
@@ -287,7 +326,7 @@ export class DonationService {
   private async uploadDonationFile(donationId: string, file: File, fileType: DonationFileType, index: number): Promise<void> {
     const safeFileName = this.createSafeFileName(file.name);
 
-    const folder = fileType === 'material_image' ? 'images' : 'videos';
+    const folder = fileType === 'material_image' ? 'images' : fileType === 'material_video' ? 'videos' : 'proof';
 
     const storagePath = `donations/${donationId}/` + `${folder}/${index}-${safeFileName}`;
 

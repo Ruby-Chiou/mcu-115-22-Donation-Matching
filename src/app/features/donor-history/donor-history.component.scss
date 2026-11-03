@@ -441,9 +441,108 @@
   }
 }
 
+.logistics-edit-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  align-items: end;
+
+  .shortcut-hint,
+  .tracking-message,
+  .logistics-actions {
+    grid-column: 1 / -1;
+  }
+
+  .logistics-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .logistics-field label {
+    white-space: normal;
+  }
+
+  .logistics-field input,
+  .logistics-field select {
+    width: 100%;
+    min-width: 0;
+    flex: none;
+    box-sizing: border-box;
+  }
+
+  .logistics-actions {
+    display: flex;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 767px) {
+  .logistics-edit-form {
+    grid-template-columns: 1fr;
+  }
+}
+
 .tracking-message {
   color: var(--color-action);
   font-weight: var(--font-weight-bold);
+}
+
+.proof-upload-form {
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-action) 30%, var(--border-light));
+  border-radius: var(--radius-8);
+  background: var(--bg-action-glaze);
+}
+
+.proof-complete {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-8);
+  background: #e6f6ea;
+  color: #1b7a3d;
+}
+
+.thank-visibility-form {
+  display: block;
+  padding: 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-8);
+  background: var(--bg-paper);
+
+  .visibility-groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md);
+    margin-top: 0.85rem;
+  }
+
+  fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0.75rem 1rem 1rem;
+    border: 1px solid var(--border-slate);
+    border-radius: var(--radius-8);
+    background: var(--color-white);
+  }
+
+  legend {
+    padding: 0 0.35rem;
+    color: var(--color-text-main);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .visibility-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .visibility-save-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
 }
 
 .shortcut-hint {
@@ -569,6 +668,16 @@ embed.viewer-file {
 
     dt {
       margin-top: 0.5rem;
+    }
+  }
+
+  .thank-visibility-form {
+    .visibility-groups {
+      grid-template-columns: 1fr;
+    }
+
+    .visibility-save-row .btn {
+      width: 100%;
     }
   }
 }

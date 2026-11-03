@@ -97,7 +97,7 @@ export class HelperListComponent {
   // 篩選選項
   statusOptions: DisplayHelperStatus[] = ['已上架', '隱藏中', '已下架'];
   priorityOptions: HelperDemand['priority'][] = ['普通', '緊急', '非常緊急'];
-  typeOptions: NonNullable<HelperDemand['type']>[] = ['物資搬運', '物資整理', '環境清潔', '醫療照護', '其他'];
+  typeOptions: NonNullable<HelperDemand['type']>[] = ['物資搬運', '物資整理', '環境清潔', '健康照護', '其他'];
   messageOptions = ['已回覆', '未回覆'];
 
   selectedFilters: HelperFilterState = {

@@ -30,23 +30,11 @@
       <span class="tag">面交</span>
       }
     </div>
-    <div class="info">
-      <p>需求對象：{{ demand.serviceTargetDescription }}</p>
+    <div class="info-stack">
+      <p class="info">需求數量：{{ demand.amount ?? '—' }} {{ demand.unit || '' }}</p>
+      <p class="info">接收方：{{ demand.recipient || '—' }}</p>
+      <p class="info">{{ getRegion(demand.address) || '—' }}</p>
     </div>
-    <div class="info">
-      <p>需求數量： {{ demand.amount }} {{ demand.unit }}</p>
-    </div>
-    <div class="info">
-      <p>{{ demand.recipient }}</p>
-    </div>
-    <div class="info">
-      <p>{{ getRegion(demand.address) }}</p>
-    </div>
-    @if (demand.publishedAt) {
-      <div class="info">
-        <p>發布日期：{{ demand.publishedAt | date: 'yyyy/MM/dd' }}</p>
-      </div>
-    }
   </div>
   <button class="detail-btn" type="button" (click)="onView()">查看詳情</button>
 </div>

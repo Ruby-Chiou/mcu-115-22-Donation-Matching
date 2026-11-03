@@ -13,17 +13,17 @@ import { DisasterControlService } from '../../../../core/services/disaster-contr
 import { sortByPriorityThenDate } from '../../../../core/codes/demand-codes';
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 import { HelperDemand } from '../../../../models/agency/helper-demand';
+import { sameTaiwanCity, taiwanAddressRegion } from '../../../../core/map/taiwan-cities';
 
 export interface MaterialFilters {
   category: string[];
   priority: string[];
-  hasRemaining: boolean;
 }
 
 export interface HelperFilters {
   helperType: string[];
   helperLocation: string[];
-  hasRemaining: boolean;
+  cities: string[];
 }
 
 export type DisasterFilters = MaterialFilters | HelperFilters;
@@ -41,7 +41,6 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
   @Input() filters: DisasterFilters = {
     category: [],
     priority: [],
-    hasRemaining: false,
   };
 
   protected disasterData!: DisasterControlService['data'];
@@ -85,7 +84,8 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
       this.demands = this.disasterDemandService.getDemands().filter((demand) => demand.status === '上架');
 
-      this.helpers = this.helperDemandService.getHelpers().filter((helper) => helper.status === '上架');
+      // 直接從全表過濾，避免 getHelpers() 與前端再過濾時狀態不一致。
+      this.helpers = this.helperDemandService.getDemands().filter((helper) => helper.status === '上架');
 
       this.currentPage = 1;
     } catch (error) {
@@ -108,12 +108,8 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
     const filtered = this.demands.filter((demand) => {
       const categoryMatch = filters.category.length === 0 || filters.category.includes(demand.category);
-
       const priorityMatch = filters.priority.length === 0 || filters.priority.includes(demand.priority);
-
-      const remainingMatch = !filters.hasRemaining || (demand.remaining ?? 0) > 0;
-
-      return categoryMatch && priorityMatch && remainingMatch;
+      return categoryMatch && priorityMatch;
     });
 
     return sortByPriorityThenDate(filtered);
@@ -125,14 +121,21 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
     }
 
     const filters = this.filters as HelperFilters;
+    const cities = Array.isArray(filters.cities) ? filters.cities : [];
+    const helperTypes = Array.isArray(filters.helperType) ? filters.helperType : [];
+    const helperLocations = Array.isArray(filters.helperLocation) ? filters.helperLocation : [];
 
     const filtered = this.helpers.filter((helper) => {
-      const typeMatch = filters.helperType.length === 0 || filters.helperType.includes(helper.type);
-
+      const typeMatch = helperTypes.length === 0 || helperTypes.includes(helper.type);
       const locationMatch =
-        filters.helperLocation.length === 0 || filters.helperLocation.some((location) => helper.location.includes(location));
+        helperLocations.length === 0 ||
+        helperLocations.some((location) => (helper.location || '').includes(location));
+      const region = taiwanAddressRegion(helper.location || '');
+      const cityMatch =
+        cities.length === 0 ||
+        (!!region.city && cities.some((city) => sameTaiwanCity(city, region.city)));
 
-      return typeMatch && locationMatch;
+      return typeMatch && locationMatch && cityMatch;
     });
 
     return sortByPriorityThenDate(filtered);

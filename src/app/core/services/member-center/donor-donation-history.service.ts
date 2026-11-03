@@ -30,8 +30,10 @@ interface DonationHistoryRow {
   logistics_store_name: string | null;
   logistics_store_address: string | null;
   receipt_confirmed_at: string | null;
+  proof_uploaded_at: string | null;
   receipt_partial: boolean | null;
   receipt_declined_video: boolean | null;
+  receipt_note: string | null;
 }
 
 interface DemandMetaRow {
@@ -86,15 +88,17 @@ export class DonorDonationHistoryService {
         logistics_store_name,
         logistics_store_address,
         receipt_confirmed_at,
+        proof_uploaded_at,
         receipt_partial,
-        receipt_declined_video
+        receipt_declined_video,
+        receipt_note
       `
       )
       .eq('donor_uid', uid)
       .order('created_at', { ascending: false });
 
-    if (error && /logistics_store_/i.test(error.message ?? '')) {
-      return this.loadHistoryWithoutStoreColumns(uid);
+    if (error && /logistics_store_|proof_uploaded_at/i.test(error.message ?? '')) {
+      return this.loadHistoryLegacy(uid);
     }
 
     if (error) {
@@ -111,7 +115,8 @@ export class DonorDonationHistoryService {
     return records;
   }
 
-  private async loadHistoryWithoutStoreColumns(uid: string): Promise<DonorDonationHistory[]> {
+  /** 舊庫還沒有超商欄或面交證明欄時的相容讀取。 */
+  private async loadHistoryLegacy(uid: string): Promise<DonorDonationHistory[]> {
     const { data, error } = await this.supabaseService.client
       .from(this.donationTable)
       .select(
@@ -139,7 +144,8 @@ export class DonorDonationHistoryService {
         tracking_no,
         receipt_confirmed_at,
         receipt_partial,
-        receipt_declined_video
+        receipt_declined_video,
+        receipt_note
       `,
       )
       .eq('donor_uid', uid)
@@ -212,8 +218,10 @@ export class DonorDonationHistoryService {
       logisticsStoreName: row.logistics_store_name ?? '',
       logisticsStoreAddress: row.logistics_store_address ?? '',
       receiptConfirmedAt: row.receipt_confirmed_at,
+      proofUploadedAt: row.proof_uploaded_at,
       receiptPartial: !!row.receipt_partial,
       receiptDeclinedVideo: !!row.receipt_declined_video,
+      receiptNote: row.receipt_note?.trim() ?? '',
     };
   }
 
@@ -337,6 +345,11 @@ export class DonorDonationHistoryService {
     storeName = '',
     storeAddress = '',
   ): Promise<void> {
+    const record = this.recordsSignal().find((item) => item.id === donationId);
+    if (record?.receiptConfirmedAt) {
+      throw new Error('機構已確認簽收，物流資料不能再修改');
+    }
+
     const uid = await this.session.getCurrentUid();
     const trimmed = trackingNo.trim();
     const carrier = logisticsCarrier.trim();

@@ -127,6 +127,15 @@
   font-size: var(--font-size-body);
 }
 
+.field span strong {
+  color: var(--color-error);
+}
+
+.field span small {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
+}
+
 /* input 基本樣式 */
 input[type='text'],
 input[type='email'],

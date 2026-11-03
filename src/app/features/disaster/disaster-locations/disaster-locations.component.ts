@@ -1,9 +1,11 @@
-import { Component, AfterViewInit, OnDestroy, signal, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, effect, signal, inject } from '@angular/core';
 import * as L from 'leaflet';
 
 import { HelperDemandService } from '../../../core/services/agency-helper-demand/helper-demand.service';
 import { addTaiwanBasemap, fontMarkerIcon, releaseLeafletContainer } from '../../../core/map/leaflet-map';
 import { escapeHtml, googleMapsSearchUrl } from '../../../core/map/map-links';
+import { sameTaiwanCity, taiwanAddressRegion } from '../../../core/map/taiwan-cities';
+import { HelperLocationFilterService } from '../../../core/services/disaster-control/helper-location-filter.service';
 
 interface HelperMapLocation {
   id: number;
@@ -24,6 +26,7 @@ interface HelperMapLocation {
 })
 export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
   private readonly helperDemandService = inject(HelperDemandService);
+  private readonly locationFilter = inject(HelperLocationFilterService);
 
   private map?: L.Map;
   private markers = new Map<number, L.Marker>();
@@ -31,8 +34,18 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
   private stopBasemap?: () => void;
 
   protected helperList: HelperMapLocation[] = [];
+  private allHelperLocations: HelperMapLocation[] = [];
   protected readonly selectedLocation = signal<HelperMapLocation | null>(null);
   protected readonly loading = signal(true);
+
+  constructor() {
+    effect(() => {
+      this.locationFilter.selection();
+      if (this.allHelperLocations.length > 0) {
+        this.applyLocationFilter();
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     const host = document.getElementById('disaster-map');
@@ -70,7 +83,7 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
 
   private async loadHelperLocations(): Promise<void> {
     const demands = await this.helperDemandService.listPublishedForMap();
-    this.helperList = demands
+    this.allHelperLocations = demands
       .filter(
         (demand) =>
           demand.latitude != null &&
@@ -95,7 +108,7 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
         };
       });
 
-    this.showMarkers(this.helperList);
+    this.applyLocationFilter();
     this.loading.set(false);
 
     if (!this.map || this.helperList.length === 0) {
@@ -106,6 +119,29 @@ export class DisasterLocationsComponent implements AfterViewInit, OnDestroy {
       L.latLngBounds(this.helperList.map((item) => [item.lat, item.lng] as [number, number])),
       { padding: [50, 50], maxZoom: 12 },
     );
+  }
+
+  private applyLocationFilter(): void {
+    const cities = this.locationFilter.selection().cities ?? [];
+    this.helperList = this.allHelperLocations.filter((item) => {
+      if (cities.length === 0) {
+        return true;
+      }
+      const region = taiwanAddressRegion(item.location || '');
+      return !!region.city && cities.some((city) => sameTaiwanCity(city, region.city));
+    });
+    this.showMarkers(this.helperList);
+
+    if (this.selectedLocation() && !this.helperList.some((item) => item.id === this.selectedLocation()?.id)) {
+      this.selectedLocation.set(null);
+    }
+
+    if (this.map && this.helperList.length > 0) {
+      this.map.fitBounds(
+        L.latLngBounds(this.helperList.map((item) => [item.lat, item.lng] as [number, number])),
+        { padding: [50, 50], maxZoom: 12 },
+      );
+    }
   }
 
   private showMarkers(items: HelperMapLocation[]): void {

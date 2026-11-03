@@ -11,6 +11,7 @@ export const environment = {
   /**
    * AI 審核／客服：Supabase Edge Functions（免費、不長睡）。
    * 需在 Dashboard Secrets 設定 OPENROUTER_API_KEY。
+   * aiReviewApiUrl 僅供 supabaseUrl 未設定時向下相容。
    */
   aiReviewApiUrl: 'https://wxryryyiakzkeeoorlrq.supabase.co/functions/v1/ai-donation-review',
   aiChatApiUrl: 'https://wxryryyiakzkeeoorlrq.supabase.co/functions/v1/ai-assistant-chat',

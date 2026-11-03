@@ -154,6 +154,17 @@ app-beneficiary-panel {
   margin: 0;
 }
 
+.quantity-row h3 {
+  color: var(--color-text-main, #1a1c1c);
+  font-size: var(--font-size-17);
+}
+
+.quantity-row .quantity-value {
+  color: var(--color-text-body, #333333);
+  font-size: var(--font-size-16);
+  line-height: 1.5;
+}
+
 .quantity-row h4 {
   min-width: 120px;
   text-align: right;

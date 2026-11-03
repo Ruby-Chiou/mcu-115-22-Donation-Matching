@@ -29,6 +29,9 @@
           接收地址：
           <strong>{{ demand?.address }}</strong>
         </p>
+        <p class="face-to-face-hint">
+          災害物資僅限面交、不提供寄送；收貨位置為受助者可收貨地點，不一定是機構住址，由受助者自行調度至災害現場。
+        </p>
       </div>
     </div>
 
@@ -154,8 +157,8 @@
           <i class="fa-solid fa-box"></i>
           物資捐助提醒
         </strong>
-        <p>為避免物資誤送或與目前需求不符， 完成捐贈申請後，系統才會提供本次捐贈的指定接收地址。</p>
-        <p>請勿在尚未確認前直接將物資寄送至受助單位。</p>
+        <p>災害物資僅限面交、不提供寄送。請先完成申請並與受助者確認面交時間及收貨位置。</p>
+        <p>收貨位置不一定是機構住址，物資將由受助者自行調度至災害現場。</p>
       </div>
       <div class="form-buttons">
         <button type="button" class="cancel-button" (click)="cancelForm()">取消</button>
@@ -190,9 +193,9 @@
         </div>
       </div>
       <div class="address-notice">
-        <strong> <i class="fa-solid fa-exclamation"></i> 寄送注意事項 </strong>
-        <p>請依照以上指定地址寄送物資， 勿直接寄送至其他受助單位。</p>
-        <p>若寄送方式或地址有任何疑問， 請先與接收單位聯繫確認。</p>
+        <strong> <i class="fa-solid fa-exclamation"></i> 面交注意事項 </strong>
+        <p>災害物資不提供寄送，請先與受助者確認面交時間及以上收貨位置。</p>
+        <p>收貨位置不一定是機構住址，物資將由受助者自行調度至災害現場。</p>
       </div>
       <div class="donation-summary">
         <h2>本次捐贈詳情</h2>
@@ -213,27 +216,13 @@
           <strong> {{ phone }} </strong>
         </div>
       </div>
-      @if (needProofUpload) {
       <div class="proof-upload">
         <h2>
           <span class="material-symbols-outlined" aria-hidden="true">attach_file</span>
-          上傳捐贈完成證明
+          面交完成後補上證明
         </h2>
-        <p>
-          @if (needReceipt === 'yes') { 您已申請捐贈收據。 } @if (needThankYou === 'yes') { 您已申請感謝狀。 }
-          <br />
-          完成實際捐贈後，請上傳相關證明， 供受助單位確認。
-        </p>
-        <label class="upload-button">
-          選擇檔案
-          <input type="file" accept="image/*,.pdf" (change)="onProofSelected($event)" />
-        </label>
-        @if (proofFileName) {
-        <p class="file-name">已選擇： {{ proofFileName }}</p>
-        <button type="button" class="upload-submit-button" (click)="uploadProof()">上傳捐贈完成證明</button>
-        }
+        <p>本表單不需預先上傳。完成捐贈後，請到「會員專區 → 捐贈紀錄」上傳照片或 PDF 證明，供受助單位確認。</p>
       </div>
-      }
       <div class="success-buttons">
         <button type="button" class="back-button" (click)="goToDisasterOpen()">完成捐贈，返回災害救助</button>
       </div>

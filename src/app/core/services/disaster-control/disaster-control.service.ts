@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, OnDestroy, inject, signal } from '@angular/core';
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { SupabaseService } from '../database/supabase.service';
 
 export interface MaterialNeed {
   item: string;
@@ -18,6 +20,7 @@ export interface DisasterControlData {
 }
 
 const STORAGE_KEY = 'disasterControlData';
+const TABLE_NAME = 'disaster_control_state';
 
 const defaultData: DisasterControlData = {
   isOpen: false,
@@ -31,11 +34,18 @@ const defaultData: DisasterControlData = {
 };
 
 @Injectable({ providedIn: 'root' })
-export class DisasterControlService {
+export class DisasterControlService implements OnDestroy {
+  private readonly supabase = inject(SupabaseService);
   readonly data = signal<DisasterControlData>(this.loadData());
+  /** Increments for each closed -> open transition so the app shell can replay its broadcast. */
+  readonly openBroadcast = signal(0);
+  readonly initialized: Promise<void>;
+  private realtimeChannel?: RealtimeChannel;
 
   constructor() {
     window.addEventListener('storage', this.handleStorageChange);
+    this.subscribeToRealtime();
+    this.initialized = this.loadFromSupabase();
     this.armCloseTimer();
   }
 
@@ -45,7 +55,6 @@ export class DisasterControlService {
       closedAt: isOpen ? null : Date.now(),
       scheduledCloseAt: isOpen ? null : this.data().scheduledCloseAt,
     });
-    localStorage.setItem('disasterOpen', String(isOpen));
     this.armCloseTimer();
   }
 
@@ -79,8 +88,8 @@ export class DisasterControlService {
 
   private updateData(changes: Partial<DisasterControlData>): void {
     const nextData = { ...this.data(), ...changes };
-    this.data.set(nextData);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextData));
+    this.applyData(nextData);
+    void this.persistToSupabase(nextData);
   }
 
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -106,14 +115,84 @@ export class DisasterControlService {
   }
 
   private closeScheduledDisaster(): void {
-    this.updateData({
+    const nextData = {
+      ...this.data(),
       isOpen: false,
       closedAt: Date.now(),
       scheduledCloseAt: null,
       announcement: '',
-    });
-    localStorage.setItem('disasterOpen', 'false');
+    };
+    this.applyData(nextData);
+    void this.persistToSupabase(nextData);
     this.closeTimer = undefined;
+  }
+
+  private async loadFromSupabase(): Promise<void> {
+    const { data, error } = await this.supabase.client.from(TABLE_NAME).select('*').eq('id', 1).maybeSingle();
+    if (error) {
+      console.warn('無法載入跨裝置災害模式，暫用本機快取：', error.message);
+      return;
+    }
+    if (data) {
+      this.applyDatabaseRow(data);
+    }
+  }
+
+  private subscribeToRealtime(): void {
+    this.realtimeChannel = this.supabase.client
+      .channel('disaster-control-state')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: TABLE_NAME, filter: 'id=eq.1' },
+        (payload) => {
+          if (payload.new && Object.keys(payload.new).length > 0) {
+            this.applyDatabaseRow(payload.new);
+          }
+        },
+      )
+      .subscribe();
+  }
+
+  private async persistToSupabase(value: DisasterControlData): Promise<void> {
+    const { error } = await this.supabase.client.from(TABLE_NAME).upsert({
+      id: 1,
+      is_open: value.isOpen,
+      closed_at: value.closedAt,
+      scheduled_close_at: value.scheduledCloseAt,
+      announcement: value.announcement,
+      name: value.name,
+      description: value.description,
+      material_needs: value.materialNeeds,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      console.error('同步災害模式失敗：', error.message);
+    }
+  }
+
+  private applyDatabaseRow(row: Record<string, unknown>): void {
+    const cachedImage = this.data().image;
+    this.applyData({
+      isOpen: row['is_open'] === true,
+      closedAt: typeof row['closed_at'] === 'number' ? row['closed_at'] : null,
+      scheduledCloseAt: typeof row['scheduled_close_at'] === 'string' ? row['scheduled_close_at'] : null,
+      announcement: typeof row['announcement'] === 'string' ? row['announcement'] : '',
+      name: typeof row['name'] === 'string' ? row['name'] : '',
+      description: typeof row['description'] === 'string' ? row['description'] : '',
+      image: cachedImage,
+      materialNeeds: Array.isArray(row['material_needs']) ? row['material_needs'] as MaterialNeed[] : [],
+    });
+  }
+
+  private applyData(nextData: DisasterControlData): void {
+    const opened = !this.data().isOpen && nextData.isOpen;
+    this.data.set(nextData);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextData));
+    localStorage.setItem('disasterOpen', String(nextData.isOpen));
+    if (opened) {
+      this.openBroadcast.update((value) => value + 1);
+    }
+    this.armCloseTimer();
   }
 
   private loadData(): DisasterControlData {
@@ -138,13 +217,22 @@ export class DisasterControlService {
     }
 
     try {
-      this.data.set({
+      this.applyData({
         ...defaultData,
         ...JSON.parse(event.newValue) as Partial<DisasterControlData>,
       });
-      this.armCloseTimer();
     } catch {
-      this.data.set(defaultData);
+      this.applyData(defaultData);
     }
   };
+
+  ngOnDestroy(): void {
+    window.removeEventListener('storage', this.handleStorageChange);
+    if (this.closeTimer !== undefined) {
+      clearTimeout(this.closeTimer);
+    }
+    if (this.realtimeChannel) {
+      void this.supabase.client.removeChannel(this.realtimeChannel);
+    }
+  }
 }

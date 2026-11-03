@@ -1,0 +1,55 @@
+:host {
+  display: contents;
+}
+
+.disaster-broadcast {
+  position: fixed;
+  inset: var(--layout-header-height) 0 auto;
+  z-index: 950;
+  overflow: hidden;
+  padding: 10px 0;
+  background: #9f1239;
+  box-shadow: 0 3px 12px rgb(15 23 42 / 20%);
+}
+
+.disaster-broadcast__message {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: max-content;
+  color: var(--color-white);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  white-space: nowrap;
+  animation: disaster-broadcast-scroll 7s linear 3 forwards;
+}
+
+@keyframes disaster-broadcast-scroll {
+  from {
+    transform: translateX(100vw);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disaster-broadcast__message {
+    margin-inline: 1rem;
+    white-space: normal;
+    animation: disaster-broadcast-fade 7s ease 3 forwards;
+  }
+}
+
+@keyframes disaster-broadcast-fade {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+}

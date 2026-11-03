@@ -35,8 +35,10 @@ export interface DonorDonationHistory {
   /** 超商取件門市地址 */
   logisticsStoreAddress: string;
   receiptConfirmedAt: string | null;
+  proofUploadedAt: string | null;
   receiptPartial: boolean;
   receiptDeclinedVideo: boolean;
+  receiptNote: string;
 }
 
 export const DONATION_HISTORY_STATUS_LABELS: Record<DonationStatus, string> = {

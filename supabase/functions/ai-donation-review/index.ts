@@ -13,7 +13,21 @@ const corsHeaders = {
 
 const BUCKET = 'donation-files';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = Deno.env.get('OPENROUTER_VISION_MODEL') ?? 'openai/gpt-4o-mini';
+const DEFAULT_VISION_MODEL = 'openai/gpt-4o-mini';
+
+/** Secrets 若誤填變數名本身或空字串，會被 OpenRouter 打回 400；這裡強制回退。 */
+function resolveVisionModel(): string {
+  const configured = Deno.env.get('OPENROUTER_VISION_MODEL')?.trim() ?? '';
+  if (!configured || configured === 'OPENROUTER_VISION_MODEL' || !configured.includes('/')) {
+    if (configured) {
+      console.warn(`OPENROUTER_VISION_MODEL 無效「${configured}」，改用 ${DEFAULT_VISION_MODEL}`);
+    }
+    return DEFAULT_VISION_MODEL;
+  }
+  return configured;
+}
+
+const MODEL = resolveVisionModel();
 
 type DonationRow = {
   id: string;
@@ -87,12 +101,13 @@ Deno.serve(async (req) => {
       });
     } catch (error) {
       console.error('OpenRouter 辨識失敗', error instanceof Error ? error.message : error);
+      const diagnostic = visionFailureDiagnostic(error);
       const recorded = await recordReview(
         admin,
         donationId,
         'rejected',
         '無法自動判定',
-        '系統影像辨識未完成，請機構直接依照片人工確認。',
+        `系統影像辨識未完成，請機構直接依照片人工確認。${diagnostic}`,
       );
       return json(200, toClientPayload(recorded));
     }
@@ -171,42 +186,127 @@ async function askVision(
     '{"decision":"accepted 或 rejected","condition":"辨識到的物資狀態或種類","reason":"至少 20 字的中文說明"}',
   ].join('\n');
 
-  const content: Array<Record<string, unknown>> = [{ type: 'text', text: prompt }];
-  for (const url of input.imageUrls) {
-    content.push({ type: 'image_url', image_url: { url } });
+  const imageUrls = input.imageUrls.slice(0, 2);
+  const attempts: Array<{ label: string; urls: string[] }> = [
+    { label: 'signed-url', urls: imageUrls },
+  ];
+
+  try {
+    const dataUrls = await Promise.all(imageUrls.map((url) => downloadImageAsDataUrl(url)));
+    attempts.push({ label: 'base64', urls: dataUrls });
+  } catch (error) {
+    console.warn('照片轉 base64 失敗，改用簽名網址', safeErrorMessage(error));
   }
 
-  const response = await fetch(OPENROUTER_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': Deno.env.get('SUPABASE_URL') ?? 'https://donation-matching.local',
-      'X-Title': 'Donation Matching AI Review',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      temperature: 0.2,
-      messages: [{ role: 'user', content }],
-      response_format: { type: 'json_object' },
-    }),
-  });
+  let lastError: unknown;
+  for (const attempt of attempts) {
+    const content: Array<Record<string, unknown>> = [{ type: 'text', text: prompt }];
+    for (const url of attempt.urls) {
+      content.push({ type: 'image_url', image_url: { url } });
+    }
+
+    for (const useResponseFormat of [true, false]) {
+      try {
+        return await requestVision(apiKey, content, useResponseFormat);
+      } catch (error) {
+        lastError = error;
+        console.warn(
+          `OpenRouter 失敗（${attempt.label}, jsonFormat=${useResponseFormat}）`,
+          safeErrorMessage(error),
+        );
+      }
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('OpenRouter 辨識失敗');
+}
+
+async function requestVision(
+  apiKey: string,
+  content: Array<Record<string, unknown>>,
+  useResponseFormat: boolean,
+): Promise<{ decision: 'accepted' | 'rejected'; condition: string; reason: string }> {
+  let response: Response;
+  try {
+    response = await fetch(OPENROUTER_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': Deno.env.get('SUPABASE_URL') ?? 'https://donation-matching.local',
+        'X-Title': 'Donation Matching AI Review',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        temperature: 0.2,
+        messages: [{ role: 'user', content }],
+        ...(useResponseFormat ? { response_format: { type: 'json_object' } } : {}),
+      }),
+      signal: AbortSignal.timeout(60_000),
+    });
+  } catch (error) {
+    throw new VisionProviderError(
+      error instanceof DOMException && error.name === 'TimeoutError' ? 'timeout' : 'network',
+      undefined,
+      safeErrorMessage(error),
+    );
+  }
 
   const raw = await response.text();
   if (!response.ok) {
-    throw new Error(`OpenRouter ${response.status}: ${raw.slice(0, 300)}`);
+    throw new VisionProviderError('response', response.status, `OpenRouter ${response.status}: ${raw.slice(0, 300)}`);
   }
 
+  try {
+    return normalizeVisionResult(extractVisionJson(raw));
+  } catch (error) {
+    console.error('OpenRouter 回傳無法解析', raw.slice(0, 500));
+    throw new VisionProviderError('payload', response.status, safeErrorMessage(error));
+  }
+}
+
+function extractVisionJson(raw: string): unknown {
   const parsed = JSON.parse(raw) as {
-    choices?: Array<{ message?: { content?: string } }>;
+    choices?: Array<{ message?: { content?: unknown; reasoning?: unknown } }>;
   };
-  const text = parsed.choices?.[0]?.message?.content?.trim() ?? '';
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new Error('模型沒有回傳 JSON');
+  const message = parsed.choices?.[0]?.message;
+  const text = extractMessageText(message?.content) || extractMessageText(message?.reasoning);
+  if (!text) {
+    throw new Error('模型沒有回傳文字內容');
   }
 
-  const body = JSON.parse(jsonMatch[0]) as {
+  const fenced = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/i);
+  const candidate = fenced?.[1] ?? text.match(/\{[\s\S]*\}/)?.[0];
+  if (!candidate) {
+    throw new Error(`模型沒有回傳 JSON：${text.slice(0, 120)}`);
+  }
+
+  return JSON.parse(candidate);
+}
+
+function extractMessageText(content: unknown): string {
+  if (typeof content === 'string') {
+    return content.trim();
+  }
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === 'string') {
+          return part;
+        }
+        if (part && typeof part === 'object' && 'text' in part) {
+          return String((part as { text?: unknown }).text ?? '');
+        }
+        return '';
+      })
+      .join('\n')
+      .trim();
+  }
+  return '';
+}
+
+function normalizeVisionResult(value: unknown): { decision: 'accepted' | 'rejected'; condition: string; reason: string } {
+  const body = value as {
     decision?: unknown;
     condition?: unknown;
     reason?: unknown;
@@ -222,6 +322,56 @@ async function askVision(
   }
 
   return { decision, condition, reason };
+}
+
+async function downloadImageAsDataUrl(url: string): Promise<string> {
+  let response: Response;
+  try {
+    response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+  } catch (error) {
+    throw new VisionProviderError('image_download', undefined, safeErrorMessage(error));
+  }
+
+  if (!response.ok) {
+    throw new VisionProviderError('image_download', response.status, `下載照片失敗：${response.status}`);
+  }
+
+  const contentType = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
+  const mimeType = contentType === 'image/png' ? 'image/png' : 'image/jpeg';
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  let binary = '';
+  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+  }
+  return `data:${mimeType};base64,${btoa(binary)}`;
+}
+
+class VisionProviderError extends Error {
+  constructor(
+    readonly kind: 'timeout' | 'network' | 'response' | 'payload' | 'image_download',
+    readonly status?: number,
+    message = '影像辨識供應商錯誤',
+  ) {
+    super(message);
+    this.name = 'VisionProviderError';
+  }
+}
+
+function visionFailureDiagnostic(error: unknown): string {
+  if (
+    error instanceof VisionProviderError &&
+    (error.kind === 'timeout' || error.kind === 'network' || error.status === 408 || error.status === 429 || (error.status ?? 0) >= 500)
+  ) {
+    return '（供應商回應錯誤／逾時）';
+  }
+  if (error instanceof VisionProviderError && error.kind === 'image_download') {
+    return '（照片下載錯誤）';
+  }
+  return '（供應商回應錯誤）';
+}
+
+function safeErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function recordReview(

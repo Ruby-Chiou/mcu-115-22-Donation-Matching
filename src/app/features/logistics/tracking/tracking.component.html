@@ -84,6 +84,10 @@
     <p>
       新竹物流：請依託運單上的查貨號碼輸入
     </p>
+
+    <p>
+      嘉里物流：請依託運單上的查貨號碼輸入
+    </p>
       </div>
     </div>
 
@@ -167,9 +171,10 @@
     <div class="carrier-list">
 
   <a
-    href="#"
     class="carrier-card"
-    (click)="goToCarrier('黑貓宅急便', $event)"
+    [href]="officialSites['黑貓宅急便']"
+    target="_blank"
+    rel="noopener noreferrer"
   >
     <i class="fa-solid fa-box"></i>
     <div>
@@ -180,9 +185,10 @@
 
 
   <a
-    href="#"
     class="carrier-card"
-    (click)="goToCarrier('7-ELEVEN', $event)"
+    [href]="officialSites['7-ELEVEN']"
+    target="_blank"
+    rel="noopener noreferrer"
   >
     <i class="fa-solid fa-store"></i>
     <div>
@@ -193,9 +199,10 @@
 
 
   <a
-    href="#"
     class="carrier-card"
-    (click)="goToCarrier('全家', $event)"
+    [href]="officialSites['全家']"
+    target="_blank"
+    rel="noopener noreferrer"
   >
     <i class="fa-solid fa-store"></i>
     <div>
@@ -206,9 +213,10 @@
 
 
   <a
-    href="#"
     class="carrier-card"
-    (click)="goToCarrier('中華郵政', $event)"
+    [href]="officialSites['中華郵政']"
+    target="_blank"
+    rel="noopener noreferrer"
   >
     <i class="fa-solid fa-envelope"></i>
     <div>
@@ -218,13 +226,27 @@
   </a>
 
   <a
-    href="#"
     class="carrier-card"
-    (click)="goToCarrier('新竹物流', $event)"
+    [href]="officialSites['新竹物流']"
+    target="_blank"
+    rel="noopener noreferrer"
   >
     <i class="fa-solid fa-truck"></i>
     <div>
       <h4>新竹物流</h4>
+      <span>查詢貨態 →</span>
+    </div>
+  </a>
+
+  <a
+    class="carrier-card"
+    [href]="officialSites['嘉里物流']"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <i class="fa-solid fa-truck-fast"></i>
+    <div>
+      <h4>嘉里物流</h4>
       <span>查詢貨態 →</span>
     </div>
   </a>

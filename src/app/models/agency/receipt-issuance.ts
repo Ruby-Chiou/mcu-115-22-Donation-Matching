@@ -83,7 +83,7 @@ export interface AgencyReceiptTask {
   donationDate: string;
 }
 
-export const RECEIPT_CARRIERS = ['黑貓宅急便', '7-ELEVEN', '全家', '中華郵政', '新竹物流'] as const;
+export const RECEIPT_CARRIERS = ['黑貓宅急便', '7-ELEVEN', '全家', '中華郵政', '新竹物流', '嘉里物流'] as const;
 
 export const RECEIPT_TASK_FILTER_OPTIONS: { value: ReceiptTaskFilter; label: string }[] = [
   { value: 'ALL', label: '全部' },

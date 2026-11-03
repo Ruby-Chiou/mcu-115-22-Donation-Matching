@@ -8,6 +8,7 @@ import {
 } from '../../../models/user/donor';
 import { SupabaseService } from '../database/supabase.service';
 import { MemberSessionService } from './member-session.service';
+import { MemberMailDispatchService } from './member-mail-dispatch.service';
 
 interface DonorProfileRow {
   uid: string;
@@ -30,6 +31,7 @@ export interface UpdateProfilePayload {
   accountName: string;
   fullName: string;
   phoneNumber: string;
+  email: string;
   city: string;
 }
 
@@ -70,6 +72,7 @@ export class MemberProfileService {
 
   private readonly supabaseService = inject(SupabaseService);
   private readonly session = inject(MemberSessionService);
+  private readonly mail = inject(MemberMailDispatchService);
   private readonly router = inject(Router);
 
   private readonly profileSignal = signal<DonorProfile | null>(null);
@@ -106,10 +109,23 @@ export class MemberProfileService {
 
   async updateProfile(payload: UpdateProfilePayload): Promise<DonorProfile> {
     const current = this.requireProfile();
+    const email = payload.email.trim();
+
+    if (!payload.accountName.trim() || !payload.phoneNumber.trim() || !email) {
+      throw new Error('帳號名稱、聯絡電話與電子信箱不可空白');
+    }
+
+    if (email !== current.email) {
+      const { error: authError } = await this.supabaseService.client.auth.updateUser({ email });
+      if (authError) {
+        throw authError;
+      }
+    }
 
     const { data, error } = await this.supabaseService.client
       .from(this.tableName)
       .update({
+        email,
         displayName: payload.displayName.trim(),
         accountName: payload.accountName.trim() || null,
         fullName: payload.fullName.trim() || null,
@@ -238,6 +254,8 @@ export class MemberProfileService {
       console.error('註銷帳號失敗：', error);
       throw error;
     }
+
+    await this.mail.sweep();
 
     // 若已有 Auth session，嘗試登出（尚未登入則略過）
     await this.supabaseService.client.auth.signOut().catch(() => undefined);

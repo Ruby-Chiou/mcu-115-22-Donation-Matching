@@ -34,13 +34,11 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   donorIdNo = '';
   receiptLines: ReceiptLineItem[] = [];
   receiptAgreed = false;
-  handoverMethod = '寄送';
+  handoverMethod = '面交';
   private profileName = '';
   private profilePhone = '';
   private profileEmail = '';
   needThankYou = '';
-  proofFile: File | null = null;
-  proofFileName = '';
 
   submitted = false;
   constructor(
@@ -90,10 +88,6 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       default:
         return '';
     }
-  }
-  // 是否需要上傳證明  //
-  get needProofUpload(): boolean {
-    return this.needReceipt === 'yes' || this.needThankYou === 'yes';
   }
   // 自動填入帳戶資料  //
   fillAccountInfo(): void {
@@ -195,24 +189,6 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
-  }
-  // 選擇捐贈完成證明  //
-  onProofSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-    this.proofFile = input.files[0];
-    this.proofFileName = this.proofFile.name;
-  }
-  // 上傳捐贈完成證明  //
-  uploadProof(): void {
-    if (!this.proofFile) {
-      alert('請先選擇捐贈完成證明');
-      return;
-    }
-    console.log('捐贈完成證明：', this.proofFile);
-    alert('捐贈完成證明已上傳，等待受助單位確認。');
   }
   // 提交捐贈表單  //
   submitForm(): void {

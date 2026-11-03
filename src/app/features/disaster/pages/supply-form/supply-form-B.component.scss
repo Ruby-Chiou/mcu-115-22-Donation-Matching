@@ -190,6 +190,16 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.face-to-face-hint {
+  margin: -2px 0 10px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--color-warning-amber);
+  background: var(--bg-warning-soft);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-13);
+  line-height: var(--line-height-normal);
+}
+
 /* 統一標題間距，確保上下對齊 */
 .align-title {
   margin-top: 0 !important;

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
 
 import { priorityCode, priorityLabel } from '../../codes/demand-codes';
+import { normalizeServiceTargets } from '../../codes/service-targets';
 import { DailyDemand, CreateDailyDemand, DailyConditions } from '../../../models/agency/daily-demand';
 import { DemandRepository } from '../../demands/demand-repository';
 import { SupabaseService } from '../database/supabase.service';
@@ -95,6 +96,9 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
   }
 
   private mapRowToDemand(row: DailyDemandRow): DailyDemand {
+    const normalizedTargets = normalizeServiceTargets(row.serviceTargets, row.customServiceTargets);
+    const customTargetsForDisplay = normalizedTargets.customServiceTargets.filter((target) => target.trim());
+
     return {
       id: row.id,
       serialNo: this.toSerialNo(row.serialNo, row.id),
@@ -123,11 +127,9 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
       note: row.note ?? '',
       brand: row.brand ?? '',
 
-      serviceTargets: row.serviceTargets ?? [],
-
-      customServiceTargets: this.toStringArray(row.customServiceTargets),
-
-      serviceTargetDescription: [...(row.serviceTargets ?? []), ...this.toStringArray(row.customServiceTargets)].join('、'),
+      serviceTargets: normalizedTargets.serviceTargets,
+      customServiceTargets: normalizedTargets.customServiceTargets,
+      serviceTargetDescription: [...normalizedTargets.serviceTargets, ...customTargetsForDisplay].join('、'),
 
       conditions: this.toConditions(row.conditions),
 
@@ -427,11 +429,21 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
   }
 
   private toStringArray(value: unknown): string[] {
-    if (Array.isArray(value)) {
-      return value.filter((item): item is string => typeof item === 'string');
+    if (!Array.isArray(value)) {
+      return [];
     }
 
-    return [];
+    return value
+      .map((item) => {
+        if (typeof item === 'string') {
+          return item;
+        }
+        if (item == null) {
+          return '';
+        }
+        return String(item);
+      })
+      .filter((item) => item.trim() !== '');
   }
 
   private toConditions(value: string[] | null): DailyConditions {

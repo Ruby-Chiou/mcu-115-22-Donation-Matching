@@ -7,6 +7,17 @@
   padding: var(--space-30);
   box-sizing: border-box;
 }
+
+.face-to-face-banner {
+  margin: 0 0 1.25rem;
+  padding: 12px 14px;
+  border: 1px solid #f0c28a;
+  border-radius: 10px;
+  background: #fff7eb;
+  color: #8a4b12;
+  font-size: var(--font-size-14);
+  line-height: 1.55;
+}
 .request-switcher {
   display: flex;
   align-items: center;

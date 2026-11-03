@@ -8,21 +8,25 @@
       <h1>物資捐贈表</h1>
       <p>感謝您的愛心，請填寫以下捐贈資料</p>
     </div>
-    <div class="material-info">
-      <div class="material-image">
-        <img
-          [src]="demand?.image?.[0] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
-          [alt]="demand?.item || '物資圖片'"
-        />
-      </div>
-      <div class="material-text">
-        <span class="label">捐助物資</span>
-        <h2>{{ demand?.item }}</h2>
-        <p>
-          受助機構：
-          <strong>{{ demand?.recipient }}</strong>
-        </p>
-      </div>
+    <div class="material-info" [class.is-loading]="!demandReady">
+      @if (!demandReady) {
+        <p class="material-loading">物資資料載入中…</p>
+      } @else {
+        <div class="material-image">
+          <img
+            [src]="demand?.image?.[0] || 'https://api.fnkr.net/testimg/200x200/DDDDDD/999999/?text=img'"
+            [alt]="demand?.item || '物資圖片'"
+          />
+        </div>
+        <div class="material-text">
+          <span class="label">捐助物資</span>
+          <h2>{{ demand?.item }}</h2>
+          <p>
+            受助機構：
+            <strong>{{ demand?.recipient }}</strong>
+          </p>
+        </div>
+      }
     </div>
     <!--捐助人資料 -->
     <div class="section-title-row">
@@ -257,9 +261,15 @@
       </div>
       <!-- 注意事項 -->
       <div class="notice">
-        <strong> <i class="fa-solid fa-box"></i> 物資寄送提醒 </strong>
-        <p>申請會先經過 AI 審核，再由受助機構人工確認。通過之前請先不要寄出，也不用填物流單號。</p>
-        <p>審核通過後，再到捐助紀錄上傳物流單號。機構看到單號，才會等這批貨。</p>
+        @if (donationMethod === '面交') {
+          <strong> <i class="fa-solid fa-handshake"></i> 面交提醒 </strong>
+          <p>申請會先經過 AI 審核，再由受助機構人工確認。通過前請先不要前往面交。</p>
+          <p><strong>面交完成後，請到「會員專區 → 捐贈紀錄」上傳捐贈證明；本表單不需預先上傳。</strong></p>
+        } @else {
+          <strong> <i class="fa-solid fa-box"></i> 物資寄送提醒 </strong>
+          <p>申請會先經過 AI 審核，再由受助機構人工確認。通過之前請先不要寄出，也不用填物流單號。</p>
+          <p>審核通過後，再到捐助紀錄上傳物流單號。機構看到單號，才會等這批貨。</p>
+        }
       </div>
       <!-- 確認按鈕-->
       <div class="form-buttons">
@@ -277,6 +287,9 @@
       <div class="success-icon">✓</div>
       <h1>捐贈申請已送出</h1>
       <p class="success-text">照片已交給系統。AI 審核會先跑完，接著才是機構人工審核。通過之前請先不要寄出。</p>
+      @if (donationMethod === '面交') {
+        <p class="success-text">完成面交後，請到「會員專區 → 捐贈紀錄」上傳捐贈證明；系統也會在約一天後提醒您。</p>
+      }
       <div class="address-box">
         <h2>接下來會發生的事</h2>
         <div class="address-item">
@@ -285,11 +298,15 @@
         </div>
         <div class="address-item">
           <span>2</span>
-          <strong>機構通過後，再到捐助紀錄上傳物流單號</strong>
+          <strong>
+            {{ donationMethod === '面交'
+              ? '機構通過後，依約完成面交並到捐助紀錄上傳證明'
+              : '機構通過後，再到捐助紀錄上傳物流單號' }}
+          </strong>
         </div>
         <div class="address-item">
           <span>3</span>
-          <strong>機構看到單號、收到貨，會拍照回報簽收</strong>
+          <strong>{{ donationMethod === '面交' ? '機構確認面交完成' : '機構看到單號、收到貨，會拍照回報簽收' }}</strong>
         </div>
       </div>
       <div class="donation-summary">

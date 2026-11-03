@@ -54,61 +54,40 @@
     </div>
 
     <div class="guide-selector">
+      <div class="guide-selector-item">
+        <button
+          type="button"
+          class="guide-selector-button"
+          [class.active]="selectedGuide() === 'donor'"
+          [attr.aria-expanded]="selectedGuide() === 'donor'"
+          (click)="selectGuide('donor')"
+        >
+          <i class="fa-solid fa-hand-holding-heart"></i>
+          <span>捐助者導覽</span>
+          <i class="fa-solid fa-chevron-down arrow"></i>
+        </button>
+        @if (selectedGuide() === 'donor') {
+          <div class="guide-selector-content"><app-donor-guide></app-donor-guide></div>
+        }
+      </div>
 
-  <button
-    type="button"
-    class="guide-selector-button"
-    [class.active]="selectedGuide() === 'donor'"
-    (click)="selectGuide('donor')"
-  >
-    <i class="fa-solid fa-hand-holding-heart"></i>
-
-    <span>
-      捐助者導覽
-    </span>
-
-    <i class="fa-solid fa-chevron-down arrow"></i>
-  </button>
-
-
-  <button
-    type="button"
-    class="guide-selector-button"
-    [class.active]="selectedGuide() === 'agency'"
-    (click)="selectGuide('agency')"
-  >
-    <i class="fa-solid fa-building"></i>
-
-    <span>
-      受助者導覽
-    </span>
-
-    <i class="fa-solid fa-chevron-down arrow"></i>
-  </button>
-
-</div>
-
-    <!--
-      尚未登入：
-      顯示捐助者與受助者兩張鎖定卡
-
-      受助者登入：
-      只顯示受助者導覽
-    -->
-
- @if (selectedGuide() === 'donor') {
-
-  <app-donor-guide></app-donor-guide>
-
-}
-
-@if (selectedGuide() === 'agency') {
-
-  <app-agency-guide
-    [currentRole]="currentRole()"
-  ></app-agency-guide>
-
-}
+      <div class="guide-selector-item">
+        <button
+          type="button"
+          class="guide-selector-button"
+          [class.active]="selectedGuide() === 'agency'"
+          [attr.aria-expanded]="selectedGuide() === 'agency'"
+          (click)="selectGuide('agency')"
+        >
+          <i class="fa-solid fa-building"></i>
+          <span>受助者導覽</span>
+          <i class="fa-solid fa-chevron-down arrow"></i>
+        </button>
+        @if (selectedGuide() === 'agency') {
+          <div class="guide-selector-content"><app-agency-guide [currentRole]="currentRole()" /></div>
+        }
+      </div>
+    </div>
 
   </section>
 

@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DisasterControlService, MaterialNeed } from '../../../core/services/disaster-control/disaster-control.service';
 
@@ -29,13 +29,17 @@ export class AdminDisasterControlComponent {
   };
 
   constructor() {
-    const data = this.disasterData();
-    this.disasterName = data.name;
-    this.disasterDescription = data.description;
-    this.scheduledCloseAt = this.toDateTimeLocal(data.scheduledCloseAt);
-    this.announcement = data.announcement;
-    this.disasterImage = data.image;
-    this.materialNeeds = data.materialNeeds;
+    effect(() => {
+      const data = this.disasterData();
+      if (!this.isEditing) {
+        this.disasterName = data.name;
+        this.disasterDescription = data.description;
+      }
+      this.scheduledCloseAt = this.toDateTimeLocal(data.scheduledCloseAt);
+      this.announcement = data.announcement;
+      this.disasterImage = data.image;
+      this.materialNeeds = data.materialNeeds;
+    });
   }
 
   get isDisasterOpen(): boolean {

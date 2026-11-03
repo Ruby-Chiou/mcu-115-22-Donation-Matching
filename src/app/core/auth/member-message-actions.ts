@@ -65,6 +65,10 @@ export function memberMessageActions(
       record?.status === 'human_approved' &&
       record.donationMethod === '寄送' &&
       (!record.trackingNo || !record.logisticsCarrier);
+    const needsHandoverProof =
+      record?.donationMethod === '面交' &&
+      !record.proofUploadedAt &&
+      record.status !== 'human_rejected';
 
     const canRevise =
       record?.status === 'pending_ai_review' ||
@@ -73,7 +77,14 @@ export function memberMessageActions(
 
     const canSupplement = record?.status === 'needs_supplement' || record?.status === 'human_rejected';
 
-    if (needsTracking) {
+    if (needsHandoverProof) {
+      actions.push({
+        label: '上傳面交證明',
+        hint: '完成面交後，請補上傳照片或 PDF 證明',
+        commands: ['/member'],
+        queryParams: { tab: 'history', record: donationId },
+      });
+    } else if (needsTracking) {
       actions.push({
         label: '上傳物流單號',
         hint: '審核已通過，請補物流公司與單號',
@@ -144,6 +155,22 @@ export function donationNextStep(record: DonorDonationHistory): DonationNextStep
       kind: 'action',
       listLabel: '待上傳物流',
       detailLabel: '請選擇物流公司並上傳單號',
+    };
+  }
+
+  if (record.status === 'human_approved' && record.donationMethod === '面交' && !record.proofUploadedAt) {
+    return {
+      kind: 'action',
+      listLabel: '待上傳面交證明',
+      detailLabel: '完成面交後，請上傳照片或 PDF 證明',
+    };
+  }
+
+  if (record.status === 'human_approved' && record.donationMethod === '面交' && record.proofUploadedAt && !record.receiptConfirmedAt) {
+    return {
+      kind: 'wait',
+      listLabel: '等待機構確認',
+      detailLabel: '面交證明已上傳，等待機構確認',
     };
   }
 

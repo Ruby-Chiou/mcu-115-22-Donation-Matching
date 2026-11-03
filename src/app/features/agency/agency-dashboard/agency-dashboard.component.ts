@@ -43,6 +43,23 @@ export class AgencyDashboardComponent implements OnInit {
     return this.disaster.data().isOpen;
   }
 
+  protected tourKeyForCard(card: DashboardCard): string {
+    switch (card.title) {
+      case '日常需求':
+        return 'agency-daily-card';
+      case '待審核物資':
+        return 'agency-review-card';
+      case '待審核發票':
+        return 'agency-receipt-card';
+      case '待確認收件':
+        return 'agency-delivery-card';
+      case '災害需求':
+        return 'agency-disaster-card';
+      default:
+        return '';
+    }
+  }
+
   cards: DashboardCard[] = [
     {
       title: '日常需求',

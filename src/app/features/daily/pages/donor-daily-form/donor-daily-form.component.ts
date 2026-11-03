@@ -19,6 +19,7 @@ import { maskDonorName } from '../../../../models/member/public-donation-thank';
 export class DonorDailyFormComponent implements OnInit {
   donationMethod: '寄送' | '面交' | '' = '';
   demand?: DailyDemand;
+  demandReady = false;
   private readonly demandId: number;
 
   // 圖片預覽
@@ -54,14 +55,19 @@ export class DonorDailyFormComponent implements OnInit {
 
       if (!this.demand) {
         console.error('找不到這筆物資需求資料，id：', this.demandId);
-
+        this.cdr.detectChanges();
         return;
       }
 
       this.applyDefaultDonationMethod();
       await this.loadProfileDefaults();
+      this.demandReady = true;
+      // 非同步載入後強制刷新，避免首屏空白、要捲動才出現圖文。
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('讀取捐贈表單需求資料失敗：', error);
+      this.demandReady = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -146,16 +152,11 @@ export class DonorDailyFormComponent implements OnInit {
   donorIdNo = '';
   receiptLines: ReceiptLineItem[] = [];
   receiptAgreed = false;
-  proofFile: File | null = null;
-  proofFileName = '';
   // 捐贈完成證明
   get maskedPreview(): string {
     return maskDonorName(this.donorName || '王小明');
   }
 
-  get needProofUpload(): boolean {
-    return this.needReceipt === 'yes' || this.needThankYou === 'yes';
-  }
   // 自動填入帳戶資料
   fillAccountInfo() {
     if (this.useAccountInfo) {
@@ -189,24 +190,6 @@ export class DonorDailyFormComponent implements OnInit {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
-  }
-  // 選擇捐贈完成證明
-  onProofSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-    this.proofFile = input.files[0];
-    this.proofFileName = this.proofFile.name;
-  }
-  // 上傳捐贈完成證明
-  uploadProof() {
-    if (!this.proofFile) {
-      alert('請先選擇捐贈完成證明');
-      return;
-    }
-    console.log('捐贈完成證明：', this.proofFile);
-    alert('捐贈完成證明已上傳，等待受助單位確認。');
   }
   async submitForm(form: NgForm): Promise<void> {
     if (this.isSubmitting) {
