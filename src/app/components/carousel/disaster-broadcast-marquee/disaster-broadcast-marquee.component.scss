@@ -1,11 +1,11 @@
 :host {
-  display: contents;
+  display: block;
+  width: 100%;
 }
 
 .disaster-broadcast {
-  position: fixed;
-  inset: var(--layout-header-height) 0 auto;
-  z-index: 950;
+  position: relative;
+  width: 100%;
   overflow: hidden;
   padding: 10px 0;
   background: #9f1239;

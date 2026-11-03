@@ -1,6 +1,8 @@
 <app-header></app-header>
-<app-thanks-marquee></app-thanks-marquee>
-<app-disaster-broadcast-marquee></app-disaster-broadcast-marquee>
+<div class="chrome-marquee-stack" [class.header-hidden]="chrome.headerHidden()">
+  <app-thanks-marquee></app-thanks-marquee>
+  <app-disaster-broadcast-marquee></app-disaster-broadcast-marquee>
+</div>
 
 <main class="main-container">
   <app-agency-access-banner />

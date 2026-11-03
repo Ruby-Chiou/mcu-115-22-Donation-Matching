@@ -14,6 +14,7 @@ import { AGENCY_OFFICE } from '../../../../models/user/agency';
 
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
+import { DisasterClosedModalService } from '../../../../core/services/disaster-control/disaster-closed-modal.service';
 
 import { DisasterCommentService } from '../../../../core/services/comments/disaster-comment.service';
 import { DisasterComment } from '../../../../core/services/comments/disaster-comment.service';
@@ -37,6 +38,7 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   private readonly authRedirect = inject(AuthRedirectService);
   private readonly auth = inject(AuthSessionService);
   private readonly uiNotice = inject(UiNoticeService);
+  private readonly closedModal = inject(DisasterClosedModalService);
   commentNotice = '';
   commentSending = false;
   protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
@@ -139,6 +141,10 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   // 前往物資捐助表單
   // =========================
   goToSupplyForm(): void {
+    if (this.closedModal.blockIfClosed()) {
+      return;
+    }
+
     void this.authRedirect.openDonorAction(`/donor/disaster/supply/form/${this.demand.id}`);
   }
 

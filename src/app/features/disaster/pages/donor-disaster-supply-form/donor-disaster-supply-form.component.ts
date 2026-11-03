@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { DisasterDemand } from '../../../../models/agency/disaster-demand';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
+import { DisasterClosedModalService } from '../../../../core/services/disaster-control/disaster-closed-modal.service';
 import { DonorReceiptRequestComponent } from '../../../../components/receipt/donor-receipt-request/donor-receipt-request.component';
 import { MemberProfileService } from '../../../../core/services/member-center/member-profile.service';
 import { ReceiptLineItem, emptyReceiptLine, validateDonorReceiptRequest } from '../../../../core/receipt/donation-receipt-document';
@@ -16,6 +17,8 @@ import { ReceiptLineItem, emptyReceiptLine, validateDonorReceiptRequest } from '
   styleUrl: './donor-disaster-supply-form.component.scss',
 })
 export class DonorDisasterSupplyFormComponent implements OnInit {
+  private readonly closedModal = inject(DisasterClosedModalService);
+
   demand: DisasterDemand | undefined;
   // 目前這筆需求最多可以捐多少
   maxDonationQuantity = 0;
@@ -192,6 +195,10 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   }
   // 提交捐贈表單  //
   submitForm(): void {
+    if (this.closedModal.blockIfClosed()) {
+      return;
+    }
+
     // 基本資料檢查
     if (!this.donorName || !this.actualMaterial || !this.quantity || !this.needReceipt || !this.needThankYou) {
       alert('請填寫完整的捐贈資料');

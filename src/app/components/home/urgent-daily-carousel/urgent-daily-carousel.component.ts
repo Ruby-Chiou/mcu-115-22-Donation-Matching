@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { DonorDailyCardComponent } from '../../card/daily/donor-daily-card/donor-daily-card.component';
@@ -14,15 +14,20 @@ import { DailyDemand } from '../../../models/agency/daily-demand';
   templateUrl: './urgent-daily-carousel.component.html',
   styleUrl: './urgent-daily-carousel.component.scss',
 })
-export class UrgentDailyCarouselComponent implements OnInit {
+export class UrgentDailyCarouselComponent implements OnInit, OnDestroy {
   private readonly demandService = inject(DailyDemandService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+
+  private static readonly AUTO_MS = 4500;
 
   items: DailyDemand[] = [];
   visibleCount = 3;
   startIndex = 0;
   isLoading = true;
+
+  private autoTimer?: ReturnType<typeof setInterval>;
+  private paused = false;
 
   @HostListener('window:resize')
   onResize(): void {
@@ -30,6 +35,7 @@ export class UrgentDailyCarouselComponent implements OnInit {
     if (next !== this.visibleCount) {
       this.visibleCount = next;
       this.startIndex = 0;
+      this.restartAutoPlay();
       this.cdr.detectChanges();
     }
   }
@@ -48,8 +54,13 @@ export class UrgentDailyCarouselComponent implements OnInit {
       this.items = [];
     } finally {
       this.isLoading = false;
+      this.restartAutoPlay();
       this.cdr.detectChanges();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.stopAutoPlay();
   }
 
   get pageItems(): DailyDemand[] {
@@ -80,6 +91,7 @@ export class UrgentDailyCarouselComponent implements OnInit {
       return;
     }
     this.startIndex = (this.startIndex - 1 + this.items.length) % this.items.length;
+    this.restartAutoPlay();
   }
 
   next(): void {
@@ -87,10 +99,39 @@ export class UrgentDailyCarouselComponent implements OnInit {
       return;
     }
     this.startIndex = (this.startIndex + 1) % this.items.length;
+    this.restartAutoPlay();
+  }
+
+  pauseAutoPlay(): void {
+    this.paused = true;
+    this.stopAutoPlay();
+  }
+
+  resumeAutoPlay(): void {
+    this.paused = false;
+    this.restartAutoPlay();
   }
 
   openDetail(item: DailyDemand): void {
     void this.router.navigate(['/donor/daily/detail', item.id]);
+  }
+
+  private restartAutoPlay(): void {
+    this.stopAutoPlay();
+    if (this.paused || !this.canPage) {
+      return;
+    }
+    this.autoTimer = setInterval(() => {
+      this.startIndex = (this.startIndex + 1) % this.items.length;
+      this.cdr.detectChanges();
+    }, UrgentDailyCarouselComponent.AUTO_MS);
+  }
+
+  private stopAutoPlay(): void {
+    if (this.autoTimer) {
+      clearInterval(this.autoTimer);
+      this.autoTimer = undefined;
+    }
   }
 
   private computeVisibleCount(): number {

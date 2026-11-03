@@ -1,3 +1,23 @@
+.chrome-marquee-stack {
+  position: fixed;
+  top: var(--layout-header-height);
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  transition: top 0.3s ease;
+
+  &.header-hidden {
+    top: 0;
+  }
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
 .disaster-closed-modal-backdrop {
 	position: fixed;
 	inset: 0;

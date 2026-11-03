@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, inject, signal } from '@angular/core';
+import { Injectable, NgZone, OnDestroy, inject, signal } from '@angular/core';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { SupabaseService } from '../database/supabase.service';
 
@@ -36,9 +36,12 @@ const defaultData: DisasterControlData = {
 @Injectable({ providedIn: 'root' })
 export class DisasterControlService implements OnDestroy {
   private readonly supabase = inject(SupabaseService);
+  private readonly zone = inject(NgZone);
   readonly data = signal<DisasterControlData>(this.loadData());
   /** Increments for each closed -> open transition so the app shell can replay its broadcast. */
   readonly openBroadcast = signal(0);
+  /** Increments for each open -> closed transition so donors can be ejected immediately. */
+  readonly closeBroadcast = signal(0);
   readonly initialized: Promise<void>;
   private realtimeChannel?: RealtimeChannel;
 
@@ -185,14 +188,28 @@ export class DisasterControlService implements OnDestroy {
   }
 
   private applyData(nextData: DisasterControlData): void {
-    const opened = !this.data().isOpen && nextData.isOpen;
-    this.data.set(nextData);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextData));
-    localStorage.setItem('disasterOpen', String(nextData.isOpen));
-    if (opened) {
-      this.openBroadcast.update((value) => value + 1);
+    const apply = () => {
+      const wasOpen = this.data().isOpen;
+      const opened = !wasOpen && nextData.isOpen;
+      const closed = wasOpen && !nextData.isOpen;
+      this.data.set(nextData);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextData));
+      localStorage.setItem('disasterOpen', String(nextData.isOpen));
+      if (opened) {
+        this.openBroadcast.update((value) => value + 1);
+      }
+      if (closed) {
+        this.closeBroadcast.update((value) => value + 1);
+      }
+      this.armCloseTimer();
+    };
+
+    if (NgZone.isInAngularZone()) {
+      apply();
+      return;
     }
-    this.armCloseTimer();
+
+    this.zone.run(apply);
   }
 
   private loadData(): DisasterControlData {

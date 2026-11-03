@@ -15,6 +15,7 @@ import { HelperDemandService } from '../../../../core/services/agency-helper-dem
 import { HelperDemand } from '../../../../models/agency/helper-demand';
 import { HelperCommentService, HelperComment } from '../../../../core/services/comments/helper-comment.service';
 import { AuthRedirectService } from '../../../../core/services/auth/auth-redirect.service';
+import { DisasterClosedModalService } from '../../../../core/services/disaster-control/disaster-closed-modal.service';
 
 interface CommentThreadNode {
   comment: HelperComment;
@@ -32,6 +33,7 @@ export class DonorDisasterHelperDetailPageComponent implements OnInit {
   private readonly authRedirect = inject(AuthRedirectService);
   private readonly auth = inject(AuthSessionService);
   private readonly uiNotice = inject(UiNoticeService);
+  private readonly closedModal = inject(DisasterClosedModalService);
   commentNotice = '';
   commentSending = false;
   protected readonly beneficiaryProfiles = inject(BeneficiaryPublicProfileService);
@@ -88,6 +90,10 @@ export class DonorDisasterHelperDetailPageComponent implements OnInit {
     return 0;
   }
   goToHelperForm(): void {
+    if (this.closedModal.blockIfClosed()) {
+      return;
+    }
+
     const id = this.helper?.id;
 
     if (id == null) {

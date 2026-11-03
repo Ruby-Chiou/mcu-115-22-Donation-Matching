@@ -2,10 +2,7 @@
   <!-- 感謝跑馬燈 -->
   <!-- ========================================== -->
   @if (marqueeItems().length && !finished()) {
-  <div
-  class="global-thanks-bar"
-  [class.marquee-top]="isHeaderHidden()"
->
+  <div class="global-thanks-bar">
     <div class="thanks-track">
       <div class="thanks-content" [style.animation-duration.s]="scrollSeconds()" (animationend)="onMarqueeEnd($event)">
         @for (item of marqueeItems(); track item.id) {

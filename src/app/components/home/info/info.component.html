@@ -53,13 +53,13 @@
 
   <div class="latest-news-list">
 
-    @for (news of latestNewsList; track news.title) {
+    @for (news of latestNewsList(); track news.title) {
       @if (isExternalNewsLink(news.link)) {
         <a [href]="news.link" target="_blank" rel="noopener noreferrer" class="latest-news-item">
           <ng-container *ngTemplateOutlet="newsBody; context: { $implicit: news }" />
         </a>
       } @else {
-        <a [routerLink]="news.link" class="latest-news-item">
+        <a [routerLink]="news.link" class="latest-news-item" (click)="onNewsClick($event, news.link)">
           <ng-container *ngTemplateOutlet="newsBody; context: { $implicit: news }" />
         </a>
       }

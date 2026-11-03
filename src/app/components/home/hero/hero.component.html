@@ -4,6 +4,7 @@
     [routerLink]="currentNews().link"
     class="news-click-area"
     [attr.aria-label]="currentNews().text"
+    (click)="onHeroNavigate($event)"
   ></a>
 
   <div class="card-image">
@@ -53,7 +54,7 @@
 
     <div class="carousel-indicators">
 
-      @for (i of [0, 1, 2]; track i) {
+      @for (item of newsList(); track item.link; let i = $index) {
 
         <button
           type="button"

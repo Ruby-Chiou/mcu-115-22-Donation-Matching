@@ -1,29 +1,22 @@
 @use 'breakpoint' as bp;
 
 // ==========================================
-// 全域感謝公告欄
+// 全域感謝公告欄（由 chrome-marquee-stack 負責隨頁首移動）
 // ==========================================
 
-.global-thanks-bar {
-  position: fixed;
-  top: var(--layout-header-height);
-  left: 0;
+:host {
+  display: block;
   width: 100%;
+}
 
+.global-thanks-bar {
+  position: relative;
+  width: 100%;
   background-color: var(--color-ink);
   color: var(--color-white);
   padding: 10px 0;
-
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-
-  z-index: 900;
   overflow: hidden;
-
-  transition: top 0.3s ease;
-
-  &.marquee-top {
-    top: 0;
-  }
 
   .thanks-track {
     width: 100%;
@@ -44,15 +37,15 @@
     animation-iteration-count: 3;
     animation-fill-mode: forwards;
 
-  .thanks-item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-10);
-
-    span {
-      display: flex;
+    .thanks-item {
+      display: inline-flex;
       align-items: center;
-      line-height: var(--line-height-none);
+      gap: var(--space-10);
+
+      span {
+        display: flex;
+        align-items: center;
+        line-height: var(--line-height-none);
       }
     }
 
@@ -73,8 +66,6 @@
   }
 }
 
-
-// 感謝文字跑馬燈
 @keyframes marquee {
   from {
     transform: translateX(100vw);
@@ -85,8 +76,6 @@
   }
 }
 
-
-// 愛心跳動動畫
 @keyframes pulse {
   0% {
     transform: scale(1);

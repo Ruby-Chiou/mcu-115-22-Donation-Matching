@@ -109,6 +109,10 @@ export class HeaderComponent implements OnInit {
     return this.auth.principal().role === 'agency' ? null : { tab: 'inbox' };
   }
 
+  protected accountQuery(): { tab: string } | null {
+    return this.auth.principal().role === 'agency' ? null : { tab: 'profile' };
+  }
+
   get navItems() {
     return navigationFor(this.auth.principal().role, this.disaster.data().isOpen);
   }

@@ -12,11 +12,17 @@
       @if (isLoading) {
         <p class="urgent-empty">載入中…</p>
       } @else {
-        <div class="urgent-stage">
+        <div
+          class="urgent-stage"
+          (mouseenter)="pauseAutoPlay()"
+          (mouseleave)="resumeAutoPlay()"
+          (focusin)="pauseAutoPlay()"
+          (focusout)="resumeAutoPlay()"
+        >
           @if (canPage) {
             <button type="button" class="nav prev" (click)="prev()" aria-label="上一組">‹</button>
           }
-          <div class="urgent-track" [style.--cols]="visibleCount">
+          <div class="urgent-track" [style.--cols]="visibleCount" aria-live="polite">
             @for (item of pageItems; track item.id) {
               <div class="urgent-card-wrap">
                 <app-donor-daily-card [demand]="item" (view)="openDetail(item)"></app-donor-daily-card>

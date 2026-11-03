@@ -37,7 +37,7 @@ export class MemberCenterComponent {
   private readonly notifications = inject(MemberNotificationSettingsService);
   private readonly mail = inject(MemberMailDispatchService);
 
-  readonly activeTab = signal<MemberTab>('inbox');
+  readonly activeTab = signal<MemberTab>('profile');
   protected readonly companyNotice = computed(() => companyNoticeText(this.auth.principal()));
 
   constructor() {
@@ -57,7 +57,11 @@ export class MemberCenterComponent {
 
       if (tab && MEMBER_TABS.includes(tab)) {
         this.activeTab.set(tab);
+        return;
       }
+
+      // 沒有指定 tab 時預設個資；收件匣請帶 ?tab=inbox
+      this.activeTab.set('profile');
     });
   }
 

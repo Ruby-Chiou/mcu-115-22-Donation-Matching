@@ -1,5 +1,8 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+import { DisasterClosedModalService } from '../../../core/services/disaster-control/disaster-closed-modal.service';
+import { DisasterControlService } from '../../../core/services/disaster-control/disaster-control.service';
 
 interface NewsItem {
   image: string;
@@ -7,6 +10,7 @@ interface NewsItem {
   highlight: string;
   link: string;
   source: string;
+  disasterOnly?: boolean;
 }
 
 @Component({
@@ -17,13 +21,18 @@ interface NewsItem {
   styleUrl: './hero.component.scss',
 })
 export class HomeHeroComponent implements OnInit, OnDestroy {
-  protected readonly newsList: NewsItem[] = [
+  private readonly disaster = inject(DisasterControlService);
+  private readonly closedModal = inject(DisasterClosedModalService);
+
+  /** 首頁輪播仍保留災害頁；關閉時點擊改跳出提示，不直接進入捐助動作。 */
+  protected readonly newsList = signal<NewsItem[]>([
     {
       image: 'assets/images/H_1.jpg',
       text: '災害救助',
       highlight: '查看目前受災地區的物資需求',
       link: '/donor/disaster',
       source: '圖片來源：基督教救助協會',
+      disasterOnly: true,
     },
     {
       image: 'assets/images/donate_h.png',
@@ -39,13 +48,14 @@ export class HomeHeroComponent implements OnInit, OnDestroy {
       link: '/donor/daily',
       source: '圖片來源：台灣好新聞',
     },
-  ];
+  ]);
 
   protected readonly currentIndex = signal(0);
 
-  protected readonly currentNews = computed(
-    () => this.newsList[this.currentIndex()]
-  );
+  protected readonly currentNews = computed(() => {
+    const list = this.newsList();
+    return list[this.currentIndex() % list.length];
+  });
 
   private autoSlideTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -58,8 +68,8 @@ export class HomeHeroComponent implements OnInit, OnDestroy {
   }
 
   protected setSlide(index: number): void {
-    this.currentIndex.set(index);
-
+    const max = this.newsList().length;
+    this.currentIndex.set(((index % max) + max) % max);
     this.stopAutoSlide();
     this.startAutoSlide();
   }
@@ -68,12 +78,8 @@ export class HomeHeroComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    const previousIndex =
-      (this.currentIndex() - 1 + this.newsList.length) %
-      this.newsList.length;
-
-    this.currentIndex.set(previousIndex);
-
+    const max = this.newsList().length;
+    this.currentIndex.set((this.currentIndex() - 1 + max) % max);
     this.stopAutoSlide();
     this.startAutoSlide();
   }
@@ -82,21 +88,25 @@ export class HomeHeroComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    const nextIndex =
-      (this.currentIndex() + 1) % this.newsList.length;
-
-    this.currentIndex.set(nextIndex);
-
+    const max = this.newsList().length;
+    this.currentIndex.set((this.currentIndex() + 1) % max);
     this.stopAutoSlide();
     this.startAutoSlide();
   }
 
-  private startAutoSlide(): void {
-    this.autoSlideTimer = setInterval(() => {
-      const nextIndex =
-        (this.currentIndex() + 1) % this.newsList.length;
+  protected onHeroNavigate(event: Event): void {
+    const news = this.currentNews();
+    if (news.disasterOnly && !this.disaster.data().isOpen) {
+      event.preventDefault();
+      this.closedModal.show();
+    }
+  }
 
-      this.currentIndex.set(nextIndex);
+  private startAutoSlide(): void {
+    this.stopAutoSlide();
+    this.autoSlideTimer = setInterval(() => {
+      const max = this.newsList().length;
+      this.currentIndex.set((this.currentIndex() + 1) % max);
     }, 3000);
   }
 

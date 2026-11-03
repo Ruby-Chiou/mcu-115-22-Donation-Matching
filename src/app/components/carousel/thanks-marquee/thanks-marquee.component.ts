@@ -1,6 +1,5 @@
 import { Component, OnInit, computed, inject, linkedSignal } from '@angular/core';
 
-import { ChromeVisibilityService } from '../../../core/layout/chrome-visibility.service';
 import { PublicDonationThankService } from '../../../core/services/member-center/public-donation-thank.service';
 
 @Component({
@@ -11,8 +10,6 @@ import { PublicDonationThankService } from '../../../core/services/member-center
 })
 export class ThanksMarqueeComponent implements OnInit {
   protected readonly thankService = inject(PublicDonationThankService);
-  private readonly chrome = inject(ChromeVisibilityService);
-  readonly isHeaderHidden = this.chrome.headerHidden;
 
   /** 一份清單從右到左算一遍，播完三遍就收起。 */
   readonly marqueeItems = computed(() => this.thankService.broadcasts());
