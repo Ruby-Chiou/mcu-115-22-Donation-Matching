@@ -56,7 +56,16 @@
       <div class="form-group">
         <label>捐贈數量<span>*</span></label>
         <div class="quantity-input">
-          <input type="number" name="quantity" [(ngModel)]="quantity" min="1" placeholder="請輸入數量" max="100" required />
+          <input
+            type="number"
+            name="quantity"
+            [(ngModel)]="quantity"
+            min="1"
+            [max]="maxDonationQuantity"
+            placeholder="請輸入數量（上限 {{ maxDonationQuantity }}）"
+            (input)="limitQuantityInput($event)"
+            required
+          />
         </div>
       </div>
       <!-- 實際捐贈物資 -->

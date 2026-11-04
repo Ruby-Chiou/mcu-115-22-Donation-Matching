@@ -19,6 +19,7 @@ import { DisasterClosedModalService } from '../../../../core/services/disaster-c
 import { DisasterCommentService } from '../../../../core/services/comments/disaster-comment.service';
 import { DisasterComment } from '../../../../core/services/comments/disaster-comment.service';
 import { AuthRedirectService } from '../../../../core/services/auth/auth-redirect.service';
+import { disasterPriorityClass } from '../../../../core/demand/priority-class';
 
 // 每一筆留言及其底下的所有回覆
 interface CommentThreadNode {
@@ -213,14 +214,7 @@ export class DonorDisasterSupplyDetailPageComponent implements OnInit {
   // 緊急程度樣式
   // =========================
   getPriorityClass(): string {
-    switch (this.demand.priority) {
-      case '非常緊急':
-        return 'very-urgent';
-      case '緊急':
-        return 'urgent';
-      default:
-        return 'normal';
-    }
+    return disasterPriorityClass(this.demand.priority);
   }
   // =========================
   // 留言

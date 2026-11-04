@@ -204,14 +204,11 @@
     <button type="button" class="publish-btn" (click)="onPublish()" [disabled]="isSaving">{{ isEditMode ? '儲存' : '發布需求' }}</button>
   </div>
 </div>
-<div class="cancel-modal-backdrop" *ngIf="showCancelModal" role="presentation" (click)="closeCancelModal()">
-  <section class="cancel-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title" (click)="$event.stopPropagation()">
-    <div class="cancel-modal-icon" aria-hidden="true">!</div>
-    <h2 id="cancel-modal-title">確定要離開編輯嗎？</h2>
-    <p>尚未儲存的修改將會遺失。</p>
-    <div class="cancel-modal-actions">
-      <button type="button" class="stay-btn" (click)="closeCancelModal()">繼續編輯</button>
-      <button type="button" class="leave-btn" (click)="confirmCancel()">放棄修改</button>
-    </div>
-  </section>
-</div>
+@if (showCancelModal) {
+  <app-leave-unsaved-modal
+    [saveDisabled]="isSaving"
+    (stay)="closeCancelModal()"
+    (leave)="confirmCancel()"
+    (saveAndLeave)="confirmSaveAndLeave()"
+  ></app-leave-unsaved-modal>
+}

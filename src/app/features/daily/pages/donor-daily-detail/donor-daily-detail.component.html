@@ -59,7 +59,7 @@
   </div>
 
   <div class="quantity-row amount-description-row">
-    <h4>數量描述</h4>
+    <h4>需要多少</h4>
     <p class="description">{{ demand.amountDescription || '無' }}</p>
   </div>
 
@@ -134,8 +134,6 @@
     <h4>其他說明</h4>
     <p class="description">{{ demand.note || '無' }}</p>
   </div>
-
-  <button type="button" class="contact-btn bottom-contact-btn" (click)="requestDonate()">我要捐助</button>
 </div>
 
 @if (beneficiary; as profile) {

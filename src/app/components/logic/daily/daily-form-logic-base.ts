@@ -1,5 +1,6 @@
 import { Router, ActivatedRoute } from '@angular/router';
 import { DAILY_SERVICE_TARGET_OPTIONS } from '../../../core/codes/service-targets';
+import { validateDemandImageUpload } from '../../../core/demand/image-upload-rules';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyDemand } from '../../../models/agency/daily-demand';
 
@@ -260,15 +261,9 @@ export class DailyFormLogicBase {
     this.demand.conditionDescription = this.buildConditionDescription();
   }
 
-  scrollToServiceTarget(): void {
-    const element = document.querySelector('.service-target-area');
-
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }
+  /** 元件應捲動至服務對象區塊；logic 不再直接操作 DOM。 */
+  serviceTargetScrollSelector(): string {
+    return '.service-target-area';
   }
 
   toggleCondition(key: keyof DailyDemand['conditions']): void {
@@ -364,25 +359,19 @@ export class DailyFormLogicBase {
     }
   }
 
-  onImageSelected(event: Event): void {
+  onImageSelected(event: Event): string | null {
     const input = event.target as HTMLInputElement;
 
     if (!input.files || input.files.length === 0) {
-      return;
+      return null;
     }
 
     const file = input.files[0];
+    const uploadError = validateDemandImageUpload(this.demand.image?.length ?? 0, file);
 
-    if ((this.demand.image?.length ?? 0) >= 5) {
-      alert('最多只能上傳 5 張圖片');
+    if (uploadError) {
       input.value = '';
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('圖片大小不可超過 5MB');
-      input.value = '';
-      return;
+      return uploadError;
     }
 
     this.imageFiles.push(file);
@@ -405,6 +394,7 @@ export class DailyFormLogicBase {
     };
 
     reader.readAsDataURL(file);
+    return null;
   }
 
   removeImage(index: number): void {

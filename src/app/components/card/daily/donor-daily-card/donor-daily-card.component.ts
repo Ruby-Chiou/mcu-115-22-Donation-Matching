@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { dailyPriorityClass } from '../../../../core/demand/priority-class';
+import { regionFromAddress } from '../../../../core/map/address-display';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 
 @Component({
@@ -19,31 +21,10 @@ export class DonorDailyCardComponent {
     this.view.emit();
   }
   getPriorityClass(priority: string | undefined): string {
-    switch (priority) {
-      case '非常緊急':
-      case 'P1':
-        return 'priority-urgent';
-
-      case '緊急':
-      case 'P2':
-        return 'priority-normal';
-
-      case '普通':
-      case 'P3':
-        return 'priority-low';
-
-      default:
-        return 'priority-default';
-    }
+    return dailyPriorityClass(priority);
   }
   getRegion(address: string | undefined): string {
-    if (!address) {
-      return '';
-    }
-
-    const match = address.match(/^(.*?[縣市].*?[區鄉鎮市])/);
-
-    return match ? match[1] : address;
+    return regionFromAddress(address);
   }
   currentImageIndex = 0;
   previousImage(event: Event): void {

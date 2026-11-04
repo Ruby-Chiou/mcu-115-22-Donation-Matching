@@ -33,15 +33,7 @@
           (clear)="clearSearch()"
         ></app-daily-search-bar>
 
-        <!-- 排序區 -->
-        <app-daily-sort-bar
-          [selectedSort]="selectedSort"
-          [sortAscending]="sortAscending"
-          (selectedSortChange)="onSortChange($event)"
-          (sortAscendingChange)="onSortOrderChange($event)"
-        ></app-daily-sort-bar>
-
-        <!-- 篩選按鈕區 -->
+        <!-- 篩選（放在排序前，讓上下鍵緊鄰排序欄位更直覺） -->
         <app-daily-filter
           [showFilterModal]="showFilterModal"
           [statusOptions]="statusOptions"
@@ -55,6 +47,14 @@
           (reset)="resetFilters()"
           (apply)="applyFilterFromModal()"
         ></app-daily-filter>
+
+        <!-- 排序區 -->
+        <app-daily-sort-bar
+          [selectedSort]="selectedSort"
+          [sortAscending]="sortAscending"
+          (selectedSortChange)="onSortChange($event)"
+          (sortAscendingChange)="onSortOrderChange($event)"
+        ></app-daily-sort-bar>
       </div>
     </div>
 

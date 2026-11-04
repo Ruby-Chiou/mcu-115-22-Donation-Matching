@@ -24,11 +24,14 @@
 /*標題*/
 .detail-header {
   margin-bottom: 30px;
-  color: var(--color-link);
+  text-align: center;
 }
 .detail-header h1 {
   margin: 0;
-  font-size: var(--font-size-30);
+  color: var(--color-action);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-5);
 }
 /* 上方主要資訊*/
 .detail-main {

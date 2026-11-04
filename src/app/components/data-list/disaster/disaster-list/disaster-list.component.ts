@@ -1,9 +1,8 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand, DisplayStatus } from '../../../../models/agency/disaster-demand';
 import { PaginationComponent } from '../../../pagination/pagination.component';
 import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
@@ -12,8 +11,17 @@ import { SupplySearchBarComponent } from '../../../search-bar/supply-search-bar/
 import { SupplyFilterComponent, SupplyFilterState } from '../../../filter/supply-filter/supply-filter.component';
 import { SupplySortBarComponent, SortType } from '../../../sort-bar/supply-sort-bar/supply-sort-bar.component';
 import { DisasterListLogic, DisasterListItem } from '../../../logic/disaster/disaster-list-logic';
-import { DisasterCommentService } from '../../../../core/services/comments/disaster-comment.service';
+import { ListUiResult } from '../../../../core/ui/list-ui-result';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
 
+interface ApplyUiContext {
+  /** 呼叫 Logic 前記錄的 scrollY（配合 preserveScrollY）。 */
+  scrollY?: number;
+  /** 觸發事件的 select（配合 selectValueRestore）。 */
+  select?: HTMLSelectElement;
+}
+
+/** 薄 Facade：狀態與 domain 操作由 DisasterListLogic 持有，這裡只套用 UI 意圖。 */
 @Component({
   selector: 'app-disaster-list',
   standalone: true,
@@ -28,119 +36,309 @@ import { DisasterCommentService } from '../../../../core/services/comments/disas
     SupplyFilterComponent,
     SupplyLoadingComponent,
   ],
+  providers: [DisasterListLogic],
   templateUrl: './disaster-list.component.html',
   styleUrls: ['./disaster-list-A.component.scss'],
 })
 export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
-  demands: DisasterListItem[] = [];
-  filteredDemands: DisasterListItem[] = [];
-  pagedDemands: DisasterListItem[] = [];
+  private readonly logic = inject(DisasterListLogic);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly notices = inject(UiNoticeService);
 
   private demandChangedSubscription?: Subscription;
-  private readonly logic: DisasterListLogic;
 
-  selectAll = false;
+  // ===== 純 UI 旗標（由 ListUiResult 驅動） =====
   isRestoringScroll = false;
-  isLoading = false;
-  searchTerm = '';
-
-  currentPage = 1;
-  pageSize = 10;
-  totalPages = 1;
-  pageNumbers: number[] = [];
-
-  private readonly scrollPositionKey = 'agency-disaster-workspace-scroll';
-  private readonly pagePositionKey = 'agency-disaster-workspace-page';
-
-  selectedSort: SortType = 'serialNo';
-  sortAscending = true;
-  private userHasSorted = true;
-
   showDeleteModal = false;
-  deleteIds: number[] = [];
-  deleteType: 'single' | 'batch' = 'single';
-
   showOffShelfWarning = false;
   showOnShelfWarning = false;
-  pendingOffShelfItem?: DisasterListItem;
 
-  statusOptions: DisplayStatus[] = ['已上架', '隱藏中', '已下架'];
-  priorityOptions: DisasterDemand['priority'][] = ['普通', '緊急', '非常緊急'];
-  categoryOptions: NonNullable<DisasterDemand['category']>[] = [
-    '食品與飲用水',
-    '衣物與保暖用品',
-    '健康與照護用品',
-    '清潔與衛生用品',
-    '嬰幼兒用品',
-    '長者與身心障礙用品',
-    '女性生理用品',
-    '寵物與動物用品',
-    '防災與照明用品',
-    '通訊與求救用品',
-    '生活與炊事用品',
-    '居住安置與修繕用品',
-    '其他',
-  ];
-
-  messageOptions = ['已回覆', '未回覆'];
-
-  selectedFilters: SupplyFilterState = {
-    status: [],
-    priority: [],
-    lowRemaining: false,
-    category: [],
-    messageStatus: [],
-  };
-
-  constructor(
-    private readonly disasterDemandService: DisasterDemandService,
-    private readonly disasterCommentService: DisasterCommentService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
-  ) {
-    this.logic = new DisasterListLogic();
-
+  constructor() {
     history.scrollRestoration = 'manual';
 
-    this.demandChangedSubscription = this.disasterDemandService.demandChanged$.subscribe(() => {
+    this.demandChangedSubscription = this.logic.demandChanged$.subscribe(() => {
       void this.loadDemands(false);
     });
   }
 
+  // ===== 模板用 VM（委派 Logic） =====
+  get demands(): DisasterListItem[] {
+    return this.logic.demands;
+  }
+  get filteredDemands(): DisasterListItem[] {
+    return this.logic.filteredDemands;
+  }
+  get pagedDemands(): DisasterListItem[] {
+    return this.logic.pagedDemands;
+  }
+  get isLoading(): boolean {
+    return this.logic.isLoading;
+  }
+  get selectAll(): boolean {
+    return this.logic.selectAll;
+  }
+  set selectAll(value: boolean) {
+    this.logic.selectAll = value;
+  }
+  get searchTerm(): string {
+    return this.logic.searchTerm;
+  }
+  get currentPage(): number {
+    return this.logic.currentPage;
+  }
+  get pageSize(): number {
+    return this.logic.pageSize;
+  }
+  get totalPages(): number {
+    return this.logic.totalPages;
+  }
+  get pageNumbers(): number[] {
+    return this.logic.pageNumbers;
+  }
+  get selectedSort(): SortType {
+    return this.logic.selectedSort;
+  }
+  get sortAscending(): boolean {
+    return this.logic.sortAscending;
+  }
+  get selectedFilters(): SupplyFilterState {
+    return this.logic.selectedFilters;
+  }
+  get statusOptions(): DisplayStatus[] {
+    return this.logic.statusOptions;
+  }
+  get priorityOptions(): DisasterDemand['priority'][] {
+    return this.logic.priorityOptions;
+  }
+  get categoryOptions(): NonNullable<DisasterDemand['category']>[] {
+    return this.logic.categoryOptions;
+  }
+  get messageOptions(): string[] {
+    return this.logic.messageOptions;
+  }
+  get deleteIds(): number[] {
+    return this.logic.deleteIds;
+  }
+  get deleteType(): 'single' | 'batch' {
+    return this.logic.deleteType;
+  }
+  get pendingOffShelfItem(): DisasterListItem | undefined {
+    return this.logic.pendingOffShelfItem;
+  }
+
+  // ===== 生命週期 =====
   ngOnInit(): void {
-    const restoreListPosition = sessionStorage.getItem('restore-agency-disaster-list');
-
-    if (restoreListPosition === 'true') {
-      const savedPage = sessionStorage.getItem(this.pagePositionKey);
-
-      if (savedPage) {
-        const page = Number(savedPage);
-
-        if (page >= 1) {
-          this.currentPage = page;
-        }
-      }
-
-      sessionStorage.removeItem('restore-agency-disaster-list');
-    } else {
-      this.currentPage = 1;
-
-      sessionStorage.removeItem(this.pagePositionKey);
-      sessionStorage.removeItem(this.scrollPositionKey);
-    }
+    this.logic.initFromSession();
 
     void this.loadDemands();
   }
 
   ngAfterViewInit(): void {
-    const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
+    this.applyUi(this.logic.getRestoreScrollResult());
+  }
 
-    if (!savedScroll) {
-      return;
+  ngOnDestroy(): void {
+    this.demandChangedSubscription?.unsubscribe();
+  }
+
+  // ===== 導覽 =====
+  goToAddDemand(): void {
+    this.applyUi(this.logic.resolveAddNavigation());
+  }
+
+  goToDetail(id: number | undefined): void {
+    this.applyUi(this.logic.resolveDetailNavigation(id));
+  }
+
+  goToEdit(id: number | undefined): void {
+    const result = this.logic.resolveEditNavigation(id);
+
+    if (result.navigateTo) {
+      this.prepareListRestore();
     }
 
-    const scrollY = Number(savedScroll);
+    this.applyUi(result);
+  }
 
+  saveListPosition(): void {
+    this.logic.saveListPosition(window.scrollY);
+  }
+
+  @HostListener('window:beforeunload')
+  saveScrollPosition(): void {
+    this.saveListPosition();
+  }
+
+  // ===== 載入／搜尋／篩選／排序／分頁 =====
+  async loadDemands(showLoading = true): Promise<void> {
+    const result = await this.logic.loadDemands(showLoading);
+
+    this.applyUi(result);
+  }
+
+  onSearchChange(value: string): void {
+    this.logic.onSearchChange(value);
+  }
+
+  onSortChange(event: { selectedSort: SortType; sortAscending: boolean }): void {
+    const scrollY = window.scrollY;
+
+    this.applyUi(this.logic.onSortChange(event), { scrollY });
+  }
+
+  onFilterApply(filters: SupplyFilterState): void {
+    this.logic.onFilterApply(filters);
+  }
+
+  resetFilters(): void {
+    this.logic.resetFilters();
+  }
+
+  applyFilters(resetPage = true): void {
+    this.logic.applyFilters(resetPage);
+  }
+
+  goToPage(page: number): void {
+    this.applyUi(this.logic.goToPage(page));
+  }
+
+  // ===== 選取／批次 =====
+  toggleAll(): void {
+    this.logic.toggleAll();
+  }
+
+  hasSelected(): boolean {
+    return this.logic.hasSelected();
+  }
+
+  editSelected(): void {
+    const result = this.logic.prepareBatchEdit();
+
+    if (result.navigateTo) {
+      this.prepareListRestore();
+    }
+
+    this.applyUi(result);
+  }
+
+  // ===== 刪除 =====
+  openDeleteModal(serialNo: number): void {
+    this.applyUi(this.logic.openDeleteModal(serialNo));
+  }
+
+  openBatchDeleteModal(): void {
+    this.applyUi(this.logic.openBatchDeleteModal());
+  }
+
+  closeDeleteModal(): void {
+    this.applyUi(this.logic.closeDeleteModal());
+  }
+
+  async confirmDelete(): Promise<void> {
+    const result = await this.logic.confirmDelete((intermediate) => this.applyUi(intermediate));
+
+    this.applyUi(result);
+  }
+
+  // ===== 狀態變更／下架警告 =====
+  changeStatus(item: DisasterListItem, event: Event): void {
+    const select = event.target as HTMLSelectElement;
+
+    this.applyUi(this.logic.changeStatus(item, select.value as DisplayStatus), { select });
+  }
+
+  async confirmManualOffShelf(): Promise<void> {
+    this.applyUi(await this.logic.confirmManualOffShelf());
+  }
+
+  cancelManualOffShelf(): void {
+    this.applyUi(this.logic.cancelManualOffShelf());
+  }
+
+  async hideInsteadOfOffShelf(): Promise<void> {
+    this.applyUi(await this.logic.hideInsteadOfOffShelf());
+  }
+
+  closeOffShelfWarning(): void {
+    this.applyUi(this.logic.closeOffShelfWarning());
+  }
+
+  closeOnShelfWarning(): void {
+    this.applyUi(this.logic.closeOnShelfWarning());
+  }
+
+  // ===== UI intent 套用 =====
+  /** 離開列表前記錄位置，讓返回時能還原。 */
+  private prepareListRestore(): void {
+    this.saveListPosition();
+    this.logic.markRestoreListPosition();
+  }
+
+  private applyUi(result: ListUiResult, context: ApplyUiContext = {}): void {
+    if (result.openDeleteModal) {
+      this.showDeleteModal = true;
+    }
+    if (result.closeDeleteModal) {
+      this.showDeleteModal = false;
+    }
+    if (result.openOffShelfWarning) {
+      this.showOffShelfWarning = true;
+    }
+    if (result.closeOffShelfWarning) {
+      this.showOffShelfWarning = false;
+    }
+    if (result.openOnShelfWarning) {
+      this.showOnShelfWarning = true;
+    }
+    if (result.closeOnShelfWarning) {
+      this.showOnShelfWarning = false;
+    }
+
+    if (result.notice) {
+      void this.notices.alert(result.notice);
+    }
+
+    if (result.selectValueRestore !== undefined && context.select) {
+      const select = context.select;
+      const value = result.selectValueRestore;
+
+      setTimeout(() => {
+        select.value = value;
+      });
+    }
+
+    if (result.scrollTop) {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant',
+      });
+    }
+
+    if (result.preserveScrollY && context.scrollY !== undefined) {
+      const scrollY = context.scrollY;
+
+      setTimeout(() => {
+        window.scrollTo({
+          top: scrollY,
+          behavior: 'instant',
+        });
+      }, 0);
+    }
+
+    if (result.restoreScrollY != null) {
+      this.restoreScroll(result.restoreScrollY);
+    }
+
+    if (result.navigateTo) {
+      void this.router.navigate(result.navigateTo);
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  private restoreScroll(scrollY: number): void {
     window.scrollTo({
       top: scrollY,
       left: 0,
@@ -156,330 +354,5 @@ export class DisasterListComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    this.demandChangedSubscription?.unsubscribe();
-  }
-
-  goToAddDemand(): void {
-    this.router.navigate(['/agency/supply-form']);
-  }
-
-  goToDetail(id: number | undefined): void {
-    if (id == null || !Number.isInteger(Number(id)) || Number(id) <= 0) {
-      console.error('無法前往災害物資詳細頁，資料庫 id 不正確：', id);
-      return;
-    }
-
-    this.router.navigate(['/agency/supply-detail', id]);
-  }
-
-  goToEdit(id: number | undefined): void {
-    if (id == null || !Number.isInteger(Number(id)) || Number(id) <= 0) {
-      console.error('無法前往災害物資編輯頁，資料庫 id 不正確：', id);
-      return;
-    }
-
-    this.saveListPosition();
-    sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-edit', id]);
-  }
-
-  saveListPosition(): void {
-    sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
-    sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
-  }
-
-  @HostListener('window:beforeunload')
-  saveScrollPosition(): void {
-    this.saveListPosition();
-  }
-
-  async loadDemands(showLoading = true): Promise<void> {
-    if (this.isLoading) {
-      return;
-    }
-
-    if (showLoading) {
-      this.isLoading = true;
-    }
-
-    try {
-      await this.disasterDemandService.reload();
-
-      this.demands = this.logic.mapDemands(this.disasterDemandService.getDemands(), this.disasterDemandService);
-
-      this.demands = await this.logic.loadMessageCounts(this.demands, this.disasterCommentService);
-
-      this.filteredDemands = [...this.demands];
-      this.updatePagination();
-    } catch (error) {
-      console.error('載入物資需求失敗：', error);
-
-      this.demands = [];
-      this.filteredDemands = [];
-      this.pagedDemands = [];
-    } finally {
-      if (showLoading) {
-        this.isLoading = false;
-      }
-      this.cdr.markForCheck();
-    }
-  }
-
-  onSearchChange(value: string): void {
-    this.searchTerm = value;
-    this.applyFilters();
-  }
-
-  onSortChange(event: { selectedSort: SortType; sortAscending: boolean }): void {
-    const scrollY = window.scrollY;
-
-    this.selectedSort = event.selectedSort;
-    this.sortAscending = event.sortAscending;
-    this.userHasSorted = true;
-    this.applySort();
-
-    setTimeout(() => {
-      window.scrollTo({
-        top: scrollY,
-        behavior: 'instant',
-      });
-    }, 0);
-  }
-
-  toggleAll(): void {
-    this.pagedDemands.forEach((item) => {
-      item.selected = this.selectAll;
-    });
-  }
-
-  hasSelected(): boolean {
-    return this.filteredDemands.some((item) => item.selected);
-  }
-
-  editSelected(): void {
-    const selectedItems = this.filteredDemands.filter((item) => item.selected);
-
-    if (selectedItems.length === 0) {
-      alert('請先選擇要修改的需求');
-      return;
-    }
-
-    localStorage.setItem('editDemands', JSON.stringify(selectedItems));
-    this.saveListPosition();
-    sessionStorage.setItem('restore-agency-disaster-list', 'true');
-    this.router.navigate(['/agency/supply-batch-edit']);
-  }
-
-  onFilterApply(filters: SupplyFilterState): void {
-    this.selectedFilters = filters;
-    this.applyFilters();
-  }
-
-  resetFilters(): void {
-    this.selectedFilters = {
-      status: [],
-      priority: [],
-      lowRemaining: false,
-      category: [],
-      messageStatus: [],
-    };
-    this.applyFilters();
-  }
-
-  applyFilters(resetPage = true): void {
-    this.filteredDemands = this.logic.filterDemands(this.demands, this.searchTerm, this.selectedFilters);
-
-    if (resetPage) {
-      this.currentPage = 1;
-    }
-    if (this.userHasSorted) {
-      this.applySort();
-    } else {
-      this.updatePagination();
-    }
-  }
-
-  applySort(): void {
-    this.filteredDemands = this.logic.sortDemands(this.filteredDemands, this.selectedSort, this.sortAscending);
-    this.updatePagination();
-  }
-
-  updatePagination(): void {
-    const result = this.logic.getPaginationData(this.filteredDemands, this.currentPage, this.pageSize);
-
-    this.totalPages = result.totalPages;
-    this.pageNumbers = result.pageNumbers;
-    this.pagedDemands = result.pagedDemands;
-    this.currentPage = result.currentPage;
-    this.selectAll = result.selectAll;
-
-    console.log('目前頁數：', this.currentPage);
-    console.log('每頁筆數：', this.pageSize);
-    console.log('目前頁面資料：', this.pagedDemands.length);
-    console.log('目前頁面資料內容：', this.pagedDemands);
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePagination();
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'instant',
-      });
-    }
-  }
-
-  openDeleteModal(serialNo: number): void {
-    this.deleteIds = [serialNo];
-    this.deleteType = 'single';
-    this.showDeleteModal = true;
-  }
-
-  openBatchDeleteModal(): void {
-    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => item.id as number);
-    this.deleteType = 'batch';
-    this.showDeleteModal = true;
-  }
-
-  closeDeleteModal(): void {
-    this.showDeleteModal = false;
-  }
-
-  async confirmDelete(): Promise<void> {
-    if (this.deleteIds.length === 0) {
-      return;
-    }
-
-    try {
-      for (const id of this.deleteIds) {
-        await this.disasterDemandService.deleteDemand(id);
-      }
-      await this.onDeleted();
-    } catch (error) {
-      console.error('刪除物資需求失敗：', error);
-      alert('刪除失敗，請確認資料是否存在或是否具有刪除權限。');
-    }
-  }
-
-  async onDeleted(): Promise<void> {
-    this.showDeleteModal = false;
-    this.deleteIds = [];
-    this.selectAll = false;
-    await this.loadDemands();
-  }
-
-  changeStatus(item: DisasterListItem, event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const newStatus = select.value as DisplayStatus;
-    const originalItem = this.disasterDemandService.getDemands().find((demand) => demand.id === item.id);
-
-    // 選擇「已下架」
-    if (newStatus === '已下架') {
-      item.displayStatus = originalItem?.status === '上架' ? '已上架' : originalItem?.status === '下架' ? '已下架' : '隱藏中';
-
-      setTimeout(() => {
-        select.value = item.displayStatus;
-      });
-
-      this.pendingOffShelfItem = item;
-      this.showOffShelfWarning = true;
-      return;
-    }
-
-    if (newStatus === '已上架' && item.status === '下架') {
-      const offShelfReason = item.offShelfReason ?? originalItem?.offShelfReason;
-
-      // 只有「手動下架」不能重新上架
-      if (offShelfReason === 'manual') {
-        item.displayStatus = '已下架';
-
-        setTimeout(() => {
-          select.value = '已下架';
-        });
-
-        this.showOnShelfWarning = true;
-        return;
-      }
-
-      // 自然下架可以重新上架
-      item.displayStatus = '已上架';
-      void this.applyStatusChange(item);
-      return;
-    }
-
-    // 隱藏中 → 其他狀態
-    item.displayStatus = newStatus;
-    void this.applyStatusChange(item);
-  }
-
-  async confirmManualOffShelf(): Promise<void> {
-    if (!this.pendingOffShelfItem) {
-      return;
-    }
-
-    const item = this.pendingOffShelfItem;
-    const now = new Date();
-
-    item.status = '下架';
-    item.offShelfReason = 'manual';
-    item.expectedOffShelfAt = now.toISOString();
-    item.displayStatus = '已下架';
-    item.displayOffShelfAt = now.toLocaleDateString('zh-TW');
-
-    try {
-      await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands(false);
-    } catch (error) {
-      console.error('下架失敗：', error);
-    } finally {
-      this.closeOffShelfWarning();
-    }
-  }
-
-  cancelManualOffShelf(): void {
-    this.closeOffShelfWarning();
-  }
-
-  async hideInsteadOfOffShelf(): Promise<void> {
-    if (!this.pendingOffShelfItem) {
-      return;
-    }
-
-    const item = this.pendingOffShelfItem;
-
-    item.status = '隱藏';
-    item.offShelfReason = undefined;
-    item.publishedAt = undefined;
-    item.expectedOffShelfAt = undefined;
-    item.displayStatus = '隱藏中';
-    item.displayPublishedAt = '尚未上架';
-    item.displayOffShelfAt = '—';
-
-    try {
-      await this.disasterDemandService.updateDemand(item);
-      await this.loadDemands(false);
-    } catch (error) {
-      console.error('隱藏失敗：', error);
-    } finally {
-      this.closeOffShelfWarning();
-    }
-  }
-
-  closeOffShelfWarning(): void {
-    this.showOffShelfWarning = false;
-    this.pendingOffShelfItem = undefined;
-  }
-
-  closeOnShelfWarning(): void {
-    this.showOnShelfWarning = false;
-  }
-
-  private async applyStatusChange(item: DisasterListItem): Promise<void> {
-    await this.logic.applyStatusChange(item, this.disasterDemandService);
   }
 }

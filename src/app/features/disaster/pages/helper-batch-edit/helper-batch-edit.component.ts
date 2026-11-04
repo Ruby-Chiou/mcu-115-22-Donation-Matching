@@ -6,6 +6,7 @@ import { geocodeTaiwan, taiwanRoadName } from '../../../../core/map/geocoding';
 
 import { HelperDemandService } from '../../../../core/services/agency-helper-demand/helper-demand.service';
 import { HelperDemand } from '../../../../models/agency/helper-demand';
+import { calculateExpectedOffShelfAt, HELPER_OFF_SHELF_DAYS } from '../../../../core/demand/expected-off-shelf';
 import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
 
 // 讓元件專用的 UI 表單介面繼承原始的 HelperDemand，並擴充驗證屬性
@@ -414,23 +415,7 @@ export class HelperBatchEditComponent implements OnInit {
   // ==========================================
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: HelperDemand['priority']): string {
-    const offShelfDate = new Date(publishedDate);
-
-    switch (priority) {
-      case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 14);
-        break;
-
-      case '緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 7);
-        break;
-
-      case '非常緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 3);
-        break;
-    }
-
-    return offShelfDate.toISOString();
+    return calculateExpectedOffShelfAt(publishedDate, priority, HELPER_OFF_SHELF_DAYS);
   }
 
   // ==========================================

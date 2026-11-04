@@ -4,11 +4,15 @@ import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DailyDemand } from '../../../models/agency/daily-demand';
+import { calculateExpectedOffShelfAt, DAILY_OFF_SHELF_DAYS } from '../../../core/demand/expected-off-shelf';
 import { DailyFormLogicBase } from './daily-form-logic-base';
 
 export interface DailyFormSaveResult {
   scrollTarget?:
     'item' | 'amount' | 'unit' | 'remaining' | 'category' | 'reason' | 'description' | 'receive-method' | 'receive-info' | 'service-target';
+  notice?: string;
+  scrollTop?: boolean;
+  loadFailed?: boolean;
 }
 
 @Injectable()
@@ -17,7 +21,7 @@ export class DailyFormLogic extends DailyFormLogicBase {
     super(dailyDemandService, router, route);
   }
 
-  async ngOnInit(): Promise<void> {
+  async ngOnInit(): Promise<DailyFormSaveResult> {
     const rawId = this.route.snapshot.paramMap.get('id');
     const id = Number(rawId);
 
@@ -25,13 +29,13 @@ export class DailyFormLogic extends DailyFormLogicBase {
 
     if (rawId === null) {
       this.isEditMode = false;
-      return;
+      return {};
     }
 
     if (!Number.isInteger(id) || id <= 0) {
       console.error('[DailyFormLogic] 編輯網址的資料庫 id 不正確：', rawId);
       await this.router.navigate(['/agency/daily']);
-      return;
+      return { notice: '編輯網址不正確', loadFailed: true };
     }
 
     this.isEditMode = true;
@@ -42,7 +46,7 @@ export class DailyFormLogic extends DailyFormLogicBase {
       if (!data) {
         console.error('[DailyFormLogic] 找不到要編輯的日常需求，id：', id);
         await this.router.navigate(['/agency/daily']);
-        return;
+        return { notice: '找不到要編輯的日常需求', loadFailed: true };
       }
 
       this.originalStatus = data.status ?? '隱藏';
@@ -80,20 +84,16 @@ export class DailyFormLogic extends DailyFormLogicBase {
 
     } catch (error) {
       console.error('[DailyFormLogic] 載入日常編輯資料失敗：', error);
-
-      alert('載入日常需求失敗');
-
       await this.router.navigate(['/agency/daily']);
+      return { notice: '載入日常需求失敗', loadFailed: true };
     }
+
+    return {};
   }
 
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'instant',
-      });
-    }, 0);
+  /** UI 捲動改由元件執行，這裡只告知需要 scrollTop。 */
+  afterViewReady(): DailyFormSaveResult {
+    return { scrollTop: true };
   }
 
   onStatusClick(event: MouseEvent, newStatus: DailyDemand['status']): void {
@@ -302,9 +302,7 @@ export class DailyFormLogic extends DailyFormLogicBase {
     const addressSuccess = await this.getCoordinatesFromAddress(this.demand.address);
 
     if (!addressSuccess) {
-      alert('無法找到此地址的位置，請確認地址是否正確。');
-
-      return {};
+      return { notice: '無法找到此地址的位置，請確認地址是否正確。' };
     }
 
     this.demand.customConditions = this.demand.customConditions.filter((item) => item.trim() !== '');
@@ -324,15 +322,13 @@ export class DailyFormLogic extends DailyFormLogicBase {
     this.demand.conditionDescription = this.buildConditionDescription();
 
     if (this.isEditMode) {
-      await this.saveEdit();
-    } else {
-      await this.saveNew();
+      return this.saveEdit();
     }
 
-    return {};
+    return this.saveNew();
   }
 
-  private async saveEdit(): Promise<void> {
+  private async saveEdit(): Promise<DailyFormSaveResult> {
     const now = new Date();
 
     const isOriginalManualOffShelf = this.originalStatus === '下架' && this.originalOffShelfReason === 'manual';
@@ -340,11 +336,8 @@ export class DailyFormLogic extends DailyFormLogicBase {
     const isCurrentManualOffShelf = this.demand.status === '下架' && this.demand.offShelfReason === 'manual';
 
     if (this.demand.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
-      alert('此需求為使用者主動下架，無法重新上架。');
-
       this.demand.status = '下架';
-
-      return;
+      return { notice: '此需求為使用者主動下架，無法重新上架。' };
     }
 
     if (this.demand.status === '上架') {
@@ -387,14 +380,15 @@ export class DailyFormLogic extends DailyFormLogicBase {
           },
         });
       }
+
+      return {};
     } catch (error) {
       console.error('修改日常物資需求失敗：', error);
-
-      alert('修改失敗，請稍後再試。');
+      return { notice: '修改失敗，請稍後再試。' };
     }
   }
 
-  private async saveNew(): Promise<void> {
+  private async saveNew(): Promise<DailyFormSaveResult> {
     const createdDate = new Date();
 
     this.demand.createdAt = createdDate.toISOString();
@@ -419,30 +413,15 @@ export class DailyFormLogic extends DailyFormLogicBase {
           refresh: Date.now(),
         },
       });
+
+      return {};
     } catch (error) {
       console.error('新增日常物資需求失敗：', error);
-
-      alert('新增失敗，請稍後再試。');
+      return { notice: '新增失敗，請稍後再試。' };
     }
   }
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DailyDemand['priority']): string {
-    const offShelfDate = new Date(publishedDate);
-
-    switch (priority) {
-      case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 60);
-        break;
-
-      case '緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-
-      case '非常緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 14);
-        break;
-    }
-
-    return offShelfDate.toISOString();
+    return calculateExpectedOffShelfAt(publishedDate, priority, DAILY_OFF_SHELF_DAYS);
   }
 }

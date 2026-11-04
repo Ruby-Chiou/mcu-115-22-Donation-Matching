@@ -10,6 +10,10 @@ import { DonorReceiptRequestComponent } from '../../../../components/receipt/don
 import { MemberProfileService } from '../../../../core/services/member-center/member-profile.service';
 import { ReceiptLineItem, emptyReceiptLine, validateDonorReceiptRequest } from '../../../../core/receipt/donation-receipt-document';
 import { maskDonorName } from '../../../../models/member/public-donation-thank';
+import {
+  applyDonationQuantityInput,
+  resolveDonationQuantityCap,
+} from '../../../../core/donation/donation-quantity';
 @Component({
   selector: 'app-donor-daily-form',
   imports: [CommonModule, FormsModule, DonorReceiptRequestComponent],
@@ -20,6 +24,8 @@ export class DonorDailyFormComponent implements OnInit {
   donationMethod: '寄送' | '面交' | '' = '';
   demand?: DailyDemand;
   demandReady = false;
+  /** 剩餘需求與通用上限取較小值 */
+  maxDonationQuantity = resolveDonationQuantityCap();
   private readonly demandId: number;
 
   // 圖片預覽
@@ -59,6 +65,7 @@ export class DonorDailyFormComponent implements OnInit {
         return;
       }
 
+      this.maxDonationQuantity = resolveDonationQuantityCap(this.demand.remaining);
       this.applyDefaultDonationMethod();
       await this.loadProfileDefaults();
       this.demandReady = true;
@@ -135,6 +142,14 @@ export class DonorDailyFormComponent implements OnInit {
   cancelForm(): void {
     this.router.navigate(['/donor/daily/detail', this.demandId]);
   }
+
+  limitQuantityInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const next = applyDonationQuantityInput(input.value, this.maxDonationQuantity);
+    input.value = next.display;
+    this.quantity = next.quantity;
+  }
+
   donorName = '';
   phone = '';
   // 自動填入帳戶資料
@@ -238,8 +253,8 @@ export class DonorDailyFormComponent implements OnInit {
       return;
     }
 
-    if (!this.quantity || this.quantity <= 0) {
-      alert('請輸入正確的捐贈數量');
+    if (!this.quantity || this.quantity <= 0 || this.quantity > this.maxDonationQuantity) {
+      alert(`請輸入 1～${this.maxDonationQuantity} 的捐贈數量`);
       return;
     }
 

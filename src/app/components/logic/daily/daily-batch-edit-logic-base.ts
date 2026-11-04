@@ -1,5 +1,7 @@
 import { Router } from '@angular/router';
 import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
+import { calculateExpectedOffShelfAt, DAILY_OFF_SHELF_DAYS } from '../../../core/demand/expected-off-shelf';
+import { validateDemandImageUpload } from '../../../core/demand/image-upload-rules';
 import { DailyDemandService } from '../../../core/services/agency-daily-demand/daily-demand.service';
 import { EditableDailyDemand } from '../../../models/agency/daily-demand';
 
@@ -138,11 +140,11 @@ export class DailyBatchEditLogicBase {
     });
   }
 
-  onImageSelected(event: Event, demand: EditableDailyDemand): void {
+  onImageSelected(event: Event, demand: EditableDailyDemand): string | null {
     const input = event.target as HTMLInputElement;
 
     if (!input.files || input.files.length === 0) {
-      return;
+      return null;
     }
 
     if (!this.imageFiles[demand.serialNo]) {
@@ -150,17 +152,11 @@ export class DailyBatchEditLogicBase {
     }
 
     const file = input.files[0];
+    const uploadError = validateDemandImageUpload((this.imagePreviewUrls[demand.serialNo] || []).length, file);
 
-    if ((this.imagePreviewUrls[demand.serialNo] || []).length >= 5) {
-      alert('最多只能上傳 5 張圖片');
+    if (uploadError) {
       input.value = '';
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('圖片大小不可超過 5MB');
-      input.value = '';
-      return;
+      return uploadError;
     }
 
     this.imageFiles[demand.serialNo].push(file);
@@ -178,6 +174,7 @@ export class DailyBatchEditLogicBase {
     demand.imageFileNames.push(file.name);
 
     input.value = '';
+    return null;
   }
 
   removeImage(demand: EditableDailyDemand, index: number): void {
@@ -338,40 +335,12 @@ export class DailyBatchEditLogicBase {
   }
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: EditableDailyDemand['priority']): string {
-    const offShelfDate = new Date(publishedDate);
-
-    switch (priority) {
-      case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 60);
-        break;
-
-      case '緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-
-      case '非常緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 14);
-        break;
-    }
-
-    return offShelfDate.toISOString();
+    return calculateExpectedOffShelfAt(publishedDate, priority, DAILY_OFF_SHELF_DAYS);
   }
 
-  scrollToFirstError(): void {
-    setTimeout(() => {
-      const firstErrorElement = document.querySelector('.invalid, .invalid-box') as HTMLElement | null;
-
-      if (!firstErrorElement) {
-        return;
-      }
-
-      const top = firstErrorElement.getBoundingClientRect().top + window.scrollY - 120;
-
-      window.scrollTo({
-        top,
-        behavior: 'smooth',
-      });
-    }, 100);
+  /** 元件應捲動至第一個錯誤欄位。 */
+  firstErrorScrollSelector(): string {
+    return '.invalid, .invalid-box';
   }
 
   addCustomServiceTarget(demand: EditableDailyDemand): void {

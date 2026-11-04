@@ -1,16 +1,19 @@
 import { ChangeDetectorRef, Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { SupplyImagePreviewComponent } from '../../../../components/modal/image-preview/supply-image-preview/supply-image-preview.component';
 import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
+import { LeaveUnsavedModalComponent } from '../../../../shared/ui/leave-unsaved-modal/leave-unsaved-modal.component';
 import { DailyFormLogic } from '../../../../components/logic/daily/daily-form.logic';
+import { scrollToFirstMatching, scrollWindowToTop } from '../../../../core/ui/dom-scroll';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
 @Component({
   selector: 'app-daily-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent, ConfirmModalComponent],
+  imports: [CommonModule, FormsModule, SupplyImagePreviewComponent, ConfirmModalComponent, LeaveUnsavedModalComponent],
+  providers: [DailyFormLogic],
   templateUrl: './daily-form.component.html',
   styleUrls: [
     './daily-form-A.component.scss',
@@ -20,8 +23,11 @@ import { DailyFormLogic } from '../../../../components/logic/daily/daily-form.lo
   ],
 })
 export class DailyFormComponent implements OnInit, AfterViewInit {
-  private readonly logic: DailyFormLogic;
+  private readonly logic = inject(DailyFormLogic);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
+  private readonly notices = inject(UiNoticeService);
+  showCancelModal = false;
 
   @ViewChild('itemInput') itemInput!: ElementRef;
   @ViewChild('amountInput') amountInput!: ElementRef;
@@ -30,10 +36,6 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   @ViewChild('categoryInput') categoryInput!: ElementRef;
   @ViewChild('reasonInput') reasonInput!: ElementRef;
   @ViewChild('descriptionInput') descriptionInput!: ElementRef;
-
-  constructor(dailyDemandService: DailyDemandService, router: Router, route: ActivatedRoute) {
-    this.logic = new DailyFormLogic(dailyDemandService, router, route);
-  }
 
   get isEditMode(): boolean {
     return this.logic.isEditMode;
@@ -113,12 +115,18 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit(): Promise<void> {
-    await this.logic.ngOnInit();
+    const result = await this.logic.ngOnInit();
+    if (result.notice) {
+      void this.notices.alert(result.notice);
+    }
     this.cdr.detectChanges();
   }
 
   ngAfterViewInit(): void {
-    this.logic.ngAfterViewInit();
+    const result = this.logic.afterViewReady();
+    if (result.scrollTop) {
+      setTimeout(() => scrollWindowToTop(), 0);
+    }
   }
 
   toggleCategoryDropdown(): void {
@@ -206,7 +214,10 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
   }
 
   onImageSelected(event: Event): void {
-    this.logic.onImageSelected(event);
+    const notice = this.logic.onImageSelected(event);
+    if (notice) {
+      void this.notices.alert(notice);
+    }
   }
 
   removeImage(index: number): void {
@@ -225,8 +236,35 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     return index;
   }
 
+  onCancel(): void {
+    if (this.isEditMode) {
+      this.showCancelModal = true;
+      return;
+    }
+
+    void this.router.navigate(['/agency/daily']);
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+  }
+
+  confirmCancel(): void {
+    this.showCancelModal = false;
+    void this.router.navigate(['/agency/daily']);
+  }
+
+  async confirmSaveAndLeave(): Promise<void> {
+    this.showCancelModal = false;
+    await this.save();
+  }
+
   async save(): Promise<void> {
     const result = await this.logic.save();
+
+    if (result.notice) {
+      void this.notices.alert(result.notice);
+    }
 
     if (result.scrollTarget) {
       const elements: Record<string, ElementRef | undefined> = {
@@ -247,20 +285,11 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
           block: 'center',
         });
       } else if (result.scrollTarget === 'receive-method') {
-        document.querySelector('.receive-method-box')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        scrollToFirstMatching('.receive-method-box');
       } else if (result.scrollTarget === 'receive-info') {
-        document.querySelector('.receive-info-box')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        scrollToFirstMatching('.receive-info-box');
       } else if (result.scrollTarget === 'service-target') {
-        document.querySelector('.service-target-area')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        scrollToFirstMatching(this.logic.serviceTargetScrollSelector());
       }
     }
   }

@@ -1,19 +1,19 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { filter, Subject, takeUntil, timeout, catchError, of } from 'rxjs';
+import { filter, takeUntil } from 'rxjs';
 import { DailyDemand, DailyDisplayStatus } from '../../../../models/agency/daily-demand';
-import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { DailyListLogic } from '../../../logic/daily/daily-list-logic';
 import type { DailyFilterState, DailyListItem, ReceiveMethod } from '../../../logic/daily/daily-list-logic';
+import type { ListUiResult } from '../../../../core/ui/list-ui-result';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
 import { PaginationComponent } from '../../../pagination/pagination.component';
 import { DailySearchBarComponent } from '../../../search-bar/daily-search-bar/daily-search-bar.component';
 import { DailyFilterComponent } from '../../../filter/daily-filter/daily-filter.component';
 import { DailySortBarComponent, SortType } from '../../../sort-bar/daily-sort-bar/daily-sort-bar.component';
 import { SupplyLoadingComponent } from '../../../loading/supply-loading/supply-loading.component';
 import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
-import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 
 @Component({
   selector: 'app-daily-list',
@@ -29,96 +29,123 @@ import { DailyCommentService } from '../../../../core/services/comments/daily-co
     DailySortBarComponent,
     DailyFilterComponent,
   ],
+  providers: [DailyListLogic],
   templateUrl: './daily-list.component.html',
   styleUrls: ['./daily-list-A.component.scss', './daily-list-B.component.scss'],
 })
 export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
-  private readonly logic = new DailyListLogic();
-  demands: DailyListItem[] = [];
-  filteredDemands: DailyListItem[] = [];
-  pagedDemands: DailyListItem[] = [];
-  selectAll = false;
-  isLoading = false;
-  private readonly destroy$ = new Subject<void>();
-  searchTerm = '';
-  currentPage = 1;
-  pageSize = 10;
-  totalPages = 1;
-  pageNumbers: number[] = [];
-  private readonly scrollPositionKey = 'agency-daily-workspace-scroll';
-  private readonly pagePositionKey = 'agency-daily-workspace-page';
-  selectedSort: SortType = 'serialNo';
-  sortAscending = true;
-  private userHasSorted = false;
-  showDeleteModal = false;
-  deleteIds: number[] = [];
-  deleteType: 'single' | 'batch' = 'single';
-  showFilterModal = false;
-  showOffShelfWarning = false;
-  showOnShelfWarning = false;
-  pendingOffShelfItem?: DailyListItem;
-  private pendingOffShelfPreviousStatus?: DailyDisplayStatus;
-  statusOptions: DailyDisplayStatus[] = ['已上架', '隱藏中', '已下架'];
-  priorityOptions: DailyDemand['priority'][] = ['普通', '緊急', '非常緊急'];
-  receiveMethodOptions: ReceiveMethod[] = ['寄送', '面交'];
-  categoryOptions: NonNullable<DailyDemand['category']>[] = [
-    '食品與飲用水',
-    '衣物與保暖用品',
-    '健康與照護用品',
-    '清潔與衛生用品',
-    '嬰幼兒用品',
-    '長者與身心障礙用品',
-    '女性生理用品',
-    '寵物與動物用品',
-    '防災與照明用品',
-    '通訊與求救用品',
-    '生活與炊事用品',
-    '其他',
-  ];
+  readonly logic = inject(DailyListLogic);
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly notices = inject(UiNoticeService);
 
-  messageOptions: string[] = ['已回覆', '未回覆'];
-
-  selectedFilters: DailyFilterState = {
-    status: [],
-    priority: [],
-    receiveMethod: [],
-    lowRemaining: false,
-    category: [],
-    messageStatus: [],
-  };
-
-  constructor(
-    private dailyDemandService: DailyDemandService,
-    private dailyCommentService: DailyCommentService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {
+  constructor() {
     history.scrollRestoration = 'manual';
   }
 
-  ngOnInit(): void {
-    const restoreListPosition = sessionStorage.getItem('restore-agency-daily-list');
-    if (restoreListPosition === 'true') {
-      const savedPage = sessionStorage.getItem(this.pagePositionKey);
-      if (savedPage) {
-        const page = Number(savedPage);
-        if (page >= 1) {
-          this.currentPage = page;
-        }
-      }
+  // ── template-compatible state (delegates to logic) ────────────────
+  get demands(): DailyListItem[] {
+    return this.logic.demands;
+  }
+  get filteredDemands(): DailyListItem[] {
+    return this.logic.filteredDemands;
+  }
+  get pagedDemands(): DailyListItem[] {
+    return this.logic.pagedDemands;
+  }
+  get selectAll(): boolean {
+    return this.logic.selectAll;
+  }
+  set selectAll(value: boolean) {
+    this.logic.selectAll = value;
+  }
+  get isLoading(): boolean {
+    return this.logic.isLoading;
+  }
+  get searchTerm(): string {
+    return this.logic.searchTerm;
+  }
+  set searchTerm(value: string) {
+    this.logic.searchTerm = value;
+  }
+  get currentPage(): number {
+    return this.logic.currentPage;
+  }
+  get pageSize(): number {
+    return this.logic.pageSize;
+  }
+  get totalPages(): number {
+    return this.logic.totalPages;
+  }
+  get pageNumbers(): number[] {
+    return this.logic.pageNumbers;
+  }
+  get selectedSort(): SortType {
+    return this.logic.selectedSort;
+  }
+  get sortAscending(): boolean {
+    return this.logic.sortAscending;
+  }
+  get selectedFilters(): DailyFilterState {
+    return this.logic.selectedFilters;
+  }
+  get showDeleteModal(): boolean {
+    return this.logic.showDeleteModal;
+  }
+  get deleteIds(): number[] {
+    return this.logic.deleteIds;
+  }
+  get deleteType(): 'single' | 'batch' {
+    return this.logic.deleteType;
+  }
+  get showFilterModal(): boolean {
+    return this.logic.showFilterModal;
+  }
+  set showFilterModal(value: boolean) {
+    this.logic.showFilterModal = value;
+  }
+  get showOffShelfWarning(): boolean {
+    return this.logic.showOffShelfWarning;
+  }
+  get showOnShelfWarning(): boolean {
+    return this.logic.showOnShelfWarning;
+  }
+  get pendingOffShelfItem(): DailyListItem | undefined {
+    return this.logic.pendingOffShelfItem;
+  }
+  get statusOptions(): DailyDisplayStatus[] {
+    return this.logic.statusOptions;
+  }
+  get priorityOptions(): DailyDemand['priority'][] {
+    return this.logic.priorityOptions;
+  }
+  get receiveMethodOptions(): ReceiveMethod[] {
+    return this.logic.receiveMethodOptions;
+  }
+  get categoryOptions(): NonNullable<DailyDemand['category']>[] {
+    return this.logic.categoryOptions;
+  }
+  get messageOptions(): string[] {
+    return this.logic.messageOptions;
+  }
 
-      sessionStorage.removeItem('restore-agency-daily-list');
-    } else {
-      this.currentPage = 1;
-      sessionStorage.removeItem(this.pagePositionKey);
-      sessionStorage.removeItem(this.scrollPositionKey);
-    }
+  // ── lifecycle ─────────────────────────────────────────────────────
+  ngOnInit(): void {
+    this.logic.stateChanges.pipe(takeUntil(this.logic.destroyed$)).subscribe((kind) => {
+      if (kind === 'mark') {
+        this.cdr.markForCheck();
+      } else {
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.logic.restorePosition();
 
     void this.loadDemands();
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        takeUntil(this.destroy$)
+        takeUntil(this.logic.destroyed$)
       )
       .subscribe((event) => {
         console.log('Router NavigationEnd：', event.urlAfterRedirects);
@@ -131,420 +158,128 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    const savedScroll = sessionStorage.getItem(this.scrollPositionKey);
-    if (!savedScroll) {
-      return;
-    }
-
-    const scrollY = Number(savedScroll);
-    window.scrollTo({
-      top: scrollY,
-      left: 0,
-      behavior: 'instant',
-    });
-
-    requestAnimationFrame(() => {
-      if (window.scrollY !== scrollY) {
-        window.scrollTo({
-          top: scrollY,
-          left: 0,
-          behavior: 'instant',
-        });
-      }
-    });
+    this.applyUiResult(this.logic.getRestoreScroll());
   }
 
-  goToAddDemand(): void {
-    this.router.navigate(['/agency/daily-form']);
-  }
-
-  goToDetail(serialNo: number | undefined): void {
-    if (serialNo == null || !Number.isInteger(Number(serialNo))) {
-      console.error('無法前往日常需求詳細頁，需求編號不正確：', serialNo);
-      return;
-    }
-    this.saveListPosition();
-    sessionStorage.setItem('restore-agency-daily-list', 'true');
-    this.router.navigate(['/agency/daily-detail', serialNo]);
-  }
-
-  goToEdit(id: number): void {
-    if (!Number.isInteger(id) || id <= 0) {
-      console.error('[DailyListComponent] 無法前往編輯頁，資料庫 id 不正確：', id);
-      return;
-    }
-    this.saveListPosition();
-    sessionStorage.setItem('restore-agency-daily-list', 'true');
-    this.router.navigate(['/agency/daily-edit', id]);
-  }
-
-  saveListPosition(): void {
-    sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
-    sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
+  ngOnDestroy(): void {
+    this.logic.destroy();
   }
 
   @HostListener('window:beforeunload')
   saveScrollPosition(): void {
-    sessionStorage.setItem(this.scrollPositionKey, String(window.scrollY));
-    sessionStorage.setItem(this.pagePositionKey, String(this.currentPage));
+    this.logic.snapshotPosition(window.scrollY);
   }
 
+  // ── navigation ────────────────────────────────────────────────────
+  goToAddDemand(): void {
+    this.applyUiResult(this.logic.goToAddDemand());
+  }
+
+  goToDetail(serialNo: number | undefined): void {
+    this.applyUiResult(this.logic.goToDetail(serialNo, window.scrollY));
+  }
+
+  goToEdit(id: number): void {
+    this.applyUiResult(this.logic.goToEdit(id, window.scrollY));
+  }
+
+  saveListPosition(): void {
+    this.logic.snapshotPosition(window.scrollY);
+  }
+
+  // ── sort ──────────────────────────────────────────────────────────
   onSortChange(value: SortType): void {
     const scrollY = window.scrollY;
-    this.selectedSort = value;
-    this.userHasSorted = true;
-    this.applySort();
-
-    setTimeout(() => {
-      window.scrollTo({
-        top: scrollY,
-        behavior: 'instant',
-      });
-    }, 0);
+    this.applyUiResult(this.logic.onSortChange(value), scrollY);
   }
 
   onSortOrderChange(ascending: boolean): void {
     const scrollY = window.scrollY;
-    this.userHasSorted = true;
-    this.sortAscending = ascending;
-    this.applySort();
-
-    setTimeout(() => {
-      window.scrollTo({
-        top: scrollY,
-        behavior: 'instant',
-      });
-    }, 0);
+    this.applyUiResult(this.logic.onSortOrderChange(ascending), scrollY);
   }
 
+  // ── load / search / filter ────────────────────────────────────────
   async loadDemands(): Promise<void> {
-    if (this.isLoading) {
-      return;
-    }
-
-    this.isLoading = true;
-    this.cdr.markForCheck();
-
-    try {
-      this.dailyDemandService
-        .getDemandsFromServer()
-        .pipe(
-          timeout(2000),
-          catchError(() => {
-            return of(this.dailyDemandService.getDemands());
-          }),
-          takeUntil(this.destroy$)
-        )
-        .subscribe(async (data) => {
-          try {
-            const mappedDemands = this.logic.mapDemands(data, (item) => this.dailyDemandService.updateDemand(item));
-
-            await Promise.all(
-              mappedDemands.map(async (item) => {
-                if (item.id == null) {
-                  item.messageCount = 0;
-                  return;
-                }
-
-                item.messageCount = await this.dailyCommentService.getCommentCount(Number(item.id));
-              })
-            );
-
-            this.demands = mappedDemands;
-            this.applyFilters(false);
-          } catch (error) {
-            console.error('載入日常需求或留言數量失敗：', error);
-            this.demands = [];
-            this.filteredDemands = [];
-            this.pagedDemands = [];
-          } finally {
-            this.isLoading = false;
-            this.cdr.detectChanges();
-          }
-        });
-    } catch (error) {
-      console.error('載入日常需求失敗：', error);
-
-      this.demands = [];
-      this.filteredDemands = [];
-      this.pagedDemands = [];
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }
+    this.applyUiResult(await this.logic.loadDemands());
   }
 
   onSearch(): void {
-    this.applyFilters();
+    this.logic.onSearch();
   }
 
   clearSearch(): void {
-    this.searchTerm = '';
-    this.applyFilters();
+    this.logic.clearSearch();
   }
 
   openFilterModal(): void {
-    this.showFilterModal = true;
+    this.logic.openFilterModal();
   }
 
   closeFilterModal(): void {
-    this.showFilterModal = false;
+    this.logic.closeFilterModal();
   }
 
   resetFilters(): void {
-    this.selectedFilters = {
-      status: [],
-      priority: [],
-      receiveMethod: [],
-      lowRemaining: false,
-      category: [],
-      messageStatus: [],
-    };
-
-    this.applyFilters();
-    this.showFilterModal = false;
+    this.logic.resetFilters();
   }
 
   applyFilterFromModal(): void {
-    this.applyFilters();
-    this.showFilterModal = false;
+    this.logic.applyFilterFromModal();
   }
 
   applyFilters(resetPage: boolean = true): void {
-    this.filteredDemands = this.logic.filterDemands(this.demands, this.searchTerm, this.selectedFilters);
-
-    if (resetPage) {
-      this.currentPage = 1;
-    }
-    if (this.userHasSorted) {
-      this.applySort();
-    } else {
-      this.updatePagination();
-    }
+    this.logic.applyFilters(resetPage);
   }
 
   applySort(): void {
-    this.logic.sortDemands(this.filteredDemands, this.selectedSort, this.sortAscending);
-    this.updatePagination();
+    this.logic.applySort();
   }
 
   updatePagination(): void {
-    const result = this.logic.getPaginationData(this.filteredDemands, this.currentPage, this.pageSize);
-    this.currentPage = result.currentPage;
-    this.totalPages = result.totalPages;
-    this.pageNumbers = result.pageNumbers;
-    this.pagedDemands = result.pagedDemands;
-    this.selectAll = result.selectAll;
+    this.logic.updatePagination();
   }
 
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePagination();
-
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'instant',
-      });
-    }
+    this.applyUiResult(this.logic.goToPage(page));
   }
 
+  // ── selection / batch ─────────────────────────────────────────────
   toggleAll(): void {
-    this.pagedDemands.forEach((item) => {
-      item.selected = this.selectAll;
-    });
+    this.logic.toggleAll();
   }
 
   hasSelected(): boolean {
-    return this.filteredDemands.some((item) => item.selected);
+    return this.logic.hasSelected();
   }
 
   editSelected(): void {
-    const selectedItems = this.filteredDemands.filter((item) => item.selected);
-    if (selectedItems.length === 0) {
-      alert('請先選擇要修改的需求');
-      return;
-    }
-
-    localStorage.setItem('editDemands', JSON.stringify(selectedItems));
-    this.saveListPosition();
-    this.router.navigate(['/agency/daily-batch-edit']);
+    this.applyUiResult(this.logic.editSelected(window.scrollY));
   }
 
+  // ── delete ────────────────────────────────────────────────────────
   openDeleteModal(id: number): void {
-    if (!Number.isInteger(id) || id <= 0) {
-      console.error('[DailyListComponent] 無法刪除，資料庫 id 不正確：', id);
-
-      return;
-    }
-    this.deleteIds = [id];
-    this.deleteType = 'single';
-    this.showDeleteModal = true;
+    this.logic.openDeleteModal(id);
   }
 
   openBatchDeleteModal(): void {
-    this.deleteIds = this.filteredDemands.filter((item) => item.selected && item.id != null).map((item) => Number(item.id));
-    if (this.deleteIds.length === 0) {
-      alert('請先選擇要刪除的需求');
-      return;
-    }
-    this.deleteType = 'batch';
-    this.showDeleteModal = true;
+    this.applyUiResult(this.logic.openBatchDeleteModal());
   }
 
   closeDeleteModal(): void {
-    this.showDeleteModal = false;
+    this.logic.closeDeleteModal();
   }
 
   async confirmDelete(): Promise<void> {
-    if (this.deleteIds.length === 0) {
-      return;
-    }
-
-    try {
-      for (const id of this.deleteIds) {
-        await this.dailyDemandService.deleteDemand(id);
-      }
-      await this.onDeleted();
-    } catch (error) {
-      console.error('刪除物資需求失敗：', error);
-      alert('刪除失敗，請確認資料是否存在或是否具有刪除權限。');
-    }
+    this.applyUiResult(await this.logic.confirmDelete());
   }
 
   async onDeleted(): Promise<void> {
-    this.showDeleteModal = false;
-    this.deleteIds = [];
-    this.selectAll = false;
-    this.cdr.detectChanges();
-    await this.loadDemands();
-    this.cdr.detectChanges();
+    await this.logic.onDeleted();
   }
 
+  // ── status / off-shelf ────────────────────────────────────────────
   async changeStatus(item: DailyListItem, newStatus: DailyDisplayStatus): Promise<void> {
-    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.serialNo === item.serialNo);
-    const originalStatus = originalItem?.status;
-
-    if (newStatus === '已上架') {
-      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
-        item.status = '下架';
-        item.displayStatus = '已下架';
-        this.refreshItemReference(item);
-        this.showOnShelfWarning = true;
-        return;
-      }
-
-      const now = new Date();
-      item.publishedAt = now.toISOString();
-      const updatedItem: DailyListItem = {
-        ...item,
-        status: '上架',
-        displayStatus: '已上架',
-        createdAt: item.createdAt ?? now.toISOString(),
-        publishedAt: now.toISOString(),
-        expectedOffShelfAt: this.calculateExpectedOffShelfDate(now, item.priority),
-        displayCreatedAt:
-          (item.createdAt ?? now.toISOString()) ? new Date(item.createdAt ?? now.toISOString()).toLocaleDateString('zh-TW') : '尚未建立',
-        displayPublishedAt: now.toLocaleDateString('zh-TW'),
-        displayOffShelfAt: this.calculateExpectedOffShelfDate(now, item.priority)
-          ? new Date(this.calculateExpectedOffShelfDate(now, item.priority)).toLocaleDateString('zh-TW')
-          : '—',
-      };
-
-      try {
-        await this.dailyDemandService.updateDemand(updatedItem);
-
-        this.refreshItemReference(updatedItem);
-        this.cdr.detectChanges();
-
-        console.log('日常物資已上架並儲存至 Supabase：', updatedItem);
-      } catch (error) {
-        console.error('上架更新失敗：', error);
-
-        alert('上架失敗，請確認 Supabase 設定。');
-
-        this.loadDemands();
-      }
-
-      item.expectedOffShelfAt = this.calculateExpectedOffShelfDate(new Date(item.publishedAt), item.priority);
-      item.status = '上架';
-      item.offShelfReason = undefined;
-      item.displayStatus = '已上架';
-      item.displayPublishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('zh-TW') : '尚未上架';
-      item.displayOffShelfAt = item.expectedOffShelfAt ? new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW') : '—';
-      item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-      this.dailyDemandService.updateDemand(item);
-      this.refreshItemReference(item);
-
-      return;
-    }
-
-    if (newStatus === '已下架') {
-      if (originalStatus === '下架') {
-        item.status = '下架';
-        item.displayStatus = '已下架';
-        this.refreshItemReference(item);
-        return;
-      }
-
-      this.pendingOffShelfItem = item;
-      this.pendingOffShelfPreviousStatus =
-        originalStatus === '隱藏' ? '隱藏中' : originalStatus === '上架' ? '已上架' : item.displayStatus;
-      this.refreshItemReference(item);
-      this.showOffShelfWarning = true;
-
-      return;
-    }
-
-    if (newStatus === '隱藏中') {
-      if (originalStatus === '下架' && originalItem?.offShelfReason === 'manual') {
-        item.status = '下架';
-        item.displayStatus = '已下架';
-        this.refreshItemReference(item);
-        return;
-      }
-
-      item.status = '隱藏';
-      item.displayStatus = '隱藏中';
-      item.publishedAt = undefined;
-      item.expectedOffShelfAt = undefined;
-      item.offShelfReason = undefined;
-      item.displayPublishedAt = '尚未上架';
-      item.displayOffShelfAt = '—';
-      item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-      this.dailyDemandService.updateDemand(item);
-      this.refreshItemReference(item);
-
-      return;
-    }
-  }
-
-  private refreshItemReference(item: DailyListItem): void {
-    const demandIndex = this.demands.findIndex((d) => d.serialNo === item.serialNo);
-
-    if (demandIndex !== -1) {
-      this.demands[demandIndex] = {
-        ...item,
-      };
-    }
-
-    const filteredIndex = this.filteredDemands.findIndex((d) => d.serialNo === item.serialNo);
-
-    if (filteredIndex !== -1) {
-      this.filteredDemands[filteredIndex] = {
-        ...item,
-      };
-    }
-
-    const pagedIndex = this.pagedDemands.findIndex((d) => d.serialNo === item.serialNo);
-
-    if (pagedIndex !== -1) {
-      this.pagedDemands[pagedIndex] = {
-        ...item,
-      };
-    }
+    this.applyUiResult(await this.logic.changeStatus(item, newStatus));
   }
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DailyDemand['priority']): string {
@@ -552,108 +287,58 @@ export class DailyListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async confirmManualOffShelf(): Promise<void> {
-    if (!this.pendingOffShelfItem) {
-      return;
-    }
-
-    const item = {
-      ...this.pendingOffShelfItem,
-    };
-
-    const originalItem = this.dailyDemandService.getDemands().find((demand) => demand.id === item.id);
-    const now = new Date();
-
-    item.status = '下架';
-    item.displayStatus = '已下架';
-    item.offShelfReason = 'manual';
-    item.expectedOffShelfAt = now.toISOString();
-    item.displayOffShelfAt = new Date(item.expectedOffShelfAt).toLocaleDateString('zh-TW');
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-    if (originalItem?.publishedAt) {
-      item.publishedAt = originalItem.publishedAt;
-
-      item.displayPublishedAt = new Date(item.publishedAt).toLocaleDateString('zh-TW');
-    } else {
-      item.displayPublishedAt = '尚未上架';
-    }
-
-    try {
-      await this.dailyDemandService.updateDemand(item);
-
-      this.refreshItemReference(item);
-      this.dismissOffShelfWarning();
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('下架更新失敗：', error);
-
-      alert('下架失敗，請稍後再試。');
-
-      this.closeOffShelfWarning();
-      this.loadDemands();
-    }
+    this.applyUiResult(await this.logic.confirmManualOffShelf());
   }
 
   cancelManualOffShelf(): void {
-    this.closeOffShelfWarning();
+    this.logic.cancelManualOffShelf();
   }
 
   async hideInsteadOfOffShelf(): Promise<void> {
-    if (!this.pendingOffShelfItem) {
-      return;
-    }
-
-    const item = {
-      ...this.pendingOffShelfItem,
-    };
-
-    item.status = '隱藏';
-    item.displayStatus = '隱藏中';
-    item.offShelfReason = undefined;
-    item.publishedAt = undefined;
-    item.expectedOffShelfAt = undefined;
-    item.displayPublishedAt = '尚未上架';
-    item.displayOffShelfAt = '—';
-    item.displayCreatedAt = item.createdAt ? new Date(item.createdAt).toLocaleDateString('zh-TW') : '尚未建立';
-
-    try {
-      await this.dailyDemandService.updateDemand(item);
-
-      this.refreshItemReference(item);
-      this.dismissOffShelfWarning();
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('隱藏失敗：', error);
-
-      alert('隱藏失敗，請稍後再試。');
-
-      this.closeOffShelfWarning();
-      this.loadDemands();
-    }
+    this.applyUiResult(await this.logic.hideInsteadOfOffShelf());
   }
 
-  /** 取消下架時還原下拉選單狀態。 */
   closeOffShelfWarning(): void {
-    if (this.pendingOffShelfItem && this.pendingOffShelfPreviousStatus) {
-      this.pendingOffShelfItem.displayStatus = this.pendingOffShelfPreviousStatus;
-      this.refreshItemReference(this.pendingOffShelfItem);
-    }
-    this.dismissOffShelfWarning();
-  }
-
-  private dismissOffShelfWarning(): void {
-    this.showOffShelfWarning = false;
-    this.pendingOffShelfItem = undefined;
-    this.pendingOffShelfPreviousStatus = undefined;
-    this.cdr.detectChanges();
+    this.logic.closeOffShelfWarning();
   }
 
   closeOnShelfWarning(): void {
-    this.showOnShelfWarning = false;
+    this.logic.closeOnShelfWarning();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  // ── UI result application ─────────────────────────────────────────
+  private applyUiResult(result: ListUiResult | undefined, preservedScrollY?: number): void {
+    if (!result) {
+      return;
+    }
+
+    if (result.notice) {
+      void this.notices.alert(result.notice);
+    }
+
+    if (result.scrollTop) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+
+    if (result.preserveScrollY && preservedScrollY != null) {
+      setTimeout(() => {
+        window.scrollTo({ top: preservedScrollY, behavior: 'instant' });
+      }, 0);
+    }
+
+    if (result.restoreScrollY != null) {
+      const scrollY = result.restoreScrollY;
+      window.scrollTo({ top: scrollY, left: 0, behavior: 'instant' });
+
+      requestAnimationFrame(() => {
+        if (window.scrollY !== scrollY) {
+          window.scrollTo({ top: scrollY, left: 0, behavior: 'instant' });
+        }
+      });
+    }
+
+    if (result.navigateTo) {
+      void this.router.navigate(result.navigateTo);
+    }
   }
 }

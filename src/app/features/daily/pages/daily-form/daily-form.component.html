@@ -11,7 +11,7 @@
 
     <!-- 取消、儲存按鈕 -->
     <div class="button-area">
-      <button class="back-btn" routerLink="/agency/daily">取消</button>
+      <button class="back-btn" type="button" (click)="onCancel()">取消</button>
       <button class="save-btn" (click)="save()">{{ isEditMode ? '儲存' : '發布需求' }}</button>
     </div>
   </div>
@@ -686,7 +686,7 @@
   </div>
 
   <div class="button-area">
-    <button class="back-btn" routerLink="/agency/daily">取消</button>
+    <button class="back-btn" type="button" (click)="onCancel()">取消</button>
     <button class="save-btn" (click)="save()">{{ isEditMode ? '儲存' : '發布需求' }}</button>
   </div>
 </div>
@@ -708,3 +708,10 @@
 ></app-confirm-modal>
 
 <app-confirm-modal *ngIf="showOnShelfWarning" mode="blocked-on-shelf" (cancelled)="closeOnShelfWarning()" (confirmed)="closeOnShelfWarning()"></app-confirm-modal>
+
+<app-leave-unsaved-modal
+  *ngIf="showCancelModal"
+  (stay)="closeCancelModal()"
+  (leave)="confirmCancel()"
+  (saveAndLeave)="confirmSaveAndLeave()"
+></app-leave-unsaved-modal>

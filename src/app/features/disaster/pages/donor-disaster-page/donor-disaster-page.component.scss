@@ -91,8 +91,11 @@
 }
 .needs-section > h1 {
   margin: 0 0 1.5rem;
-  color: var(--color-link);
-  font-size: 2rem;
+  color: var(--color-action);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-5);
+  text-align: center;
 }
 
 @include bp.mobile {
@@ -138,7 +141,7 @@
   }
 
   .needs-section > h1 {
-    font-size: 1.35rem;
+    font-size: var(--font-size-28);
   }
 }
 

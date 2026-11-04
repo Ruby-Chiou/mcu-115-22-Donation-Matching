@@ -1,0 +1,18 @@
+<div class="leave-unsaved-backdrop" role="presentation" (click)="stay.emit()">
+  <section
+    class="leave-unsaved-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="leave-unsaved-modal-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="leave-unsaved-icon" aria-hidden="true">!</div>
+    <h2 id="leave-unsaved-modal-title">要儲存後再離開嗎？</h2>
+    <p>目前有未儲存的修改，請選擇要如何處理。</p>
+    <div class="leave-unsaved-actions">
+      <button type="button" class="stay-btn" (click)="stay.emit()">繼續編輯</button>
+      <button type="button" class="leave-btn" (click)="leave.emit()">不儲存離開</button>
+      <button type="button" class="save-leave-btn" (click)="saveAndLeave.emit()" [disabled]="saveDisabled">儲存後離開</button>
+    </div>
+  </section>
+</div>

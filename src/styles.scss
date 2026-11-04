@@ -229,4 +229,15 @@ button.comment-delete.comment-delete {
   cursor: pointer;
 }
 
+/* 使用者前台頁面大標：統一顏色、大小與位置 */
+.user-page-title {
+  margin: 0;
+  color: var(--color-action);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-5);
+  text-align: center;
+  line-height: var(--line-height-tight, 1.25);
+}
+
 /* You can add global styles to this file, and also import other style files */

@@ -295,6 +295,14 @@ export class GuidedTourService {
     await this.prepareCurrentStep();
   }
 
+  async previous(): Promise<void> {
+    if (this.stepIndex() <= 0) {
+      return;
+    }
+    this.stepIndex.update((value) => value - 1);
+    await this.prepareCurrentStep();
+  }
+
   finish(): void {
     // 先清選單強制開啟，仍保持 active，header 才能把手機選單關上。
     this.clearHighlight();

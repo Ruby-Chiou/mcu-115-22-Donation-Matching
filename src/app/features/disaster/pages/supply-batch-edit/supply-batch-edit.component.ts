@@ -1,24 +1,25 @@
 import { Component, OnInit, HostListener, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../../models/agency/disaster-demand';
 import { SupplyImagePreviewComponent } from '../../../../components/modal/image-preview/supply-image-preview/supply-image-preview.component';
 import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
 import { SupplyBatchEditLogic, SupplyBatchEditState } from '../../../../components/logic/disaster/supply-batch-edit-logic';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
+import { scrollToFirstMatching } from '../../../../core/ui/dom-scroll';
 
 @Component({
   selector: 'app-supply-batch-edit',
   standalone: true,
   imports: [CommonModule, FormsModule, SupplyImagePreviewComponent, ConfirmModalComponent],
+  providers: [SupplyBatchEditLogic],
   templateUrl: './supply-batch-edit.component.html',
   styleUrls: ['./supply-batch-edit-A.component.scss', './supply-batch-edit-B.component.scss', './supply-batch-edit-C.component.scss'],
 })
 export class SupplyBatchEditComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
-
-  private logic: SupplyBatchEditLogic;
+  private logic = inject(SupplyBatchEditLogic);
+  private notices = inject(UiNoticeService);
 
   editDemands: EditableDisasterDemand[] = [];
 
@@ -46,13 +47,6 @@ export class SupplyBatchEditComponent implements OnInit {
     '居住安置與修繕用品',
     '其他',
   ];
-
-  constructor(
-    private service: DisasterDemandService,
-    private router: Router
-  ) {
-    this.logic = new SupplyBatchEditLogic(this.service, this.router);
-  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -160,7 +154,10 @@ export class SupplyBatchEditComponent implements OnInit {
   }
 
   onImageSelected(event: Event, demand: EditableDisasterDemand): void {
-    this.logic.onImageSelected(event, demand);
+    const notice = this.logic.onImageSelected(event, demand);
+    if (notice) {
+      void this.notices.alert(notice);
+    }
   }
 
   getImageUrl(image: File | string, demand: EditableDisasterDemand, index: number): string {
@@ -178,13 +175,23 @@ export class SupplyBatchEditComponent implements OnInit {
   async saveAll(): Promise<void> {
     const result = await this.logic.saveAll(this.editDemands);
 
+    for (const notice of result.notices ?? []) {
+      void this.notices.alert(notice);
+    }
+
     if (result.scrollToFirstError) {
       this.scrollToFirstError();
     }
   }
 
   scrollToFirstError(): void {
-    this.logic.scrollToFirstError();
+    setTimeout(() => {
+      const element = scrollToFirstMatching(this.logic.firstErrorScrollSelector());
+      if (element) {
+        const top = element.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 100);
   }
 
   toggleCondition(demand: EditableDisasterDemand, key: keyof EditableDisasterDemand['conditions']): void {

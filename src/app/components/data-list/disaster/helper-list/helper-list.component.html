@@ -26,10 +26,7 @@
           <!-- 搜尋 -->
           <app-helper-search-bar [searchTerm]="searchTerm" (searchChange)="onSearchChange($event)"></app-helper-search-bar>
 
-          <!-- 排序 -->
-          <app-helper-sort-bar (sortChange)="onSortChange($event)"></app-helper-sort-bar>
-
-          <!-- 篩選 -->
+          <!-- 篩選（放在排序前，讓上下鍵緊鄰排序欄位更直覺） -->
           <app-helper-filter
             [statusOptions]="statusOptions"
             [priorityOptions]="priorityOptions"
@@ -39,6 +36,9 @@
             (filterApply)="onFilterApply($event)"
             (filterReset)="resetFilters()"
           ></app-helper-filter>
+
+          <!-- 排序 -->
+          <app-helper-sort-bar (sortChange)="onSortChange($event)"></app-helper-sort-bar>
         </div>
       </div>
 

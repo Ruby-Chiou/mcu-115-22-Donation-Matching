@@ -15,6 +15,8 @@ import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
 import { DailyCommentService } from '../../../../core/services/comments/daily-comment.service';
 import { DailyComment } from '../../../../core/services/comments/daily-comment.service';
 import { AuthRedirectService } from '../../../../core/services/auth/auth-redirect.service';
+import { dailyPriorityClass } from '../../../../core/demand/priority-class';
+import { regionFromAddress } from '../../../../core/map/address-display';
 
 interface CommentThreadNode {
   comment: DailyComment;
@@ -188,32 +190,14 @@ export class DonorDailyDetailComponent implements OnInit, OnDestroy {
   // 取得優先度 CSS
   // =========================
   getPriorityClass(priority: string | undefined): string {
-    switch (priority) {
-      case '非常緊急':
-        return 'priority-urgent';
-
-      case '緊急':
-        return 'priority-normal';
-
-      case '普通':
-        return 'priority-low';
-
-      default:
-        return 'priority-default';
-    }
+    return dailyPriorityClass(priority);
   }
 
   // =========================
   // 地址只顯示到區／鄉鎮市
   // =========================
   getRegion(address: string | undefined): string {
-    if (!address) {
-      return '';
-    }
-
-    const match = address.match(/^(.*?[縣市].*?[區鄉鎮市])/);
-
-    return match ? match[1] : address;
+    return regionFromAddress(address);
   }
 
   // =========================

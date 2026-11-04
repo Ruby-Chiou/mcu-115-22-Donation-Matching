@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EditableDailyDemand } from '../../../../models/agency/daily-demand';
 import { SupplyImagePreviewComponent } from '../../../../components/modal/image-preview/supply-image-preview/supply-image-preview.component';
 import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
 import { DailyBatchEditLogic } from '../../../../components/logic/daily/daily-batch-edit.logic';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
+import { scrollToFirstMatching } from '../../../../core/ui/dom-scroll';
 
 @Component({
   selector: 'app-daily-batch-edit',
@@ -20,11 +22,8 @@ import { DailyBatchEditLogic } from '../../../../components/logic/daily/daily-ba
   ],
 })
 export class DailyBatchEditComponent implements OnInit {
-  private readonly logic: DailyBatchEditLogic;
-
-  constructor(logic: DailyBatchEditLogic) {
-    this.logic = logic;
-  }
+  private readonly logic = inject(DailyBatchEditLogic);
+  private readonly notices = inject(UiNoticeService);
 
   get editDemands(): EditableDailyDemand[] {
     return this.logic.editDemands;
@@ -71,7 +70,21 @@ export class DailyBatchEditComponent implements OnInit {
   }
 
   async saveAll(): Promise<void> {
-    await this.logic.saveAll();
+    const result = await this.logic.saveAll();
+
+    for (const notice of result.notices ?? []) {
+      void this.notices.alert(notice);
+    }
+
+    if (result.scrollToFirstError) {
+      setTimeout(() => {
+        const element = scrollToFirstMatching(this.logic.firstErrorScrollSelector());
+        if (element) {
+          const top = element.getBoundingClientRect().top + window.scrollY - 120;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }, 100);
+    }
   }
 
   cancel(): void {
@@ -147,7 +160,10 @@ export class DailyBatchEditComponent implements OnInit {
   }
 
   onImageSelected(event: Event, demand: EditableDailyDemand): void {
-    this.logic.onImageSelected(event, demand);
+    const notice = this.logic.onImageSelected(event, demand);
+    if (notice) {
+      void this.notices.alert(notice);
+    }
   }
 
   removeImage(demand: EditableDailyDemand, index: number): void {

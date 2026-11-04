@@ -9,6 +9,11 @@ import { DisasterClosedModalService } from '../../../../core/services/disaster-c
 import { DonorReceiptRequestComponent } from '../../../../components/receipt/donor-receipt-request/donor-receipt-request.component';
 import { MemberProfileService } from '../../../../core/services/member-center/member-profile.service';
 import { ReceiptLineItem, emptyReceiptLine, validateDonorReceiptRequest } from '../../../../core/receipt/donation-receipt-document';
+import {
+  applyDonationQuantityInput,
+  clampDonationQuantity,
+  resolveDonationQuantityCap,
+} from '../../../../core/donation/donation-quantity';
 
 @Component({
   selector: 'app-donor-disaster-supply-form',
@@ -20,8 +25,8 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   private readonly closedModal = inject(DisasterClosedModalService);
 
   demand: DisasterDemand | undefined;
-  // 目前這筆需求最多可以捐多少
-  maxDonationQuantity = 0;
+  // 目前這筆需求最多可以捐多少（剩餘需求與通用上限取較小值）
+  maxDonationQuantity = resolveDonationQuantityCap();
   donorName = '';
   phone = '';
   // 自動填入帳戶資料
@@ -72,7 +77,7 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       }
       
       this.demand = demand;
-      this.maxDonationQuantity = demand.remaining ?? 0;
+      this.maxDonationQuantity = resolveDonationQuantityCap(demand.remaining);
       await this.loadProfileDefaults();
       this.cdr.detectChanges();
     } catch (error) {
@@ -154,22 +159,9 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
   // 限制捐贈數量  //
   limitQuantityInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    // 沒有輸入
-    if (!input.value) {
-      this.quantity = null;
-      return;
-    }
-    let value = Number(input.value);
-    // 最少 1
-    if (value < 1) {
-      value = 1;
-    }
-    // 不可以超過剩餘需求
-    if (value > this.maxDonationQuantity) {
-      value = this.maxDonationQuantity;
-    }
-    input.value = value.toString();
-    this.quantity = value;
+    const next = applyDonationQuantityInput(input.value, this.maxDonationQuantity);
+    input.value = next.display;
+    this.quantity = next.quantity;
   }
   // 設定捐贈數量//
   setQuantity(value: number | null): void {
@@ -177,15 +169,7 @@ export class DonorDisasterSupplyFormComponent implements OnInit {
       this.quantity = null;
       return;
     }
-    if (value < 1) {
-      this.quantity = 1;
-      return;
-    }
-    if (value > this.maxDonationQuantity) {
-      this.quantity = this.maxDonationQuantity;
-      return;
-    }
-    this.quantity = value;
+    this.quantity = clampDonationQuantity(value, this.maxDonationQuantity);
   }
   // textarea 自動增加高度  //
   autoResize(event: Event): void {

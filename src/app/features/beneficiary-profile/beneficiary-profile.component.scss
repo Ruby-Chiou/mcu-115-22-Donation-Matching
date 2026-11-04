@@ -5,6 +5,10 @@
   margin: 28px auto 72px;
 }
 
+.directory-header {
+  text-align: center;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--color-link);
@@ -13,12 +17,14 @@
 
 .directory-header h1 {
   margin: 0 0 8px;
-  color: var(--color-text-dark);
-  font-size: 34px;
+  color: var(--color-action);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-5);
 }
 
 .directory-header p:last-child {
-  margin: 0;
+  margin: 0 auto;
   max-width: 640px;
   color: #445866;
   line-height: var(--line-height-loose);

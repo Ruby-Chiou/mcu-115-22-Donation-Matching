@@ -201,7 +201,9 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
     this.pendingDemand = null;
   }
 
-  async saveAll(): Promise<void> {
+  async saveAll(): Promise<{ scrollToFirstError?: boolean; notices?: string[] }> {
+    const notices: string[] = [];
+
     try {
       this.editDemands.forEach((item) => {
         item.itemError = false;
@@ -281,8 +283,7 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
       );
 
       if (invalid) {
-        this.scrollToFirstError();
-        return;
+        return { scrollToFirstError: true };
       }
 
       const invalidManualOffShelf = this.editDemands.find((item) => {
@@ -298,11 +299,10 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
       });
 
       if (invalidManualOffShelf) {
-        alert(`需求 A${invalidManualOffShelf.serialNo} 為使用者主動下架，無法重新上架。`);
-
         invalidManualOffShelf.status = '下架';
-
-        return;
+        return {
+          notices: [`需求 A${invalidManualOffShelf.serialNo} 為使用者主動下架，無法重新上架。`],
+        };
       }
 
       this.editDemands.forEach((item) => {
@@ -345,10 +345,10 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
         const isCurrentManualOffShelf = item.status === '下架' && item.offShelfReason === 'manual';
 
         if (item.status === '上架' && (isOriginalManualOffShelf || isCurrentManualOffShelf)) {
-          alert(`需求 A${item.serialNo} 為使用者主動下架，無法重新上架。`);
-
           item.status = '下架';
-          return;
+          return {
+            notices: [`需求 A${item.serialNo} 為使用者主動下架，無法重新上架。`],
+          };
         }
 
         if (item.status === '上架') {
@@ -388,9 +388,9 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
         const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
 
         if (!addressSuccess) {
-          alert(`需求 A${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
-
-          return;
+          return {
+            notices: [`需求 A${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`],
+          };
         }
 
         const files = this.imageFiles[item.serialNo] || [];
@@ -415,10 +415,11 @@ export class DailyBatchEditLogic extends DailyBatchEditLogicBase {
           refresh: Date.now(),
         },
       });
+
+      return { notices };
     } catch (error) {
       console.error('批次修改日常物資需求失敗：', error);
-
-      alert('批次修改失敗，請確認網路或 Supabase 權限後再試。');
+      return { notices: ['批次修改失敗，請確認網路或 Supabase 權限後再試。'] };
     }
   }
 

@@ -1,17 +1,21 @@
-import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, AfterViewInit, HostListener, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DisasterDemandService } from '../../../../core/services/agency-disaster-demand/disaster-demand.service';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { SupplyImagePreviewComponent } from '../../../../components/modal/image-preview/supply-image-preview/supply-image-preview.component';
 import { ConfirmModalComponent } from '../../../../shared/ui/confirm-modal/confirm-modal.component';
+import { LeaveUnsavedModalComponent } from '../../../../shared/ui/leave-unsaved-modal/leave-unsaved-modal.component';
 import { DisasterDemand, ConditionStatus } from '../../../../models/agency/disaster-demand';
 import { SupplyFormLogic, SupplyFormStatusState } from '../../../../components/logic/disaster/supply-form-logic';
+import { UiNoticeService } from '../../../../core/ui/ui-notice.service';
+import { scrollWindowToTop } from '../../../../core/ui/dom-scroll';
 
 @Component({
   selector: 'app-supply-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SupplyImagePreviewComponent, ConfirmModalComponent],
+  imports: [CommonModule, FormsModule, SupplyImagePreviewComponent, ConfirmModalComponent, LeaveUnsavedModalComponent],
+  providers: [SupplyFormLogic],
   templateUrl: './supply-form.component.html',
   styleUrls: [
     './supply-form-A.component.scss',
@@ -21,7 +25,8 @@ import { SupplyFormLogic, SupplyFormStatusState } from '../../../../components/l
   ],
 })
 export class SupplyFormComponent implements OnInit, AfterViewInit {
-  private readonly logic: SupplyFormLogic;
+  private readonly logic = inject(SupplyFormLogic);
+  private readonly notices = inject(UiNoticeService);
 
   isEditMode = false;
   submitted = false;
@@ -54,6 +59,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
   showOffShelfWarning = false;
   showOnShelfWarning = false;
+  showCancelModal = false;
 
   private originalStatus: DisasterDemand['status'] = '隱藏';
   private originalOffShelfReason: DisasterDemand['offShelfReason'] | undefined;
@@ -118,9 +124,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
-  ) {
-    this.logic = new SupplyFormLogic(this.disasterDemandService);
-  }
+  ) {}
 
   async ngOnInit(): Promise<void> {
     const rawId = this.route.snapshot.paramMap.get('id');
@@ -183,12 +187,7 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'instant',
-      });
-    }, 0);
+    setTimeout(() => scrollWindowToTop(), 0);
   }
 
   @HostListener('document:click', ['$event'])
@@ -299,6 +298,29 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
 
   async getCoordinatesFromAddress(address: string): Promise<boolean> {
     return this.logic.getCoordinatesFromAddress(this.demand, address);
+  }
+
+  onCancel(): void {
+    if (this.isEditMode) {
+      this.showCancelModal = true;
+      return;
+    }
+
+    void this.router.navigate(['/agency/disaster']);
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+  }
+
+  confirmCancel(): void {
+    this.showCancelModal = false;
+    void this.router.navigate(['/agency/disaster']);
+  }
+
+  async confirmSaveAndLeave(): Promise<void> {
+    this.showCancelModal = false;
+    await this.save();
   }
 
   async save(): Promise<void> {
@@ -425,7 +447,10 @@ export class SupplyFormComponent implements OnInit, AfterViewInit {
   }
 
   onImageSelected(event: Event): void {
-    this.logic.onImageSelected(this.demand, this.imageFiles, event);
+    const notice = this.logic.onImageSelected(this.demand, this.imageFiles, event);
+    if (notice) {
+      void this.notices.alert(notice);
+    }
   }
 
   getImageUrl(image: File | string, index: number): string {

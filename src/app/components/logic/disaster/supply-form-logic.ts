@@ -1,6 +1,9 @@
+import { Injectable } from '@angular/core';
 import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
 import { DisasterDemandService } from '../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { DisasterDemand } from '../../../models/agency/disaster-demand';
+import { calculateExpectedOffShelfAt, DISASTER_OFF_SHELF_DAYS } from '../../../core/demand/expected-off-shelf';
+import { validateDemandImageUpload } from '../../../core/demand/image-upload-rules';
 
 export interface SupplyFormStatusState {
   isEditMode: boolean;
@@ -17,6 +20,7 @@ export interface SaveDemandResult {
   manualOffShelfBlocked: boolean;
 }
 
+@Injectable()
 export class SupplyFormLogic {
   constructor(private readonly disasterDemandService: DisasterDemandService) {}
 
@@ -313,23 +317,7 @@ export class SupplyFormLogic {
   }
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DisasterDemand['priority']): string {
-    const offShelfDate = new Date(publishedDate);
-
-    switch (priority) {
-      case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-
-      case '緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 14);
-        break;
-
-      case '非常緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 7);
-        break;
-    }
-
-    return offShelfDate.toISOString();
+    return calculateExpectedOffShelfAt(publishedDate, priority, DISASTER_OFF_SHELF_DAYS);
   }
 
   toggleCondition(demand: DisasterDemand, key: keyof DisasterDemand['conditions']): void {
@@ -420,27 +408,19 @@ export class SupplyFormLogic {
     demand.customConditions[index] = input.value;
   }
 
-  onImageSelected(demand: DisasterDemand, imageFiles: (File | string)[], event: Event): void {
+  onImageSelected(demand: DisasterDemand, imageFiles: (File | string)[], event: Event): string | null {
     const input = event.target as HTMLInputElement;
 
     if (!input.files || input.files.length === 0) {
-      return;
+      return null;
     }
 
     const file = input.files[0];
+    const uploadError = validateDemandImageUpload(imageFiles.length, file);
 
-    if (imageFiles.length >= 5) {
-      alert('最多只能上傳 5 張圖片');
+    if (uploadError) {
       input.value = '';
-
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('圖片大小不可超過 5MB');
-      input.value = '';
-
-      return;
+      return uploadError;
     }
 
     imageFiles.push(file);
@@ -463,6 +443,7 @@ export class SupplyFormLogic {
     reader.readAsDataURL(file);
 
     input.value = '';
+    return null;
   }
 
   getImageUrl(demand: DisasterDemand, image: File | string, index: number): string {

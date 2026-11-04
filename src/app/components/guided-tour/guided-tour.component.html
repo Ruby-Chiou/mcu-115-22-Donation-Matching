@@ -27,6 +27,9 @@
     <p>{{ step.body }}</p>
     <div class="actions">
       <button type="button" class="ghost" (click)="tour.skip()">結束</button>
+      @if (tour.stepNumber() > 1) {
+        <button type="button" class="ghost" (click)="tour.previous()">上一步</button>
+      }
       <button type="button" class="primary" (click)="tour.next()">
         {{ tour.stepNumber() >= tour.stepTotal() ? '完成' : '下一步' }}
       </button>

@@ -66,9 +66,6 @@
           <span>捐助者導覽</span>
           <i class="fa-solid fa-chevron-down arrow"></i>
         </button>
-        @if (selectedGuide() === 'donor') {
-          <div class="guide-selector-content"><app-donor-guide></app-donor-guide></div>
-        }
       </div>
 
       <div class="guide-selector-item">
@@ -83,11 +80,15 @@
           <span>受助者導覽</span>
           <i class="fa-solid fa-chevron-down arrow"></i>
         </button>
-        @if (selectedGuide() === 'agency') {
-          <div class="guide-selector-content"><app-agency-guide [currentRole]="currentRole()" /></div>
-        }
       </div>
     </div>
+
+    @if (selectedGuide() === 'donor') {
+      <div class="guide-selector-content"><app-donor-guide></app-donor-guide></div>
+    }
+    @if (selectedGuide() === 'agency') {
+      <div class="guide-selector-content"><app-agency-guide [currentRole]="currentRole()" /></div>
+    }
 
   </section>
 

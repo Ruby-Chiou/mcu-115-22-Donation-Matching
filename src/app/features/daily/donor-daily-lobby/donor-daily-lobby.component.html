@@ -1,14 +1,20 @@
-<app-donor-daily-search (searchChange)="onSearchChange($event)"></app-donor-daily-search>
+<section class="donor-daily-page">
+  <header class="workspace-title">
+    <h1 class="user-page-title">日常捐助</h1>
+  </header>
 
-<app-donor-daily-filter
-  (filterChange)="onFilterChange($event)"
-  (sortChange)="onSortChange($event)"
-></app-donor-daily-filter>
+  <app-donor-daily-search (searchChange)="onSearchChange($event)"></app-donor-daily-search>
 
-<section class="daily-lobby-supplies" id="daily-lobby-supplies">
-  <app-donor-daily-card-list></app-donor-daily-card-list>
-</section>
+  <app-donor-daily-filter
+    (filterChange)="onFilterChange($event)"
+    (sortChange)="onSortChange($event)"
+  ></app-donor-daily-filter>
 
-<section class="daily-lobby-thanks" aria-label="感謝名單">
-  <app-thank-you-list></app-thank-you-list>
+  <section class="daily-lobby-supplies" id="daily-lobby-supplies">
+    <app-donor-daily-card-list></app-donor-daily-card-list>
+  </section>
+
+  <section class="daily-lobby-thanks" aria-label="感謝名單">
+    <app-thank-you-list></app-thank-you-list>
+  </section>
 </section>

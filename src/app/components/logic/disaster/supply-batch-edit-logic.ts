@@ -1,5 +1,8 @@
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { geocodeTaiwan, taiwanRoadName } from '../../../core/map/geocoding';
+import { calculateExpectedOffShelfAt, DISASTER_OFF_SHELF_DAYS } from '../../../core/demand/expected-off-shelf';
+import { validateDemandImageUpload } from '../../../core/demand/image-upload-rules';
 import { DisasterDemandService } from '../../../core/services/agency-disaster-demand/disaster-demand.service';
 import { EditableDisasterDemand } from '../../../models/agency/disaster-demand';
 
@@ -11,8 +14,10 @@ export interface SupplyBatchEditState {
 
 export interface SaveAllResult {
   scrollToFirstError: boolean;
+  notices?: string[];
 }
 
+@Injectable()
 export class SupplyBatchEditLogic {
   constructor(
     private readonly service: DisasterDemandService,
@@ -282,23 +287,17 @@ export class SupplyBatchEditLogic {
     }
   }
 
-  onImageSelected(event: Event, demand: EditableDisasterDemand): void {
+  onImageSelected(event: Event, demand: EditableDisasterDemand): string | null {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) {
-      return;
+      return null;
     }
     const file = input.files[0];
+    const uploadError = validateDemandImageUpload(demand.imageFiles.length, file);
 
-    if (demand.imageFiles.length >= 5) {
-      alert('最多只能上傳 5 張圖片');
+    if (uploadError) {
       input.value = '';
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('圖片大小不可超過 5MB');
-      input.value = '';
-      return;
+      return uploadError;
     }
 
     demand.imageFiles.push(file);
@@ -315,6 +314,7 @@ export class SupplyBatchEditLogic {
     };
     reader.readAsDataURL(file);
     input.value = '';
+    return null;
   }
 
   getImageUrl(image: File | string, demand: EditableDisasterDemand, index: number): string {
@@ -403,6 +403,7 @@ export class SupplyBatchEditLogic {
     }
     this.prepareConditions(editDemands);
     editDemands = editDemands.map((demand) => this.checkNaturalOffShelf(demand));
+    const notices: string[] = [];
 
     for (const item of editDemands) {
       item.customConditions = item.customConditions.filter((condition) => condition.trim() !== '');
@@ -418,7 +419,7 @@ export class SupplyBatchEditLogic {
       if (item.status === '上架') {
         const blocked = originalStatus === '下架' && originalOffShelfReason === 'manual';
         if (blocked) {
-          alert(`需求編號 ${item.serialNo} 為使用者主動下架，無法重新上架。`);
+          notices.push(`需求編號 ${item.serialNo} 為使用者主動下架，無法重新上架。`);
           item.status = '下架';
           item.offShelfReason = 'manual';
           if (originalItem?.expectedOffShelfAt) {
@@ -460,9 +461,9 @@ export class SupplyBatchEditLogic {
       const addressSuccess = await this.getCoordinatesFromAddress(item.address, item);
 
       if (!addressSuccess) {
-        alert(`需求編號 ${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`);
         return {
           scrollToFirstError: false,
+          notices: [...notices, `需求編號 ${item.serialNo} 的地址無法找到位置，請確認地址是否正確。`],
         };
       }
       console.log(`需求編號 ${item.serialNo} 經緯度：`, item.latitude, item.longitude);
@@ -473,6 +474,7 @@ export class SupplyBatchEditLogic {
 
     return {
       scrollToFirstError: false,
+      notices,
     };
   }
 
@@ -509,19 +511,9 @@ export class SupplyBatchEditLogic {
     });
   }
 
-  scrollToFirstError(): void {
-    setTimeout(() => {
-      const firstErrorElement = document.querySelector('.invalid, .invalid-box') as HTMLElement | null;
-      if (!firstErrorElement) {
-        return;
-      }
-
-      const top = firstErrorElement.getBoundingClientRect().top + window.scrollY - 120;
-      window.scrollTo({
-        top,
-        behavior: 'smooth',
-      });
-    }, 100);
+  /** 元件應捲動至第一個錯誤欄位。 */
+  firstErrorScrollSelector(): string {
+    return '.invalid, .invalid-box';
   }
 
   toggleCondition(demand: EditableDisasterDemand, key: keyof EditableDisasterDemand['conditions']): void {
@@ -559,20 +551,7 @@ export class SupplyBatchEditLogic {
   }
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: EditableDisasterDemand['priority']): string {
-    const offShelfDate = new Date(publishedDate);
-    switch (priority) {
-      case '普通':
-        offShelfDate.setDate(offShelfDate.getDate() + 30);
-        break;
-      case '緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 14);
-        break;
-      case '非常緊急':
-        offShelfDate.setDate(offShelfDate.getDate() + 7);
-        break;
-    }
-
-    return offShelfDate.toISOString();
+    return calculateExpectedOffShelfAt(publishedDate, priority, DISASTER_OFF_SHELF_DAYS);
   }
 
   trackByIndex(index: number): number {

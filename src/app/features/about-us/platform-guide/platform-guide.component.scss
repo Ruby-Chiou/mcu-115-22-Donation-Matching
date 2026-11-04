@@ -54,11 +54,13 @@
 .guide-hero h1 {
   margin: 0 0 15px;
 
-  color: var(--color-text-main);
+  color: var(--color-action);
 
-  font-size: 42px;
+  font-size: var(--font-size-32);
 
   font-weight: var(--font-weight-bold);
+
+  letter-spacing: var(--tracking-5);
 }
 
 
@@ -155,12 +157,8 @@
 }
 
 .guide-selector-content {
-  width: calc(200% + var(--space-18));
+  width: 100%;
   margin-top: 30px;
-}
-
-.guide-selector-item:nth-child(2) .guide-selector-content {
-  margin-left: calc(-100% - var(--space-18));
 }
 
 
@@ -279,13 +277,7 @@
   }
 
   .guide-selector-content {
-    width: 100%;
     margin-top: 10px;
-    margin-left: 0;
-  }
-
-  .guide-selector-item:nth-child(2) .guide-selector-content {
-    margin-left: 0;
   }
 
 }
@@ -298,7 +290,7 @@
 
 
   .guide-hero h1 {
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
   }
 
 
@@ -324,13 +316,7 @@
   }
 
   .guide-selector-content {
-    width: 100%;
     margin-top: 8px;
-    margin-left: 0;
-  }
-
-  .guide-selector-item:nth-child(2) .guide-selector-content {
-    margin-left: 0;
   }
 
 }
