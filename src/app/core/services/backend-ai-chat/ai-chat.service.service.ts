@@ -21,10 +21,26 @@ export interface AiChatResponse {
 })
 export class AiChatService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = environment.aiChatApiUrl;
 
-  /** 附上平台摘要，避免後端提示詞漏掉志工／協力者等相關問答。 */
+  /** 正式環境走 Supabase Edge；本機填了 backendApiUrl 才打 C#。 */
+  private get apiUrl(): string {
+    const backend = environment.backendApiUrl?.replace(/\/$/, '');
+    if (backend) {
+      return `${backend}/api/Assistant/chat`;
+    }
+    return environment.aiChatApiUrl;
+  }
+
+  /** 附上平台摘要，避免提示詞漏掉志工／協力者等相關問答。 */
   chat(message: string, role: string, history: ChatHistoryItem[], system = AI_ASSISTANT_BRIEF): Observable<AiChatResponse> {
+    const backend = environment.backendApiUrl?.replace(/\/$/, '');
+    const headers: Record<string, string> = backend
+      ? { 'Content-Type': 'application/json' }
+      : {
+          apikey: environment.supabasePublishableKey,
+          Authorization: `Bearer ${environment.supabasePublishableKey}`,
+        };
+
     return this.http.post<AiChatResponse>(
       this.apiUrl,
       {
@@ -33,12 +49,7 @@ export class AiChatService {
         history,
         system,
       },
-      {
-        headers: {
-          apikey: environment.supabasePublishableKey,
-          Authorization: `Bearer ${environment.supabasePublishableKey}`,
-        },
-      },
+      { headers },
     );
   }
 }

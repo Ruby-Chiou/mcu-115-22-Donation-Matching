@@ -474,6 +474,13 @@ video.preview-image {
   }
 }
 
+.shortcut-hint {
+  margin: 0 0 12px;
+  color: var(--color-text-slate-dark);
+  font-size: var(--font-size-14);
+  line-height: 1.5;
+}
+
 .reason-error {
   margin: 9px 0 0;
   color: var(--color-error-hot);

@@ -410,15 +410,22 @@
         @if (reviewResult?.reason) {
           <p>{{ reviewResult?.reason }}</p>
         }
+        @if (reviewResult?.status === 'needs_supplement') {
+          <p class="shipping-guide-link">
+            不必撤回重填：到捐助紀錄同一筆申請，重新上傳更清楚的照片／影片後再送審即可。
+          </p>
+        }
       </div>
-      @if (donationMethod === '寄送') {
+      @if (donationMethod === '寄送' && reviewResult?.status !== 'needs_supplement') {
         <p class="shipping-guide-link">
           審核通過後再寄貨。各物流寄送步驟請看
           <a routerLink="/shipping-guide">寄送教學</a>。
         </p>
       }
       <div class="success-buttons">
-        <button type="button" class="back-button" (click)="goToHistory()">到捐助紀錄看進度</button>
+        <button type="button" class="back-button" (click)="goToHistory()">
+          {{ reviewResult?.status === 'needs_supplement' ? '到捐助紀錄重新上傳' : '到捐助紀錄看進度' }}
+        </button>
       </div>
     </div>
     }

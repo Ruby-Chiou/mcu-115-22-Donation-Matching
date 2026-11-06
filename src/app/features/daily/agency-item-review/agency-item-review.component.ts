@@ -291,7 +291,7 @@ export class AgencyItemReviewComponent implements OnInit {
     }
 
     if (donation.status === 'needs_supplement') {
-      return '待捐助者補件';
+      return '待補件（仍可人工決定）';
     }
 
     if (donation.status === 'pending_human_review') {

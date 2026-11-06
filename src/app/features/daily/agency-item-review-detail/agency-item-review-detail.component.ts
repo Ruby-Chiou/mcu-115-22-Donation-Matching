@@ -184,8 +184,14 @@ export class AgencyItemReviewDetailComponent implements OnInit {
     this.selectedVideo = null;
   }
 
+  /** 待人工、需補件、AI 進行中都可人工決定（決定後鎖定，晚到的補件無效）。 */
+  canHumanDecide(): boolean {
+    const status = this.donation?.status;
+    return status === 'pending_human_review' || status === 'needs_supplement' || status === 'pending_ai_review';
+  }
+
   openRejectModal(): void {
-    if (this.isSubmittingDecision || this.donation?.status !== 'pending_human_review') {
+    if (this.isSubmittingDecision || !this.canHumanDecide()) {
       return;
     }
 
@@ -272,7 +278,7 @@ export class AgencyItemReviewDetailComponent implements OnInit {
   }
 
   async acceptDonation(): Promise<void> {
-    if (!this.donation || this.isSubmittingDecision || this.donation.status !== 'pending_human_review') {
+    if (!this.donation || this.isSubmittingDecision || !this.canHumanDecide()) {
       return;
     }
 
@@ -303,7 +309,7 @@ export class AgencyItemReviewDetailComponent implements OnInit {
     } catch (error) {
       console.error('接受物資失敗：', error);
 
-      this.errorMessage = '接受物資失敗，請稍後再試。';
+      this.errorMessage = error instanceof Error ? error.message : '接受物資失敗，請稍後再試。';
     } finally {
       this.isSubmittingDecision = false;
       this.cdr.detectChanges();
@@ -311,7 +317,7 @@ export class AgencyItemReviewDetailComponent implements OnInit {
   }
 
   async rejectDonation(): Promise<void> {
-    if (!this.donation || this.isSubmittingDecision || this.donation.status !== 'pending_human_review') {
+    if (!this.donation || this.isSubmittingDecision || !this.canHumanDecide()) {
       return;
     }
 
@@ -357,7 +363,7 @@ export class AgencyItemReviewDetailComponent implements OnInit {
     } catch (error) {
       console.error('不接受物資失敗：', error);
 
-      this.errorMessage = '不接受物資失敗，請稍後再試。';
+      this.errorMessage = error instanceof Error ? error.message : '不接受物資失敗，請稍後再試。';
     } finally {
       this.isSubmittingDecision = false;
       this.cdr.detectChanges();

@@ -115,8 +115,18 @@
 
       <p>捐助者尚未上傳照片或影片。</p>
     </section>
-    } @if ( donation.status === 'pending_human_review' ) {
+    } @if ( canHumanDecide() ) {
     <section class="decision-section">
+      @if (donation.status === 'needs_supplement') {
+      <p class="shortcut-hint">
+        AI 尚未通過、捐助者可能還在補件。你仍可依目前照片人工決定；一旦接受或不接受，後續補件會無效並以你的判定為準。
+      </p>
+      }
+      @if (donation.status === 'pending_ai_review') {
+      <p class="shortcut-hint">
+        AI 還在跑或剛重送。你可直接人工決定並鎖定，晚到的 AI／補件結果會無效。
+      </p>
+      }
       @if (imageFiles.length === 0) {
       <p class="reason-error">沒有照片時不能按接受，請改用不接受。</p>
       }

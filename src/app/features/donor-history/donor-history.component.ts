@@ -15,6 +15,7 @@ import { DonationReceiptService } from '../../core/services/member-center/donati
 import { DonorDonationHistoryService } from '../../core/services/member-center/donor-donation-history.service';
 import { PublicDonationThankService } from '../../core/services/member-center/public-donation-thank.service';
 import { UiNoticeService } from '../../core/ui/ui-notice.service';
+import { DonationFile } from '../../models/agency/item-review';
 import { AgencyCertificate, isImageCertificate, isPdfCertificate } from '../../models/member/agency-certificate';
 import {
   DONATION_HISTORY_FILTER_OPTIONS,
@@ -186,10 +187,19 @@ export class DonorHistoryComponent implements OnInit {
   readonly quantityDraft = signal(1);
   readonly noteDraft = signal('');
   readonly methodDraft = signal('寄送');
-  readonly supplementFiles = signal<File[]>([]);
+  readonly supplementImages = signal<File[]>([]);
+  readonly supplementVideos = signal<File[]>([]);
   readonly proofFile = signal<File | null>(null);
   readonly proofSaving = signal(false);
   readonly proofMessage = signal('');
+  readonly materialFiles = signal<DonationFile[]>([]);
+  readonly mediaLoading = signal(false);
+  readonly mediaError = signal('');
+  readonly previewImage = signal<DonationFile | null>(null);
+  readonly previewVideo = signal<DonationFile | null>(null);
+
+  readonly materialImages = computed(() => this.materialFiles().filter((file) => file.file_type === 'material_image'));
+  readonly materialVideos = computed(() => this.materialFiles().filter((file) => file.file_type === 'material_video'));
 
   selectRecord(record: DonorDonationHistory): void {
     this.applySelection(record);
@@ -235,6 +245,48 @@ export class DonorHistoryComponent implements OnInit {
     this.methodDraft.set(record.donationMethod || '寄送');
     this.proofFile.set(null);
     this.proofMessage.set('');
+    this.previewImage.set(null);
+    this.previewVideo.set(null);
+    void this.loadMaterialMedia(record.id);
+  }
+
+  private async loadMaterialMedia(donationId: string): Promise<void> {
+    this.mediaLoading.set(true);
+    this.mediaError.set('');
+    this.materialFiles.set([]);
+
+    try {
+      const files = await this.donationService.getDonationFiles(donationId);
+      if (this.selectedId() !== donationId) {
+        return;
+      }
+      this.materialFiles.set(files);
+    } catch (error) {
+      if (this.selectedId() !== donationId) {
+        return;
+      }
+      console.error('載入物資媒體失敗：', error);
+      this.mediaError.set(error instanceof Error ? error.message : '無法載入物資照片／影片');
+    } finally {
+      if (this.selectedId() === donationId) {
+        this.mediaLoading.set(false);
+      }
+    }
+  }
+
+  openMaterialImage(file: DonationFile): void {
+    this.previewVideo.set(null);
+    this.previewImage.set(file);
+  }
+
+  openMaterialVideo(file: DonationFile): void {
+    this.previewImage.set(null);
+    this.previewVideo.set(file);
+  }
+
+  closeMediaPreview(): void {
+    this.previewImage.set(null);
+    this.previewVideo.set(null);
   }
 
   needsHandoverProof(record: DonorDonationHistory): boolean {
@@ -278,15 +330,21 @@ export class DonorHistoryComponent implements OnInit {
     return this.historyService.canSupplement(record);
   }
 
-  onSupplementFilesSelected(event: Event): void {
+  onSupplementImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.supplementFiles.set(Array.from(input.files ?? []));
+    this.supplementImages.set(Array.from(input.files ?? []));
+  }
+
+  onSupplementVideosSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.supplementVideos.set(Array.from(input.files ?? []));
   }
 
   async submitSupplement(record: DonorDonationHistory): Promise<void> {
-    const files = this.supplementFiles();
-    if (files.length === 0) {
-      this.pendingMessage.set('請先選擇至少一張物資照片再送審。');
+    const images = this.supplementImages();
+    const videos = this.supplementVideos();
+    if (images.length === 0) {
+      this.pendingMessage.set('請先選擇至少一張物資照片再送審（影片可選）。');
       return;
     }
 
@@ -301,16 +359,18 @@ export class DonorHistoryComponent implements OnInit {
         donationMethod: this.methodDraft() || record.donationMethod,
       }).catch(() => undefined);
 
-      await this.donationService.uploadSupplementFiles(record.id, files);
+      await this.donationService.uploadSupplementFiles(record.id, images, videos);
       await this.historyService.resubmitAfterSupplement(record.id);
 
-      let reviewNote = '已補件並重新送審。';
+      let reviewNote = '已重新上傳並送審。';
       try {
         const ai = await this.donationService.runAiReviewAfterSubmit(record.id);
-        if (ai.status === 'needs_supplement') {
-          reviewNote = '照片仍不足，請再補上傳後送審。';
+        if (ai.status === 'human_approved' || ai.status === 'human_rejected') {
+          reviewNote = '機構已先完成人工審核並鎖定，這次補件無效，結果以人工判定為準。';
+        } else if (ai.status === 'needs_supplement') {
+          reviewNote = `AI 仍未通過：${ai.reason || '請依原因更換更清楚的照片／影片後再送審。'}`;
         } else if (ai.status === 'pending_human_review') {
-          reviewNote = 'AI 已審完，已送到受助機構待人工確認。';
+          reviewNote = 'AI 已通過，已送到受助機構待人工確認。';
         } else {
           reviewNote = `已補件送審：${ai.decisionText || ai.status}`;
         }
@@ -321,13 +381,16 @@ export class DonorHistoryComponent implements OnInit {
             : '已補件，但 AI 沒跑完，請稍後再試或等機構查看。';
       }
 
-      this.supplementFiles.set([]);
+      this.supplementImages.set([]);
+      this.supplementVideos.set([]);
       this.editingPending.set(false);
       this.pendingMessage.set(reviewNote);
       await this.historyService.loadHistory();
       const refreshed = this.historyService.records().find((item) => item.id === record.id);
       if (refreshed) {
         this.applySelection(refreshed);
+      } else {
+        await this.loadMaterialMedia(record.id);
       }
     } catch (error) {
       this.pendingMessage.set(error instanceof Error ? error.message : '補件送審失敗，請稍後再試。');

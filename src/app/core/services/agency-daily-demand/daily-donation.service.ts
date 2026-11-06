@@ -185,13 +185,16 @@ export class DonationService {
   }
 
   async reviewDonationWithAi(donationId: string): Promise<AiReviewResult> {
+    const usingBackend = !!environment.backendApiUrl?.trim();
     const response = await fetch(this.aiReviewUrl(donationId), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: environment.supabasePublishableKey,
-        Authorization: `Bearer ${environment.supabasePublishableKey}`,
-      },
+      headers: usingBackend
+        ? { 'Content-Type': 'application/json', Accept: 'application/json' }
+        : {
+            'Content-Type': 'application/json',
+            apikey: environment.supabasePublishableKey,
+            Authorization: `Bearer ${environment.supabasePublishableKey}`,
+          },
     });
     const rawBody = await response.text();
     const payload = ((): {
@@ -267,10 +270,9 @@ export class DonationService {
 
   private async handoffAiToHumanReview(donationId: string, reason: string): Promise<AiReviewResult> {
     const safeReason = reason.trim().length >= 8 ? reason.trim() : '系統影像辨識未完成，請機構直接依照片人工確認。';
-    const { data, error } = await this.supabase.rpc('record_ai_donation_review', {
+    // 略過／基礎設施失敗：轉人工，不要寫成 AI rejected（那會進需補件）
+    const { data, error } = await this.supabase.rpc('handoff_donation_to_human_review', {
       p_donation_id: donationId,
-      p_decision: 'rejected',
-      p_condition: '無法自動判定',
       p_reason: safeReason,
     });
 
@@ -293,18 +295,24 @@ export class DonationService {
       status: body?.status ?? 'pending_human_review',
       decision: body?.decision ?? 'rejected',
       decisionText: body?.decisionText ?? '已轉交機構人工審核',
-      detectedCondition: body?.detectedCondition ?? '無法自動判定',
+      detectedCondition: body?.detectedCondition ?? '改由人工確認',
       reason: body?.reason ?? safeReason,
       conditionMatches: Boolean(body?.conditionMatches),
     };
   }
 
-  /** 直接打 Supabase Edge Function（本機／正式站同一網址）。 */
+  /**
+   * 正式環境走 Supabase Edge Function（避開 Render 休眠；保質期提示詞在 Edge）。
+   * 僅當 backendApiUrl 有值時（本機 C# 開發）才改打後端。
+   */
   private aiReviewUrl(donationId: string): string {
-    const configuredSupabaseUrl = environment.supabaseUrl?.replace(/\/$/, '');
-    const fallbackUrl = environment.aiReviewApiUrl.replace(/\/$/, '');
-    const base = configuredSupabaseUrl ? `${configuredSupabaseUrl}/functions/v1/ai-donation-review` : fallbackUrl;
-    return `${base}?donationId=${encodeURIComponent(donationId)}`;
+    const backend = environment.backendApiUrl?.replace(/\/$/, '');
+    if (backend) {
+      return `${backend}/api/ai-donation-reviews/donations/${encodeURIComponent(donationId)}/ai-review`;
+    }
+
+    const edgeUrl = environment.aiReviewApiUrl.replace(/\/$/, '');
+    return `${edgeUrl}?donationId=${encodeURIComponent(donationId)}`;
   }
 
   private toAiReviewResult(donationId: string, data: unknown): AiReviewResult {
@@ -573,27 +581,26 @@ export class DonationService {
   }
 
   /**
-   * 寫入人工審核結果。
+   * 寫入人工審核結果並鎖定。
+   * 可在待人工／需補件／AI 進行中決定；通過後捐助者後續補件無效。
    */
   async updateHumanReviewDecision(donationId: string, humanDecision: HumanDecision, humanReason: string | null): Promise<void> {
     const isAccepted = humanDecision === 'accepted';
 
-    const updateData = {
-      status: isAccepted ? 'human_approved' : 'human_rejected',
-
-      human_decision: humanDecision,
-
-      human_reason: isAccepted ? null : humanReason,
-
-      human_checked_at: new Date().toISOString(),
-    };
-
-    const { error } = await this.supabase.from(this.tableName).update(updateData).eq('id', donationId).eq('status', 'pending_human_review');
+    const { data, error } = await this.supabase.rpc('decide_donation_human_review', {
+      p_donation_id: donationId,
+      p_decision: humanDecision,
+      p_reason: isAccepted ? null : humanReason,
+    });
 
     if (error) {
       console.error('更新人工審核結果失敗：', error);
+      throw new Error(error.message || '更新人工審核結果失敗');
+    }
 
-      throw error;
+    const body = data as { status?: string; locked?: boolean; message?: string } | null;
+    if (body?.status !== 'human_approved' && body?.status !== 'human_rejected') {
+      throw new Error(body?.message || '目前狀態無法人工審核');
     }
 
     const { error: noticeError } = await this.supabase.rpc('notify_donation_review', {

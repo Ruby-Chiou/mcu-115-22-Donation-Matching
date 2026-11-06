@@ -134,11 +134,11 @@ export function donationNextStep(record: DonorDonationHistory): DonationNextStep
   if (record.status === 'needs_supplement' || record.status === 'human_rejected') {
     return {
       kind: 'supplement',
-      listLabel: record.status === 'needs_supplement' ? '需補件再送審' : '可補件再送審',
+      listLabel: record.status === 'needs_supplement' ? '重新上傳再送審' : '可補件再送審',
       detailLabel:
         record.status === 'needs_supplement'
-          ? 'AI 審核未通過，請在同一筆補上傳照片後再送審'
-          : '機構未通過，可在同一筆補件後再送審',
+          ? 'AI 未通過，請在同一筆重新上傳照片／影片後再送審'
+          : '機構未通過，可在同一筆補上傳照片／影片後再送審',
     };
   }
 

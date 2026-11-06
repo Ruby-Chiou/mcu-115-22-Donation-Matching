@@ -1,10 +1,12 @@
 {
   "/api/ai-donation-reviews": {
-    "target": "https://wxryryyiakzkeeoorlrq.supabase.co",
-    "secure": true,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/api/ai-donation-reviews/donations/([^/]+)/ai-review": "/functions/v1/ai-donation-review?donationId=$1"
-    }
+    "target": "http://localhost:5015",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/Assistant": {
+    "target": "http://localhost:5015",
+    "secure": false,
+    "changeOrigin": true
   }
 }

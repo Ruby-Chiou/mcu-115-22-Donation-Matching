@@ -260,8 +260,11 @@ export class DonorDonationHistoryService {
     );
   }
 
-  /** 需補件或機構未通過：同一筆補圖後再送審，不必重跑申請。 */
+  /** AI 未過可反覆補件；人工已通過則鎖定不可再補。人工不通過仍可刻意再補。 */
   canSupplement(record: DonorDonationHistory): boolean {
+    if (record.status === 'human_approved') {
+      return false;
+    }
     return record.status === 'needs_supplement' || record.status === 'human_rejected';
   }
 

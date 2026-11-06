@@ -9,11 +9,15 @@ export const environment = {
   memberDemoUid: null as string | null,
 
   /**
-   * AI 審核／客服：Supabase Edge Functions（免費、不長睡）。
-   * 需在 Dashboard Secrets 設定 OPENROUTER_API_KEY。
-   * aiReviewApiUrl 僅供 supabaseUrl 未設定時向下相容。
+   * 正式環境不走 Render（免費方案會休眠）。
+   * AI 審核／客服改由下方 Supabase Edge Functions 直連 OpenRouter。
+   * 本機若要打 C# Backend 開發，可暫時填 http://localhost:5015。
    */
+  backendApiUrl: '',
+
+  /** 捐助影像 AI 審核（含保質期規則） */
   aiReviewApiUrl: 'https://wxryryyiakzkeeoorlrq.supabase.co/functions/v1/ai-donation-review',
+  /** AI 客服聊天 */
   aiChatApiUrl: 'https://wxryryyiakzkeeoorlrq.supabase.co/functions/v1/ai-assistant-chat',
   aiInspectionApiUrl: 'http://127.0.0.1:8000',
 };

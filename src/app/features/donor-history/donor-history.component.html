@@ -117,7 +117,7 @@
           @if (canSupplement(record)) {
             <div class="tracking-form pending-revise closed-action-panel">
               <p class="shortcut-hint">
-                在<strong>同一筆申請</strong>補上傳物資照片後再送審即可，不必重跑整段捐助流程。
+                AI 未通過時可反覆重新上傳照片／影片直到通過。若機構已先完成人工審核，後續補件會無效，以人工結果為準。
                 @if (record.aiReason) {
                   <br />原因：{{ record.aiReason }}
                 }
@@ -126,13 +126,22 @@
                 }
               </p>
               <label>
-                補上傳物資照片
-                <input type="file" accept="image/*" multiple (change)="onSupplementFilesSelected($event)" />
+                重新上傳物資照片
+                <input type="file" accept="image/*" multiple (change)="onSupplementImagesSelected($event)" />
               </label>
-              @if (supplementFiles().length > 0) {
-                <p class="shortcut-hint">已選 {{ supplementFiles().length }} 張照片</p>
+              <label>
+                重新上傳物資影片（選填）
+                <input type="file" accept="video/*" multiple (change)="onSupplementVideosSelected($event)" />
+              </label>
+              @if (supplementImages().length > 0 || supplementVideos().length > 0) {
+                <p class="shortcut-hint">
+                  已選 {{ supplementImages().length }} 張照片
+                  @if (supplementVideos().length > 0) {
+                    、{{ supplementVideos().length }} 個影片
+                  }
+                </p>
               }
-              @if (record.status === 'needs_supplement') {
+              @if (record.status === 'needs_supplement' || record.status === 'human_rejected') {
                 <label>
                   實際物資（可一併修正）
                   <input [value]="materialDraft()" (input)="materialDraft.set($any($event.target).value)" />
@@ -144,7 +153,7 @@
               }
               <div class="detail-actions">
                 <button type="button" class="btn btn-primary" [disabled]="pendingSaving()" (click)="submitSupplement(record)">
-                  {{ pendingSaving() ? '送出中...' : '補件並重新送審' }}
+                  {{ pendingSaving() ? '送出中...' : '重新上傳並送審' }}
                 </button>
               </div>
               @if (pendingMessage()) {
@@ -295,6 +304,34 @@
               }
             </p>
           }
+
+          <section class="material-media-section" aria-label="已上傳的物資媒體">
+            <h3 class="media-heading">已上傳的物資照片／影片</h3>
+            @if (mediaLoading()) {
+              <p class="shortcut-hint">媒體載入中…</p>
+            } @else if (mediaError()) {
+              <p class="tracking-message">{{ mediaError() }}</p>
+            } @else if (materialImages().length === 0 && materialVideos().length === 0) {
+              <p class="shortcut-hint">這筆還沒有物資照片或影片。</p>
+            } @else {
+              <div class="material-media-grid">
+                @for (file of materialImages(); track file.id) {
+                  <button type="button" class="media-thumb" [disabled]="!file.public_url" (click)="openMaterialImage(file)">
+                    @if (file.public_url) {
+                      <img [src]="file.public_url" [alt]="file.original_filename || '物資照片'" />
+                    }
+                    <span>{{ file.original_filename || '物資照片' }}</span>
+                  </button>
+                }
+                @for (file of materialVideos(); track file.id) {
+                  <button type="button" class="media-thumb media-thumb-video" [disabled]="!file.public_url" (click)="openMaterialVideo(file)">
+                    <span class="video-badge">影片</span>
+                    <span>{{ file.original_filename || '物資影片' }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </section>
 
           <dl class="detail-list">
             <dt>需求物資</dt>
@@ -524,4 +561,34 @@
       </div>
     }
   }
+}
+
+@if (previewImage(); as image) {
+  <div class="viewer-backdrop" role="presentation" (click)="closeMediaPreview()">
+    <div class="viewer-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="viewer-head">
+        <h3>{{ image.original_filename || '物資照片' }}</h3>
+        <button type="button" class="btn btn-outline" (click)="closeMediaPreview()">關閉</button>
+      </div>
+      @if (image.public_url) {
+        <img class="viewer-file" [src]="image.public_url" [alt]="image.original_filename || '物資照片'" />
+      }
+    </div>
+  </div>
+}
+
+@if (previewVideo(); as video) {
+  <div class="viewer-backdrop" role="presentation" (click)="closeMediaPreview()">
+    <div class="viewer-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="viewer-head">
+        <h3>{{ video.original_filename || '物資影片' }}</h3>
+        <button type="button" class="btn btn-outline" (click)="closeMediaPreview()">關閉</button>
+      </div>
+      @if (video.public_url) {
+        <video class="viewer-file" controls autoplay preload="metadata">
+          <source [src]="video.public_url" [type]="video.mime_type" />
+        </video>
+      }
+    </div>
+  </div>
 }
