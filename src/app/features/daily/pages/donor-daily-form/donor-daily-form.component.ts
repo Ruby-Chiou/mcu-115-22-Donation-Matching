@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { DailyDemand } from '../../../../models/agency/daily-demand';
 import { DailyDemandService } from '../../../../core/services/agency-daily-demand/daily-demand.service';
 import { AiReviewResult, DonationService } from '../../../../core/services/agency-daily-demand/daily-donation.service';
@@ -16,7 +17,7 @@ import {
 } from '../../../../core/donation/donation-quantity';
 @Component({
   selector: 'app-donor-daily-form',
-  imports: [CommonModule, FormsModule, DonorReceiptRequestComponent],
+  imports: [CommonModule, FormsModule, RouterLink, DonorReceiptRequestComponent],
   templateUrl: './donor-daily-form.component.html',
   styleUrl: './donor-daily-form.component.scss',
 })
@@ -84,6 +85,10 @@ export class DonorDailyFormComponent implements OnInit {
 
   get allowsMeetup(): boolean {
     return !!this.demand?.receiveMethod?.面交;
+  }
+
+  get requiresShelfLife(): boolean {
+    return !!this.demand?.requireShelfLife;
   }
 
   /** 區塊編號：有捐贈方式時從 3 起算，否則從 2 起算。 */
@@ -158,6 +163,9 @@ export class DonorDailyFormComponent implements OnInit {
   accountPhone = '0912345678';
   actualMaterial = '';
   quantity: number | null = null;
+  manufactureDate = '';
+  shelfLifeDuration = '';
+  expiryDate = '';
   note = '';
   needReceipt = '';
   needThankYou = '';
@@ -224,6 +232,13 @@ export class DonorDailyFormComponent implements OnInit {
     if (this.materialFiles.length === 0) {
       alert('請先上傳物資照片');
       return;
+    }
+
+    if (this.requiresShelfLife) {
+      if (!this.manufactureDate.trim() || !this.shelfLifeDuration.trim() || !this.expiryDate.trim()) {
+        alert('此需求需提供保質期：請填寫製造日期、保存時長與保存期限');
+        return;
+      }
     }
 
     if (this.needReceipt === 'yes') {
@@ -299,6 +314,9 @@ export class DonorDailyFormComponent implements OnInit {
         receiptLines: this.needReceipt === 'yes' ? this.receiptLines : null,
         materialFiles: this.materialFiles,
         materialVideoFiles: this.materialVideoFiles,
+        manufactureDate: this.requiresShelfLife ? this.manufactureDate : null,
+        shelfLifeDuration: this.requiresShelfLife ? this.shelfLifeDuration.trim() : null,
+        expiryDate: this.requiresShelfLife ? this.expiryDate : null,
       });
 
       console.log('捐助資料、圖片和影片已成功儲存：', donation);

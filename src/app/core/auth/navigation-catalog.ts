@@ -28,6 +28,7 @@ const PROGRESS: NavItem = {
   sub: [
     { name: '捐助紀錄', link: '/donor/history' },
     { name: '配送查詢', link: '/tracking' },
+    { name: '寄送教學', link: '/shipping-guide' },
   ],
 };
 

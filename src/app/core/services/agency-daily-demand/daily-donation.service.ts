@@ -68,6 +68,9 @@ export class DonationService {
     receiptLines: { name: string; quantity: number; unit: string; estimatedPrice: number | null }[] | null;
     materialFiles: File[];
     materialVideoFiles: File[];
+    manufactureDate?: string | null;
+    shelfLifeDuration?: string | null;
+    expiryDate?: string | null;
   }) {
     const donorUid = await this.resolveDonorUid();
 
@@ -91,6 +94,9 @@ export class DonationService {
         donor_email: data.donorEmail,
         donor_id_no: data.donorIdNo,
         receipt_lines: data.receiptLines,
+        manufacture_date: data.manufactureDate || null,
+        shelf_life_duration: data.shelfLifeDuration || null,
+        expiry_date: data.expiryDate || null,
         status: 'pending_ai_review',
       })
       .select()

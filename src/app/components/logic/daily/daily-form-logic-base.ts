@@ -91,6 +91,10 @@ export class DailyFormLogicBase {
     note: '',
     brand: '',
     category: '',
+    requireShelfLife: false,
+    logisticsStoreChain: '',
+    logisticsStoreName: '',
+    logisticsStoreAddress: '',
   };
 
   constructor(dailyDemandService: DailyDemandService, router: Router, route: ActivatedRoute) {
@@ -343,7 +347,10 @@ export class DailyFormLogicBase {
     }
   }
 
-  limitSimpleTextLength(field: 'unit' | 'recipient' | 'address' | 'phone', maxLength: number): void {
+  limitSimpleTextLength(
+    field: 'unit' | 'recipient' | 'address' | 'phone' | 'logisticsStoreName' | 'logisticsStoreAddress',
+    maxLength: number,
+  ): void {
     const value = this.demand[field];
 
     if (typeof value === 'string' && value.length > maxLength) {

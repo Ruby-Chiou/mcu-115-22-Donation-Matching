@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export type DisasterFilters = MaterialFilters | HelperFilters;
   templateUrl: './donor-disaster-card-list.component.html',
   styleUrl: './donor-disaster-card-list.component.scss',
 })
-export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
+export class DonorDisasterCardListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() type: 'material' | 'helper' = 'material';
 
   @Input() filters: DisasterFilters = {
@@ -51,6 +51,7 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
   currentPage = 1;
   pageSize = 8;
   isLoading = true;
+  private hasLoadedOnce = false;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -67,27 +68,53 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
     this.disasterDemandService.demandChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.type === 'material') {
-        void this.loadDemands();
+        void this.loadDemands({ resetPage: false, showLoading: false });
+      }
+    });
+
+    this.helperDemandService.demandChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (this.type === 'helper') {
+        void this.loadDemands({ resetPage: false, showLoading: false });
       }
     });
 
     await Promise.all([this.disasterDemandService.waitUntilLoaded(), this.helperDemandService.waitUntilLoaded()]);
 
-    await this.loadDemands();
+    await this.loadDemands({ resetPage: true, showLoading: true });
   }
 
-  private async loadDemands(): Promise<void> {
-    this.isLoading = true;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.hasLoadedOnce) {
+      return;
+    }
+
+    if (changes['filters'] || changes['type']) {
+      this.currentPage = 1;
+      this.clampCurrentPage();
+    }
+  }
+
+  private async loadDemands(options: { resetPage: boolean; showLoading: boolean }): Promise<void> {
+    if (options.showLoading || !this.hasLoadedOnce) {
+      this.isLoading = true;
+    }
 
     try {
-      await Promise.all([this.disasterDemandService.reload(), this.helperDemandService.reload()]);
+      // 首次才強制 reload；後續訂閱只讀目前快取，避免點分頁時整頁重載跳回第 1 頁。
+      if (!this.hasLoadedOnce) {
+        await Promise.all([this.disasterDemandService.reload(), this.helperDemandService.reload()]);
+      }
 
       this.demands = this.disasterDemandService.getDemands().filter((demand) => demand.status === '上架');
-
-      // 直接從全表過濾，避免 getHelpers() 與前端再過濾時狀態不一致。
       this.helpers = this.helperDemandService.getDemands().filter((helper) => helper.status === '上架');
 
-      this.currentPage = 1;
+      if (options.resetPage) {
+        this.currentPage = 1;
+      } else {
+        this.clampCurrentPage();
+      }
+
+      this.hasLoadedOnce = true;
     } catch (error) {
       console.error('載入捐贈需求失敗：', error);
 
@@ -132,8 +159,7 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
         helperLocations.some((location) => (helper.location || '').includes(location));
       const region = taiwanAddressRegion(helper.location || '');
       const cityMatch =
-        cities.length === 0 ||
-        (!!region.city && cities.some((city) => sameTaiwanCity(city, region.city)));
+        cities.length === 0 || (!!region.city && cities.some((city) => sameTaiwanCity(city, region.city)));
 
       return typeMatch && locationMatch && cityMatch;
     });
@@ -143,13 +169,11 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
 
   get paginatedDemands(): DisasterDemand[] {
     const start = (this.currentPage - 1) * this.pageSize;
-
     return this.filteredDemands.slice(start, start + this.pageSize);
   }
 
   get paginatedHelpers(): HelperDemand[] {
     const start = (this.currentPage - 1) * this.pageSize;
-
     return this.filteredHelpers.slice(start, start + this.pageSize);
   }
 
@@ -158,16 +182,11 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
   }
 
   get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
+    return Math.max(1, Math.ceil(this.totalItems / this.pageSize) || 1);
   }
 
   get pageNumbers(): number[] {
-    return Array.from(
-      {
-        length: this.totalPages,
-      },
-      (_, index) => index + 1
-    );
+    return Array.from({ length: this.totalPages }, (_, index) => index + 1);
   }
 
   goToPage(page: number): void {
@@ -176,6 +195,20 @@ export class DonorDisasterCardListComponent implements OnInit, OnDestroy {
     }
 
     this.currentPage = page;
+    this.scrollListIntoView();
+  }
+
+  private clampCurrentPage(): void {
+    this.currentPage = Math.min(Math.max(1, this.currentPage), this.totalPages);
+  }
+
+  private scrollListIntoView(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const target = document.querySelector('.card-list') || document.querySelector('.needs-section');
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   ngOnDestroy(): void {

@@ -4,19 +4,19 @@
 
   <div class="role-options">
     <button type="button" class="role-card donor" (click)="selectRole('donor')">
-      <span class="role-title">捐助者</span>
-      <span class="role-subtitle">個人或企業捐助者</span>
+      <span class="role-title">個人或企業捐助者</span>
+      <span class="role-subtitle">捐助者</span>
     </button>
 
     <button type="button" class="role-card agency" (click)="selectRole('agency')">
-      <span class="role-title">受助者</span>
-      <span class="role-subtitle">社福團體 / 機構</span>
+      <span class="role-title">社福團體 / 機構</span>
+      <span class="role-subtitle">受助者</span>
     </button>
 
     @if (showAdmin) {
       <button type="button" class="role-card admin" (click)="selectRole('admin')">
-        <span class="role-title">管理者</span>
-        <span class="role-subtitle">平台管理帳號</span>
+        <span class="role-title">平台管理帳號</span>
+        <span class="role-subtitle">管理者</span>
       </button>
     }
   </div>

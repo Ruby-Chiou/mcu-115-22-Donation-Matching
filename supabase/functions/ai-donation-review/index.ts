@@ -34,6 +34,9 @@ type DonationRow = {
   status: string;
   actual_material: string | null;
   demand_id: number | null;
+  manufacture_date: string | null;
+  shelf_life_duration: string | null;
+  expiry_date: string | null;
 };
 
 type FileRow = {
@@ -59,7 +62,7 @@ Deno.serve(async (req) => {
     const admin = adminClient();
     const { data: donation, error: donationError } = await admin
       .from('donor_daily_donations')
-      .select('id, status, actual_material, demand_id')
+      .select('id, status, actual_material, demand_id, manufacture_date, shelf_life_duration, expiry_date')
       .eq('id', donationId)
       .maybeSingle();
 
@@ -72,7 +75,7 @@ Deno.serve(async (req) => {
       return json(404, { message: '找不到這筆捐助。' });
     }
 
-    const demandItem = await loadDemandItem(admin, donation.demand_id);
+    const demand = await loadDemandMeta(admin, donation.demand_id);
     const imageUrls = await loadImageUrls(admin, donationId);
 
     if (imageUrls.length === 0) {
@@ -96,7 +99,11 @@ Deno.serve(async (req) => {
     try {
       vision = await askVision(apiKey, {
         claimedMaterial: donation.actual_material ?? '',
-        demandItem,
+        demandItem: demand.item,
+        requireShelfLife: demand.requireShelfLife,
+        manufactureDate: donation.manufacture_date ?? '',
+        shelfLifeDuration: donation.shelf_life_duration ?? '',
+        expiryDate: donation.expiry_date ?? '',
         imageUrls,
       });
     } catch (error) {
@@ -136,13 +143,24 @@ async function resolveDonationId(req: Request): Promise<string> {
   return typeof body?.donationId === 'string' ? body.donationId.trim() : '';
 }
 
-async function loadDemandItem(admin: ReturnType<typeof adminClient>, demandId: number | null): Promise<string> {
+async function loadDemandMeta(
+  admin: ReturnType<typeof adminClient>,
+  demandId: number | null,
+): Promise<{ item: string; requireShelfLife: boolean }> {
   if (!demandId) {
-    return '';
+    return { item: '', requireShelfLife: false };
   }
 
-  const { data } = await admin.from('agency_daily_supply_items').select('item').eq('id', demandId).maybeSingle();
-  return typeof data?.item === 'string' ? data.item : '';
+  const { data } = await admin
+    .from('agency_daily_supply_items')
+    .select('item, require_shelf_life')
+    .eq('id', demandId)
+    .maybeSingle();
+
+  return {
+    item: typeof data?.item === 'string' ? data.item : '',
+    requireShelfLife: !!data?.require_shelf_life,
+  };
 }
 
 async function loadImageUrls(admin: ReturnType<typeof adminClient>, donationId: string): Promise<string[]> {
@@ -173,17 +191,39 @@ async function loadImageUrls(admin: ReturnType<typeof adminClient>, donationId: 
 
 async function askVision(
   apiKey: string,
-  input: { claimedMaterial: string; demandItem: string; imageUrls: string[] },
+  input: {
+    claimedMaterial: string;
+    demandItem: string;
+    requireShelfLife: boolean;
+    manufactureDate: string;
+    shelfLifeDuration: string;
+    expiryDate: string;
+    imageUrls: string[];
+  },
 ): Promise<{ decision: 'accepted' | 'rejected'; condition: string; reason: string }> {
+  const shelfLifeRules = input.requireShelfLife
+    ? [
+        'Shelf-life requirement is ON for this demand.',
+        'You MUST reject if none of the photos clearly show a readable manufacture date, expiry date, or best-before date on the packaging/label.',
+        'Blurry, cropped-away, or missing date text counts as reject.',
+        `Donor-entered manufacture date: ${input.manufactureDate || '(empty)'}`,
+        `Donor-entered shelf-life duration: ${input.shelfLifeDuration || '(empty)'}`,
+        `Donor-entered expiry date: ${input.expiryDate || '(empty)'}`,
+        'If dates are visible but do not roughly match the entered values, prefer reject and explain the mismatch.',
+      ]
+    : ['Shelf-life requirement is OFF. Do not require date labels on packaging.'];
+
   const prompt = [
-    '你是物資捐助平台的照片審核助理。',
-    '請只根據照片判斷：畫面中的物資是否大致符合捐助者填寫的實際物資名稱，以及需求項目。',
-    '通過條件：照片清楚可見物資，且種類與填寫內容相符（品牌細節可略有差異）。',
-    '不通過條件：無關畫面、自拍、螢幕截圖、空箱、明顯不同種類的物資、或完全看不清。',
-    `需求項目：${input.demandItem || '（未提供）'}`,
-    `捐助者填寫的實際物資：${input.claimedMaterial || '（空白）'}`,
-    '請只回傳 JSON，不要 markdown：',
-    '{"decision":"accepted 或 rejected","condition":"辨識到的物資狀態或種類","reason":"至少 20 字的中文說明"}',
+    'You are a photo reviewer for a donation-matching platform.',
+    'Decide only from the photos whether the goods roughly match the claimed material and the demand item.',
+    'Accept when the goods are clearly visible and the type matches (brand details may differ slightly).',
+    'Reject for unrelated scenes, selfies, screenshots, empty boxes, clearly wrong item types, or unreadable photos.',
+    ...shelfLifeRules,
+    `Demand item: ${input.demandItem || '(none)'}`,
+    `Donor claimed material: ${input.claimedMaterial || '(empty)'}`,
+    'Return JSON only, no markdown.',
+    'The "reason" field MUST be Traditional Chinese (Taiwan), at least 20 characters.',
+    '{"decision":"accepted or rejected","condition":"detected goods condition or type","reason":"Traditional Chinese explanation"}',
   ].join('\n');
 
   const imageUrls = input.imageUrls.slice(0, 2);

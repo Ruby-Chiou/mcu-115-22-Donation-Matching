@@ -126,8 +126,19 @@
   </div>
 
   <div class="quantity-row">
-    <h4>地址</h4>
-    <p class="description">{{ getRegion(demand.address) || '無' }}</p>
+    <h4>收貨地區</h4>
+    <p class="description">
+      {{ getRegion(demand.address) || '無' }}
+      <span class="muted-note">（僅顯示縣市／區域；完整宅配地址與超商門市於機構審核通過後，在捐助紀錄查看）</span>
+    </p>
+    @if (demand.requireShelfLife) {
+      <p class="description shelf-life-flag">此需求需提供保質期資訊，並上傳可辨識日期的照片。</p>
+    }
+    @if (demand.logisticsStoreChain || demand.logisticsStoreName) {
+      <p class="description">
+        收貨方式含超商取貨（{{ demand.logisticsStoreChain || '超商' }}）；門市詳情於審核通過後顯示。
+      </p>
+    }
   </div>
 
   <div class="quantity-row">

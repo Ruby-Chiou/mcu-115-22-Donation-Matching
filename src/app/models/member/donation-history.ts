@@ -10,9 +10,16 @@ export interface DonorDonationHistory {
   demandCategory: string;
   recipient: string;
   address: string;
+  /** 需求端指定的超商品牌／門市（審核通過後顯示） */
+  demandStoreChain: string;
+  demandStoreName: string;
+  demandStoreAddress: string;
   actualMaterial: string;
   quantity: number;
   donationMethod: '寄送' | '面交' | string;
+  manufactureDate: string;
+  shelfLifeDuration: string;
+  expiryDate: string;
   status: DonationStatus;
   aiDecision: string | null;
   aiReason: string | null;

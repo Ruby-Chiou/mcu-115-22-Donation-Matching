@@ -29,6 +29,9 @@ interface DonationHistoryRow {
   tracking_no: string | null;
   logistics_store_name: string | null;
   logistics_store_address: string | null;
+  manufacture_date: string | null;
+  shelf_life_duration: string | null;
+  expiry_date: string | null;
   receipt_confirmed_at: string | null;
   proof_uploaded_at: string | null;
   receipt_partial: boolean | null;
@@ -42,6 +45,9 @@ interface DemandMetaRow {
   category: string | null;
   recipient: string | null;
   address: string | null;
+  logistics_store_chain: string | null;
+  logistics_store_name: string | null;
+  logistics_store_address: string | null;
 }
 
 @Injectable({
@@ -87,6 +93,9 @@ export class DonorDonationHistoryService {
         tracking_no,
         logistics_store_name,
         logistics_store_address,
+        manufacture_date,
+        shelf_life_duration,
+        expiry_date,
         receipt_confirmed_at,
         proof_uploaded_at,
         receipt_partial,
@@ -97,7 +106,7 @@ export class DonorDonationHistoryService {
       .eq('donor_uid', uid)
       .order('created_at', { ascending: false });
 
-    if (error && /logistics_store_|proof_uploaded_at/i.test(error.message ?? '')) {
+    if (error && /logistics_store_|proof_uploaded_at|manufacture_date|shelf_life|expiry_date/i.test(error.message ?? '')) {
       return this.loadHistoryLegacy(uid);
     }
 
@@ -171,18 +180,30 @@ export class DonorDonationHistoryService {
       return map;
     }
 
-    const { data, error } = await this.supabaseService.client
+    const withStore = await this.supabaseService.client
       .from(this.demandTable)
-      .select('id, item, category, recipient, address')
+      .select('id, item, category, recipient, address, logistics_store_chain, logistics_store_name, logistics_store_address')
       .in('id', uniqueIds);
 
-    if (error) {
-      console.error('讀取需求資料失敗：', error);
+    const result = withStore.error
+      ? await this.supabaseService.client
+          .from(this.demandTable)
+          .select('id, item, category, recipient, address')
+          .in('id', uniqueIds)
+      : withStore;
+
+    if (result.error) {
+      console.error('讀取需求資料失敗：', result.error);
       return map;
     }
 
-    for (const row of (data ?? []) as DemandMetaRow[]) {
-      map.set(row.id, row);
+    for (const row of (result.data ?? []) as DemandMetaRow[]) {
+      map.set(row.id, {
+        ...row,
+        logistics_store_chain: row.logistics_store_chain ?? null,
+        logistics_store_name: row.logistics_store_name ?? null,
+        logistics_store_address: row.logistics_store_address ?? null,
+      });
     }
 
     return map;
@@ -197,9 +218,15 @@ export class DonorDonationHistoryService {
       demandCategory: demand?.category ?? '',
       recipient: demand?.recipient ?? '',
       address: demand?.address ?? '',
+      demandStoreChain: demand?.logistics_store_chain ?? '',
+      demandStoreName: demand?.logistics_store_name ?? '',
+      demandStoreAddress: demand?.logistics_store_address ?? '',
       actualMaterial: row.actual_material ?? '',
       quantity: row.quantity ?? 0,
       donationMethod: row.donation_method ?? '',
+      manufactureDate: row.manufacture_date ?? '',
+      shelfLifeDuration: row.shelf_life_duration ?? '',
+      expiryDate: row.expiry_date ?? '',
       status: row.status,
       aiDecision: row.ai_decision,
       aiReason: row.ai_reason,

@@ -181,6 +181,18 @@ app-beneficiary-panel {
   white-space: pre-line;
 }
 
+.quantity-row .muted-note {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-text-muted, #6b7c8a);
+  font-size: var(--font-size-13);
+}
+
+.quantity-row .shelf-life-flag {
+  margin-top: 8px;
+  color: var(--color-action);
+}
+
 .quantity-row.amount-description-row {
   margin-top: 40px;
 }

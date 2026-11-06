@@ -118,6 +118,42 @@
   margin: 35px 0;
 }
 
+.shelf-life-option {
+  margin: -12px 0 28px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-soft, #dce7f2);
+  border-radius: var(--radius-10, 10px);
+  background: var(--bg-page, #f8fafc);
+}
+
+.shelf-life-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  line-height: 1.45;
+}
+
+.shelf-life-checkbox input[type='checkbox'] {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.shelf-life-checkbox small {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-text-quiet, #6b7c8a);
+  font-size: var(--font-size-13);
+}
+
+.store-fields {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-soft, #dce7f2);
+}
+
 .condition-columns {
   display: flex;
   flex-wrap: wrap;

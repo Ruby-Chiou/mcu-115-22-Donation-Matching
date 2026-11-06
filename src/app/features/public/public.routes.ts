@@ -22,6 +22,11 @@ export const publicRoutes: Routes = [
     loadComponent: () => import('../logistics/tracking/tracking.component').then((m) => m.TrackingComponent),
   },
   {
+    path: 'shipping-guide',
+    loadComponent: () =>
+      import('../logistics/shipping-guide/shipping-guide.component').then((m) => m.ShippingGuideComponent),
+  },
+  {
     path: 'thank-you-wall',
     loadComponent: () => import('../thank-you-wall/thank-you-wall.component').then((m) => m.ThankYouWallComponent),
   },

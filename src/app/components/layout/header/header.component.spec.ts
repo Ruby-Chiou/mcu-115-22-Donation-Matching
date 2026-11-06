@@ -88,7 +88,7 @@ describe('HeaderComponent', () => {
     const service = component.navItems.find((item) => item.name === '客服中心');
 
     expect(donor?.sub.map((item) => item.name)).toEqual(['日常捐助', '災害救助', '捐助地圖', '受助機構']);
-    expect(progress?.sub.map((item) => item.name)).toEqual(['捐助紀錄', '配送查詢']);
+    expect(progress?.sub.map((item) => item.name)).toEqual(['捐助紀錄', '配送查詢', '寄送教學']);
     expect(service?.sub.map((item) => item.name)).toEqual(['常見問題', 'AI 客服', '聯絡我們']);
   });
 

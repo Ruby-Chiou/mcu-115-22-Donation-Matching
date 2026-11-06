@@ -76,8 +76,48 @@
         </label>
         <input type="text" name="actualMaterial" [(ngModel)]="actualMaterial" placeholder="例如：統一純水 600ml" required />
         <small class="input-hint"> 請填寫實際準備捐贈的品牌及物資名稱 </small>
-        <!-- 上傳物資照片 -->
-        <label class="label-row"> 上傳物資照片<span>*</span> </label>
+      </div>
+
+      @if (demandReady) {
+        <div class="form-group shelf-life-sync" [class.is-required]="requiresShelfLife">
+          <label>
+            保質期資訊
+            @if (requiresShelfLife) {
+              <span>*</span>
+            }
+          </label>
+          @if (requiresShelfLife) {
+            <p class="input-hint">
+              受助機構已勾選「需要保質期」：請填寫下列欄位，並至少上傳一張能清楚辨識製造／有效日期的照片供 AI 審核。
+            </p>
+            <div class="shelf-life-fields">
+              <label>製造日期<span>*</span></label>
+              <input type="date" name="manufactureDate" [(ngModel)]="manufactureDate" required />
+              <label>保存時長<span>*</span></label>
+              <input
+                type="text"
+                name="shelfLifeDuration"
+                [(ngModel)]="shelfLifeDuration"
+                maxlength="40"
+                placeholder="例如：12 個月、180 天"
+                required
+              />
+              <label>保存期限<span>*</span></label>
+              <input type="date" name="expiryDate" [(ngModel)]="expiryDate" required />
+            </div>
+          } @else {
+            <p class="input-hint">此需求目前<strong>不需</strong>填寫保質期。若機構之後改為需要，重新開啟本表單即可看到必填欄位。</p>
+          }
+        </div>
+      }
+
+      <div class="form-group">
+        <label class="label-row">
+          上傳物資照片<span>*</span>
+          @if (requiresShelfLife) {
+            <small class="input-hint">請確保其中一張能辨識製造或有效日期</small>
+          }
+        </label>
         <div class="image-upload-box">
           <div class="image-upload-area">
             <div class="upload-controls">
@@ -281,6 +321,11 @@
         }
       </div>
       <!-- 確認按鈕-->
+      <p class="shipping-guide-link">
+        寄貨前可先閱讀
+        <a routerLink="/shipping-guide">寄送教學</a>
+        （各物流怎麼寄、審核通過後要看哪裡）。
+      </p>
       <div class="form-buttons">
         <button type="button" class="cancel-button" (click)="cancelForm()">取消</button>
         <button type="submit" class="submit-button" [disabled]="isSubmitting">
@@ -366,6 +411,12 @@
           <p>{{ reviewResult?.reason }}</p>
         }
       </div>
+      @if (donationMethod === '寄送') {
+        <p class="shipping-guide-link">
+          審核通過後再寄貨。各物流寄送步驟請看
+          <a routerLink="/shipping-guide">寄送教學</a>。
+        </p>
+      }
       <div class="success-buttons">
         <button type="button" class="back-button" (click)="goToHistory()">到捐助紀錄看進度</button>
       </div>

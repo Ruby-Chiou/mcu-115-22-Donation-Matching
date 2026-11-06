@@ -420,6 +420,18 @@
       </div>
     </div>
 
+    <!-- 保質期：緊接接受物資狀態 -->
+    <div class="shelf-life-option">
+      <label class="label-row align-title">保質期資訊</label>
+      <label class="shelf-life-checkbox">
+        <input type="checkbox" [(ngModel)]="demand.requireShelfLife" name="requireShelfLife" />
+        <span>
+          需要捐助者提供保質期（製造日期、保存時長、保存期限，並上傳可辨識日期的照片）
+          <small>勾選＝需要；再點一下取消勾選＝不需要</small>
+        </span>
+      </label>
+    </div>
+
     <!-- 緊急優先度 -->
     <label class="label-row align-title">
       緊急優先度
@@ -527,9 +539,9 @@
         (input)="limitSimpleTextLength('recipient', 30)"
       />
 
-      <!-- 接收物資地址 -->
+      <!-- 宅配收件地址：可與超商同時填；僅面交時作會面／收貨參考地址 -->
       <label class="label-row">
-        接收物資地址
+        {{ demand.receiveMethod['寄送'] ? '宅配收件地址' : '收貨／會面地址' }}
         <span class="required">*</span>
         <span class="word-count" *ngIf="demand.address"> {{ demand.address.length }}/35 </span>
       </label>
@@ -543,6 +555,62 @@
         [(ngModel)]="demand.address"
         (input)="limitSimpleTextLength('address', 35)"
       />
+
+      <!-- 超商門市：有勾選寄送時必填；可與宅配地址同時填，不是二選一。僅面交則不需填 -->
+      <div class="store-fields" *ngIf="demand.receiveMethod['寄送']">
+        <label class="label-row align-title">
+          超商取貨門市
+          <span class="required">*</span>
+          <span class="priority-limit-info">
+            與上方宅配地址可同時填寫（非二選一）。有勾選「寄送」時必填；若接收方式只有面交則不必填。
+          </span>
+        </label>
+
+        <label class="label-row">
+          超商品牌
+          <span class="required">*</span>
+        </label>
+        <select
+          class="phone-input"
+          [class.error-input]="submitted && !demand.logisticsStoreChain"
+          [(ngModel)]="demand.logisticsStoreChain"
+          name="logisticsStoreChain"
+        >
+          <option value="">請選擇</option>
+          <option value="7-ELEVEN">7-ELEVEN</option>
+          <option value="全家">全家</option>
+        </select>
+
+        <label class="label-row">
+          門市名稱
+          <span class="required">*</span>
+          <span class="word-count" *ngIf="demand.logisticsStoreName"> {{ demand.logisticsStoreName.length }}/40 </span>
+        </label>
+        <input
+          class="phone-input"
+          maxlength="40"
+          type="text"
+          [class.error-input]="submitted && !demand.logisticsStoreName?.trim()"
+          placeholder="例如：台北某門市"
+          [(ngModel)]="demand.logisticsStoreName"
+          (input)="limitSimpleTextLength('logisticsStoreName', 40)"
+        />
+
+        <label class="label-row">
+          門市地址
+          <span class="required">*</span>
+          <span class="word-count" *ngIf="demand.logisticsStoreAddress"> {{ demand.logisticsStoreAddress.length }}/60 </span>
+        </label>
+        <input
+          class="medium-input"
+          maxlength="60"
+          type="text"
+          [class.error-input]="submitted && !demand.logisticsStoreAddress?.trim()"
+          placeholder="門市完整地址"
+          [(ngModel)]="demand.logisticsStoreAddress"
+          (input)="limitSimpleTextLength('logisticsStoreAddress', 60)"
+        />
+      </div>
     </div>
 
     <!-- 聯絡電話 -->

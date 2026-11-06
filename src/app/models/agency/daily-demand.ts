@@ -90,10 +90,18 @@ export interface DailyDemand {
   // 接收方式
   receiveMethod: DailyReceiveMethod;
   recipient: string; // 收件人
-  address: string; // 接收物資地址
+  address: string; // 接收物資地址（宅配）
   latitude?: number; // 接收物資地址緯度
   longitude?: number; // 接收物資地址經度
   phone: string; // 聯絡電話
+
+  /** 受助者勾選後，捐助者須填保質期三欄，且照片須含可辨識日期 */
+  requireShelfLife?: boolean;
+
+  /** 受助者指定的超商取貨門市（選填；審核通過後才完整揭露給捐助者） */
+  logisticsStoreChain?: '' | '7-ELEVEN' | '全家';
+  logisticsStoreName?: string;
+  logisticsStoreAddress?: string;
 
   // 聯絡時間：平日
   contactTimeWeekday: boolean;

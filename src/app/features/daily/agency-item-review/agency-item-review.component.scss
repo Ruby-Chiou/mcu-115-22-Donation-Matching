@@ -7,7 +7,7 @@
   --text-body: var(--color-text-slate-dark);
   --text-muted: var(--color-text-slate);
   --border: var(--border-soft);
-  --page-bg: var(--bg-page);
+  --page-bg: var(--nav-bg);
   --card-bg: var(--color-white);
 
   display: block;
@@ -36,11 +36,11 @@
 
 .review-list-page h1 {
   margin-bottom: 8px;
-  color: #111827;
-  font-size: var(--font-size-28);
+  color: var(--color-action);
+  font-size: var(--font-size-32);
   font-weight: var(--font-weight-bold);
   line-height: 1.35;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-5);
 }
 
 .review-list-page > header p {

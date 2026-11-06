@@ -34,8 +34,10 @@ textarea {
 
 .page-heading h1 {
   margin: 0 0 clamp(6px, 0.7vh, 12px);
-  color: var(--color-text-slate-night-2);
-  font-size: clamp(28px, 2.6vh, 36px);
+  color: var(--color-action);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-5);
   line-height: var(--line-height-tight);
 }
 

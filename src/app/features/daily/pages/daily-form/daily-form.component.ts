@@ -205,7 +205,10 @@ export class DailyFormComponent implements OnInit, AfterViewInit {
     this.logic.limitTextLength(field, maxLength);
   }
 
-  limitSimpleTextLength(field: 'unit' | 'recipient' | 'address' | 'phone', maxLength: number): void {
+  limitSimpleTextLength(
+    field: 'unit' | 'recipient' | 'address' | 'phone' | 'logisticsStoreName' | 'logisticsStoreAddress',
+    maxLength: number,
+  ): void {
     this.logic.limitSimpleTextLength(field, maxLength);
   }
 

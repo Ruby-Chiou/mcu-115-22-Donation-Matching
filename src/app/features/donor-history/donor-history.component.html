@@ -214,7 +214,15 @@
 
           @if (record.status === 'human_approved' && record.donationMethod === '寄送' && !record.receiptConfirmedAt) {
             <form class="tracking-form logistics-edit-form" (submit)="$event.preventDefault(); saveTracking(record)">
-              <p class="shortcut-hint">審核已通過：先填物流單號可自動辨識物流公司（仍可手動改）。超商請再填門市與地址。</p>
+              <p class="shortcut-hint">
+                審核已通過：先填物流單號可自動辨識物流公司（仍可手動改）。
+                @if (record.demandStoreName) {
+                  受助機構已指定超商門市，系統會帶入；仍可微調。
+                } @else {
+                  若選超商且機構未指定門市，請自行填寫門市與地址。
+                }
+                <a routerLink="/shipping-guide">寄送教學</a>
+              </p>
               <div class="logistics-field">
                 <label for="tracking-no">物流單號</label>
                 <input
@@ -312,8 +320,28 @@
             }
 
             @if (record.status === 'human_approved' && record.address) {
-              <dt>收件地址</dt>
+              <dt>宅配收件地址</dt>
               <dd>{{ record.address }}</dd>
+            }
+
+            @if (record.status === 'human_approved' && (record.demandStoreName || record.demandStoreAddress)) {
+              <dt>超商取貨門市</dt>
+              <dd>
+                @if (record.demandStoreChain) { {{ record.demandStoreChain }} · }
+                {{ record.demandStoreName || '（門市名稱未填）' }}
+                @if (record.demandStoreAddress) {
+                  <br />{{ record.demandStoreAddress }}
+                }
+              </dd>
+            }
+
+            @if (record.manufactureDate || record.shelfLifeDuration || record.expiryDate) {
+              <dt>保質期</dt>
+              <dd>
+                @if (record.manufactureDate) { 製造 {{ record.manufactureDate }} }
+                @if (record.shelfLifeDuration) { ／保存 {{ record.shelfLifeDuration }} }
+                @if (record.expiryDate) { ／期限 {{ record.expiryDate }} }
+              </dd>
             }
 
             <dt>AI 審核</dt>

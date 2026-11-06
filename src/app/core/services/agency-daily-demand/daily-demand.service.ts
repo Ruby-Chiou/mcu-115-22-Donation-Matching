@@ -41,6 +41,10 @@ interface DailyDemandRow {
   longitude: number | null;
   phone: string;
   note: string | null;
+  require_shelf_life?: boolean | null;
+  logistics_store_chain?: string | null;
+  logistics_store_name?: string | null;
+  logistics_store_address?: string | null;
 
   imageFileNames: unknown;
   serialNo: number | null;
@@ -126,6 +130,10 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
       phone: row.phone,
       note: row.note ?? '',
       brand: row.brand ?? '',
+      requireShelfLife: this.toRequireShelfLife(row),
+      logisticsStoreChain: this.toStoreChain(row.logistics_store_chain),
+      logisticsStoreName: row.logistics_store_name ?? '',
+      logisticsStoreAddress: row.logistics_store_address ?? '',
 
       serviceTargets: normalizedTargets.serviceTargets,
       customServiceTargets: normalizedTargets.customServiceTargets,
@@ -224,6 +232,10 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
       longitude: demand.longitude ?? null,
       phone: demand.phone,
       note: demand.note ?? null,
+      require_shelf_life: !!demand.requireShelfLife,
+      logistics_store_chain: demand.logisticsStoreChain || null,
+      logistics_store_name: demand.logisticsStoreName?.trim() || null,
+      logistics_store_address: demand.logisticsStoreAddress?.trim() || null,
 
       imageFileNames: demand.imageFileNames ?? [],
 
@@ -499,5 +511,18 @@ export class DailyDemandService implements DemandRepository<DailyDemand> {
     }
 
     return methods;
+  }
+
+  private toStoreChain(value: string | null | undefined): DailyDemand['logisticsStoreChain'] {
+    if (value === '7-ELEVEN' || value === '全家') {
+      return value;
+    }
+    return '';
+  }
+
+  private toRequireShelfLife(row: DailyDemandRow): boolean {
+    const extended = row as DailyDemandRow & { requireShelfLife?: boolean | string | number | null };
+    const raw = extended.require_shelf_life ?? extended.requireShelfLife;
+    return raw === true || raw === 'true' || raw === 1 || raw === '1';
   }
 }

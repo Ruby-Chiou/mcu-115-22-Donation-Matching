@@ -217,8 +217,12 @@ export class DonorHistoryComponent implements OnInit {
       this.carrierDraft.set('');
       this.carrierAutoFilled.set(false);
     }
-    this.storeNameDraft.set(record.logisticsStoreName || '');
-    this.storeAddressDraft.set(record.logisticsStoreAddress || '');
+    this.storeNameDraft.set(record.logisticsStoreName || record.demandStoreName || '');
+    this.storeAddressDraft.set(record.logisticsStoreAddress || record.demandStoreAddress || '');
+    if (!record.logisticsCarrier && record.demandStoreChain && (record.demandStoreChain === '7-ELEVEN' || record.demandStoreChain === '全家')) {
+      this.carrierDraft.set(record.demandStoreChain);
+      this.carrierAutoFilled.set(true);
+    }
     this.trackingMessage.set('');
     this.nameModeDraft.set(record.thankNameMode);
     this.publicDraft.set(record.thankPublic);

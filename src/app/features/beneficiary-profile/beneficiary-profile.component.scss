@@ -12,7 +12,9 @@
 .eyebrow {
   margin: 0 0 8px;
   color: var(--color-link);
+  font-size: var(--font-size-24);
   font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-wide, 0.04em);
 }
 
 .directory-header h1 {

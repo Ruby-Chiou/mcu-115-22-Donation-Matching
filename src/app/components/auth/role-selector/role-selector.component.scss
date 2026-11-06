@@ -66,14 +66,17 @@
 }
 
 .role-title {
-  font-size: var(--font-size-20);
+  font-size: var(--font-size-18);
   font-weight: var(--font-weight-bold);
   color: #17394c;
+  line-height: var(--line-height-normal);
 }
 
 .role-subtitle {
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-slate-blue);
+  letter-spacing: 0.04em;
   line-height: var(--line-height-normal);
 }
 

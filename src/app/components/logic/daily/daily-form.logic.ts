@@ -73,6 +73,10 @@ export class DailyFormLogic extends DailyFormLogicBase {
         recipient: data.recipient ?? '',
         address: data.address ?? '',
         phone: data.phone ?? '',
+        requireShelfLife: !!data.requireShelfLife,
+        logisticsStoreChain: data.logisticsStoreChain || '',
+        logisticsStoreName: data.logisticsStoreName ?? '',
+        logisticsStoreAddress: data.logisticsStoreAddress ?? '',
         image: [...(data.image ?? [])],
         imageFileNames: [...(data.imageFileNames ?? [])],
       };
@@ -223,8 +227,15 @@ export class DailyFormLogic extends DailyFormLogicBase {
     this.hasServiceTarget = this.demand.serviceTargets.length > 0 || this.demand.customServiceTargets.some((target) => target.trim());
 
     const hasReceiveMethod = this.demand.receiveMethod.寄送 || this.demand.receiveMethod.面交;
+    const shippingSelected = !!this.demand.receiveMethod.寄送;
+    const storeIncomplete =
+      shippingSelected &&
+      (!this.demand.logisticsStoreChain ||
+        !this.demand.logisticsStoreName?.trim() ||
+        !this.demand.logisticsStoreAddress?.trim());
 
-    const invalidReceiveInfo = !hasReceiveMethod || !this.demand.recipient || !this.demand.address;
+    const invalidReceiveInfo =
+      !hasReceiveMethod || !this.demand.recipient || !this.demand.address || storeIncomplete;
 
     if (
       !this.demand.item ||
@@ -284,9 +295,12 @@ export class DailyFormLogic extends DailyFormLogicBase {
         };
       }
 
-      if (!this.demand.recipient || !this.demand.address) {
+      if (!this.demand.recipient || !this.demand.address || storeIncomplete) {
         return {
           scrollTarget: 'receive-info',
+          notice: storeIncomplete
+            ? '有勾選寄送時，宅配地址與超商門市（品牌／名稱／地址）都要填，兩者可同時提供。'
+            : undefined,
         };
       }
 
@@ -384,7 +398,7 @@ export class DailyFormLogic extends DailyFormLogicBase {
       return {};
     } catch (error) {
       console.error('修改日常物資需求失敗：', error);
-      return { notice: '修改失敗，請稍後再試。' };
+      return { notice: this.saveFailureNotice(error) };
     }
   }
 
@@ -417,11 +431,19 @@ export class DailyFormLogic extends DailyFormLogicBase {
       return {};
     } catch (error) {
       console.error('新增日常物資需求失敗：', error);
-      return { notice: '新增失敗，請稍後再試。' };
+      return { notice: this.saveFailureNotice(error, '新增') };
     }
   }
 
   calculateExpectedOffShelfDate(publishedDate: Date, priority: DailyDemand['priority']): string {
     return calculateExpectedOffShelfAt(publishedDate, priority, DAILY_OFF_SHELF_DAYS);
+  }
+
+  private saveFailureNotice(error: unknown, action: '新增' | '修改' = '修改'): string {
+    const message = error && typeof error === 'object' && 'message' in error ? String((error as { message?: unknown }).message ?? '') : '';
+    if (/require_shelf_life|logistics_store_/i.test(message)) {
+      return `${action}失敗：資料庫尚未套用保質期／超商門市欄位，請先執行 migration 20261106000001 後再儲存。`;
+    }
+    return `${action}失敗，請稍後再試。`;
   }
 }

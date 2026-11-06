@@ -25,10 +25,11 @@
   h2 {
     margin: 0 0 10px;
 
-    color: var(--color-text-main);
+    color: var(--color-action);
 
-    font-size: var(--font-size-30);
+    font-size: var(--font-size-32);
     font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-5);
   }
 
   p {
@@ -74,7 +75,7 @@
   margin-bottom: 25px;
 
   i {
-    color: var(--color-brand-primary);
+    color: var(--color-action);
     font-size: var(--font-size-22);
   }
 
@@ -135,9 +136,9 @@
       box-shadow 0.2s ease;
 
     &:focus {
-      border-color: var(--color-brand-primary);
+      border-color: var(--color-action);
 
-      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+      box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
     }
   }
 }
@@ -168,7 +169,7 @@
     border: none;
     border-radius: var(--radius-8);
 
-    background-color: var(--color-brand-primary);
+    background-color: var(--color-action);
     color: var(--color-white);
 
     font-size: var(--font-size-16);
@@ -182,7 +183,7 @@
 
     &:hover {
       transform: translateY(-2px);
-      background-color: var(--color-action-deep);
+      background-color: var(--color-action-dark);
     }
 
     &:disabled {
@@ -215,7 +216,7 @@
   i {
     margin-top: 2px;
 
-    color: var(--color-brand-primary);
+    color: var(--color-action);
 
     font-size: var(--font-size-18);
   }
@@ -298,7 +299,7 @@
   }
 
   .status {
-    color: #16803c;
+    color: var(--color-success);
     font-size: var(--font-size-16);
     font-weight: var(--font-weight-semibold);
     line-height: 1.45;
@@ -369,7 +370,7 @@
 
     border-radius: var(--radius-12);
 
-    background-color: var(--color-brand-primary);
+    background-color: var(--color-action);
 
     color: var(--color-white);
 
@@ -387,7 +388,7 @@
   }
 
   span {
-    color: var(--color-brand-primary);
+    color: var(--color-action);
 
     font-size: var(--font-size-14);
   }
@@ -408,7 +409,7 @@
 }
 
 .text-link {
-  color: var(--color-brand-primary);
+  color: var(--color-action);
   font-size: var(--font-size-14);
 }
 
@@ -458,13 +459,13 @@
 
   button {
     border: none;
-    background: var(--color-brand-primary);
+    background: var(--color-action);
     color: var(--color-white);
     cursor: pointer;
   }
 
   .notice-link {
-    color: var(--color-brand-primary);
+    color: var(--color-action);
     background: transparent;
   }
 }
