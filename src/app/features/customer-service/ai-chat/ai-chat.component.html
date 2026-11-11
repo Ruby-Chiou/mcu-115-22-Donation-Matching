@@ -37,7 +37,9 @@
 
         <div class="message-row" [class.user-row]="item.sender === 'user'" [class.assistant-row]="item.sender === 'assistant'">
           <div class="message-bubble" [class.user-message]="item.sender === 'user'" [class.assistant-message]="item.sender === 'assistant'">
-            {{ item.content }}
+            @if (item.sender === 'assistant') {
+            <markdown [data]="item.content"></markdown>
+            } @else { {{ item.content }} }
           </div>
         </div>
 

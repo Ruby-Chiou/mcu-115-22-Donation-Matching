@@ -13,7 +13,7 @@
    主容器：固定於畫面
 ===================== */
 .support-container {
-   display: grid;
+  display: grid;
   width: min(1000px, 100%);
   min-height: 630px;
   height: calc(100vh - 160px);
@@ -133,10 +133,11 @@
   max-width: min(75%, 620px);
   padding: 11px 15px;
   font-size: var(--font-size-14);
-  line-height: 1.65;
+  line-height: 1;
   white-space: pre-wrap;
   word-break: break-word;
   border-radius: var(--radius-12);
+  overflow-wrap: anywhere;
 
   &.assistant-message {
     color: var(--color-text-charcoal);
@@ -149,6 +150,117 @@
     background: var(--color-link-bright);
     border-bottom-right-radius: 4px;
   }
+}
+
+/* Markdown 內部樣式，不影響外層對話框 */
+.message-bubble markdown {
+  display: block;
+}
+
+/* 段落 */
+.message-bubble markdown p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.message-bubble markdown p + p {
+  margin-top: 3px;
+}
+
+/* 清單 */
+.message-bubble markdown ul,
+.message-bubble markdown ol {
+  padding-left: 20px;
+  margin: 3px 0;
+  line-height: 1.4;
+}
+
+.message-bubble markdown li {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 標題 */
+.message-bubble markdown h1,
+.message-bubble markdown h2,
+.message-bubble markdown h3,
+.message-bubble markdown h4 {
+  margin: 4px 0 2px;
+  line-height: 1.4;
+}
+
+/* 粗體 */
+.message-bubble markdown strong {
+  font-weight: 700;
+}
+
+/* 程式碼 */
+.message-bubble markdown pre {
+  overflow-x: auto;
+  padding: 8px;
+  margin: 4px 0;
+  border-radius: 8px;
+}
+
+.message-bubble markdown code {
+  overflow-wrap: anywhere;
+}
+
+/* 只調整 AI 回覆，不影響使用者訊息 */
+.message-bubble.assistant-message {
+  line-height: 1.4;
+  white-space: normal;
+}
+
+/* Markdown 內容 */
+.message-bubble.assistant-message markdown {
+  display: block;
+  width: 100%;
+  white-space: normal;
+}
+
+.message-bubble.assistant-message markdown p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.message-bubble.assistant-message markdown p + p {
+  margin-top: 3px;
+}
+
+.message-bubble.assistant-message markdown ul,
+.message-bubble.assistant-message markdown ol {
+  margin: 3px 0;
+  padding-left: 20px;
+  line-height: 1.4;
+}
+
+.message-bubble.assistant-message markdown li {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Markdown 標題與內文間距 */
+.message-bubble.assistant-message markdown h1,
+.message-bubble.assistant-message markdown h2,
+.message-bubble.assistant-message markdown h3,
+.message-bubble.assistant-message markdown h4 {
+  margin-top: 4px;
+  margin-bottom: 0;
+  line-height: 1.35;
+}
+
+.message-bubble.assistant-message markdown h1 + p,
+.message-bubble.assistant-message markdown h2 + p,
+.message-bubble.assistant-message markdown h3 + p,
+.message-bubble.assistant-message markdown h4 + p {
+  margin-top: 0;
+}
+
+.message-bubble.assistant-message markdown p {
+  margin-top: 0;
+  margin-bottom: 3px;
+  line-height: 1.4;
 }
 
 /* AI 回應中的 Loading 點 */

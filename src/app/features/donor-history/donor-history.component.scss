@@ -336,50 +336,6 @@
   }
 }
 
-.progress-track {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-xs);
-  list-style: none;
-  margin: 0 0 1.5rem;
-  padding: 0;
-
-  li {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2xs);
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--color-text-light);
-    position: relative;
-
-    &.done,
-    &.current {
-      color: var(--color-action);
-      font-weight: var(--font-weight-semibold);
-    }
-  }
-
-  .dot {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: var(--radius-circle);
-    background: var(--border-slate);
-    border: 2px solid var(--border-slate);
-  }
-
-  li.done .dot,
-  li.current .dot {
-    background: var(--color-action);
-    border-color: var(--color-action);
-  }
-
-  li.current .dot {
-    box-shadow: 0 0 0 4px var(--bg-action-glaze);
-  }
-}
-
 .detail-list {
   display: grid;
   grid-template-columns: 7rem 1fr;
@@ -428,7 +384,10 @@
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .btn-primary {

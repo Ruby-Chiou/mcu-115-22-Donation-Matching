@@ -28,6 +28,7 @@
     "@cantoo/pdf-lib": "^2.11.1",
     "@supabase/supabase-js": "^2.115.0",
     "leaflet": "^1.9.4",
+    "ngx-markdown": "^21.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

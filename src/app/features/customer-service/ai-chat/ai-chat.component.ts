@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AiChatService } from '../../../core/services/backend-ai-chat/ai-chat.service.service';
 import { APP_ROLE_LABEL } from '../../../models/auth/app-role';
 import { AuthSessionService } from '../../../core/services/auth/auth-session.service';
+import { MarkdownModule } from 'ngx-markdown';
 
 interface ChatMessage {
   sender: 'user' | 'assistant';
@@ -13,7 +14,7 @@ interface ChatMessage {
 @Component({
   selector: 'app-ai-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [MarkdownModule, CommonModule, FormsModule],
   templateUrl: './ai-chat.component.html',
   styleUrl: './ai-chat.component.scss',
 })
